@@ -1055,9 +1055,8 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "links": [],
- "modified": "2021-01-22 20:27:11.418690",
- "modified_by": "Administrator",
+ "modified": "2021-12-28 22:59:17.473553",
+ "modified_by": "hassaan.khalid@gourmetpakistan.com",
  "module": "Buying",
  "name": "Purchase Order",
  "owner": "Administrator",
@@ -1114,5 +1113,7 @@
  "sort_order": "DESC",
  "timeline_field": "supplier",
  "title_field": "supplier",
- "track_changes": 1
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
 }
