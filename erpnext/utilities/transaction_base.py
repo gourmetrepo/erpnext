@@ -18,15 +18,16 @@ class TransactionBase(StatusUpdater):
 		if frappe.flags.in_import and self.posting_date:
 			self.set_posting_time = 1
 
-		if not getattr(self, 'set_posting_time', None):
-			now = now_datetime()
-			self.posting_date = now.strftime('%Y-%m-%d')
-			self.posting_time = now.strftime('%H:%M:%S.%f')
-		elif self.posting_time:
-			try:
-				get_time(self.posting_time)
-			except ValueError:
-				frappe.throw(_('Invalid Posting Time'))
+		# if not getattr(self, 'set_posting_time', None):
+		# 	now = now_datetime()
+		# 	self.posting_date = now.strftime('%Y-%m-%d')
+		# 	self.posting_time = now.strftime('%H:%M:%S.%f')
+		# elif self.posting_time:
+		# 	try:
+		# 		get_time(self.posting_time)
+		# 	except ValueError:
+		# 		frappe.throw(_('Invalid Posting Time'))
+  
 
 	def add_calendar_event(self, opts, force=False):
 		if cstr(self.contact_by) != cstr(self._prev.contact_by) or \
