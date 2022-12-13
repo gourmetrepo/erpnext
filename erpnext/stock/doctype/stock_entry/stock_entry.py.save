@@ -110,21 +110,14 @@ class StockEntry(StockController):
 		if self.work_order and self.purpose == "Material Consumption for Manufacture":
 			self.validate_work_order_status()
 
-		frappe.log_error('In Stock Entry Before update_work_order', 'Stock Entry')
-		self.update_work_order()
-		frappe.log_error('In Stock Entry Before update_stock_ledger', 'Stock Entry')
+		
+self.update_work_order()
 		self.update_stock_ledger()
-		frappe.log_error('In Stock Entry Before make_gl_entries_on_cancel', 'Stock Entry')
 		self.make_gl_entries_on_cancel()
-		frappe.log_error('In Stock Entry Before update_cost_in_project', 'Stock Entry')
 		self.update_cost_in_project()
-		frappe.log_error('In Stock Entry Before update_transferred_qty', 'Stock Entry')
 		self.update_transferred_qty()
-		frappe.log_error('In Stock Entry Before update_quality_inspection', 'Stock Entry')
 		self.update_quality_inspection()
-		frappe.log_error('In Stock Entry Before delete_auto_create_batches', 'Stock Entry')
 		self.delete_auto_created_batches()
-		frappe.log_error('In Stock Entry delete_linked_stock_entry', 'Stock Entry')
 		self.delete_linked_stock_entry()
 
 	def set_job_card_data(self):
