@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "EMP-CKIN-.MM.-.YYYY.-.######",
  "creation": "2019-06-10 11:56:34.536413",
@@ -61,7 +60,6 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Time",
-   "permlevel": 1,
    "reqd": 1
   },
   {
@@ -107,8 +105,7 @@
    "label": "Shift Actual End"
   }
  ],
- "links": [],
- "modified": "2020-01-23 04:57:42.551355",
+ "modified": "2021-12-25 23:25:34.046851",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Checkin",
