@@ -13,12 +13,12 @@
   "reference_type",
   "reference_name",
   "section_break_7",
+  "item_name",
   "item_code",
   "item_serial_no",
   "batch_no",
   "sample_size",
   "column_break1",
-  "item_name",
   "description",
   "status",
   "section_break_14",
@@ -65,15 +65,13 @@
    "label": "Inspection Type",
    "oldfieldname": "inspection_type",
    "oldfieldtype": "Select",
-   "options": "\nIncoming\nOutgoing\nIn Process",
-   "reqd": 1
+   "options": "\nIncoming\nOutgoing\nIn Process"
   },
   {
    "fieldname": "reference_type",
    "fieldtype": "Select",
    "label": "Reference Type",
-   "options": "\nPurchase Receipt\nPurchase Invoice\nDelivery Note\nSales Invoice\nStock Entry",
-   "reqd": 1
+   "options": "\nPurchase Receipt\nPurchase Invoice\nDelivery Note\nSales Invoice\nStock Entry"
   },
   {
    "fieldname": "reference_name",
@@ -84,8 +82,7 @@
    "label": "Reference Name",
    "oldfieldname": "purchase_receipt_no",
    "oldfieldtype": "Link",
-   "options": "reference_type",
-   "reqd": 1
+   "options": "reference_type"
   },
   {
    "fieldname": "section_break_7",
@@ -138,8 +135,7 @@
    "fieldname": "item_name",
    "fieldtype": "Data",
    "in_global_search": 1,
-   "label": "Item Name",
-   "read_only": 1
+   "label": "Item Name"
   },
   {
    "fieldname": "description",
@@ -232,10 +228,8 @@
  ],
  "icon": "fa fa-search",
  "idx": 1,
- "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-09-12 16:11:31.910508",
+ "modified": "2023-01-11 13:15:18.696593",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Quality Inspection",
