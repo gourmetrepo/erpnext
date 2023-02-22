@@ -9,6 +9,14 @@ frappe.ui.form.on("Payment Request", {
 				query: "erpnext.setup.doctype.party_type.party_type.get_party_type",
 			};
 		});
+	},
+	//umair added code for series automapped for Quintech Sciences
+	company: function(frm) {
+		if(frm.doc.company == "QuinTech Sciences")
+		{
+			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+			frm.set_value("naming_series","PRQQS-.YY.-")
+		}
 	}
 })
 

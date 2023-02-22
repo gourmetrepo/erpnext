@@ -92,6 +92,14 @@ frappe.ui.form.on("Delivery Note", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+	},
+	//umair added code for series automapped for Quintech Sciences
+	company: function(frm) {
+		if(frm.doc.company == "QuinTech Sciences")
+		{
+			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+			frm.set_value("naming_series","DNQS-.YY.-")
+		}
 	}
 });
 

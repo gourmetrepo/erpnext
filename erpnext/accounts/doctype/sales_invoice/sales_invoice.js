@@ -703,6 +703,12 @@ frappe.ui.form.on('Sales Invoice', {
 				}
 			})
 		}
+		//umair added code for series automapped for Quintech Sciences
+		if(frm.doc.company == "QuinTech Sciences")
+		{
+			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+			frm.set_value("naming_series","SIQS-.YY.-")
+		}
 	},
 
 	project: function(frm){

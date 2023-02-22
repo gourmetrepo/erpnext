@@ -528,5 +528,14 @@ frappe.ui.form.on("Purchase Invoice", {
 			erpnext.buying.get_default_bom(frm);
 		}
 		frm.toggle_reqd("supplier_warehouse", frm.doc.is_subcontracted==="Yes");
+	},
+	//umair added code for series automapped for Quintech Sciences
+	company: function(frm) {
+		frm.trigger("toggle_display_account_head");
+		if(frm.doc.company == "QuinTech Sciences")
+		{
+			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+			frm.set_value("naming_series","PIQS-.YY.-")
+		}
 	}
 })
