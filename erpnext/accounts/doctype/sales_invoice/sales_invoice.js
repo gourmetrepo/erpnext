@@ -802,7 +802,7 @@ frappe.ui.form.on('Sales Invoice', {
 	refresh: function(frm) {
 		if (frm.doc.queue_status == 'Queued'){
             $('.primary-action').hide();
-			
+		}
 		if (frappe.boot.active_domains.includes("Healthcare")){
 			frm.set_df_property("patient", "hidden", 0);
 			frm.set_df_property("patient_name", "hidden", 0);
