@@ -13,7 +13,7 @@ class AccountSegmentData(Document):
 
 @frappe.whitelist()
 def calculate_segment_profit():
-	bgroup = ['CSD (Carbonated Soft Drinks)','Confectionery','Water','Juice','19 Ltr','Other']
+	bgroup = ['CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other']
 	form_body = get_post_params()
 	if form_body.get('date'):
 		date_yesterday = form_body.get('date')
@@ -24,12 +24,14 @@ def calculate_segment_profit():
 	b_group_data = []
 	for single_unit in units:
 		sale_bgroup = get_unit_sales_bgroup(single_unit,date_yesterday)
-		print(type(sale_bgroup))
+		count = 0
 		for index,bg in enumerate(bgroup):			
-			if(bg in str(sale_bgroup)):
-				b_group_data.append(sale_bgroup[index])
-			else:
+			if bg not in str(sale_bgroup):
 				b_group_data.append({"business_group":bg,'amount':1})
+			else:
+				print(sale_bgroup[count])
+				b_group_data.append(sale_bgroup[count])
+				count = count + 1
 
 
 		for coa in units[single_unit].get('segment'):
@@ -46,7 +48,7 @@ def get_unit_sales_bgroup(unit,date):
 	INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
 	 where 
 	DATE(A.`creation`) between '{0}' AND '{0}' AND C.company = '{1}' AND
-	`business_group` IN ('CSD (Carbonated Soft Drinks)','Confectionery','Water')
+	`business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')
 	group by `business_group`
 	""".format(date,unit),as_dict=True)
 	
@@ -65,18 +67,18 @@ def get_segment_gl_data(account_title,account,date,unit,sale_bgroup):
 		FROM `tabGL Entry` WHERE account IN {0}  AND company='{2}' 
 		AND DATE(creation) BETWEEN '{1}' AND '{1}'
 		""".format(condition,date,unit),as_dict=True)
+	
 	for bgroup_data in sale_bgroup:		
-		print(bgroup_data)
 		if data:
 			if data[0].account_value != None:
 				Amount = (data[0].account_value * bgroup_data.get('amount'))/100
 			else:
-				Amount = (1 * bgroup_data.get('amount'))/100
+				Amount = 0
 		else:
-			Amount = (1 * bgroup_data.get('amount'))/100
+			Amount = 0
 				#business group wise sale_bgroup (account_value*busines group amount/100) 
 				# put in bussiness group as segment in data base 
-		print(Amount)
+
 		save_doc = {
 			'doctype':'Account Segment Data',
 			'segment':bgroup_data.get('business_group'),
@@ -86,5 +88,7 @@ def get_segment_gl_data(account_title,account,date,unit,sale_bgroup):
 			'date':date,
 			'account_value':Amount
 		}
+		# print(save_doc)
 		data = frappe.get_doc(save_doc).save(ignore_permissions=True)
-		print('End data')
+		frappe.db.commit()
+		# print('End data')

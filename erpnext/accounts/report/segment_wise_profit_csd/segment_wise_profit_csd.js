@@ -15,7 +15,7 @@ frappe.query_reports["Segment Wise Profit CSD"] = {
 		{
 			fieldname:"to_date",
 			reqd: 1,
-			default: frappe.datetime.month_end(),
+			default: frappe.datetime.add_days(frappe.datetime.get_today(), 10),
 			label: __("To Date"),
 			fieldtype: "Date",
 		},				

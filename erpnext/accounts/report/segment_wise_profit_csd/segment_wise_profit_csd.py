@@ -22,12 +22,12 @@ def execute(filters=None):
 	data = []
 	data = frappe.db.sql(""" 
 		SELECT `account`,
-			SUM(IF (`segment`='CSD' , `account_value`,0)) as csd, 
-			SUM(IF (`segment`='JUICES' , `account_value` ,0))as juices,
-			SUM(IF (`segment`='WATER' , `account_value`,0))AS  water,
-			SUM(IF (`segment`='Candy&Confectionary' , `account_value`,0)) AS  candyconfectionary,
-			SUM(IF (`segment`='Concentrates' , `account_value` ,0)) AS concentrates,
-			SUM(IF (`segment`='19 LTR.'  ,`account_value`,0) ) as 19ltr,
+			SUM(IF (`segment`='CSD (Carbonated Soft Drinks)' , `account_value`,0)) as csd, 
+			SUM(IF (`segment`='Juice' , `account_value` ,0))as juices,
+			SUM(IF (`segment`='Water' , `account_value`,0))AS  water,
+			SUM(IF (`segment`='Confectionery' , `account_value`,0)) AS  candyconfectionary,
+			SUM(IF (`segment`='Concentrate' , `account_value` ,0)) AS concentrates,
+			SUM(IF (`segment`='19 Ltr'  ,`account_value`,0) ) as 19ltr,
 			SUM(IF (`segment`='Other' , `account_value` ,0)) as other
 		FROM `tabAccount Segment Data`
 		WHERE date BETWEEN '{from_date}' and '{to_date}' 
