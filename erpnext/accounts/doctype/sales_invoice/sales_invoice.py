@@ -152,6 +152,7 @@ class SalesInvoice(SellingController):
 	
 	def submit(self):
 		time.sleep(1)
+		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Queued' WHERE `name`='{docname}';".format(docname=self.name))
 		frappe.db.commit()
 		self.queue_action('submit',queue_name="si_tertiary")
 
@@ -217,7 +218,7 @@ class SalesInvoice(SellingController):
 		# Healthcare Service Invoice.
 		domain_settings = frappe.get_doc('Domain Settings')
 		active_domains = [d.domain for d in domain_settings.active_domains]
-
+		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
 
