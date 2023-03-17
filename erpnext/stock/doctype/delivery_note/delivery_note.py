@@ -426,6 +426,7 @@ class DeliveryNote(SellingController):
 	def make_return_invoice(self):
 		try:
 			return_invoice = make_sales_invoice(self.name)
+			return_invoice.delivery_note_reference=self.name
 			return_invoice.is_return = True
 			return_invoice.save()
 			return_invoice.submit()
