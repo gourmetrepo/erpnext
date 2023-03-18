@@ -525,7 +525,7 @@ def make_sales_invoice_return(delivery_note):
 	savedoc =	make_sales_invoice(source_name=delivery_note)
 	savedoc.save(ignore_permissions=True)
 	savedoc.submit()
-	frappe.db.sql("UPDATE `tabDelivery Note Item` SET against_sales_invoice ='{sale_invoice}' WHERE `parent`='{docname}';".format(docname=source_name,sale_invoice=savedoc.name))
+	frappe.db.sql("UPDATE `tabDelivery Note Item` SET against_sales_invoice ='{sale_invoice}' WHERE `parent`='{docname}';".format(sale_invoice=savedoc.name,docname=delivery_note))
 
 
 @frappe.whitelist()
