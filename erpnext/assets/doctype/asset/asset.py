@@ -33,7 +33,13 @@ class Asset(AccountsController):
 		self.set_status()
 		self.make_asset_movement()
 		if not self.booked_fixed_asset and self.validate_make_gl_entry():
-			self.make_gl_entries()
+			#self.make_gl_entries()
+			try:
+				frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+			except Exception as e:
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 
 	def before_cancel(self):
 		self.cancel_auto_gen_movement()
@@ -528,7 +534,7 @@ class Asset(AccountsController):
 		purchase_document = self.get_purchase_document()
 		fixed_asset_account, cwip_account = self.get_fixed_asset_account(), self.get_cwip_account()
 
-		if (purchase_document and self.purchase_receipt_amount and self.available_for_use_date <= nowdate()):
+		if (purchase_document and self.purchase_receipt_amount and getdate(self.available_for_use_date) <= getdate(nowdate())):
 
 			gl_entries.append(self.get_gl_dict({
 				"account": cwip_account,
@@ -599,7 +605,13 @@ def make_post_gl_entry():
 
 			for asset in assets:
 				doc = frappe.get_doc('Asset', asset)
-				doc.make_gl_entries()
+				#doc.make_gl_entries()
+				try:
+					frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+				except Exception as e:
+					traceback = frappe.get_traceback()
+					frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+					doc.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 
 def get_asset_naming_series():
 	meta = frappe.get_meta('Asset')

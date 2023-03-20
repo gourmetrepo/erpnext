@@ -8,6 +8,27 @@ frappe.ui.form.on('Payment Entry', {
 			if (!frm.doc.paid_from) frm.set_value("paid_from_account_currency", null);
 			if (!frm.doc.paid_to) frm.set_value("paid_to_account_currency", null);
 		}
+		if(frm.doc.payment_order){
+			frm.set_df_property("party", "read_only", 1);
+			frm.set_df_property("party_name", "read_only", 1);
+			var doc_ref = frappe.meta.get_docfield("Payment Entry Reference","reference_doctype", frm.doc.name);
+			doc_ref.read_only = 1;
+			var ref_name = frappe.meta.get_docfield("Payment Entry Reference","reference_name", frm.doc.name);
+			ref_name.read_only = 1;
+		}
+		if(frm.doc.mode_of_payment=='Cheque'){
+			frm.set_df_property('cheque_number', 'reqd', 1);
+			frm.set_query("cheque_number", function() {
+				return{
+					filters: {
+						"status": 'Not Used',
+						"company_account": frm.doc.paid_from
+					}								
+				}
+			});
+		}else{
+			frm.set_df_property('cheque_number', 'reqd', 0);
+		}
 	},
 
 	setup: function(frm) {
@@ -155,6 +176,22 @@ frappe.ui.form.on('Payment Entry', {
 		frm.events.hide_unhide_fields(frm);
 		frm.events.set_dynamic_labels(frm);
 		frm.events.show_general_ledger(frm);
+		if (frm.doc.status == 'Submitted' && frm.doc.docstatus == 1 && frm.doc.payment_type == "Pay") {
+			frm.add_custom_button(__('Is Paid'), function () {
+				frappe.call({
+					method: "erpnext.accounts.doctype.payment_entry.payment_entry.Update_payment_entry_status",
+					args: {
+						payment_entry_no: frm.doc.name,
+					},
+					freeze: true,
+					callback: function(r) {
+						console.log(r)
+						if(r.message) {
+						}
+					}
+				});
+			});
+		}
 	},
 
 	validate_company: (frm) => {
@@ -408,7 +445,7 @@ frappe.ui.form.on('Payment Entry', {
 										(r.message['account_type'] == "Bank" ? 1 : 0));
 									if(!frm.doc.received_amount && frm.doc.paid_amount)
 										frm.events.paid_amount(frm);
-								} else if(frm.doc.payment_type=="Pay" && currency_field=="paid_from_account_currency") {
+								} else if(frm.doc.payment_type=="Pay" && frm.doc.payment_type=="Cheque" && currency_field=="paid_from_account_currency") {
 									frm.toggle_reqd(["reference_no", "reference_date"],
 										(r.message['account_type'] == "Bank" ? 1 : 0));
 

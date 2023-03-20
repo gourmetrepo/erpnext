@@ -230,8 +230,14 @@ class StockController(AccountsController):
 		return stock_ledger
 
 	def make_batches(self, warehouse_field):
+		v_rate=0.00
 		'''Create batches if required. Called before submit'''
 		for d in self.items:
+			if self.doctype=='Delivery Note':
+				v_rate=	d.rate
+			else:
+				v_rate=	d.valuation_rate
+
 			if d.get(warehouse_field) and not d.batch_no:
 				has_batch_no, create_new_batch = frappe.db.get_value('Item', d.item_code, ['has_batch_no', 'create_new_batch'])
 				if has_batch_no and create_new_batch:
@@ -239,6 +245,8 @@ class StockController(AccountsController):
 						doctype='Batch',
 						item=d.item_code,
 						supplier=getattr(self, 'supplier', None),
+						company=getattr(self, 'company', None),
+						valuation_rate= v_rate,
 						reference_doctype=self.doctype,
 						reference_name=self.name)).insert().name
 
@@ -461,7 +469,7 @@ def get_future_stock_vouchers(posting_date, posting_time, for_warehouses=None, f
 	for d in frappe.db.sql("""select distinct sle.voucher_type, sle.voucher_no
 		from `tabStock Ledger Entry` sle
 		where timestamp(sle.posting_date, sle.posting_time) >= timestamp(%s, %s) {condition}
-		order by timestamp(sle.posting_date, sle.posting_time) asc, creation asc for update""".format(condition=condition),
+		order by timestamp(sle.posting_date, sle.posting_time) asc, creation asc""".format(condition=condition), # for update remove
 		tuple([posting_date, posting_time] + values), as_dict=True):
 			future_stock_vouchers.append([d.voucher_type, d.voucher_no])
 

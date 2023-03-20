@@ -68,7 +68,14 @@ class PaymentEntry(AccountsController):
 		self.setup_party_account_field()
 		if self.difference_amount:
 			frappe.throw(_("Difference Amount must be zero"))
-		self.make_gl_entries()
+		#self.make_gl_entries()
+		try:
+			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+
 		self.update_outstanding_amounts()
 		self.update_advance_paid()
 		self.update_expense_claim()
@@ -444,8 +451,9 @@ class PaymentEntry(AccountsController):
 		if frappe.flags.in_import and self.title:
 			# do not set title dynamically if title exists during data import.
 			return
-
-		if self.payment_type in ("Receive", "Pay"):
+		if self.title:
+			self.title = self.title
+		elif self.payment_type in ("Receive", "Pay"):
 			self.title = self.party
 		else:
 			self.title = self.paid_from + " - " + self.paid_to
@@ -454,7 +462,7 @@ class PaymentEntry(AccountsController):
 		bank_account = self.paid_to if self.payment_type == "Receive" else self.paid_from
 		bank_account_type = frappe.db.get_value("Account", bank_account, "account_type")
 
-		if bank_account_type == "Bank":
+		if bank_account_type == "Bank" and self.mode_of_payment != 'Cheque':
 			if not self.reference_no or not self.reference_date:
 				frappe.throw(_("Reference No and Reference Date is mandatory for Bank transaction"))
 
@@ -1145,6 +1153,12 @@ def get_party_and_account_balance(company, date, paid_from=None, paid_to=None, p
 		"paid_from_account_balance": get_balance_on(paid_from, date, cost_center=cost_center),
 		"paid_to_account_balance": get_balance_on(paid_to, date=date, cost_center=cost_center)
 	})
+
+@frappe.whitelist()
+def Update_payment_entry_status(payment_entry_no):
+	update_status = frappe.db.sql("""UPDATE `tabPayment Entry` SET `status`='Paid' WHERE NAME='{payment_entry_no}'""".format(payment_entry_no=payment_entry_no), as_dict=True)
+	frappe.db.commit()
+	return True
 
 @frappe.whitelist()
 def make_payment_order(source_name, target_doc=None):

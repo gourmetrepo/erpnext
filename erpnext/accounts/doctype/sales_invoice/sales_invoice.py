@@ -24,7 +24,7 @@ from erpnext.accounts.general_ledger import get_round_off_account_and_cost_cente
 from erpnext.accounts.doctype.loyalty_program.loyalty_program import \
 	get_loyalty_program_details_with_points, get_loyalty_details, validate_loyalty_points
 from erpnext.accounts.deferred_revenue import validate_service_stop_date
-
+import time
 from erpnext.healthcare.utils import manage_invoice_submit_cancel
 
 from six import iteritems
@@ -149,6 +149,12 @@ class SalesInvoice(SellingController):
 
 	def before_save(self):
 		set_account_for_mode_of_payment(self)
+	
+	def submit(self):
+		time.sleep(1)
+		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Queued' WHERE `name`='{docname}';".format(docname=self.name))
+		frappe.db.commit()
+		self.queue_action('submit',queue_name="si_tertiary")
 
 	def on_submit(self):
 		self.validate_pos_paid_amount()
@@ -174,7 +180,13 @@ class SalesInvoice(SellingController):
 			self.update_stock_ledger()
 
 		# this sequence because outstanding may get -ve
-		self.make_gl_entries()
+		#self.make_gl_entries()
+		try:
+			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 
 		if not self.is_return:
 			self.update_billing_status_for_zero_amount_refdoc("Delivery Note")
@@ -206,7 +218,7 @@ class SalesInvoice(SellingController):
 		# Healthcare Service Invoice.
 		domain_settings = frappe.get_doc('Domain Settings')
 		active_domains = [d.domain for d in domain_settings.active_domains]
-
+		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
 

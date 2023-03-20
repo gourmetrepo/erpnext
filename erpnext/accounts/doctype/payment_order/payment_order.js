@@ -29,6 +29,34 @@ frappe.ui.form.on('Payment Order', {
 			frm.add_custom_button(__('Create Payment Entries'), function() {
 				frm.trigger("make_payment_records");
 			});
+			frm.add_custom_button(__('Create Payment Entry With Single Cheque'), function() {
+				frappe.call({
+					method: "erpnext.accounts.doctype.payment_order.payment_order.make_payment_with_single_cheque",
+					args: {
+						"name": frm.doc.name,
+					},
+					freeze: true,
+					callback: function(r) {
+						frm.refresh();
+					}
+				})
+				setTimeout(() => {
+					frm.remove_custom_button('Create Payment Entry With Single Cheque','Create');
+
+				}, 100);
+			},('Create'));
+			// frm.add_custom_button(__('Create Payment Entry For All Suppliers'), function() {
+			// 	frappe.call({
+			// 		method: "erpnext.accounts.doctype.payment_order.payment_order.make_payment_entry_on_single_click",
+			// 		args: {
+			// 			"name": frm.doc.name,
+			// 		},
+			// 		freeze: true,
+			// 		callback: function(r) {
+			// 			frm.refresh();
+			// 		}
+			// 	})
+			// },('Create'));
 		}
 	},
 
@@ -124,7 +152,7 @@ frappe.ui.form.on('Payment Order', {
 				args: {
 					"name": me.frm.doc.name,
 					"supplier": args.supplier,
-					"mode_of_payment": args.mode_of_payment
+					"mode_of_payment": me.mode_of_payment
 				},
 				freeze: true,
 				callback: function(r) {

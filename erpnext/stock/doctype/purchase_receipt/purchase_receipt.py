@@ -166,8 +166,14 @@ class PurchaseReceipt(BuyingController):
 		from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 		update_serial_nos_after_submit(self, "items")
 
-		self.make_gl_entries()
-
+		#self.make_gl_entries()
+		try:
+			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+	
 	def check_next_docstatus(self):
 		submit_rv = frappe.db.sql("""select t1.name
 			from `tabPurchase Invoice` t1,`tabPurchase Invoice Item` t2

@@ -305,21 +305,24 @@ class DeliveryNote(SellingController):
 		if not self.is_return:
 			self.check_credit_limit()
 		elif self.issue_credit_note:
-			self.make_return_invoice()
+			frappe.enqueue("erpnext.stock.doctype.delivery_note.delivery_note.make_return_sales_invoice",delivery_note=self.name,queue="si_primary",enqueue_after_commit=True)			
 		elif self.is_return and self.return_type == 'Shop Return' and len(self.items) > 0:
-			savedoc =	make_sales_invoice(self.name)
-			savedoc.submit()
-			frappe.db.sql("UPDATE `tabDelivery Note Item` SET against_sales_invoice ='{sale_invoice}' WHERE `parent`='{docname}';".format(docname=self.name,sale_invoice=savedoc.name))
+			frappe.enqueue("erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice_return",delivery_note=self.name,queue="si_primary",enqueue_after_commit=True)
 		# Updating stock ledger should always be called after updating prevdoc status,
 		# because updating reserved qty in bin depends upon updated delivered qty in SO
 		from nrp_manufacturing.modules.gourmet.delivery_note.delivery_note import update_stock_ledger
 		DeliveryNote.update_stock_ledger = update_stock_ledger
 		self.update_stock_ledger()
-		stock_gl = frappe.new_doc('Stock GL Queue')
-		stock_gl.stock_entry = self.name
-		stock_gl.save(ignore_permissions=True)
+		# stock_gl = frappe.new_doc('Stock GL Queue')
+		# stock_gl.stock_entry = self.name
+		# stock_gl.save(ignore_permissions=True)
 		time.sleep(1)
-		frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",stock_entry_name=stock_gl.stock_entry,queue="gl",enqueue_after_commit=True)
+		try:
+			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 		#self.make_gl_entries()
 		frappe.db.sql("UPDATE `tabDelivery Note` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 			
@@ -432,15 +435,17 @@ class DeliveryNote(SellingController):
 	def make_return_invoice(self):
 		try:
 			return_invoice = make_sales_invoice(self.name)
+			return_invoice.delivery_note_reference=self.name
 			return_invoice.is_return = True
 			return_invoice.save()
 			return_invoice.submit()
 
 			credit_note_link = frappe.utils.get_link_to_form('Sales Invoice', return_invoice.name)
 
-			frappe.msgprint(_("Credit Note {0} has been created automatically").format(credit_note_link))
-		except:
-			frappe.throw(_("Could not create Credit Note automatically, please uncheck 'Issue Credit Note' and submit again"))
+			#frappe.msgprint(_("Credit Note {0} has been created automatically").format(credit_note_link))
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc Credit Note '+str(self.name))
 
 def update_billed_amount_based_on_so(so_detail, update_modified=True):
 	# Billed against Sales Order directly
@@ -519,6 +524,18 @@ def get_returned_qty_map(delivery_note):
 	""", delivery_note))
 
 	return returned_qty_map
+@frappe.whitelist()
+def make_return_sales_invoice(delivery_note):
+	doc = frappe.get_doc('Delivery Note',delivery_note)
+	doc.make_return_invoice()
+
+@frappe.whitelist()
+def make_sales_invoice_return(delivery_note):
+	savedoc =	make_sales_invoice(source_name=delivery_note)
+	savedoc.save(ignore_permissions=True)
+	savedoc.submit()
+	frappe.db.sql("UPDATE `tabDelivery Note Item` SET against_sales_invoice ='{sale_invoice}' WHERE `parent`='{docname}';".format(sale_invoice=savedoc.name,docname=delivery_note))
+
 
 @frappe.whitelist()
 def make_sales_invoice(source_name, target_doc=None):

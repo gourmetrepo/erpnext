@@ -42,7 +42,7 @@ def make_sl_entries(sl_entries, is_amended=None, allow_negative_stock=False, via
 				"sle_id": sle_id,
 				"is_amended": is_amended
 			})
-			update_bin(args, allow_negative_stock, via_landed_cost_voucher)
+			#update_bin(args, allow_negative_stock, via_landed_cost_voucher) for testing and impact calculation 
 
 		if cancel:
 			delete_cancelled_entry(sl_entries[0].get('voucher_type'), sl_entries[0].get('voucher_no'))
@@ -501,6 +501,7 @@ def get_stock_ledger_entries(previous_sle, operator=None,
 	if operator in (">", "<=") and previous_sle.get("name"):
 		conditions += " and name!=%(name)s"
 
+	for_update=False # for update remove
 	if previous_sle.get('item_code'):
 		return frappe.db.sql("""select *, timestamp(posting_date, posting_time) as "timestamp" from `tabStock Ledger Entry`
 			where item_code = %%(item_code)s

@@ -107,7 +107,7 @@ def get_data():
 			"type": "module",
 			"description": "Quality goals, procedures, reviews and action."
 		},
-
+		
 
 		# Category: "Domains"
 		{

@@ -46,7 +46,15 @@ class JournalEntry(AccountsController):
 	def on_submit(self):
 		self.validate_cheque_info()
 		self.check_credit_limit()
-		self.make_gl_entries()
+		#self.make_gl_entries()
+		try:
+			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		except Exception as e:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+
+
 		self.update_advance_paid()
 		self.update_expense_claim()
 		self.update_loan()
@@ -1056,3 +1064,11 @@ def make_reverse_journal_entry(source_name, target_doc=None):
 	}, target_doc)
 
 	return doclist 
+@frappe.whitelist()
+def settlement_reference(doctype, txt, searchfield, start, page_len, filters):
+	# cond = ''
+	# if filters and filters.get('account'):
+	# 	account_type = frappe.db.get_value('Account', filters.get('account'), 'account_type')
+	# 	cond = "and account_type = '%s'" % account_type
+
+	return frappe.db.sql("""SELECT name from `tabJournal Entry` WHERE provision_type = 'Booking' and voucher_type = 'Provisions Booking & Settlement' and settlement_reference is null """)
