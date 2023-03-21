@@ -33,6 +33,7 @@ frappe.listview_settings['Purchase Order'] = {
 		if (Object.values(frappe.route_options).length == 0){
 			frappe.route_options = {
 				// "status": "Draft",
+				"company": frappe.get_cookie('company') ,
 				"creation":["Between",[frappe.datetime.add_days(frappe.datetime.get_today(), - 15),frappe.datetime.get_today()]]
 			};
 		}
