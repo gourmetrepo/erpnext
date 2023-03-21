@@ -25,17 +25,21 @@ def calculate_segment_profit():
 	for single_unit in units:
 		sale_bgroup = get_unit_sales_bgroup(single_unit,date_yesterday)
 		count = 0
+		totalsales = 0
 		for index,bg in enumerate(bgroup):			
 			if bg not in str(sale_bgroup):
 				b_group_data.append({"business_group":bg,'amount':1})
 			else:
-				print(sale_bgroup[count])
+				print(sale_bgroup[count].get('amount'))
 				b_group_data.append(sale_bgroup[count])
+				totalsales = totalsales + sale_bgroup[count].get('amount')
 				count = count + 1
-
-
+		
+		# if b_group_data:
+		# 	for total_sale in b_group_data:
+		# 		totalsales = totalsales + total_sale.get('amount')
 		for coa in units[single_unit].get('segment'):
-			data =get_segment_gl_data(coa,units[single_unit].get('segment').get(coa),date_yesterday,single_unit,b_group_data)
+			data =get_segment_gl_data(coa,units[single_unit].get('segment').get(coa),date_yesterday,single_unit,b_group_data,totalsales)
 		
 
 
@@ -52,7 +56,7 @@ def get_unit_sales_bgroup(unit,date):
 	group by `business_group`
 	""".format(date,unit),as_dict=True)
 	
-def get_segment_gl_data(account_title,account,date,unit,sale_bgroup):
+def get_segment_gl_data(account_title,account,date,unit,sale_bgroup,totalsales):
     condition = ''
     if len(account) == 1:
         condition = (f"""('{account[0]}')""")
@@ -69,7 +73,7 @@ def get_segment_gl_data(account_title,account,date,unit,sale_bgroup):
         try:
             if data:
                 if data[0].account_value != None:
-                    Amount = (data[0].account_value * bgroup_data.get('amount'))/100
+                    Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
                 else:
                     Amount = 0
             else:
@@ -85,6 +89,6 @@ def get_segment_gl_data(account_title,account,date,unit,sale_bgroup):
 			'date':date,
 			'account_value':Amount
 		}
-        data = frappe.get_doc(save_doc).save(ignore_permissions=True)
-        frappe.db.commit()
+        frappe.get_doc(save_doc).save(ignore_permissions=True)
+    frappe.db.commit()
 		# print('End data')
