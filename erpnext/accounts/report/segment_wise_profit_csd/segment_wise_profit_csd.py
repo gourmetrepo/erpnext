@@ -10,6 +10,7 @@ def execute(filters=None):
 	from_date = filters.get('from_date')
 	to_date = filters.get('to_date')
 	columns = [
+		("HEAD")+ "::250",
 		("ACCOUNT") + "::250",
         ("CSD") + ":Float:250",
         ("JUICES") + ":Float:200",
