@@ -657,3 +657,7 @@ def get_item_account_wise_additional_cost(purchase_document):
 
 	return item_account_wise_cost
 
+@frappe.whitelist()
+def delete_items(data):
+    frappe.db.sql("""DELETE FROM `tabPurchase Receipt Item` WHERE parent ='{name}';""".format(name =data))
+    frappe.db.commit()
