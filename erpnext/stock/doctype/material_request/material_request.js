@@ -52,6 +52,16 @@ frappe.ui.form.on('Material Request', {
 			};
 		});
 	},
+	company:function(frm){
+		frm.set_value("items",[]);
+		refresh_field("items");
+		frappe.call({
+			method:"nrp_manufacturing.modules.gourmet.material_request.material_request.delete_mr_items",
+			args: {
+				"data": frm.doc.name
+			}
+		});
+	},
 
 	onload_post_render: function(frm) {
 		frm.get_field("items").grid.set_multiple_add("item_code", "qty");
