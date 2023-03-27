@@ -48,6 +48,17 @@ frappe.ui.form.on("Purchase Order", {
 		}
 
 	},
+	company:function(frm){
+		console.log("company enter")
+		frm.set_value("items",[]);
+		refresh_field("items");
+		frappe.call({
+			method:"nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.delete_items",
+			args: {
+				"data": frm.doc.name
+			}
+		});
+	},
 
 	onload: function(frm) {
 		set_schedule_date(frm);
