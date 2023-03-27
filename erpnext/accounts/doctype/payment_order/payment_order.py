@@ -199,6 +199,7 @@ def make_payment_with_single_cheque(name, mode_of_payment=None):
 			`tabPayment Order Detail`
 		WHERE
 			parent = '{0}'
+		ORDER BY idx
 	""".format(name),as_dict=True)
 	if query_data:
 		is_unique_cheque_number = True
@@ -278,6 +279,7 @@ def make_payment_entry_on_single_click(name, mode_of_payment=None):
 			`tabPayment Order Detail`
 		WHERE
 			parent = '{0}'
+		ORDER BY idx
 	""".format(name),as_dict=True)
 	if query_data:
 		for supplier in query_data:
