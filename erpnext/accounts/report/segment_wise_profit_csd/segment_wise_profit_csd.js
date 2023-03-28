@@ -27,5 +27,25 @@ frappe.query_reports["Segment Wise Profit CSD"] = {
 			options: ["Unit 5", "Unit 8", "Unit 11"]
 		}
 
-	]
+	],
+	"formatter": function(value, row, column, data, default_formatter) {
+        if (data.indent == 0 || data.indent == 1 || data.indent == 2){
+            if (data.indent == 0){
+                color = '#3EAB36'
+            }
+            if (data.indent == 1){
+                color = '#F15159'
+            }
+            if (data.indent == 2){
+                color = '#9C6137'
+            }
+            return "<b style=\"color:"+color+"\">"+value+"</b>";
+        }else{
+            return "<span style=\"color:#B600B8\"><b>"+value+"</b></span>";
+        }
+    },
+    "treeView": true,
+    "name_field": "Total Profit",
+    "parent_field": "parent_item_group",
+    "initial_depth": 1
 };
