@@ -22,8 +22,8 @@ def execute(filters=None):
     ]
 	f_data = []
 	data = []
-	from_date='2023-03-01'
-	to_date='2023-03-05'
+	# from_date='2023-03-01'
+	# to_date='2023-03-05'
 	r_data = frappe.db.sql(""" 
 		SELECT head,`account`,
 			SUM(IF (`segment`='CSD (Carbonated Soft Drinks)' , `account_value`,0)) AS csd, 
