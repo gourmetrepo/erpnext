@@ -200,7 +200,10 @@ frappe.ui.form.on('Payment Entry', {
 		}
 	},
 
-	company: function(frm) {
+	company: function(frm) {	
+		// Reset the form state to a new empty document
+		frm.doc = {};
+		frm.refresh_fields();
 		frm.events.hide_unhide_fields(frm);
 		frm.events.set_dynamic_labels(frm);
 	},
