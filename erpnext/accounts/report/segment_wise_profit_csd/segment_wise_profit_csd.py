@@ -91,14 +91,14 @@ def prepare_data(r_data):
 					ltr_total += parent_row['19ltr']
 					other_total += parent_row['other']
 
-					parent_row['indent'] = 0
-					# parent_row['parent_item_group'] ='Total Profit'
-					#parent_row['has_value'] = True
-					data.append(parent_row)
-						
-					for row in child_rows:
-						data.append(row)
-    
+			parent_row['indent'] = 0
+			# parent_row['parent_item_group'] ='Total Profit'
+			#parent_row['has_value'] = True
+			data.append(parent_row)
+				
+			for row in child_rows:
+				data.append(row)
+
 	data.append({'head': 'TP', 'account': '', 'csd': csd_total, 'juices': juices_total,
              'water': water_total, 'candyconfectionary':candyconfectionary_total, 'concentrates': concentrates_total, '19ltr': ltr_total, 'other':other_total, })
 	
