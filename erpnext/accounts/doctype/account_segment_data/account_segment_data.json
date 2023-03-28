@@ -6,6 +6,7 @@
  "field_order": [
   "account",
   "company",
+  "head",
   "segment",
   "account_value",
   "date",
@@ -54,10 +55,16 @@
    "fieldtype": "Text",
    "label": "COA",
    "read_only": 1
+  },
+  {
+   "fieldname": "head",
+   "fieldtype": "Data",
+   "label": "Head",
+   "read_only": 1
   }
  ],
- "modified": "2023-03-16 05:48:17.873628",
- "modified_by": "Administrator",
+ "modified": "2023-03-24 16:46:42.778998",
+ "modified_by": "abdul.samad@gourmetpakistan.com",
  "module": "Accounts",
  "name": "Account Segment Data",
  "owner": "Administrator",
