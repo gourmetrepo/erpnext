@@ -57,25 +57,25 @@ def prepare_data(r_data):
 			account =""
 			for _k, _d in enumerate(r_data[k:]):
 				if parent_head == _d.head:
-					parent_row["csd"] += float(_d["csd"] or 0)
-					parent_row["juices"] += float(_d["juices"] or 0)
-					parent_row["water"] += float(_d["water"] or 0)
-					parent_row["candyconfectionary"] += float(_d["candyconfectionary"] or 0)
-					parent_row["concentrates"] += float(_d["concentrates"] or 0)
-					parent_row["19ltr"] += float(_d["19ltr"] or 0)
-					parent_row["other"] += float(_d["other"] or 0)
+					parent_row["csd"] += round(float(_d["csd"] or 0),2)
+					parent_row["juices"] += round(float(_d["juices"] or 0),2)
+					parent_row["water"] += round(float(_d["water"] or 0),2)
+					parent_row["candyconfectionary"] += round(float(_d["candyconfectionary"] or 0),2)
+					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),2)
+					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),2)
+					parent_row["other"] += round(float(_d["other"] or 0),2)
 					parent_row['account']=''
 					head=""
 					if account != _d.account:
 						account = _d.account
 						child_row = copy.copy(_d)
-						child_row['csd'] = float(_d["csd"] or 0)
-						child_row['juices'] = float(_d["juices"] or 0)
-						child_row['water'] = float(_d["water"] or 0)
-						child_row['candyconfectionary'] = float(_d["candyconfectionary"] or 0)
-						child_row["concentrates"] = float(_d["concentrates"] or 0)
-						child_row['19ltr'] = float(_d["19ltr"] or 0)
-						child_row['other'] = float(_d["other"] or 0)
+						child_row['csd'] = round(float(_d["csd"] or 0),2)
+						child_row['juices'] = round(float(_d["juices"] or 0),2)
+						child_row['water'] = round(float(_d["water"] or 0),2)
+						child_row['candyconfectionary'] = round(float(_d["candyconfectionary"] or 0),2)
+						child_row["concentrates"] = round(float(_d["concentrates"] or 0),2)
+						child_row['19ltr'] = round(float(_d["19ltr"] or 0),2)
+						child_row['other'] = round(float(_d["other"] or 0),2)
 						child_row['head'] = ''
 						child_row['parent_item_group'] = _d["head"]
 						child_row['indent'] = 1
@@ -99,8 +99,8 @@ def prepare_data(r_data):
 			for row in child_rows:
 				data.append(row)
 
-	data.append({'head': 'TP', 'account': '', 'csd': csd_total, 'juices': juices_total,
-             'water': water_total, 'candyconfectionary':candyconfectionary_total, 'concentrates': concentrates_total, '19ltr': ltr_total, 'other':other_total, })
+	data.append({'head': 'TP', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
+             'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2), })
 	
 
 	return data

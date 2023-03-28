@@ -39,9 +39,9 @@ frappe.query_reports["Segment Wise Profit CSD"] = {
             if (data.indent == 2){
                 color = '#9C6137'
             }
-            return "<b style=\"color:"+color+"\">"+value+"</b>";
+            return "<b style=\"color:"+color+"\">Rs "+value+"</b>";
         }else{
-            return "<span style=\"color:#B600B8\"><b>"+value+"</b></span>";
+            return "<span style=\"color:#B600B8\"><b>Rs "+value+"</b></span>";
         }
     },
     "treeView": true,
