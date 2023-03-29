@@ -99,8 +99,10 @@ def prepare_data(r_data):
 			for row in child_rows:
 				data.append(row)
 
-	data.append({'head': 'TP', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
+	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
              'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2), })
+	data.append({'head': 'Net Profit Total', 'account': '','csd': round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total,2),  'juices':'',
+             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '', })
 	
 
 	return data
