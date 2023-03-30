@@ -59,9 +59,11 @@ frappe.ui.form.on("Purchase Receipt", {
 	},
 
 	company: function(frm) {
+		if (!frm.is_new()){
+			frm.set_value("items",[]);
+			refresh_field("items");
+		}
 		frm.trigger("toggle_display_account_head");
-		frm.set_value("items",[]);
-		refresh_field("items");
 		frappe.call({
 		method:"erpnext.stock.doctype.purchase_receipt.purchase_receipt.delete_items",
 		args: {
