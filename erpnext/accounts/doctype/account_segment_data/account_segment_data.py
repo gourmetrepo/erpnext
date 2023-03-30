@@ -65,7 +65,7 @@ def get_unit_sales_bgroup(unit,date):
 	DATE(A.`creation`) between '{0}' AND '{0}' AND C.company = '{1}' AND
 	`business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')
 	group by `business_group`
-	""".format(date,unit),as_dict=True, debug = 1)
+	""".format(date,unit),as_dict=True, debug = True)
 	
 def get_segment_gl_data(account_title,account,head,formula,date,unit,sale_bgroup,totalsales):		
 		condition = ''
@@ -75,22 +75,71 @@ def get_segment_gl_data(account_title,account,head,formula,date,unit,sale_bgroup
 		# 		condition = (f"""('{account}')""")
 		# else:
 		# 		condition = (f"""{account}""")
-			data = frappe.db.sql("""
-				SELECT SUM(`credit_in_account_currency`-`debit_in_account_currency`) AS account_value 
-				FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-				AND DATE(creation) BETWEEN '{1}' AND '{1}'
-				""".format(account,date,unit),as_dict=True ,debug =1)
+
 			for bgroup_data in sale_bgroup:
 				try:
-					if data:
-						# if data[0].account_value != None:
-						# 	Amount = data[0].account_value
-						if data[0].account_value != None :
-							Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
-						else:
-							Amount = 0
+					if formula=='true':
+								data = frappe.db.sql("""
+										SELECT SUM(`credit_in_account_currency`-`debit_in_account_currency`) AS account_value 
+										FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+										AND DATE(creation) BETWEEN '{1}' AND '{1}'
+										""".format(account,date,unit),as_dict=True ,debug =1)
+								if data[0].account_value != None :
+									Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
+								else:
+									Amount = 0
 					else:
-						Amount = 0
+						if (account_title.title()=='Distributor Revenue'):
+								DRData =  frappe.db.sql("""
+										select sum(amount) as amount from `tabSales Invoice Item` as A
+										INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+										INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+										where 
+										DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND C.customer_group IN ('CSD Distributors')
+										AND `business_group` ='{2}'
+										""".format(date,unit,bgroup_data.get('business_group')),as_dict=True, debug = True)
+								if DRData[0].amount != None :
+											Amount =  DRData[0].amount  
+								else:
+											Amount = 0
+						elif (account_title.title()=='Inter Units Revenue'):
+								data =  frappe.db.sql("""
+										select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
+										INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+										INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+										where 
+										DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND A.customer_group IN ('Inter-Unit')
+										`business_group` ='{2}'
+										group by `business_group`
+										""".format(date,unit,bgroup_data.get('business_group')),as_dict=True, debug = True)
+								if data[0].amount != None :
+											Amount =  data[0].amount  
+								else:
+											Amount = 0
+						elif (account_title.title()=='Inter Units Revenue'):
+								data =  frappe.db.sql("""
+										select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
+										INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+										INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+										where 
+										DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND A.customer_group IN ('Inter-Unit')
+										`business_group` ='{2}'
+										group by `business_group`
+										""".format(date,unit,bgroup_data.get('business_group')),as_dict=True, debug = True)
+								if data[0].amount != None :
+											Amount =  data[0].amount  
+								else:
+											Amount = 0
+						else:
+							data = frappe.db.sql("""
+											SELECT SUM(`credit_in_account_currency`-`debit_in_account_currency`) AS account_value 
+											FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+											AND DATE(creation) BETWEEN '{1}' AND '{1}'
+											""".format(account,date,unit),as_dict=True ,debug =1)	
+							if data[0].account_value != None :
+										Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
+							else:
+										Amount = 0
 				except Exception as e:
 					print(e)
 					Amount = 0
