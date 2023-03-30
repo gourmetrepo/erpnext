@@ -123,6 +123,7 @@ erpnext.stock.PurchaseReceiptController = erpnext.buying.BuyingController.extend
 							target: me.frm,
 							setters: {
 								supplier: me.frm.doc.supplier,
+								company:me.frm.doc.company
 							},
 							get_query_filters: {
 								docstatus: 1,
