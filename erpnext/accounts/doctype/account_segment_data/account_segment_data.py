@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import (today, add_days)
+import ast
 #site confige import
 from nrp_manufacturing.utils import  get_config_by_name,get_post_params
 class AccountSegmentData(Document):
@@ -35,11 +36,21 @@ def calculate_segment_profit():
 				totalsales = totalsales + sale_bgroup[count].get('amount')
 				count = count + 1
 		
-		# if b_group_data:
-		# 	for total_sale in b_group_data:
-		# 		totalsales = totalsales + total_sale.get('amount')
+		if b_group_data:
+			for total_sale in b_group_data:
+				totalsales = totalsales + total_sale.get('amount')
 		for coa in units[single_unit].get('segment'):
-			data =get_segment_gl_data(coa,units[single_unit].get('segment').get(coa),date_yesterday,single_unit,b_group_data,totalsales)
+			acc_data=units[single_unit].get('segment').get(coa)
+   
+			# account =re.sub('"', '',acc_data[0]['accounts'])
+			if  acc_data.get('accounts') != "":		
+				# account  = ast.literal_eval(acc_data.get('accounts'))
+				account = acc_data.get('accounts')
+			else:
+				account = ""
+			head = acc_data.get('head')
+			formula =acc_data.get('formula')
+			data =get_segment_gl_data(coa,account,head,formula,date_yesterday,single_unit,b_group_data,totalsales)
 		
 
 
@@ -54,41 +65,44 @@ def get_unit_sales_bgroup(unit,date):
 	DATE(A.`creation`) between '{0}' AND '{0}' AND C.company = '{1}' AND
 	`business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')
 	group by `business_group`
-	""".format(date,unit),as_dict=True)
+	""".format(date,unit),as_dict=True, debug = 1)
 	
-def get_segment_gl_data(account_title,account,date,unit,sale_bgroup,totalsales):
-    condition = ''
-    if len(account) == 1:
-        condition = (f"""('{account[0]}')""")
-    else:
-        condition = tuple(account)
-    if len(account) == 0:
-        return
-    data = frappe.db.sql("""
-		SELECT SUM(`credit_in_account_currency`-`debit_in_account_currency`) AS account_value 
-		FROM `tabGL Entry` WHERE account IN {0}  AND company='{2}' 
-		AND DATE(creation) BETWEEN '{1}' AND '{1}'
-		""".format(condition,date,unit),as_dict=True)
-    for bgroup_data in sale_bgroup:
-        try:
-            if data:
-                if data[0].account_value != None:
-                    Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
-                else:
-                    Amount = 0
-            else:
-                Amount = 0
-        except Exception as e:
-            Amount = 0
-        save_doc = {
-			'doctype':'Account Segment Data',
-			'segment':bgroup_data.get('business_group'),
-			'account':account_title,
-			'coa': str(account),
-			'company':unit,
-			'date':date,
-			'account_value':Amount
-		}
-        frappe.get_doc(save_doc).save(ignore_permissions=True)
-    frappe.db.commit()
-		# print('End data')
+def get_segment_gl_data(account_title,account,head,formula,date,unit,sale_bgroup,totalsales):		
+		condition = ''
+		Amount =0
+		if account != None and account != "":	
+		# if type(account) == str:
+		# 		condition = (f"""('{account}')""")
+		# else:
+		# 		condition = (f"""{account}""")
+			data = frappe.db.sql("""
+				SELECT SUM(`credit_in_account_currency`-`debit_in_account_currency`) AS account_value 
+				FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+				AND DATE(creation) BETWEEN '{1}' AND '{1}'
+				""".format(account,date,unit),as_dict=True ,debug =1)
+			for bgroup_data in sale_bgroup:
+				try:
+					if data:
+						# if data[0].account_value != None:
+						# 	Amount = data[0].account_value
+						if data[0].account_value != None :
+							Amount =   (bgroup_data.get('amount')/totalsales) * data[0].account_value  
+						else:
+							Amount = 0
+					else:
+						Amount = 0
+				except Exception as e:
+					print(e)
+					Amount = 0
+				save_doc = {
+					'doctype':'Account Segment Data',
+					'segment':bgroup_data.get('business_group'),
+					'account':account_title.title(),
+					'coa': str(account),
+					'company':unit,
+					'head':head.title(),
+					'date':date,
+					'account_value':Amount
+				}
+				frappe.get_doc(save_doc).save(ignore_permissions=True)
+				frappe.db.commit()
