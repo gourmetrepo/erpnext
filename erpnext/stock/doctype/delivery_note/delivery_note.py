@@ -202,7 +202,16 @@ class DeliveryNote(SellingController):
 		## id returnable
 		if self.is_return:
 			return
-
+		# umair added returnable total quantity
+		returnables = self.get("returnable_items")
+		if len(returnables) != 0:
+			returnable_total_quantity = 0.0
+			for returnable in returnables:
+				returnable_total_quantity += returnable.actual_qty
+				
+			self.returnable_total_quantity = returnable_total_quantity
+		else:
+			self.returnable_total_quantity = 0
 		if self.get('manually_manage_return_items'):
 			returnables = self.get("returnable_items")
 			for returnable in returnables:
