@@ -337,6 +337,22 @@ def get_data():
 				},
 				{
 					"type": "doctype",
+					"name": "Employee Warning",
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Warning Type",
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Appreciation",
+				},
+				{
+					"type": "doctype",
+					"name": "Employee Appreciation Type",
+				},
+				{
+					"type": "doctype",
 					"name": "Energy Point Rule",
 				},
 				{
@@ -446,6 +462,19 @@ def get_data():
 					"is_query_report": True,
 					"name": "Department Analytics",
 					"doctype": "Employee"
+				},
+			]
+		},
+		{
+			"label": _("Gratuity"),
+			"items": [
+				{
+					"type": "doctype",
+					"name": "Employee Gratuity"
+				},
+				{
+					"type": "doctype",
+					"name": "Gratuity Configuration"
 				},
 			]
 		},
