@@ -12,20 +12,21 @@ def execute(filters=None):
 	columns = [
 		("HEAD")+ "::250",
 		("ACCOUNT") + "::250",
-        ("CSD") + ":Currency:250",
-        ("JUICES") + ":Currency:200",
-        ("WATER") + ":Currency:150",
-        ("CandyConfectionary") + ":Currency:120",
+        ("CSD") + ":Currency:120",
+        ("JUICES") + ":Currency:120",
+        ("WATER") + ":Currency:120",
+        ("CandyConfectionary") + ":Currency:150",
         ("Concentrates") + ":Currency:120",
-        ("19LTR") + ":Currency:180",
-		("Other") + ":Currency:180"
+        ("19LTR") + ":Currency:120",
+		("Other") + ":Currency:120",
+		("Total") + ":Currency:120"
     ]
 	f_data = []
 	data = []
 	# from_date='2023-03-01'
 	# to_date='2023-03-05'
-	r_data = frappe.db.sql(""" 
-		SELECT head,`account`,
+	r_data = frappe.db.sql("""SELECT head,account,csd,juices,water,candyconfectionary,concentrates,19ltr,other,(csd+juices+water+candyconfectionary+concentrates+19ltr+other) AS total FROM (
+SELECT head,account,
 			SUM(IF (`segment`='CSD (Carbonated Soft Drinks)' , `account_value`,0)) AS csd, 
 			SUM(IF (`segment`='Juice' , `account_value` ,0))AS juices,
 			SUM(IF (`segment`='Water' , `account_value`,0))AS  water,
@@ -34,10 +35,10 @@ def execute(filters=None):
 			SUM(IF (`segment`='19 Ltr'  ,`account_value`,0) ) AS 19ltr,
 			SUM(IF (`segment`='Other' , `account_value` ,0)) AS other
 		FROM `tabAccount Segment Data`
-		WHERE date BETWEEN '{from_date}' and '{to_date}' 
+		WHERE DATE BETWEEN '{from_date}' and '{to_date}' 
 		AND company = '{company}'
-			group by head,`account`
-   order by creation ASC
+			GROUP BY head,`account`
+   ORDER BY creation ASC) AS A
 	""".format(from_date=from_date, to_date=to_date,company=company), as_dict=True, debug =1)
 	data = prepare_data(r_data)
  
@@ -45,7 +46,7 @@ def execute(filters=None):
 	return columns, data
 def prepare_data(r_data):	
 	import copy
-	other_total =ltr_total=csd_total=juices_total=water_total=candyconfectionary_total=concentrates_total=concentrates_total=0.00
+	other_total=total_total =ltr_total=csd_total=juices_total=water_total=candyconfectionary_total=concentrates_total=concentrates_total=0.00
 	data = []
 	parent_head =""
 	for k, d in enumerate(r_data):
@@ -64,6 +65,7 @@ def prepare_data(r_data):
 					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),2)
 					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),2)
 					parent_row["other"] += round(float(_d["other"] or 0),2)
+					parent_row["total"] += round(float(_d["total"] or 0),2)
 					parent_row['account']=''
 					head=""
 					if account != _d.account:
@@ -76,6 +78,7 @@ def prepare_data(r_data):
 						child_row["concentrates"] = round(float(_d["concentrates"] or 0),2)
 						child_row['19ltr'] = round(float(_d["19ltr"] or 0),2)
 						child_row['other'] = round(float(_d["other"] or 0),2)
+						child_row["total"] += round(float(_d["total"] or 0),2)
 						child_row['head'] = ''
 						child_row['parent_item_group'] = _d["head"]
 						child_row['indent'] = 1
@@ -90,7 +93,7 @@ def prepare_data(r_data):
 					concentrates_total  += parent_row['concentrates']
 					ltr_total += parent_row['19ltr']
 					other_total += parent_row['other']
-
+					total_total += parent_row['total']
 			parent_row['indent'] = 0
 			# parent_row['parent_item_group'] ='Total Profit'
 			#parent_row['has_value'] = True
@@ -100,9 +103,9 @@ def prepare_data(r_data):
 				data.append(row)
 
 	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
-             'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2), })
-	data.append({'head': 'Net Profit Total', 'account': '','csd': round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total,2),  'juices':'',
-             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '', })
+             'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2),'total': round(total_total,2), })
+	data.append({'head': 'Net Profit Total', 'account': '','csd': '',  'juices':'',
+             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total,2) })
 	
 
 	return data
