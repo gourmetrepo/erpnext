@@ -78,7 +78,7 @@ def prepare_data(r_data):
 						child_row["concentrates"] = round(float(_d["concentrates"] or 0),2)
 						child_row['19ltr'] = round(float(_d["19ltr"] or 0),2)
 						child_row['other'] = round(float(_d["other"] or 0),2)
-						child_row["total"] += round(float(_d["total"] or 0),2)
+						child_row["total"] = round(float(_d["total"] or 0),2)
 						child_row['head'] = ''
 						child_row['parent_item_group'] = _d["head"]
 						child_row['indent'] = 1
