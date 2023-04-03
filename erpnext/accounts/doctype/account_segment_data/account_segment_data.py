@@ -229,7 +229,7 @@ def calculate_segment_profit():
 											'account_value':float(Amount)
 											}
 											frappe.get_doc(save_doc).save(ignore_permissions=True)	
-							elif(coa.title()=='Directcost' or coa.title()=='Electricity Cost-Factory' or coa.title()=='Boiler_Fuel' or coa.title()=='Water Bill' or coa.title()=='Salaries And Wages-Direct' or coa.title()=='Reapir & Maintenance' or coa.title()=='Mess Expenses' or coa.title()=='Vehicle Running Expenses' or coa.title()=='Other Cost Of Goods Sold' or coa.title()=='Salaries, Wages And Benefits' or coa.title()=='Charity And Donations' or coa.title()=='Lunger' or coa.title()=='Legal Expenses' or coa.title()=='Fuel Expenses' or coa.title()=='Research & Development Expenses' or coa.title()=='Reapir & Maintenance Admin' or coa.title()=='Insurance Expenses' or coa.title()=='Other Admin Expenses' or coa.title()=='Mark Up On Short Term Borrowing' or coa.title()=='Mark Up Leasing' or coa.title()=='Bank Charges' or coa.title()=='Taxation Expense'):
+							elif(coa.title()=='Directcost' or coa.title()=='Electricity Cost-Factory' or coa.title()=='Boiler_Fuel' or coa.title()=='Water Bill' or coa.title()=='Salaries And Wages-Direct' or coa.title()=='Reapir & Maintenance' or coa.title()=='Mess Expenses' or coa.title()=='Vehicle Running Expenses' or coa.title()=='Other Cost Of Goods Sold' or coa.title()=='Salaries Wages And Benefits' or coa.title()=='Charity And Donations' or coa.title()=='Lunger' or coa.title()=='Legal Expenses' or coa.title()=='Fuel Expenses' or coa.title()=='Research And Development Expenses' or coa.title()=='Reapir And Maintenance Admin' or coa.title()=='Insurance Expenses' or coa.title()=='Other Admin Expenses' or coa.title()=='Mark Up On Short Term Borrowing' or coa.title()=='Mark Up Leasing' or coa.title()=='Bank Charges' or coa.title()=='Taxation Expense'):
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
@@ -366,6 +366,94 @@ def calculate_segment_profit():
 													InterunitRevenue.get('nineteenLtr')+
 													InterunitRevenue.get('Confectionery')+
 													InterunitRevenue.get('Concentrate')
+													)) * data[0].account_value  
+								
+											save_doc = {
+											'doctype':'Account Segment Data',
+											'segment':bgroup_data,
+											'account':coa.title(),
+											'coa': str(account),
+											'company':single_unit,
+											'head':head.title(),
+											'date':date_yesterday,
+											'account_value':float(Amount)
+											}
+											frappe.get_doc(save_doc).save(ignore_permissions=True)	
+							elif(coa.title()=='Salaries Sales Staff' or coa.title()=='Advertising' or coa.title()=='Out Words Freights' or coa.title()=='Whare House Fork Lifetr Fuel & Repair' or coa.title()=='Give Away' or coa.title()=='Other Selling Expenses'):
+									data = frappe.db.sql("""
+												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
+												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												""".format(account,date_yesterday,single_unit),as_dict=True )
+									for index,bgroup_data in enumerate(bgroup):
+											if data[0].account_value != None :
+												data[0].account_value=0.000
+												
+											if(bgroup_data=='Concentrate'):
+												Amount =  0.000
+											elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
+												Amount =   ((InterunitRevenue.get('csd')+ShopRevenue.get('csd')+DistributorRevenue.get('csd'))/(
+													DistributorRevenue.get('csd')+
+													DistributorRevenue.get('Juice')+
+													DistributorRevenue.get('Water')+
+													DistributorRevenue.get('Confectionery')+
+													ShopRevenue.get('csd')+
+													ShopRevenue.get('Juice')+
+													ShopRevenue.get('Water')+
+													ShopRevenue.get('Confectionery')+
+													InterunitRevenue.get('csd')+
+													InterunitRevenue.get('Juice')+
+													InterunitRevenue.get('Water')+
+													InterunitRevenue.get('Confectionery')
+													)) * data[0].account_value 
+											elif(bgroup_data=='Juice'):
+												Amount =   ((InterunitRevenue.get('Juice')+ShopRevenue.get('Juice')+DistributorRevenue.get('Juice'))/(
+												DistributorRevenue.get('csd')+
+													DistributorRevenue.get('Juice')+
+													DistributorRevenue.get('Water')+
+													DistributorRevenue.get('Confectionery')+
+													ShopRevenue.get('csd')+
+													ShopRevenue.get('Juice')+
+													ShopRevenue.get('Water')+
+													ShopRevenue.get('Confectionery')+
+													InterunitRevenue.get('csd')+
+													InterunitRevenue.get('Juice')+
+													InterunitRevenue.get('Water')+
+													InterunitRevenue.get('Confectionery')
+													)) * data[0].account_value  
+											elif(bgroup_data=='Other'):
+												Amount =0.000
+											elif(bgroup_data=='19 Ltr'):
+												Amount =   0.0000
+											elif(bgroup_data=='Water'):
+												Amount =   ((InterunitRevenue.get('Water')+ShopRevenue.get('Water')+DistributorRevenue.get('Water'))/(
+													DistributorRevenue.get('csd')+
+													DistributorRevenue.get('Juice')+
+													DistributorRevenue.get('Water')+
+													DistributorRevenue.get('Confectionery')+
+													ShopRevenue.get('csd')+
+													ShopRevenue.get('Juice')+
+													ShopRevenue.get('Water')+
+													ShopRevenue.get('Confectionery')+
+													InterunitRevenue.get('csd')+
+													InterunitRevenue.get('Juice')+
+													InterunitRevenue.get('Water')+
+													InterunitRevenue.get('Confectionery')
+													)) * data[0].account_value  
+											elif(bgroup_data=='Confectionery'):
+												Amount =   ((InterunitRevenue.get('Confectionery')+ShopRevenue.get('Confectionery')+DistributorRevenue.get('Confectionery'))/(
+													DistributorRevenue.get('csd')+
+													DistributorRevenue.get('Juice')+
+													DistributorRevenue.get('Water')+
+													DistributorRevenue.get('Confectionery')+
+													ShopRevenue.get('csd')+
+													ShopRevenue.get('Juice')+
+													ShopRevenue.get('Water')+
+													ShopRevenue.get('Confectionery')+
+													InterunitRevenue.get('csd')+
+													InterunitRevenue.get('Juice')+
+													InterunitRevenue.get('Water')+
+													InterunitRevenue.get('Confectionery')
 													)) * data[0].account_value  
 								
 											save_doc = {
@@ -701,6 +789,86 @@ def calculate_segment_profit():
 												'account_value':float(Amount)
 											}
 										frappe.get_doc(save_doc).save(ignore_permissions=True)			
+							elif(coa.title()=='Other Income' or coa.title()=='Waste Sale'):
+									data = frappe.db.sql("""
+												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
+												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												""".format(account,date_yesterday,single_unit),as_dict=True )
+									for index,bgroup_data in enumerate(bgroup):
+										if data[0].account_value != None :
+												if(bgroup_data=='Concentrate'):
+													Amount =  0.00
+												elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
+													Amount =  data[0].account_value  
+												elif(bgroup_data=='Juice'):
+													Amount =   0.0000
+												elif(bgroup_data=='Other'):
+													Amount =0.000
+												elif(bgroup_data=='19 Ltr'):
+													Amount =     0.0000
+												elif(bgroup_data=='Water'):
+													Amount =    0.0000 
+												elif(bgroup_data=='Confectionery'):
+													Amount =   0.0000
+										else:
+											Amount = 0
+
+										save_doc = {
+										'doctype':'Account Segment Data',
+										'segment':bgroup_data,
+										'account':coa.title(),
+										'coa': str(account),
+										'company':single_unit,
+										'head':head.title(),
+										'date':date_yesterday,
+										'account_value':float(Amount)
+										}
+										frappe.get_doc(save_doc).save(ignore_permissions=True)
+							elif(coa.title()=='Material Consumption'):
+									Consumption =  frappe.db.sql("""
+													SELECT business_group,SUM(A.qty*D.`valuation_rate`) AS amount FROM `tabDelivery Note Item`  AS A
+													INNER JOIN `tabItem CSD` AS B ON A.`item_code` = B.item_code
+													INNER JOIN `tabDelivery Note` AS C ON A.`parent` = C.`name`
+													INNER JOIN `tabStock Ledger Entry` AS D ON A.`batch_no` = D.`batch_no` 
+													WHERE DATE(C.posting_date) BETWEEN '{0}' AND '{0}' AND C.company = '{1}'
+													AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
+													GROUP BY business_group		
+													""".format(date_yesterday,single_unit),as_dict=True)
+									count = 0
+									for index,bg in enumerate(bgroup):			
+										if bg not in str(Consumption):
+											Amount=0.000
+										else:
+											Amount= Consumption[count].get('amount')
+											count = count + 1
+											
+										if(bg=='Concentrate'):
+											ShopRevenue['Concentrate'] = Amount
+										elif(bg=='CSD (Carbonated Soft Drinks)'):
+											ShopRevenue['csd'] = Amount
+										elif(bg=='Juice'):
+											ShopRevenue['Juice'] = Amount
+										elif(bg=='Other'):
+											ShopRevenue['other']= Amount
+										elif(bg=='19 Ltr'):
+											ShopRevenue['nineteenLtr']= Amount
+										elif(bg=='Water'):
+											ShopRevenue['Water']= Amount
+										elif(bg=='Confectionery'):
+											ShopRevenue['Confectionery']= Amount
+
+										save_doc = {
+											'doctype':'Account Segment Data',
+											'segment':bg,
+											'account':coa.title(),
+											'coa': str(account),
+											'company':single_unit,
+											'head':head.title(),
+											'date':date_yesterday,
+											'account_value':float(Amount)
+											}
+										frappe.get_doc(save_doc).save(ignore_permissions=True)	
 						# save_doc = {
 						# 	'doctype':'Account Segment Data',
 						# 	'segment':bgroup_data,
