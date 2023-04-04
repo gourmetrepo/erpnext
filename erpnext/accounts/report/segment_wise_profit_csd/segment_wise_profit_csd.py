@@ -37,7 +37,7 @@ SELECT head,account,
 		FROM `tabAccount Segment Data`
 		WHERE DATE BETWEEN '{from_date}' and '{to_date}' 
 		AND company = '{company}'
-			GROUP BY head,`account`
+			GROUP BY head,`account` order by creation ASC
    ) AS A 
 	""".format(from_date=from_date, to_date=to_date,company=company), as_dict=True, debug =1)
 	data = prepare_data(r_data)
@@ -94,14 +94,14 @@ def prepare_data(r_data):
 						grand_child = []
 						child_rows.append(child_row)
 				
-					csd_total += parent_row['csd']
-					juices_total += parent_row['juices']
-					water_total += parent_row['water']
-					candyconfectionary_total += parent_row['candyconfectionary']
-					concentrates_total  += parent_row['concentrates']
-					ltr_total += parent_row['19ltr']
-					other_total += parent_row['other']
-					total_total += parent_row['total']
+						csd_total += _d['csd']
+						juices_total += _d['juices']
+						water_total += _d['water']
+						candyconfectionary_total += _d['candyconfectionary']
+						concentrates_total  += _d['concentrates']
+						ltr_total += _d['19ltr']
+						other_total += _d['other']
+						total_total += _d['total']
 			parent_row['indent'] = 0
 			# parent_row['parent_item_group'] ='Total Profit'
 			#parent_row['has_value'] = True
@@ -113,7 +113,7 @@ def prepare_data(r_data):
 	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
              'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2),'total': round(total_total,2), })
 	data.append({'head': 'Net Profit Total', 'account': '','csd': '',  'juices':'',
-             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total,2) })
+             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total+water_total,2) })
 	
 
 	return data

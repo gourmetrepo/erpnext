@@ -15,7 +15,8 @@ class AccountSegmentData(Document):
 
 @frappe.whitelist()
 def calculate_segment_profit():
-
+		sumdiv=0.0
+		sumtotal=0.0
 		DistributorRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		ShopRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
@@ -112,105 +113,37 @@ def calculate_segment_profit():
 															'account_value':float(Amount)
 														}
 													frappe.get_doc(save_doc).save(ignore_permissions=True)	
-							elif(coa.title()=='Sales Tax & Fed'):
+							elif(coa.title()=='Sales Tax & Fed' or coa.title()=='Federal Excise Duty'):
+									sumtotal= 0.00
+									sumdiv= 0.00
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
 												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
+									sumtotal = DistributorRevenue.get('csd')+DistributorRevenue.get('Juice')+DistributorRevenue.get('Water')+DistributorRevenue.get('nineteenLtr')+DistributorRevenue.get('Confectionery')+DistributorRevenue.get('Concentrate')+ShopRevenue.get('csd')+ShopRevenue.get('Juice')+ShopRevenue.get('Water')+ShopRevenue.get('nineteenLtr')+ShopRevenue.get('Confectionery')+ShopRevenue.get('Concentrate')
 									for index,bgroup_data in enumerate(bgroup):
 											if(bgroup_data=='Concentrate'):
-												Amount =   ((ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value 
+												sumdiv= ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
-												Amount =   ((ShopRevenue.get('csd')+DistributorRevenue.get('csd'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv= ShopRevenue.get('csd')+DistributorRevenue.get('csd')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value)  
 											elif(bgroup_data=='Juice'):
-												Amount =   ((ShopRevenue.get('Juice')+DistributorRevenue.get('Juice'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv= ShopRevenue.get('Juice')+DistributorRevenue.get('Juice')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value)  
 											elif(bgroup_data=='Other'):
 												Amount =0.000
 											elif(bgroup_data=='19 Ltr'):
-												Amount =   ((ShopRevenue.get('nineteenLtr')+DistributorRevenue.get('nineteenLtr'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv= ShopRevenue.get('nineteenLtr')+DistributorRevenue.get('nineteenLtr')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value)  
 											elif(bgroup_data=='Water'):
-												Amount =   ((ShopRevenue.get('Water')+DistributorRevenue.get('Water'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv= ShopRevenue.get('Water')+DistributorRevenue.get('Water')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value)  
 											elif(bgroup_data=='Confectionery'):
-												Amount =   ((ShopRevenue.get('Confectionery')+DistributorRevenue.get('Confectionery'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv= ShopRevenue.get('Confectionery')+DistributorRevenue.get('Confectionery')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value)  
+												
 								
 											save_doc = {
 											'doctype':'Account Segment Data',
@@ -223,143 +156,40 @@ def calculate_segment_profit():
 											'account_value':float(Amount)
 											}
 											frappe.get_doc(save_doc).save(ignore_permissions=True)	
-							elif(coa.title()=='Directcost' or coa.title()=='Electricity Cost-Factory' or coa.title()=='Boiler_Fuel' or coa.title()=='Water Bill' or coa.title()=='Salaries And Wages-Direct' or coa.title()=='Reapir & Maintenance' or coa.title()=='Mess Expenses' or coa.title()=='Vehicle Running Expenses' or coa.title()=='Other Cost Of Goods Sold' or coa.title()=='Salaries Wages And Benefits' or coa.title()=='Charity And Donations' or coa.title()=='Lunger' or coa.title()=='Legal Expenses' or coa.title()=='Fuel Expenses' or coa.title()=='Research And Development Expenses' or coa.title()=='Reapir And Maintenance Admin' or coa.title()=='Insurance Expenses' or coa.title()=='Other Admin Expenses' or coa.title()=='Mark Up On Short Term Borrowing' or coa.title()=='Mark Up Leasing' or coa.title()=='Bank Charges' or coa.title()=='Taxation Expense'):
+							elif(coa.title()=='Direct Cost' or coa.title()=='Electricity Cost-Factory' or coa.title()=='Boiler_Fuel' or coa.title()=='Water Bill' or coa.title()=='Salaries And Wages-Direct' or coa.title()=='Repair & Maintenance' or coa.title()=='Mess Expenses' or coa.title() == 'Vehicle Running Expenses' or coa.title()=='Other Cost Of Goods Sold' or coa.title()=='Salaries Wages And Benefits' or coa.title()=='Charity And Donations' or coa.title()=='Lunger' or coa.title()=='Legal Expenses' or coa.title()=='Fuel Expenses' or coa.title()=='Research And Development Expenses' or coa.title()=='Reapir And Maintenance Admin' or coa.title()=='Insurance Expenses' or coa.title()=='Other Admin Expenses' or coa.title()=='Mark Up On Short Term Borrowing' or coa.title()=='Mark Up Leasing' or coa.title()=='Bank Charges' or coa.title()=='Taxation Expense'):
+									sumdiv=0.0
+									sumtotal=0.0
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
 												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
-												""".format(account,date_yesterday,single_unit),as_dict=True )
+												""".format(account,date_yesterday,single_unit),as_dict=True ,debug=True)
+									sumtotal = DistributorRevenue.get('csd')+DistributorRevenue.get('Juice')+DistributorRevenue.get('Water')+DistributorRevenue.get('nineteenLtr')+DistributorRevenue.get('Confectionery')+DistributorRevenue.get('Concentrate')+ShopRevenue.get('csd')+ShopRevenue.get('Juice')+ShopRevenue.get('Water')+ShopRevenue.get('nineteenLtr')+ShopRevenue.get('Confectionery')+ShopRevenue.get('Concentrate')+InterunitRevenue.get('csd')+InterunitRevenue.get('Juice')+InterunitRevenue.get('Water')+InterunitRevenue.get('nineteenLtr')+InterunitRevenue.get('Confectionery')+InterunitRevenue.get('Concentrate')
+									print(sumtotal)			
 									for index,bgroup_data in enumerate(bgroup):
 								
 											if(bgroup_data=='Concentrate'):
-												Amount =   ((InterunitRevenue.get('Concentrate')+ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value 
+												sumdiv = InterunitRevenue.get('Concentrate')+ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
-												Amount =   ((InterunitRevenue.get('csd')+ShopRevenue.get('csd')+DistributorRevenue.get('csd'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value 
+												sumdiv = InterunitRevenue.get('csd')+ShopRevenue.get('csd')+DistributorRevenue.get('csd')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='Juice'):
-												Amount =   ((InterunitRevenue.get('Juice')+ShopRevenue.get('Juice')+DistributorRevenue.get('Juice'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv = InterunitRevenue.get('Juice')+ShopRevenue.get('Juice')+DistributorRevenue.get('Juice')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='Other'):
 												Amount =0.000
 											elif(bgroup_data=='19 Ltr'):
-												Amount =   ((InterunitRevenue.get('nineteenLtr')+ShopRevenue.get('nineteenLtr')+DistributorRevenue.get('nineteenLtr'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv = InterunitRevenue.get('nineteenLtr')+ShopRevenue.get('nineteenLtr')+DistributorRevenue.get('nineteenLtr')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='Water'):
-												Amount =   ((InterunitRevenue.get('Water')+ShopRevenue.get('Water')+DistributorRevenue.get('Water'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value  
+												sumdiv = InterunitRevenue.get('Water')+ShopRevenue.get('Water')+DistributorRevenue.get('Water')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
 											elif(bgroup_data=='Confectionery'):
-												Amount =   ((InterunitRevenue.get('Confectionery')+ShopRevenue.get('Confectionery')+DistributorRevenue.get('Confectionery'))/(
-													DistributorRevenue.get('csd')+
-													DistributorRevenue.get('Juice')+
-													DistributorRevenue.get('Water')+
-													DistributorRevenue.get('nineteenLtr')+
-													DistributorRevenue.get('Confectionery')+
-													DistributorRevenue.get('Concentrate')+
-													ShopRevenue.get('csd')+
-													ShopRevenue.get('Juice')+
-													ShopRevenue.get('Water')+
-													ShopRevenue.get('nineteenLtr')+
-													ShopRevenue.get('Confectionery')+
-													ShopRevenue.get('Concentrate')+
-													InterunitRevenue.get('csd')+
-													InterunitRevenue.get('Juice')+
-													InterunitRevenue.get('Water')+
-													InterunitRevenue.get('nineteenLtr')+
-													InterunitRevenue.get('Confectionery')+
-													InterunitRevenue.get('Concentrate')
-													)) * data[0].account_value  
-								
+												sumdiv = InterunitRevenue.get('Confectionery')+ShopRevenue.get('Confectionery')+DistributorRevenue.get('Confectionery')
+												Amount =   ((sumdiv/sumtotal) * data[0].account_value) 
+												
+											print(sumdiv)	
 											save_doc = {
 											'doctype':'Account Segment Data',
 											'segment':bgroup_data,
@@ -580,6 +410,37 @@ def calculate_segment_profit():
 											InterunitRevenue['Water']= Amount
 										elif(bg=='Confectionery'):
 											InterunitRevenue['Confectionery']= Amount
+
+										save_doc = {
+											'doctype':'Account Segment Data',
+											'segment':bg,
+											'account':coa.title(),
+											'coa': str(account),
+											'company':single_unit,
+											'head':head.title(),
+											'date':date_yesterday,
+											'account_value':float(Amount)
+											}
+										frappe.get_doc(save_doc).save(ignore_permissions=True)
+							elif(coa.title()=='Other Revenue'):
+									otherdata =  frappe.db.sql("""
+												select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
+												INNER JOIN `tabItem` as B ON A.`item_code` = B.item_code
+												INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+												INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
+												where 
+												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}' AND D.customer_group NOT IN ('Faisalabad Retail Shops','Islamabad Retail Shops','Multan Retail Shops','Lahore Retail Shops','Key-Account Customer','Modern Trade Shop','Inter-Unit','All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors')
+												AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
+											GROUP BY business_group		
+												""".format(date_yesterday,single_unit),as_dict=True)
+									count = 0
+									for index,bg in enumerate(bgroup):			
+										if bg not in str(otherdata):
+											Amount=0.000
+										else:
+											Amount= otherdata[count].get('amount')
+											count = count + 1
+										
 
 										save_doc = {
 											'doctype':'Account Segment Data',
@@ -829,23 +690,23 @@ def calculate_segment_profit():
 										if bg not in str(Consumption):
 											Amount=0.000
 										else:
-											Amount= Consumption[count].get('amount')
+											Amount = (-1*(Consumption[count].get('amount')))
 											count = count + 1
 											
-										if(bg=='Concentrate'):
-											ShopRevenue['Concentrate'] = Amount
-										elif(bg=='CSD (Carbonated Soft Drinks)'):
-											ShopRevenue['csd'] = Amount
-										elif(bg=='Juice'):
-											ShopRevenue['Juice'] = Amount
-										elif(bg=='Other'):
-											ShopRevenue['other']= Amount
-										elif(bg=='19 Ltr'):
-											ShopRevenue['nineteenLtr']= Amount
-										elif(bg=='Water'):
-											ShopRevenue['Water']= Amount
-										elif(bg=='Confectionery'):
-											ShopRevenue['Confectionery']= Amount
+										# if(bg=='Concentrate'):
+										# 	ShopRevenue['Concentrate'] = Amount
+										# elif(bg=='CSD (Carbonated Soft Drinks)'):
+										# 	ShopRevenue['csd'] = Amount
+										# elif(bg=='Juice'):
+										# 	ShopRevenue['Juice'] = Amount
+										# elif(bg=='Other'):
+										# 	ShopRevenue['other']= Amount
+										# elif(bg=='19 Ltr'):
+										# 	ShopRevenue['nineteenLtr']= Amount
+										# elif(bg=='Water'):
+										# 	ShopRevenue['Water']= Amount
+										# elif(bg=='Confectionery'):
+										# 	ShopRevenue['Confectionery']= Amount
 
 										save_doc = {
 											'doctype':'Account Segment Data',
