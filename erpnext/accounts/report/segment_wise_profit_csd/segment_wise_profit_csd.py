@@ -38,18 +38,18 @@ SELECT head,account,
 		WHERE DATE BETWEEN '{from_date}' and '{to_date}' 
 		AND company = '{company}'
 			GROUP BY head,`account`
-   ORDER BY creation ASC) AS A ORDER BY CASE
-         WHEN A.head = 'Revenue' THEN 1
-         WHEN A.head = 'Cost Of Goods Sold' THEN 2 
-         WHEN A.head = 'Other Income' THEN 3
-         WHEN A.head = 'Administrative Expenses' THEN 4
-         WHEN A.head= 'Selling And Distribution Expenses' THEN 5
-         WHEN A.head= 'Markup Long Term Loans' THEN 6
-          WHEN A.head= 'Taxation' THEN 7
-         END ASC  
+   ) AS A 
 	""".format(from_date=from_date, to_date=to_date,company=company), as_dict=True, debug =1)
 	data = prepare_data(r_data)
- 
+#  ORDER BY CASE
+#          WHEN A.head = 'Revenue' THEN 1
+#          WHEN A.head = 'Cost Of Goods Sold' THEN 2 
+#          WHEN A.head = 'Other Income' THEN 3
+#          WHEN A.head = 'Administrative Expenses' THEN 4
+#          WHEN A.head= 'Selling And Distribution Expenses' THEN 5
+#          WHEN A.head= 'Markup Long Term Loans' THEN 6
+#           WHEN A.head= 'Taxation' THEN 7
+#          END ASC  
 
 	return columns, data
 def prepare_data(r_data):	

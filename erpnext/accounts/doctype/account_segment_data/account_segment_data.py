@@ -19,7 +19,7 @@ def calculate_segment_profit():
 		DistributorRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		ShopRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
-		bgroup = ['CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other']
+		bgroup = ['19 Ltr','Concentrate','Confectionery','CSD (Carbonated Soft Drinks)','Juice','Other','Water']
 		form_body = get_post_params()
 		if form_body.get('date'):
 			date_yesterday = form_body.get('date')
@@ -48,10 +48,9 @@ def calculate_segment_profit():
 										data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
 										for index,bgroup_data in enumerate(bgroup):
-											if data[0].account_value != None :
 													if(bgroup_data=='Concentrate'):
 														Amount =  0.00
 													elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
@@ -101,30 +100,25 @@ def calculate_segment_profit():
 															DistributorRevenue.get('Confectionery')
 															
 															)) * data[0].account_value 
-											else:
-												Amount = 0
-
-											save_doc = {
-											'doctype':'Account Segment Data',
-											'segment':bgroup_data,
-											'account':coa.title(),
-											'coa': str(account),
-											'company':single_unit,
-											'head':head.title(),
-											'date':date_yesterday,
-											'account_value':float(Amount)
-											}
-											frappe.get_doc(save_doc).save(ignore_permissions=True)	
+												
+													save_doc = {
+															'doctype':'Account Segment Data',
+															'segment':bgroup_data,
+															'account':coa.title(),
+															'coa': str(account),
+															'company':single_unit,
+															'head':head.title(),
+															'date':date_yesterday,
+															'account_value':float(Amount)
+														}
+													frappe.get_doc(save_doc).save(ignore_permissions=True)	
 							elif(coa.title()=='Sales Tax & Fed'):
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
 									for index,bgroup_data in enumerate(bgroup):
-											if data[0].account_value != None :
-												data[0].account_value=0.000
-												
 											if(bgroup_data=='Concentrate'):
 												Amount =   ((ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate'))/(
 													DistributorRevenue.get('csd')+
@@ -233,12 +227,10 @@ def calculate_segment_profit():
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
 									for index,bgroup_data in enumerate(bgroup):
-											if data[0].account_value != None :
-												data[0].account_value=0.000
-												
+								
 											if(bgroup_data=='Concentrate'):
 												Amount =   ((InterunitRevenue.get('Concentrate')+ShopRevenue.get('Concentrate')+DistributorRevenue.get('Concentrate'))/(
 													DistributorRevenue.get('csd')+
@@ -383,12 +375,10 @@ def calculate_segment_profit():
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
 									for index,bgroup_data in enumerate(bgroup):
-											if data[0].account_value != None :
-												data[0].account_value=0.000
-												
+										
 											if(bgroup_data=='Concentrate'):
 												Amount =  0.000
 											elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
@@ -471,10 +461,11 @@ def calculate_segment_profit():
 							if (coa.title()=='Distributor Revenue'):
 									DRData =  frappe.db.sql("""
 											select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
-											INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+											INNER JOIN `tabItem` as B ON A.`item_code` = B.item_code
 											INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+											INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
 											where 
-											DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND C.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors')
+											DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}' AND D.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors')
 											AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 											GROUP BY business_group											
 											""".format(date_yesterday,single_unit),as_dict=True)
@@ -514,10 +505,11 @@ def calculate_segment_profit():
 							elif (coa.title()=='Shop Sale'):
 									Shopdata =  frappe.db.sql("""
 												select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
-												INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+												INNER JOIN `tabItem` as B ON A.`item_code` = B.item_code
 												INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+												INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
 												where 
-												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND C.customer_group IN ('Faisalabad Retail Shops','Islamabad Retail Shops','Multan Retail Shops','Lahore Retail Shops','Key-Account Customer','Modern Trade Shop')
+												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}' AND D.customer_group IN ('Faisalabad Retail Shops','Islamabad Retail Shops','Multan Retail Shops','Lahore Retail Shops','Key-Account Customer','Modern Trade Shop')
 												AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 											GROUP BY business_group		
 												""".format(date_yesterday,single_unit),as_dict=True)
@@ -558,10 +550,11 @@ def calculate_segment_profit():
 							elif (coa.title()=='Inter Units Revenue'):
 									iudata =  frappe.db.sql("""
 												select business_group,sum(amount) as amount from `tabSales Invoice Item` as A
-												INNER JOIN `tabItem CSD` as B ON A.`item_code` = B.item_code
+												INNER JOIN `tabItem` as B ON A.`item_code` = B.item_code
 												INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
+												INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
 												where 
-												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.company = '{1}' AND C.customer_group IN ('Inter-Unit')
+												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}' AND D.customer_group IN ('Inter-Unit')
 												AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 											GROUP BY business_group		
 												""".format(date_yesterday,single_unit),as_dict=True)
@@ -789,14 +782,13 @@ def calculate_segment_profit():
 												'account_value':float(Amount)
 											}
 										frappe.get_doc(save_doc).save(ignore_permissions=True)			
-							elif(coa.title()=='Other Income' or coa.title()=='Waste Sale'):
+							elif(coa.title()=='Others Income' or coa.title()=='Waste Sale'):
 									data = frappe.db.sql("""
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
-												AND DATE(creation) BETWEEN '{1}' AND '{1}'
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
 												""".format(account,date_yesterday,single_unit),as_dict=True )
 									for index,bgroup_data in enumerate(bgroup):
-										if data[0].account_value != None :
 												if(bgroup_data=='Concentrate'):
 													Amount =  0.00
 												elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
@@ -811,28 +803,25 @@ def calculate_segment_profit():
 													Amount =    0.0000 
 												elif(bgroup_data=='Confectionery'):
 													Amount =   0.0000
-										else:
-											Amount = 0
-
-										save_doc = {
-										'doctype':'Account Segment Data',
-										'segment':bgroup_data,
-										'account':coa.title(),
-										'coa': str(account),
-										'company':single_unit,
-										'head':head.title(),
-										'date':date_yesterday,
-										'account_value':float(Amount)
-										}
-										frappe.get_doc(save_doc).save(ignore_permissions=True)
+									
+												save_doc = {
+												'doctype':'Account Segment Data',
+												'segment':bgroup_data,
+												'account':coa.title(),
+												'coa': str(account),
+												'company':single_unit,
+												'head':head.title(),
+												'date':date_yesterday,
+												'account_value':float(Amount)
+												}
+												frappe.get_doc(save_doc).save(ignore_permissions=True)
 							elif(coa.title()=='Material Consumption'):
 									Consumption =  frappe.db.sql("""
-													SELECT business_group,SUM(A.qty*D.`valuation_rate`) AS amount FROM `tabDelivery Note Item`  AS A
-													INNER JOIN `tabItem CSD` AS B ON A.`item_code` = B.item_code
+													SELECT business_group,SUM(A.qty*(SELECT `valuation_rate` FROM `tabStock Ledger Entry` AS D WHERE A.`batch_no` = D.`batch_no`  LIMIT 1 )) AS amount FROM `tabDelivery Note Item`  AS A
+													INNER JOIN `tabItem` AS B ON A.`item_code` = B.item_code
 													INNER JOIN `tabDelivery Note` AS C ON A.`parent` = C.`name`
-													INNER JOIN `tabStock Ledger Entry` AS D ON A.`batch_no` = D.`batch_no` 
 													WHERE DATE(C.posting_date) BETWEEN '{0}' AND '{0}' AND C.company = '{1}'
-													AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
+													 AND C.docstatus=1  AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 													GROUP BY business_group		
 													""".format(date_yesterday,single_unit),as_dict=True)
 									count = 0
