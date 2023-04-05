@@ -26,20 +26,17 @@ def calculate_segmented_profit_date_range():
    
    
 @frappe.whitelist()
-def calculate_segment_profit(f_date=None):
+def calculate_segment_profit(f_date=''):
 		sumdiv=0.0
 		sumtotal=0.0
 		DistributorRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		ShopRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		bgroup = ['19 Ltr','Concentrate','Confectionery','CSD (Carbonated Soft Drinks)','Juice','Other','Water']
-		# if  frappe.request.data:
-		# 	form_body = get_post_params()
 
-		if(f_date!=None):
+		if(f_date!=''):
 			date_yesterday = f_date
-		# elif form_body.get('date'):
-		# 	date_yesterday = form_body.get('date')
+		
 		else:
 			date_yesterday = add_days(today(), -1)
 
