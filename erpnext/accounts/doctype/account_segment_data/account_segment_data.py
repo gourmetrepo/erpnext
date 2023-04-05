@@ -474,7 +474,7 @@ def calculate_segment_profit(f_date=''):
 																	INNER JOIN `tabSales Taxes and Charges` AS B ON B.parent= A.name
 																	INNER JOIN `tabCustomer` AS C ON C.name = A.`customer`
 																	WHERE  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}'  AND C.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
-																	AND D.`account_head` in ({account})""")
+																	AND B.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
 											json_result = json.loads(d[0])
@@ -513,7 +513,7 @@ def calculate_segment_profit(f_date=''):
 																	INNER JOIN `tabSales Taxes and Charges` AS B ON B.parent= A.name
 																	INNER JOIN `tabCustomer` AS C ON C.name = A.`customer`
 																	WHERE  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}'  AND C.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
-																	AND D.`account_head` in ({account})""")
+																	AND B.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
 											json_result = json.loads(d[0])
@@ -552,7 +552,7 @@ def calculate_segment_profit(f_date=''):
 																	INNER JOIN `tabSales Taxes and Charges` AS B ON B.parent= A.name
 																	INNER JOIN `tabCustomer` AS C ON C.name = A.`customer`
 																	WHERE  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}'  AND C.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
-																	AND D.`account_head` in ({account})""")
+																	AND B.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
 											json_result = json.loads(d[0])
