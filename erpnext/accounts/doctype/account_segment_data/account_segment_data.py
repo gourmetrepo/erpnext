@@ -21,7 +21,7 @@ def calculate_segmented_profit_date_range():
 
 		for i in range(0, 31):  # loop through 1 to 15 days
 			date = start_date + timedelta(days=i)
-			calculate_segment_profit(start_date)
+			calculate_segment_profit(date)
 			print(date.strftime('%Y-%m-%d'))
    
    
