@@ -19,25 +19,27 @@ def calculate_segmented_profit_date_range():
 		if form_body.get('start_date'):
 			start_date = datetime.strptime(form_body.get('start_date'), "%Y-%m-%d")
 
-		for i in range(0, 31):  # loop through 1 to 15 days
+		for i in range(0, 32):  # loop through 1 to 15 days
 			date = start_date + timedelta(days=i)
 			calculate_segment_profit(date)
 			print(date.strftime('%Y-%m-%d'))
    
    
 @frappe.whitelist()
-def calculate_segment_profit(f_date):
+def calculate_segment_profit(f_date=None):
 		sumdiv=0.0
 		sumtotal=0.0
 		DistributorRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		ShopRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		bgroup = ['19 Ltr','Concentrate','Confectionery','CSD (Carbonated Soft Drinks)','Juice','Other','Water']
-		form_body = get_post_params()
+		# if  frappe.request.data:
+		# 	form_body = get_post_params()
+
 		if(f_date):
 			date_yesterday = f_date
-		elif form_body.get('date'):
-			date_yesterday = form_body.get('date')
+		# elif form_body.get('date'):
+		# 	date_yesterday = form_body.get('date')
 		else:
 			date_yesterday = add_days(today(), -1)
 
