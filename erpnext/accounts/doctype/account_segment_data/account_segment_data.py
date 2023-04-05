@@ -36,7 +36,7 @@ def calculate_segment_profit(f_date=None):
 		# if  frappe.request.data:
 		# 	form_body = get_post_params()
 
-		if(f_date):
+		if(f_date!=None):
 			date_yesterday = f_date
 		# elif form_body.get('date'):
 		# 	date_yesterday = form_body.get('date')
