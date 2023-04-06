@@ -65,6 +65,7 @@ def prepare_data(r_data):
 			parent_row["concentrates"]=parent_row["csd"]=parent_row["juices"]=parent_row["water"]=parent_row["candyconfectionary"]=parent_row["19ltr"]=parent_row["other"]=0
 			account =""
 			for _k, _d in enumerate(r_data[k:]):
+				parent_row["total"] =0.00
 				if parent_head == _d.head:
 					parent_row["csd"] += round(float(_d["csd"] or 0),2)
 					parent_row["juices"] += round(float(_d["juices"] or 0),2)
