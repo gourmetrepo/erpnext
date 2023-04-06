@@ -587,9 +587,9 @@ def calculate_segment_profit(f_date=''):
 									dict = {}
 									Amount = 0	
 									result = frappe.db.sql(f"""SELECT item_wise_tax_detail
-																	FROM `tabSales Invoice` AS C
-																	INNER JOIN `tabSales Taxes and Charges` AS D ON D.parent= C.name
-																	WHERE A.docstatus=1 AND  DATE(C.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND C.company = '{single_unit}'  
+																	FROM `tabSales Invoice` AS A
+																	INNER JOIN `tabSales Taxes and Charges` AS D ON D.parent= A.name
+																	WHERE A.docstatus=1 AND  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}'  
 																	AND D.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
@@ -625,9 +625,9 @@ def calculate_segment_profit(f_date=''):
 									dict = {}
 									Amount = 0	
 									result = frappe.db.sql(f"""SELECT item_wise_tax_detail
-																	FROM `tabSales Invoice` AS C
-																	INNER JOIN `tabSales Taxes and Charges` AS D ON D.parent= C.name
-																	WHERE A.docstatus=1 AND  DATE(C.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND C.company = '{single_unit}' AND C.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
+																	FROM `tabSales Invoice` AS A
+																	INNER JOIN `tabSales Taxes and Charges` AS D ON D.parent= A.name
+																	WHERE A.docstatus=1 AND  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}' AND A.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
 																	AND D.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
