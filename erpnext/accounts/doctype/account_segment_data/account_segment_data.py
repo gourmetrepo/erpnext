@@ -376,7 +376,7 @@ def calculate_segment_profit(f_date=''):
 												INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
 												INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
 												where 
-												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}' AND D.customer_group IN ('Inter-Unit')
+												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}'  AND A.customer_group IN ('Inter-Unit')
 												AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 											GROUP BY business_group		
 												""".format(date_yesterday,single_unit),as_dict=True)
@@ -645,7 +645,7 @@ def calculate_segment_profit(f_date=''):
 									result = frappe.db.sql(f"""SELECT item_wise_tax_detail
 																	FROM `tabSales Invoice` AS A
 																	INNER JOIN `tabSales Taxes and Charges` AS D ON D.parent= A.name
-																	WHERE A.docstatus=1 AND  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}' AND A.customer_group IN ('All Customer Groups','CSD Distributors','Restaurants','Gourmet Gujranwala Shops','Confectionary Distributors','RGB Distributors') 
+																	WHERE A.docstatus=1 AND  DATE(A.`posting_date`) BETWEEN '{date_yesterday}' AND '{date_yesterday}' AND A.company = '{single_unit}' 
 																	AND D.`account_head` in ({account})""")
 									b_g = frappe.db.sql("""SELECT business_group, group_concat(NAME) as items_code FROM `tabItem` GROUP BY business_group""", as_dict=True)
 									for d in result:
