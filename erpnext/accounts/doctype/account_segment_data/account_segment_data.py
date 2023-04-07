@@ -712,7 +712,7 @@ def calculate_segment_profit(f_date=''):
 												frappe.get_doc(save_doc).save(ignore_permissions=True)
 							elif(coa.title()=='Material Consumption'):
 									Consumption =  frappe.db.sql("""
-													SELECT business_group,SUM(A.qty*(SELECT `valuation_rate` FROM `tabStock Ledger Entry` AS D WHERE A.`batch_no` = D.`batch_no`  LIMIT 1 )) AS amount FROM `tabDelivery Note Item`  AS A
+													SELECT business_group,SUM((CASE WHEN C.name LIKE '%MAT-RN%' THEN -1*A.qty ELSE A.qty END)*(SELECT `valuation_rate` FROM `tabStock Ledger Entry` AS D WHERE A.`batch_no` = D.`batch_no`  LIMIT 1 )) AS amount FROM `tabDelivery Note Item`  AS A
 													INNER JOIN `tabItem` AS B ON A.`item_code` = B.item_code
 													INNER JOIN `tabDelivery Note` AS C ON A.`parent` = C.`name`
 													WHERE DATE(C.posting_date) BETWEEN '{0}' AND '{0}' AND C.company = '{1}'
