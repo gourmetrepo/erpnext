@@ -712,7 +712,7 @@ def calculate_segment_profit(f_date=''):
 												frappe.get_doc(save_doc).save(ignore_permissions=True)
 							elif(coa.title()=='Material Consumption'):
 									Consumption =  frappe.db.sql("""
-													SELECT business_group,SUM(stock_value_difference) FROM `tabStock Ledger Entry`  AS A
+													SELECT business_group,SUM(stock_value_difference) as amount FROM `tabStock Ledger Entry`  AS A
 													INNER JOIN `tabItem` AS B ON A.`item_code` = B.item_code
 													WHERE  A.voucher_type='Delivery Note' AND DATE(A.posting_date) BETWEEN '{0}' AND '{0}' AND A.company = '{1}'
 													AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
