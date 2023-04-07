@@ -66,9 +66,9 @@ def insertData(from_date,to_date,head=''):
 						'company':company,
 						'account': str(account_title),
 						'date':current_date,
-						'opening': opening_balance,
-						'closing' : closing_balance,
-						'value' : value
+						'opening': 0,
+						'closing' : 0,
+						'value' : account_totel
 					}
 					frappe.get_doc(save_doc).save(ignore_permissions=True)
 		current_date += timedelta(days=1)
