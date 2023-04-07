@@ -376,7 +376,7 @@ def calculate_segment_profit(f_date=''):
 												INNER JOIN `tabSales Invoice` AS C ON C.name = A.parent
 												INNER JOIN `tabCustomer` AS D ON D.name = C.`customer`
 												where 
-												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}'  AND A.customer_group IN ('Inter-Unit')
+												DATE(C.`posting_date`) between '{0}' AND '{0}' AND C.docstatus=1 AND C.company = '{1}'  AND D.customer_group IN ('Inter-Unit')
 												AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
 											GROUP BY business_group		
 												""".format(date_yesterday,single_unit),as_dict=True)
