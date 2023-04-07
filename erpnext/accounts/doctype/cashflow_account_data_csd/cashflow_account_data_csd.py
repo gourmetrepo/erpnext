@@ -59,6 +59,8 @@ def insertData(from_date,to_date,head=''):
 						}
 						frappe.get_doc(save_doc).save(ignore_permissions=True)
 						account_totel += value
+					if account_totel < 0:
+						account_totel = account_totel * -1
 					#save doc
 					save_doc = {
 						'doctype':'Cashflow account data csd',
