@@ -712,12 +712,11 @@ def calculate_segment_profit(f_date=''):
 												frappe.get_doc(save_doc).save(ignore_permissions=True)
 							elif(coa.title()=='Material Consumption'):
 									Consumption =  frappe.db.sql("""
-													SELECT business_group,SUM((CASE WHEN C.name LIKE '%MAT-RN%' THEN -1*A.qty ELSE A.qty END)*(SELECT `valuation_rate` FROM `tabStock Ledger Entry` AS D WHERE A.`batch_no` = D.`batch_no`  LIMIT 1 )) AS amount FROM `tabDelivery Note Item`  AS A
+													SELECT business_group,SUM(stock_value_difference) FROM `tabStock Ledger Entry`  AS A
 													INNER JOIN `tabItem` AS B ON A.`item_code` = B.item_code
-													INNER JOIN `tabDelivery Note` AS C ON A.`parent` = C.`name`
-													WHERE DATE(C.posting_date) BETWEEN '{0}' AND '{0}' AND C.company = '{1}'
-													 AND C.docstatus=1  AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
-													GROUP BY business_group		
+													WHERE  A.voucher_type='Delivery Note' AND DATE(A.posting_date) BETWEEN '{0}' AND '{0}' AND A.company = '{1}'
+													AND `business_group` IN ('CSD (Carbonated Soft Drinks)','Concentrate','Confectionery','Water','Juice','19 Ltr','Other')	
+													GROUP BY business_group	
 													""".format(date_yesterday,single_unit),as_dict=True)
 									count = 0
 									for index,bg in enumerate(bgroup):			
