@@ -63,32 +63,33 @@ def prepare_data(r_data):
 			child_rows=[]
 			parent_row = copy.copy(d)
 			parent_row["concentrates"]=parent_row["csd"]=parent_row["juices"]=parent_row["water"]=parent_row["candyconfectionary"]=parent_row["19ltr"]=parent_row["other"]=0
+			parent_row['account']=''
 			account =""
 			parent_row["total"] =0.00
 			for _k, _d in enumerate(r_data[k:]):
 				
 				if parent_head == _d.head:
-					parent_row["csd"] += round(float(_d["csd"] or 0),2)
-					parent_row["juices"] += round(float(_d["juices"] or 0),2)
-					parent_row["water"] += round(float(_d["water"] or 0),2)
-					parent_row["candyconfectionary"] += round(float(_d["candyconfectionary"] or 0),2)
-					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),2)
-					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),2)
-					parent_row["other"] += round(float(_d["other"] or 0),2)
-					parent_row["total"] += round(float(_d["total"] or 0),2)
-					parent_row['account']=''
+					parent_row["csd"] += round(float(_d["csd"] or 0),1)
+					parent_row["juices"] += round(float(_d["juices"] or 0),1)
+					parent_row["water"] += round(float(_d["water"] or 0),1)
+					parent_row["candyconfectionary"] += round(float(_d["candyconfectionary"] or 0),1)
+					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),1)
+					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),1)
+					parent_row["other"] += round(float(_d["other"] or 0),1)
+					parent_row["total"] += round(float(_d["total"] or 0),1)
+					
 					head=""
 					if account != _d.account:
 						account = _d.account
 						child_row = copy.copy(_d)
-						child_row['csd'] = round(float(_d["csd"] or 0),2)
-						child_row['juices'] = round(float(_d["juices"] or 0),2)
+						child_row['csd'] = round(float(_d["csd"] or 0),1)
+						child_row['juices'] = round(float(_d["juices"] or 0),1)
 						child_row['water'] = round(float(_d["water"] or 0),2)
-						child_row['candyconfectionary'] = round(float(_d["candyconfectionary"] or 0),2)
-						child_row["concentrates"] = round(float(_d["concentrates"] or 0),2)
-						child_row['19ltr'] = round(float(_d["19ltr"] or 0),2)
-						child_row['other'] = round(float(_d["other"] or 0),2)
-						child_row["total"] = round(float(_d["total"] or 0),2)
+						child_row['candyconfectionary'] = round(float(_d["candyconfectionary"] or 0),1)
+						child_row["concentrates"] = round(float(_d["concentrates"] or 0),1)
+						child_row['19ltr'] = round(float(_d["19ltr"] or 0),1)
+						child_row['other'] = round(float(_d["other"] or 0),1)
+						child_row["total"] = round(float(_d["total"] or 0),1)
 						child_row['head'] = ''
 						child_row['parent_item_group'] = _d["head"]
 						child_row['indent'] = 1
@@ -112,10 +113,10 @@ def prepare_data(r_data):
 			for row in child_rows:
 				data.append(row)
 
-	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
-             'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2),'total': round(total_total,2), })
+	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,1), 'juices':  round(juices_total,2),
+             'water':  round(water_total,1), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,1), '19ltr':  round(ltr_total,1), 'other': round(other_total,1),'total': round(total_total,1), })
 	data.append({'head': 'Net Profit Total', 'account': '','csd': '',  'juices':'',
-             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total+water_total,2) })
+             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total+water_total,1) })
 	
 
 	return data

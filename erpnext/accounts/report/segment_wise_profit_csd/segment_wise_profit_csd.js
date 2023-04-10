@@ -30,6 +30,7 @@ frappe.query_reports["Segment Wise Profit CSD"] = {
 	],
 	"formatter": function(value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
+		console.log(value+typeof value)
         if (data.indent == 0 || data.indent == 1 || data.indent == 2){
             if (data.indent == 0){
                 color = '#649ff0'
@@ -40,10 +41,16 @@ frappe.query_reports["Segment Wise Profit CSD"] = {
             if (data.indent == 2){
                 color = '#000000'
             }
-			
-			return "<b style=\"color:"+color+"\">"+value.bold()+"</b>";
+			// if (typeof value === 'number') {
+			// 	value = value.toFixed(0);
+
+			// }
+			return "<b style=\"color:"+color+";text-align:left; display:inline-block; width:100%;\">"+value.bold()+"</b>";
         }else{
-            return "<span style=\"color:#009900\">"+value.bold()+"</span>";
+            return "<span style=\"color:#009900; text-align:left; display:inline-block; width:100%;\">"+value.bold()+"</span>";
+		// 	return "<b style=\"color:"+color+";text-align:left; display:inline-block; width:100%;\">"+(typeof value === 'number' && value % 1 !== 0 ? Math.round(value) : value).bold()+"</b>";
+        // }else{
+        //     return "<span style=\"color:#009900; text-align:left; display:inline-block; width:100%;\">"+(typeof value === 'number' && value % 1 !== 0 ? Math.round(value) : value).bold()+"</span>";
         }
     },
     "treeView": true,
