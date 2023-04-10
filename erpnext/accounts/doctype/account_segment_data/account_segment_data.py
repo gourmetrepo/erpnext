@@ -555,7 +555,8 @@ def calculate_segment_profit(f_date=''):
 											Amount=0.000
 										else:
 											Amount= dict.get(bg)
-										
+											distributormargintotal+=Amount
+
 										save_doc = {
 												'doctype':'Account Segment Data',
 												'segment':bg,
@@ -594,7 +595,7 @@ def calculate_segment_profit(f_date=''):
 											Amount=0.000
 										else:
 											Amount= dict.get(bg)
-										
+											distributormargintotal+=Amount
 										save_doc = {
 												'doctype':'Account Segment Data',
 												'segment':bg,
