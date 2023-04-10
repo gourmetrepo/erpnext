@@ -30,6 +30,7 @@ def calculate_segment_profit(f_date=''):
 		sumdiv=0.0
 		sumtotal=0.0
 		Shopdiscountinvoices=0.0
+		distributormargintotal=0.0
 		DistributorRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		ShopRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
@@ -279,6 +280,48 @@ def calculate_segment_profit(f_date=''):
 											'account_value':float(Amount)
 											}
 											frappe.get_doc(save_doc).save(ignore_permissions=True)		
+							elif(coa.title()=='Other Margin'):
+										sumtotal= 0.00
+										sumdiv= 0.00
+										data = frappe.db.sql("""
+												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
+												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
+												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
+												""".format(account,date_yesterday,single_unit),as_dict=True )
+										sumtotal =	DistributorRevenue.get('csd')+DistributorRevenue.get('Juice')+DistributorRevenue.get('Water')+DistributorRevenue.get('nineteenLtr')+DistributorRevenue.get('Confectionery')
+										for index,bgroup_data in enumerate(bgroup):
+													if(bgroup_data=='Concentrate'):
+														Amount =  0.00
+													elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
+														sumdiv= DistributorRevenue.get('csd')
+														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+													elif(bgroup_data=='Juice'):
+														sumdiv=DistributorRevenue.get('Juice')
+														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+													elif(bgroup_data=='Other'):
+														Amount =0.000
+													elif(bgroup_data=='19 Ltr'):
+														sumdiv=DistributorRevenue.get('nineteenLtr')
+														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+													elif(bgroup_data=='Water'):
+														sumdiv=DistributorRevenue.get('Water')
+														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														
+													elif(bgroup_data=='Confectionery'):
+														sumdiv=DistributorRevenue.get('Confectionery')
+														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														
+													save_doc = {
+															'doctype':'Account Segment Data',
+															'segment':bgroup_data,
+															'account':coa.title(),
+															'coa': str(account),
+															'company':single_unit,
+															'head':head.title(),
+															'date':date_yesterday,
+															'account_value':float(Amount)
+														}
+													frappe.get_doc(save_doc).save(ignore_permissions=True)
 						else:
 							if (coa.title()=='Distributor Revenue'):
 									DRData =  frappe.db.sql("""
@@ -472,6 +515,7 @@ def calculate_segment_profit(f_date=''):
 											Amount=0.000
 										else:
 											Amount= dict.get(bg)
+											distributormargintotal+=Amount
 										
 										save_doc = {
 												'doctype':'Account Segment Data',
@@ -723,7 +767,7 @@ def calculate_segment_profit(f_date=''):
 										if bg not in str(Consumption):
 											Amount=0.000
 										else:
-											Amount = (-1*(Consumption[count].get('amount')))
+											Amount = ((Consumption[count].get('amount')))
 											count = count + 1
 
 										save_doc = {
