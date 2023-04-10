@@ -280,7 +280,7 @@ def calculate_segment_profit(f_date=''):
 											'account_value':float(Amount)
 											}
 											frappe.get_doc(save_doc).save(ignore_permissions=True)		
-							elif(coa.title()=='Other Margin'):
+							elif(coa.title()=='Other Margin Discount Jv'):
 										sumtotal= 0.00
 										sumdiv= 0.00
 										data = frappe.db.sql("""
