@@ -21,14 +21,18 @@ def insertData(from_date,to_date,head=''):
 	from_date = datetime.strptime(from_date, "%Y-%m-%d").date()	
 	to_date = datetime.strptime(to_date, "%Y-%m-%d").date()	
 	current_date = from_date
+	account_head_total = {}
 	while current_date <= to_date:
 		for company, company_account in cashflow_config.items():
 			for a in company_account:
-				head = a.get('head')
+				head = a.get('head')				
 				for b in a.get('accounts'):
 					account_title = b.get('title')
-					account_totel = 0
+					account_total = 0
+					# account_opening = 0
+					# account_closing = 0
 					for account in b.get('account'):
+						print(account)
 						filters = _dict()
 						filters['group_by'] = _("Group by Voucher")
 						filters['include_default_book_entries'] = True
@@ -45,7 +49,18 @@ def insertData(from_date,to_date,head=''):
 									opening_balance = d.debit - d.credit
 								elif d.get('account') == "'Closing (Opening + Total)'":
 									closing_balance = d.debit - d.credit
+
 						value = opening_balance - closing_balance
+						# if account_title == "6.01.01.001 - Un appropriated Profit/(Loss)":
+						# 	opening_balance += account_head_total['404 - Income'].get('opening')
+						# 	closing_balance += account_head_total['404 - Income'].get('closing')
+						# 	opening_balance += account_head_total['505 - Expenses'].get('opening')
+						# 	closing_balance += account_head_total['505 - Expenses'].get('closing')
+
+						# 	value = opening_balance - closing_balance
+						# 	value = value - account_head_total['404 - Income'].get('value')
+						# 	value = value - account_head_total['505 - Expenses'].get('value')
+
 						#save doc
 						save_doc = {
 							'doctype':'Cashflow account data csd',
@@ -58,9 +73,14 @@ def insertData(from_date,to_date,head=''):
 							'value' : value
 						}
 						frappe.get_doc(save_doc).save(ignore_permissions=True)
-						account_totel += value
-					if account_totel < 0:
-						account_totel = account_totel * -1
+						account_total += value
+						# account_opening += opening_balance
+						# account_closing += closing_balance
+					if account_title == 'GAIN/LOSS ON SALE OF ASSETS':
+						account_total = account_total * -1
+					
+					# account_head_total[account_title] = {'opening' : account_opening,'closing' : account_closing,'value' : account_total}
+
 					#save doc
 					save_doc = {
 						'doctype':'Cashflow account data csd',
@@ -70,7 +90,8 @@ def insertData(from_date,to_date,head=''):
 						'date':current_date,
 						'opening': 0,
 						'closing' : 0,
-						'value' : account_totel
+						'value' : account_total
 					}
 					frappe.get_doc(save_doc).save(ignore_permissions=True)
+				frappe.db.commit()
 		current_date += timedelta(days=1)
