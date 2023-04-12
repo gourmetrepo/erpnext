@@ -27,9 +27,9 @@
   "additional_details",
   "fuel_type",
   "uom",
-  "carbon_check_date",
-  "column_break_21",
   "color",
+  "column_break_21",
+  "carbon_check_date",
   "wheels",
   "doors",
   "amended_from"
@@ -46,8 +46,7 @@
   {
    "fieldname": "make",
    "fieldtype": "Data",
-   "label": "Make",
-   "reqd": 1
+   "label": "Make"
   },
   {
    "fieldname": "column_break_3",
@@ -58,8 +57,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Model",
-   "reqd": 1
+   "label": "Model"
   },
   {
    "fieldname": "vehicle_details",
@@ -155,8 +153,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Fuel UOM",
-   "options": "UOM",
-   "reqd": 1
+   "options": "UOM"
   },
   {
    "fieldname": "carbon_check_date",
@@ -192,7 +189,7 @@
    "read_only": 1
   }
  ],
- "modified": "2023-02-20 14:30:26.462353",
+ "modified": "2023-04-11 11:55:23.332957",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Vehicle",
