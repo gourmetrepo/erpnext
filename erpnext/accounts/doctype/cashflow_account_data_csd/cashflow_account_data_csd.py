@@ -29,8 +29,8 @@ def insertData(from_date,to_date,head=''):
 				for b in a.get('accounts'):
 					account_title = b.get('title')
 					account_total = 0
-					# account_opening = 0
-					# account_closing = 0
+					account_opening = 0
+					account_closing = 0
 					for account in b.get('account'):
 						print(account)
 						filters = _dict()
@@ -74,8 +74,8 @@ def insertData(from_date,to_date,head=''):
 						}
 						frappe.get_doc(save_doc).save(ignore_permissions=True)
 						account_total += value
-						# account_opening += opening_balance
-						# account_closing += closing_balance
+						account_opening += opening_balance
+						account_closing += closing_balance
 					if account_title == 'GAIN/LOSS ON SALE OF ASSETS':
 						account_total = account_total * -1
 					
@@ -88,10 +88,19 @@ def insertData(from_date,to_date,head=''):
 						'company':company,
 						'account': str(account_title),
 						'date':current_date,
-						'opening': 0,
-						'closing' : 0,
+						'opening': account_opening,
+						'closing' : account_closing,
 						'value' : account_total
 					}
 					frappe.get_doc(save_doc).save(ignore_permissions=True)
 				frappe.db.commit()
 		current_date += timedelta(days=1)
+
+
+@frappe.whitelist()
+def updateCashBankData():
+	data = frappe.db.sql("SELECT head,date,account,sum(opening) as opening,sum(closing) as closing,value FROM `tabCashflow account data csd` WHERE  head like 'BANKS' GROUP BY DATE", as_dict=True)
+	for d in data:
+		sql = f"""update `tabCashflow account data csd` set opening = {d.opening}, closing = {d.closing} where account = 'BANKS' and date = '{d.date}'"""
+		frappe.db.sql(sql)
+		print(d)	
