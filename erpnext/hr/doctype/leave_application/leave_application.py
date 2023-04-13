@@ -610,6 +610,7 @@ def get_leave_entries(employee, leave_type, from_date, to_date):
 			AND (from_date between %(from_date)s AND %(to_date)s
 				OR to_date between %(from_date)s AND %(to_date)s
 				OR (from_date < %(from_date)s AND to_date > %(to_date)s))
+			and is_expired = FALSE
 	""", {
 		"from_date": from_date,
 		"to_date": to_date,
