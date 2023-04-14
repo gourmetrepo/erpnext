@@ -45,6 +45,10 @@ def calculate_segment_profit(f_date=''):
 		units = get_config_by_name("segment_wise_profit_csd", {})
 		b_group_data = []
 		for single_unit in units:
+			sumdiv=0.0
+			sumtotal=0.0
+			Shopdiscountinvoices=0.0
+			distributormargintotal=0.0
 			count = 0
 			totalsales = 0		
 			for coa in units[single_unit].get('segment'):
