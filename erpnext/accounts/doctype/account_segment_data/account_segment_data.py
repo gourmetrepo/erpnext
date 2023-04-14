@@ -294,22 +294,22 @@ def calculate_segment_profit(f_date=''):
 														Amount =  0.00
 													elif(bgroup_data=='CSD (Carbonated Soft Drinks)'):
 														sumdiv= DistributorRevenue.get('csd')
-														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														Amount =   (sumdiv/sumtotal) * ((-1*data[0].account_value)-distributormargintotal)  
 													elif(bgroup_data=='Juice'):
 														sumdiv=DistributorRevenue.get('Juice')
-														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														Amount =   (sumdiv/sumtotal) * ((-1*data[0].account_value)-distributormargintotal)  
 													elif(bgroup_data=='Other'):
 														Amount =0.000
 													elif(bgroup_data=='19 Ltr'):
 														sumdiv=DistributorRevenue.get('nineteenLtr')
-														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														Amount =   (sumdiv/sumtotal) * ((-1*data[0].account_value)-distributormargintotal)  
 													elif(bgroup_data=='Water'):
 														sumdiv=DistributorRevenue.get('Water')
-														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														Amount =   (sumdiv/sumtotal) * ((-1*data[0].account_value)-distributormargintotal)  
 														
 													elif(bgroup_data=='Confectionery'):
 														sumdiv=DistributorRevenue.get('Confectionery')
-														Amount =   (sumdiv/sumtotal) * (data[0].account_value-distributormargintotal)  
+														Amount =   (sumdiv/sumtotal) * ((-1*data[0].account_value)-distributormargintotal)  
 														
 													save_doc = {
 															'doctype':'Account Segment Data',
