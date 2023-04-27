@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _, _dict
 from frappe.model.document import Document
-
+import json
 class Cashflowaccountdatacsd(Document):
 	pass
 
@@ -22,6 +22,7 @@ def insertData(from_date,to_date,heads,companies):
 	to_date = datetime.strptime(to_date, "%Y-%m-%d").date()	
 	current_date = from_date
 	account_head_total = {}
+	companies = json.loads(companies)
 	while current_date <= to_date:
 		for company, company_account in cashflow_config.items():
 			if company in companies:
