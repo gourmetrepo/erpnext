@@ -105,7 +105,7 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
-					"name": "Vehicle Expenses",
+					"name": "Maintenance Asset Expenses",
 					"doctype": "Vehicle",
 					"title":"Maintenance Asset Expenses"
 				},
