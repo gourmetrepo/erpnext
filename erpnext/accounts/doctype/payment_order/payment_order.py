@@ -73,7 +73,6 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 	# if frappe.db.exists("Payment Entry", {"company": doc.company, "party": supplier,'payment_order':doc.name}):
 	# 	frappe.throw("Payment Already Created.")
 	# je = frappe.new_doc('Journal Entry')
-
 	je = frappe.new_doc('Payment Entry')
 	je.payment_order = doc.name
 	je.posting_date = nowdate()
@@ -131,13 +130,6 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 			})
 
 			paid_amt += d.amount
-
-	existed_payment_etries=frappe.db.sql("""select sum(paid_amount) as amount, sum(party_balance) as balance from `tabPayment Entry` where company='{company}' and party='{party}' and payment_order='{payment_order}'""".format(company= doc.company, party= supplier,payment_order=doc.name), as_dict= 1, debug = 1)
-	if existed_payment_etries and existed_payment_etries[0]['amount'] is not None:
-		if existed_payment_etries[0]['amount'] >= paid_amt:
-			frappe.throw("Payment Entry Already")
-		else:
-			paid_amt=paid_amt-existed_payment_etries[0]['amount']
 
 	# je.append('references', {
 	# 	'total_amount': paid_amt,
