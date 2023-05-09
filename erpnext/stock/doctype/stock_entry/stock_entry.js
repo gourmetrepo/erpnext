@@ -366,8 +366,27 @@ frappe.ui.form.on('Stock Entry', {
 			frm.trigger("toggle_display_account_head");
 
 			erpnext.accounts.dimensions.update_dimension(frm, frm.doctype);
+			frm.set_query('cost_type', function() {
+				return {
+					filters: [
+						['cost_center', '=', frm.doc.cost_center],
+						['company', '=', frm.doc.company]
+					]
+				};
+			});
 		}
 	},
+
+	cost_center: function(frm) {   
+        frm.set_query('cost_type', function() {
+            return {
+                filters: [
+                    ['cost_center', '=', frm.doc.cost_center],
+                    ['company', '=', frm.doc.company]
+                ]
+            };
+        });
+    },
 
 	set_serial_no: function(frm, cdt, cdn, callback) {
 		var d = frappe.model.get_doc(cdt, cdn);
@@ -688,47 +707,112 @@ frappe.ui.form.on('Stock Entry Detail', {
 	item_code: function(frm, cdt, cdn) {
 		var d = locals[cdt][cdn];
 		if(d.item_code) {
-			var args = {
-				'item_code'			: d.item_code,
-				'warehouse'			: cstr(d.s_warehouse) || cstr(d.t_warehouse),
-				'transfer_qty'		: d.transfer_qty,
-				'serial_no'		: d.serial_no,
-				'bom_no'		: d.bom_no,
-				'expense_account'	: d.expense_account,
-				'cost_center'		: d.cost_center,
-				'company'		: frm.doc.company,
-				'qty'			: d.qty,
-				'voucher_type'		: frm.doc.doctype,
-				'voucher_no'		: d.name,
-				'allow_zero_valuation': 1,
-			};
+			// Umair addded code to get and add expense account according to the selected cost type and cost center
+			// start
+			if(frm.doc.stock_entry_type == "Material Issue"){
 
-			return frappe.call({
-				doc: frm.doc,
-				method: "get_item_details",
-				args: args,
-				callback: function(r) {
-					if(r.message) {
-						var d = locals[cdt][cdn];
-						$.each(r.message, function(k, v) {
-							if (v) {
-								frappe.model.set_value(cdt, cdn, k, v); // qty and it's subsequent fields weren't triggered
-							}
-						});
-						refresh_field("items");
-
-						let no_batch_serial_number_value = !d.serial_no;
-						if (d.has_batch_no && !d.has_serial_no) {
-							// check only batch_no for batched item
-							no_batch_serial_number_value = !d.batch_no;
+				frappe.call({
+					method: "erpnext.stock.doctype.material_request.material_request.get_expense_account_mi",
+					args: {
+						company:frm.doc.company,
+						cost_center:frm.doc.cost_center,
+						parent:frm.doc.cost_type
+					},
+					callback: function(r) {
+						if(r.message) {
+							var e_account = r.message;
+							console.log(e_account)
+							var args = {
+								'item_code'			: d.item_code,
+								'warehouse'			: cstr(d.s_warehouse) || cstr(d.t_warehouse),
+								'transfer_qty'		: d.transfer_qty,
+								'serial_no'		: d.serial_no,
+								'bom_no'		: d.bom_no,
+								'expense_account'	: e_account,
+								'cost_center'		: frm.doc.cost_center,
+								'company'		: frm.doc.company,
+								'qty'			: d.qty,
+								'voucher_type'		: frm.doc.doctype,
+								'voucher_no'		: d.name,
+								'allow_zero_valuation': 1,
+							};
+							return frappe.call({
+								doc: frm.doc,
+								method: "get_item_details",
+								args: args,
+								callback: function(r) {
+									if(r.message) {
+										var d = locals[cdt][cdn];
+										$.each(r.message, function(k, v) {
+											if (v) {
+												frappe.model.set_value(cdt, cdn, k, v); // qty and it's subsequent fields weren't triggered
+											}
+										});
+										refresh_field("items");
+				
+										let no_batch_serial_number_value = !d.serial_no;
+										if (d.has_batch_no && !d.has_serial_no) {
+											// check only batch_no for batched item
+											no_batch_serial_number_value = !d.batch_no;
+										}
+				
+										if (no_batch_serial_number_value && !frappe.flags.hide_serial_batch_dialog) {
+											erpnext.stock.select_batch_and_serial_no(frm, d);
+										}
+									}
+								}
+							});
+	
 						}
+	
+					}
+				});
+			}
+			else{
+			// end
+				var args = {
+					'item_code'			: d.item_code,
+					'warehouse'			: cstr(d.s_warehouse) || cstr(d.t_warehouse),
+					'transfer_qty'		: d.transfer_qty,
+					'serial_no'		: d.serial_no,
+					'bom_no'		: d.bom_no,
+					'expense_account'	: d.expense_account,
+					'cost_center'		: d.cost_center,
+					'company'		: frm.doc.company,
+					'qty'			: d.qty,
+					'voucher_type'		: frm.doc.doctype,
+					'voucher_no'		: d.name,
+					'allow_zero_valuation': 1,
+				};
 
-						if (no_batch_serial_number_value && !frappe.flags.hide_serial_batch_dialog) {
-							erpnext.stock.select_batch_and_serial_no(frm, d);
+				return frappe.call({
+					doc: frm.doc,
+					method: "get_item_details",
+					args: args,
+					callback: function(r) {
+						if(r.message) {
+							var d = locals[cdt][cdn];
+							$.each(r.message, function(k, v) {
+								if (v) {
+									frappe.model.set_value(cdt, cdn, k, v); // qty and it's subsequent fields weren't triggered
+								}
+							});
+							refresh_field("items");
+	
+							let no_batch_serial_number_value = !d.serial_no;
+							if (d.has_batch_no && !d.has_serial_no) {
+								// check only batch_no for batched item
+								no_batch_serial_number_value = !d.batch_no;
+							}
+	
+							if (no_batch_serial_number_value && !frappe.flags.hide_serial_batch_dialog) {
+								erpnext.stock.select_batch_and_serial_no(frm, d);
+							}
 						}
 					}
-				}
-			});
+				});
+			}
+			
 		}
 	},
 	expense_account: function(frm, cdt, cdn) {
