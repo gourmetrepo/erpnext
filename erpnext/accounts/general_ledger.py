@@ -155,7 +155,7 @@ def make_entry(args, adv_adj, update_outstanding, from_repost=False):
 	except Exception as error:
 		
 		if args.get('voucher_type') not in ['Delivery Note','Stock Entry','Purchase Receipt']:
-			frappe.db.sql(f"""delete `tabGL Entry`  where voucher_no='{args.get('voucher_no')}'""")
+			frappe.db.sql(f"""delete from `tabGL Entry`  where voucher_no='{args.get('voucher_no')}'""")
 			frappe.db.sql(f"""update `tab{args.get('voucher_type')}` set docstatus=0 where name='{args.get('voucher_no')}'""")
 			frappe.db.commit()
 		traceback = frappe.get_traceback()
