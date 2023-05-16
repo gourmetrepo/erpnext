@@ -13,7 +13,7 @@ class Cashflowaccountdatacsd(Document):
 
 @frappe.whitelist()
 def insertData(from_date,to_date,heads,companies):
-	from erpnext.accounts.report.general_ledger.general_ledger import get_data_with_opening_closing, get_gl_entries
+	from erpnext.accounts.report.general_ledger.general_ledger import get_data_with_opening_closing, get_gl_entries, initialize_gle_map,get_accountwise_gle
 	from nrp_manufacturing.utils import get_config_by_name
 	cashflow_config = get_config_by_name('CASH_FLOW_DATA_CONFIG_CSD')
 	
@@ -44,14 +44,16 @@ def insertData(from_date,to_date,heads,companies):
 								filters['from_date'] = current_date
 								filters['to_date'] = current_date
 								gl_entries = get_gl_entries(filters)
-								account_details = ''
-								data = get_data_with_opening_closing(filters, account_details, gl_entries)
-								for d in data:
+								# account_details = ''
+								# data = get_data_with_opening_closing(filters, account_details, gl_entries)
+								gle_map = initialize_gle_map(gl_entries, filters)
+								totals = get_accountwise_gle(filters, gl_entries, gle_map, True)
+								for d in totals:
 									if d:
-										if d.get('account') == "'Opening'":
-											opening_balance = d.debit - d.credit
-										elif d.get('account') == "'Closing (Opening + Total)'":
-											closing_balance = d.debit - d.credit
+										if d == "opening":
+											opening_balance = totals[d].debit - totals[d].credit
+										elif d == "closing":
+											closing_balance = totals[d].debit - totals[d].credit
 
 								value = opening_balance - closing_balance
 								# if account_title == "6.01.01.001 - Un appropriated Profit/(Loss)":
