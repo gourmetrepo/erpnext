@@ -81,16 +81,18 @@ def make_material_request(self):
     mr.insert(ignore_permissions=True)
     mr.submit()
     return mr
-def get_warehouse(item,company):
-    warehouse=frappe.db.get_list('Item Default',
-    filters={
-        'company':company,
-        'parent':item
-    },
-    fields=['company', 'default_warehouse'],
-    as_list=True
-    )
-    return warehouse[0]
+def get_warehouse(item, company):
+    warehouse = frappe.db.get_list('Item Default',
+                                   filters={
+                                       'company': company,
+                                       'parent': item
+                                   },
+                                   fields=['company', 'default_warehouse'],
+                                   as_list=True)
+    if warehouse:
+        return warehouse[0]
+    else:
+        frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
 def make_expense_claim_auto(docname):
     expense_claim = frappe.db.exists("Expense Claim", {"vehicle_log": docname.name})
     if expense_claim:
