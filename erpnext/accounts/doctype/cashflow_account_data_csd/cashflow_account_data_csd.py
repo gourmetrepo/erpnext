@@ -36,55 +36,36 @@ def insertData(from_date,to_date,heads,companies):
 							account_closing = 0
 							for account in b.get('account'):
 								print(account)
-								filters = _dict()
-								filters['group_by'] = _("Group by Voucher")
-								filters['include_default_book_entries'] = True
-								filters['company'] = company
-								filters['account'] = account
-								filters['from_date'] = current_date
-								filters['to_date'] = current_date
-								gl_entries = get_gl_entries(filters)
-								# account_details = ''
-								# data = get_data_with_opening_closing(filters, account_details, gl_entries)
-								gle_map = initialize_gle_map(gl_entries, filters)
-								totals = get_accountwise_gle(filters, gl_entries, gle_map, True)
-								for d in totals:
-									if d:
-										if d == "opening":
-											opening_balance = totals[d].debit - totals[d].credit
-										elif d == "closing":
-											closing_balance = totals[d].debit - totals[d].credit
-
-								value = opening_balance - closing_balance
-								# if account_title == "6.01.01.001 - Un appropriated Profit/(Loss)":
-								# 	opening_balance += account_head_total['404 - Income'].get('opening')
-								# 	closing_balance += account_head_total['404 - Income'].get('closing')
-								# 	opening_balance += account_head_total['505 - Expenses'].get('opening')
-								# 	closing_balance += account_head_total['505 - Expenses'].get('closing')
-
-								# 	value = opening_balance - closing_balance
-								# 	value = value - account_head_total['404 - Income'].get('value')
-								# 	value = value - account_head_total['505 - Expenses'].get('value')
-
-								#save doc
-								save_doc = {
-									'doctype':'Cashflow account data csd',
-									'head':head,
-									'company':company,
-									'account': str(account),
-									'date':current_date,
-									'opening': opening_balance,
-									'closing' : closing_balance,
-									'value' : value
-								}
-								frappe.get_doc(save_doc).save(ignore_permissions=True)
-								account_total += value
-								account_opening += opening_balance
-								account_closing += closing_balance
+								data = frappe.db.sql(
+									f""" SELECT 
+											(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
+											WHERE ACCOUNT = "{account}" AND company = '{company}' AND posting_date < '{current_date}') AS opening,
+											(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
+											WHERE ACCOUNT = "{account}" AND company = '{company}' AND posting_date = '{current_date}') AS value """
+											,as_dict=True
+								)
+								if data:
+									opening_balance = data[0].opening if data[0].opening != None else 0
+									value = data[0].value if data[0].value != None else 0
+									closing_balance = opening_balance + value
+									#save doc
+									save_doc = {
+										'doctype':'Cashflow account data csd',
+										'head':head,
+										'company':company,
+										'account': str(account),
+										'date':current_date,
+										'opening': opening_balance,
+										'closing' : closing_balance,
+										'value' : value
+									}
+									frappe.get_doc(save_doc).save(ignore_permissions=True)
+									account_total += value
+									account_opening += opening_balance
+									account_closing += closing_balance
 							if account_title == 'GAIN/LOSS ON SALE OF ASSETS':
 								account_total = account_total * -1
 							
-							# account_head_total[account_title] = {'opening' : account_opening,'closing' : account_closing,'value' : account_total}
 
 							#save doc
 							save_doc = {
