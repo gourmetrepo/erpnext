@@ -106,7 +106,6 @@
    "bold": 1,
    "fieldname": "item_code",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "in_list_view": 1,
    "label": "Item Code",
    "oldfieldname": "item_code",
@@ -122,7 +121,6 @@
   {
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Name",
    "print_hide": 1,
    "read_only": 1
@@ -502,8 +500,8 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2021-01-05 15:05:04.891447",
- "modified_by": "Administrator",
+ "modified": "2023-04-19 15:27:20.931767",
+ "modified_by": "abubakar.sohail@gourmetpakistan.com",
  "module": "Stock",
  "name": "Stock Entry Detail",
  "owner": "Administrator",
