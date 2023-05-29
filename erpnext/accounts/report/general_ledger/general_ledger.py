@@ -283,7 +283,7 @@ def initialize_gle_map(gl_entries, filters):
 	return gle_map
 
 
-def get_accountwise_gle(filters, gl_entries, gle_map):
+def get_accountwise_gle(filters, gl_entries, gle_map, no_entries = False):
 	totals = get_totals_dict()
 	entries = []
 	consolidated_gle = OrderedDict()
@@ -325,10 +325,13 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 			update_value_in_dict(gle_map[gle.get(group_by)].totals, 'closing', gle)
 			update_value_in_dict(totals, 'closing', gle)
 
-	for key, value in consolidated_gle.items():
-		entries.append(value)
+	if no_entries == False:
+		for key, value in consolidated_gle.items():
+			entries.append(value)
 
-	return totals, entries
+		return totals, entries
+	else:
+		return totals
 
 def get_result_as_list(data, filters):
 	balance, balance_in_account_currency = 0, 0

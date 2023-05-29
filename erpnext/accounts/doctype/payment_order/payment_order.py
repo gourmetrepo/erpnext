@@ -192,6 +192,7 @@ def get_next_cheque_number(doc,count):
 
 @frappe.whitelist()
 def make_payment_with_single_cheque(name, mode_of_payment=None):
+
 	query_data = frappe.db.sql("""
 		SELECT
 			supplier as name
@@ -207,6 +208,8 @@ def make_payment_with_single_cheque(name, mode_of_payment=None):
 		cheque_refrence =  0
 		for supplier in query_data:
 			doc = frappe.get_doc('Payment Order', name)
+			if frappe.db.exists("Payment Entry", {"company": doc.company, "party": supplier.name,'payment_order':doc.name}):
+				frappe.throw("Payment Already Created.")
 			je = frappe.new_doc('Payment Entry')
 			je.payment_order = doc.name
 			je.posting_date = nowdate()
@@ -272,6 +275,7 @@ def make_payment_with_single_cheque(name, mode_of_payment=None):
 
 @frappe.whitelist()
 def make_payment_entry_on_single_click(name, mode_of_payment=None):
+
 	query_data = frappe.db.sql("""
 		SELECT
 			supplier as name
@@ -284,6 +288,9 @@ def make_payment_entry_on_single_click(name, mode_of_payment=None):
 	if query_data:
 		for supplier in query_data:
 			doc = frappe.get_doc('Payment Order', name)
+			if frappe.db.exists("Payment Entry", {"company": doc.company, "party": supplier.name,'payment_order':doc.name}):
+				frappe.throw("Payment Already Created.")
+			
 			je = frappe.new_doc('Payment Entry')
 			je.payment_order = doc.name
 			je.posting_date = nowdate()
