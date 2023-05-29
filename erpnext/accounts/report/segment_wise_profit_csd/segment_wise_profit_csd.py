@@ -37,11 +37,19 @@ SELECT head,account,
 		FROM `tabAccount Segment Data`
 		WHERE DATE BETWEEN '{from_date}' and '{to_date}' 
 		AND company = '{company}'
-			GROUP BY head,`account`
-   ORDER BY creation ASC) AS A
+			GROUP BY head,`account` order by creation ASC
+   ) AS A 
 	""".format(from_date=from_date, to_date=to_date,company=company), as_dict=True, debug =1)
 	data = prepare_data(r_data)
- 
+#  ORDER BY CASE
+#          WHEN A.head = 'Revenue' THEN 1
+#          WHEN A.head = 'Cost Of Goods Sold' THEN 2 
+#          WHEN A.head = 'Other Income' THEN 3
+#          WHEN A.head = 'Administrative Expenses' THEN 4
+#          WHEN A.head= 'Selling And Distribution Expenses' THEN 5
+#          WHEN A.head= 'Markup Long Term Loans' THEN 6
+#           WHEN A.head= 'Taxation' THEN 7
+#          END ASC  
 
 	return columns, data
 def prepare_data(r_data):	
@@ -55,30 +63,33 @@ def prepare_data(r_data):
 			child_rows=[]
 			parent_row = copy.copy(d)
 			parent_row["concentrates"]=parent_row["csd"]=parent_row["juices"]=parent_row["water"]=parent_row["candyconfectionary"]=parent_row["19ltr"]=parent_row["other"]=0
+			parent_row['account']=''
 			account =""
+			parent_row["total"] =0.00
 			for _k, _d in enumerate(r_data[k:]):
+				
 				if parent_head == _d.head:
-					parent_row["csd"] += round(float(_d["csd"] or 0),2)
-					parent_row["juices"] += round(float(_d["juices"] or 0),2)
-					parent_row["water"] += round(float(_d["water"] or 0),2)
-					parent_row["candyconfectionary"] += round(float(_d["candyconfectionary"] or 0),2)
-					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),2)
-					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),2)
-					parent_row["other"] += round(float(_d["other"] or 0),2)
-					parent_row["total"] += round(float(_d["total"] or 0),2)
-					parent_row['account']=''
+					parent_row["csd"] += round(float(_d["csd"] or 0),1)
+					parent_row["juices"] += round(float(_d["juices"] or 0),1)
+					parent_row["water"] += round(float(_d["water"] or 0),1)
+					parent_row["candyconfectionary"] += round(float(_d["candyconfectionary"] or 0),1)
+					parent_row["concentrates"] += round(float(_d["concentrates"] or 0),1)
+					parent_row["19ltr"] += round(float(_d["19ltr"] or 0),1)
+					parent_row["other"] += round(float(_d["other"] or 0),1)
+					parent_row["total"] += round(float(_d["total"] or 0),1)
+					
 					head=""
 					if account != _d.account:
 						account = _d.account
 						child_row = copy.copy(_d)
-						child_row['csd'] = round(float(_d["csd"] or 0),2)
-						child_row['juices'] = round(float(_d["juices"] or 0),2)
+						child_row['csd'] = round(float(_d["csd"] or 0),1)
+						child_row['juices'] = round(float(_d["juices"] or 0),1)
 						child_row['water'] = round(float(_d["water"] or 0),2)
-						child_row['candyconfectionary'] = round(float(_d["candyconfectionary"] or 0),2)
-						child_row["concentrates"] = round(float(_d["concentrates"] or 0),2)
-						child_row['19ltr'] = round(float(_d["19ltr"] or 0),2)
-						child_row['other'] = round(float(_d["other"] or 0),2)
-						child_row["total"] += round(float(_d["total"] or 0),2)
+						child_row['candyconfectionary'] = round(float(_d["candyconfectionary"] or 0),1)
+						child_row["concentrates"] = round(float(_d["concentrates"] or 0),1)
+						child_row['19ltr'] = round(float(_d["19ltr"] or 0),1)
+						child_row['other'] = round(float(_d["other"] or 0),1)
+						child_row["total"] = round(float(_d["total"] or 0),1)
 						child_row['head'] = ''
 						child_row['parent_item_group'] = _d["head"]
 						child_row['indent'] = 1
@@ -86,14 +97,14 @@ def prepare_data(r_data):
 						grand_child = []
 						child_rows.append(child_row)
 				
-					csd_total += parent_row['csd']
-					juices_total += parent_row['juices']
-					water_total += parent_row['water']
-					candyconfectionary_total += parent_row['candyconfectionary']
-					concentrates_total  += parent_row['concentrates']
-					ltr_total += parent_row['19ltr']
-					other_total += parent_row['other']
-					total_total += parent_row['total']
+						csd_total += _d['csd']
+						juices_total += _d['juices']
+						water_total += _d['water']
+						candyconfectionary_total += _d['candyconfectionary']
+						concentrates_total  += _d['concentrates']
+						ltr_total += _d['19ltr']
+						other_total += _d['other']
+						total_total += _d['total']
 			parent_row['indent'] = 0
 			# parent_row['parent_item_group'] ='Total Profit'
 			#parent_row['has_value'] = True
@@ -102,10 +113,10 @@ def prepare_data(r_data):
 			for row in child_rows:
 				data.append(row)
 
-	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,2), 'juices':  round(juices_total,2),
-             'water':  round(water_total,2), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,2), '19ltr':  round(ltr_total,2), 'other': round(other_total,2),'total': round(total_total,2), })
+	data.append({'head': 'Net Profit Segment Wise', 'account': '', 'csd':  round(csd_total,1), 'juices':  round(juices_total,2),
+             'water':  round(water_total,1), 'candyconfectionary': round(candyconfectionary_total,2), 'concentrates':  round(concentrates_total,1), '19ltr':  round(ltr_total,1), 'other': round(other_total,1),'total': round(total_total,1), })
 	data.append({'head': 'Net Profit Total', 'account': '','csd': '',  'juices':'',
-             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total,2) })
+             'water': '', 'candyconfectionary':'', 'concentrates': '', '19ltr':  '', 'other': '','total':round(candyconfectionary_total+ltr_total+other_total+concentrates_total+csd_total+juices_total+water_total,1) })
 	
 
 	return data

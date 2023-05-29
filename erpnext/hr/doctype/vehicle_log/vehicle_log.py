@@ -15,19 +15,20 @@ class VehicleLog(Document):
 	# 	if flt(self.odometer) < flt(self.last_odometer):
 	# 		frappe.throw(_("Current Odometer Value should be greater than Last Odometer Value {0}").format(self.last_odometer))
 
-	def on_submit(self):pass
-		# frappe.db.set_value("Vehicle", self.license_plate, "last_odometer", self.odometer)
-		# if self.maintenance_type =="Internal":
-		# 	make_material_request(self)
-		# else:
-		# 	make_expense_claim(self)
-		
+    def on_submit(self):
+        frappe.db.set_value("Vehicle", self.license_plate, "last_odometer", self.odometer)
+        if self.maintenance_type =="Internal":
+            make_material_request(self)
+        else:
+            pass
+            # make_expense_claim(self)
+        
 
-	def on_cancel(self):
-		distance_travelled = self.odometer - self.last_odometer
-		if(distance_travelled > 0):
-			updated_odometer_value = int(frappe.db.get_value("Vehicle", self.license_plate, "last_odometer")) - distance_travelled
-			frappe.db.set_value("Vehicle", self.license_plate, "last_odometer", updated_odometer_value)
+    def on_cancel(self):
+        distance_travelled = self.odometer - self.last_odometer
+        if(distance_travelled > 0):
+            updated_odometer_value = int(frappe.db.get_value("Vehicle", self.license_plate, "last_odometer")) - distance_travelled
+            frappe.db.set_value("Vehicle", self.license_plate, "last_odometer", updated_odometer_value)
 
 @frappe.whitelist()
 def make_expense_claim(docname):
@@ -80,16 +81,18 @@ def make_material_request(self):
     mr.insert(ignore_permissions=True)
     mr.submit()
     return mr
-def get_warehouse(item,company):
-    warehouse=frappe.db.get_list('Item Default',
-    filters={
-        'company':company,
-        'parent':item
-    },
-    fields=['company', 'default_warehouse'],
-    as_list=True
-    )
-    return warehouse[0]
+def get_warehouse(item, company):
+    warehouse = frappe.db.get_list('Item Default',
+                                   filters={
+                                       'company': company,
+                                       'parent': item
+                                   },
+                                   fields=['company', 'default_warehouse'],
+                                   as_list=True)
+    if warehouse:
+        return warehouse[0]
+    else:
+        frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
 def make_expense_claim_auto(docname):
     expense_claim = frappe.db.exists("Expense Claim", {"vehicle_log": docname.name})
     if expense_claim:

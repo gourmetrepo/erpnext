@@ -21,7 +21,7 @@ from erpnext.hr.doctype.employee_benefit_claim.employee_benefit_claim import get
 class SalarySlip(TransactionBase):
 	def __init__(self, *args, **kwargs):
 		super(SalarySlip, self).__init__(*args, **kwargs)
-		self.series = 'Sal Slip/{0}/.#####'.format(self.employee)
+		self.series = 'Sal Slip/{0}/.YY./.#####'.format(self.employee)
 		self.whitelisted_globals = {
 			"int": int,
 			"float": float,
