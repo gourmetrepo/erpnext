@@ -1,4 +1,4 @@
-// Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+	// Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
 frappe.provide("erpnext.buying");
@@ -641,3 +641,77 @@ frappe.ui.form.on("Purchase Order", "is_subcontracted", function(frm) {
 		erpnext.buying.get_default_bom(frm);
 	}
 });
+
+// ==============purchase order history  ticket 62056================
+
+frappe.ui.form.on('Purchase Order', 'onload', function(frm) {
+    frm.fields_dict.purchase_order_type.$input.on('change', function() {
+        var selectedOption = frm.fields_dict.purchase_order_type.get_value();
+        toggleHistoryButton(selectedOption);
+    });
+
+    function toggleHistoryButton(selectedOption) {
+        var targetField = frm.fields_dict.select_vehicle.wrapper;
+        var buttonHTML = '<button type="button" class="btn btn-default btn-xs" id="show-history-btn">Show History</button>';
+        $('#show-history-btn').remove();
+        if (selectedOption === 'Asset Maintenance Services') {
+            $(buttonHTML).insertAfter(targetField);
+            $('#show-history-btn').click(function() {
+                var vehicle = frm.doc.select_vehicle; 
+				console.log(vehicle,"ehehehheehhe")
+
+                frappe.call({
+                    method: 'nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.show_history',
+                    args: {
+                        purchase_order: frm.doc.name,
+                        vehicle: vehicle
+                    },
+                    callback: function(response) {
+                        var historyData = response.message;
+                        showHistoryPopup(historyData);
+                    }
+                });
+            });
+        }
+    }
+});
+
+function showHistoryPopup(historyData) {
+    var dialog = new frappe.ui.Dialog({
+        title: 'Purchase Order History',
+        fields: [
+            {
+                fieldtype: 'HTML',
+                label: 'History',
+                fieldname: 'history_table'
+            }
+        ]
+    });
+
+    var tableHTML = '<table class="table table-bordered">';
+    tableHTML += '<thead><tr>';
+    tableHTML += '<th>Sr#</th>';
+    tableHTML += '<th>Po Num</th>';
+    tableHTML += '<th>Date</th>';
+    tableHTML += '<th>Item</th>';
+	tableHTML += '<th>Amount</th>';
+	tableHTML += '<th>Qty</th>';
+    tableHTML += '</tr></thead>';
+    tableHTML += '<tbody>';
+
+    for (var i = 0; i < historyData.length; i++) {
+        var row = historyData[i];
+        tableHTML += '<tr>';
+        tableHTML += '<td>' + 	(i + 1)  + '</td>';
+        tableHTML += '<td>' + row.name + '</td>';
+        tableHTML += '<td>' + row.transaction_date + '</td>';
+        tableHTML += '<td>' + row.item_name + '</td>';
+        tableHTML += '<td>' + row.amount + '</td>';
+		tableHTML += '<td>' + row.qty + '</td>';
+        tableHTML += '</tr>';
+    }
+    tableHTML += '</tbody></table>';
+    dialog.fields_dict.history_table.$wrapper.html(tableHTML);
+    dialog.show();
+}
+
