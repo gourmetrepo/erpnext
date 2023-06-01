@@ -59,6 +59,26 @@ frappe.ui.form.on("Purchase Order", {
 			}
 		});
 	},
+	// ==============purchase order history  ticket 62056================
+	show_history:function(frm){
+		if(frm.doc.select_vehicle){
+			frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.show_history',
+				args: {
+					purchase_order: frm.doc.name,
+					vehicle: frm.doc.select_vehicle
+				},
+				callback: function(response) {
+					var historyData = response.message;
+					showHistoryPopup(historyData);
+				}
+			});
+		}
+		else{
+			frappe.msgprint("Please Select Vehicle first")
+		}
+
+	},
 
 	onload: function(frm) {
 		set_schedule_date(frm);
@@ -234,6 +254,9 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		}
 	},
 
+
+
+	
 	// before_save: function(frm) {
 	// 	var supplier_list = frappe.utils.get_config_by_name("supplier_expire_check")
 	// 	if(supplier_list.includes(frm.supplier)){		
@@ -643,44 +666,6 @@ frappe.ui.form.on("Purchase Order", "is_subcontracted", function(frm) {
 });
 
 // ==============purchase order history  ticket 62056================
-
-
-frappe.ui.form.on('Purchase Order', 'refresh', function(frm) {
-    frm.fields_dict.purchase_order_type.$input.on('change', function() {
-        var selectedOption = frm.fields_dict.purchase_order_type.get_value();
-        toggleHistoryButton(selectedOption);
-    });
-
-    function toggleHistoryButton(selectedOption) {
-        var targetField = frm.fields_dict.select_vehicle.wrapper;
-        var buttonHTML = '<button type="button" class="btn btn-default btn-xs" id="show-history-btn">Show History</button>';
-        $('#show-history-btn').remove();
-        if (selectedOption === 'Asset Maintenance Services') {
-            $(buttonHTML).insertAfter(targetField);
-            $('#show-history-btn').click(function() {
-                var vehicle = frm.doc.select_vehicle;
-                if (vehicle) { 
-                    frappe.call({
-                        method: 'nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.show_history',
-                        args: {
-                            purchase_order: frm.doc.name,
-                            vehicle: vehicle
-                        },
-                        callback: function(response) {
-                            var historyData = response.message;
-                            showHistoryPopup(historyData);
-                        }
-                    });
-                } else {
-                    frappe.msgprint("Please Enter a Vehicle First.");
-                }
-            });
-        }
-    }
-    $('#show-history-btn').remove();
-});
-
-
 function showHistoryPopup(historyData) {
     var dialog = new frappe.ui.Dialog({
         title: 'Purchase Order History',
@@ -732,4 +717,3 @@ function showHistoryPopup(historyData) {
     });
 
 }
-
