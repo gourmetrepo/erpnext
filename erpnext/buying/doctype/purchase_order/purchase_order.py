@@ -372,8 +372,8 @@ def make_purchase_receipt(source_name, target_doc=None):
 		"Purchase Order": {
 			"doctype": "Purchase Receipt",
 			"field_map": {
-				"supplier_warehouse":"supplier_warehouse"
-			},
+				"supplier_warehouse":"supplier_warehouse",
+    		},
 			"validation": {
 				"docstatus": ["=", 1],
 			}
@@ -395,7 +395,7 @@ def make_purchase_receipt(source_name, target_doc=None):
 			"add_if_empty": True
 		}
 	}, target_doc, set_missing_values)
-
+	doc.free_sample = 0
 	return doc
 
 @frappe.whitelist()
