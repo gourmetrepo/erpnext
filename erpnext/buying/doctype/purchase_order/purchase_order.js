@@ -27,6 +27,7 @@ frappe.ui.form.on("Purchase Order", {
 				filters: {'company': frm.doc.company}
 			}
 		});
+		
 
 	},
 
@@ -46,6 +47,11 @@ frappe.ui.form.on("Purchase Order", {
 			price_list_field.read_only = 0;
 			refresh_field("items");
 		}
+		
+		if (frm.doc.purchase_order_type === "Asset Maintenance Services") {
+			frm.set_df_property("select_vehicle", "reqd", true);
+			// frappe.msgprint("mandotry")
+		}
 
 	},
 	company:function(frm){
@@ -60,6 +66,10 @@ frappe.ui.form.on("Purchase Order", {
 		});
 	},
 	// ==============purchase order history  ticket 62056================
+	// select_vehicle:function(frm){
+			
+
+	// },
 	show_history:function(frm){
 		if(frm.doc.select_vehicle){
 			frappe.call({
@@ -717,3 +727,5 @@ function showHistoryPopup(historyData) {
     });
 
 }
+
+
