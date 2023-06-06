@@ -40,7 +40,6 @@ class PurchaseOrder(BuyingController):
 		}]
 
 	def validate(self):
-		
 		if self.docstatus == 1 :
 			self.set_status()
 			self.check_on_hold_or_closed_status()
@@ -395,7 +394,7 @@ def make_purchase_receipt(source_name, target_doc=None):
 			"add_if_empty": True
 		}
 	}, target_doc, set_missing_values)
-	doc.free_sample = 0
+	# doc.free_sample = 0
 	return doc
 
 @frappe.whitelist()
