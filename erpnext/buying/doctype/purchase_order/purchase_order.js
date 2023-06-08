@@ -27,6 +27,7 @@ frappe.ui.form.on("Purchase Order", {
 				filters: {'company': frm.doc.company}
 			}
 		});
+		
 
 	},
 
@@ -46,6 +47,11 @@ frappe.ui.form.on("Purchase Order", {
 			price_list_field.read_only = 0;
 			refresh_field("items");
 		}
+		
+		if (frm.doc.purchase_order_type === "Asset Maintenance Services") {
+			frm.set_df_property("select_vehicle", "reqd", true);
+			// frappe.msgprint("mandotry")
+		}
 
 	},
 	company:function(frm){
@@ -58,6 +64,26 @@ frappe.ui.form.on("Purchase Order", {
 				"data": frm.doc.name
 			}
 		});
+	},
+	// ==============purchase order history  ticket 62056================
+	show_history:function(frm){
+		if(frm.doc.select_vehicle){
+			frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.show_history',
+				args: {
+					purchase_order: frm.doc.name,
+					vehicle: frm.doc.select_vehicle
+				},
+				callback: function(response) {
+					var historyData = response.message;
+					showHistoryPopup(historyData);
+				}
+			});
+		}
+		else{
+			frappe.msgprint("Please Select Vehicle first")
+		}
+
 	},
 
 	onload: function(frm) {
@@ -234,6 +260,9 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		}
 	},
 
+
+
+	
 	// before_save: function(frm) {
 	// 	var supplier_list = frappe.utils.get_config_by_name("supplier_expire_check")
 	// 	if(supplier_list.includes(frm.supplier)){		
@@ -643,39 +672,6 @@ frappe.ui.form.on("Purchase Order", "is_subcontracted", function(frm) {
 });
 
 // ==============purchase order history  ticket 62056================
-
-frappe.ui.form.on('Purchase Order', 'onload', function(frm) {
-    frm.fields_dict.purchase_order_type.$input.on('change', function() {
-        var selectedOption = frm.fields_dict.purchase_order_type.get_value();
-        toggleHistoryButton(selectedOption);
-    });
-
-    function toggleHistoryButton(selectedOption) {
-        var targetField = frm.fields_dict.select_vehicle.wrapper;
-        var buttonHTML = '<button type="button" class="btn btn-default btn-xs" id="show-history-btn">Show History</button>';
-        $('#show-history-btn').remove();
-        if (selectedOption === 'Asset Maintenance Services') {
-            $(buttonHTML).insertAfter(targetField);
-            $('#show-history-btn').click(function() {
-                var vehicle = frm.doc.select_vehicle; 
-				console.log(vehicle,"ehehehheehhe")
-
-                frappe.call({
-                    method: 'nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.show_history',
-                    args: {
-                        purchase_order: frm.doc.name,
-                        vehicle: vehicle
-                    },
-                    callback: function(response) {
-                        var historyData = response.message;
-                        showHistoryPopup(historyData);
-                    }
-                });
-            });
-        }
-    }
-});
-
 function showHistoryPopup(historyData) {
     var dialog = new frappe.ui.Dialog({
         title: 'Purchase Order History',
@@ -694,24 +690,38 @@ function showHistoryPopup(historyData) {
     tableHTML += '<th>Po Num</th>';
     tableHTML += '<th>Date</th>';
     tableHTML += '<th>Item</th>';
-	tableHTML += '<th>Amount</th>';
-	tableHTML += '<th>Qty</th>';
+    tableHTML += '<th>Amount</th>';
+    tableHTML += '<th>Qty</th>';
     tableHTML += '</tr></thead>';
     tableHTML += '<tbody>';
 
-    for (var i = 0; i < historyData.length; i++) {
-        var row = historyData[i];
-        tableHTML += '<tr>';
-        tableHTML += '<td>' + 	(i + 1)  + '</td>';
-        tableHTML += '<td>' + row.name + '</td>';
-        tableHTML += '<td>' + row.transaction_date + '</td>';
-        tableHTML += '<td>' + row.item_name + '</td>';
-        tableHTML += '<td>' + row.amount + '</td>';
-		tableHTML += '<td>' + row.qty + '</td>';
-        tableHTML += '</tr>';
+    if (historyData.length === 0) {
+        tableHTML += '<tr class="no-records"><td colspan="6">No Records found</td></tr>';
+    } else {
+        for (var i = 0; i < historyData.length; i++) {
+            var row = historyData[i];
+            tableHTML += '<tr>';
+            tableHTML += '<td>' + (i + 1) + '</td>';
+            tableHTML += '<td>' + row.name + '</td>';
+            tableHTML += '<td>' + row.transaction_date + '</td>';
+            tableHTML += '<td>' + row.item_name + '</td>';
+            tableHTML += '<td>' + "Rs: " + row.amount + '</td>';
+            tableHTML += '<td>' + row.qty + '</td>';
+            tableHTML += '</tr>';
+        }
     }
+
     tableHTML += '</tbody></table>';
     dialog.fields_dict.history_table.$wrapper.html(tableHTML);
     dialog.show();
+
+    dialog.$wrapper.find('.no-records').css({
+        
+        'font-weight': 'bold',
+		'font-size': '26px',
+		'text-align': 'center'
+    });
+
 }
+
 
