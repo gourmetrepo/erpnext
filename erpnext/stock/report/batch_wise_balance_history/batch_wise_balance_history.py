@@ -24,7 +24,7 @@ def execute(filters=None):
 			for batch in sorted(iwb_map[item][wh]):
 				qty_dict = iwb_map[item][wh][batch]
 				if qty_dict.opening_qty or qty_dict.in_qty or qty_dict.out_qty or qty_dict.bal_qty:
-					data.append([item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
+					data.append([qty_dict.supplier_name,qty_dict.supplier_group,item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
 						flt(qty_dict.opening_qty, float_precision), flt(qty_dict.in_qty, float_precision),
 						flt(qty_dict.out_qty, float_precision), flt(qty_dict.bal_qty, float_precision),
 						 item_map[item]["stock_uom"]
@@ -35,7 +35,7 @@ def execute(filters=None):
 def get_columns(filters):
 	"""return columns based on filters"""
 
-	columns = [_("Item") + ":Link/Item:100"] + [_("Item Name") + "::150"] + [_("Description") + "::150"] + \
+	columns = [_("Supplier") + ":Link/Supplier:100"] +[_("Supplier Group") + ":Link/Supplier Group:100"] +[_("Item") + ":Link/Item:100"] + [_("Item Name") + "::150"] + [_("Description") + "::150"] + \
 	[_("Warehouse") + ":Link/Warehouse:100"] + [_("Batch") + ":Link/Batch:100"] + [_("Incoming Rate") + ":Float:120"]+ [_("Outgoing Rate") + ":Float:120"]+ [_("Valuation Rate") + ":Float:120"] + [_("Opening Qty") + ":Float:120"] + \
 	[_("In Qty") + ":Float:80"] + [_("Out Qty") + ":Float:80"] + [_("Balance Qty") + ":Float:90"] + \
 	[_("UOM") + "::90"]
@@ -49,13 +49,19 @@ def get_conditions(filters):
 		frappe.throw(_("'From Date' is required"))
 
 	if filters.get("to_date"):
-		conditions += " and posting_date <= '%s'" % filters["to_date"]
+		conditions += " and sle.posting_date <= '%s'" % filters["to_date"]
 	else:
 		frappe.throw(_("'To Date' is required"))
 
 	for field in ["item_code", "warehouse", "batch_no", "company"]:
 		if filters.get(field):
-			conditions += " and {0} = {1}".format(field, frappe.db.escape(filters.get(field)))
+			conditions += " and sle.{0} = {1}".format(field, frappe.db.escape(filters.get(field)))
+
+	if filters.get("supplier"):
+		conditions += " and s.name = '%s'" % filters["supplier"]
+
+	if filters.get("supplier_group"):
+		conditions += " and s.supplier_group = '%s'" % filters["supplier_group"]
 
 	return conditions
 
@@ -63,12 +69,14 @@ def get_conditions(filters):
 def get_stock_ledger_entries(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select item_code, batch_no,valuation_rate,outgoing_rate,incoming_rate, warehouse, posting_date, sum(actual_qty) as actual_qty
-		from `tabStock Ledger Entry`
-		where docstatus < 2 and ifnull(batch_no, '') != '' %s
-		group by voucher_no, batch_no, item_code, warehouse
-		order by item_code, warehouse""" %
-		conditions, as_dict=1)
+		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no,sle.valuation_rate,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
+		from `tabStock Ledger Entry` as sle
+		LEFT JOIN `tabBatch` as b ON b.name = sle.batch_no
+		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
+		where sle.docstatus < 2 and ifnull(sle.batch_no, '') != '' %s
+		group by sle.voucher_no, sle.batch_no, sle.item_code, sle.warehouse
+		order by sle.item_code, sle.warehouse""" %
+		conditions, as_dict=1,debug=True)
 
 def get_item_warehouse_batch_map(filters, float_precision):
 	sle = get_stock_ledger_entries(filters)
@@ -80,7 +88,7 @@ def get_item_warehouse_batch_map(filters, float_precision):
 	for d in sle:
 		iwb_map.setdefault(d.item_code, {}).setdefault(d.warehouse, {})\
 			.setdefault(d.batch_no, frappe._dict({
-				"opening_qty": 0.0, "in_qty": 0.0, "out_qty": 0.0, "bal_qty": 0.0, "incoming_rate": 0.0, "outgoing_rate": 0.0, "valuation_rate": 0.0
+				"opening_qty": 0.0, "in_qty": 0.0, "out_qty": 0.0, "bal_qty": 0.0, "incoming_rate": 0.0, "outgoing_rate": 0.0, "valuation_rate": 0.0,"supplier_name":d.supplier_name,"supplier_group": d.supplier_group
 			}))
 		qty_dict = iwb_map[d.item_code][d.warehouse][d.batch_no]
 		if d.posting_date < from_date:

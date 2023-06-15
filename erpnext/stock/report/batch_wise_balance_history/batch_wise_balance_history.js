@@ -52,7 +52,8 @@ frappe.query_reports["Batch-Wise Balance History"] = {
 						"company": company
 					}
 				}
-			}
+			},
+			"reqd" : 1
 		},
 		{
 			"fieldname":"batch_no",
@@ -69,6 +70,20 @@ frappe.query_reports["Batch-Wise Balance History"] = {
 					}
 				}
 			}
+		},
+		{
+			"fieldname":"supplier_group",
+			"label": __("Supplier Group"),
+			"fieldtype": "Link",
+			"options": "Supplier Group",
+			"reqd": 0
+		},
+		{
+			"fieldname":"supplier",
+			"label": __("Supplier"),
+			"fieldtype": "Link",
+			"options": "Supplier",
+			"reqd": 0
 		},
 	]
 }
