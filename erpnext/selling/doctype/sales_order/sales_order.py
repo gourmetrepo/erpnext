@@ -378,30 +378,28 @@ class SalesOrder(SellingController):
 	# def on_update(self):
 	# 	pass
 
+	# Sale order update status API (Naqeeb and Umair)
+	# def on_update(self): 
+	# 	name = self.name
+	# 	status = self.status
+	# 	owner = self.owner
+	# 	workflow_state = self.workflow_state
+	# 	modification_time = datetime.datetime.now()
+	# 	payload = {
+	# 	"name":name,
+	# 	"workflow_state": workflow_state,
+	# 	"status": status,
+	# 	"owner": owner,
+	# 	"modification_time": modification_time
+	# 	}
+	# 	baseurl =  get_config_by_name("GSSM_BASE_URL")
+	# 	url = baseurl + 'UpdateOrderToPlant'
+	# 	response = requests.post(url, data=payload)
 
-	def on_update(self): 
-		name = self.name
-		status = self.status
-		owner = self.owner
-		workflow_state = self.workflow_state
-		modification_time = datetime.datetime.now()
-		# data  = "name: {} status: {}owner: {} workflow_state: {}".format(name, status, owner, workflow_state)
-		payload = {
-		"name":name,
-		"workflow_state": workflow_state,
-		"status": status,
-		"owner": owner,
-		"modification_time": modification_time
-		}
-		print(payload)
-		baseurl =  get_config_by_name("GSSM_BASE_URL")
-		url = baseurl + 'UpdateOrderToPlant'
-		response = requests.post(url, json=payload)
-
-		if response.status_code == 200:
-			frappe.msgprint("Workflow state data sent to the API successfully.")
-		else:
-			frappe.msgprint("Failed to send workflow state data to the API.")
+	# 	if response.status_code == 200:
+	# 		frappe.msgprint("Workflow state data sent to the API successfully.")
+	# 	else:
+	# 		frappe.msgprint("Failed to send workflow state data to the API.")
 
 	
 

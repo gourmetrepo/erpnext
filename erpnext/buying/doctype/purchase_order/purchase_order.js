@@ -66,10 +66,6 @@ frappe.ui.form.on("Purchase Order", {
 		});
 	},
 	// ==============purchase order history  ticket 62056================
-	// select_vehicle:function(frm){
-			
-
-	// },
 	show_history:function(frm){
 		if(frm.doc.select_vehicle){
 			frappe.call({
