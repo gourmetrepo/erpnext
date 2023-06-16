@@ -39,6 +39,34 @@ frappe.ui.form.on("Purchase Order", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+	},
+	company:function(frm){
+
+
+		if(frm.doc.company === "Gourmet Farm"){
+			frm.fields_dict.items.grid.toggle_reqd("project", true);
+			frm.fields_dict.items.grid.toggle_reqd("cost_center", true);
+			refresh_field("project");
+			refresh_field("cost_center");
+		}else{
+			frm.fields_dict.items.grid.toggle_reqd("cost_center", false);
+			frm.fields_dict.items.grid.toggle_reqd("project", false);
+			refresh_field("project");
+			refresh_field("cost_center");
+		}
+		// if(frm.doc.company === "Gourmet Farm"){
+		// 	frm.set_df_property("cost_center", "reqd", 1);
+		// 	frm.set_df_property("project", "reqd", 1);
+		// 	frm.refresh_field('cost_center');
+		// 	frm.refresh_field('project');
+		// }
+		// else{
+		// 	frm.set_df_property("cost_center", "reqd", 0);
+		// 	frm.set_df_property("project", "reqd", 0);
+		// 	frm.refresh_field('cost_center');
+		// 	frm.refresh_field('project');
+		// }
+
 	}
 });
 

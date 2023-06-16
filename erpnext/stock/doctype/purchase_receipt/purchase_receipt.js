@@ -59,12 +59,37 @@ frappe.ui.form.on("Purchase Receipt", {
 	},
 
 	company: function(frm) {
+		console.log('company');
 		frm.trigger("toggle_display_account_head");
 		//umair added code for series automapped for Quintech Sciences
 		if(frm.doc.company == "QuinTech Sciences")
 		{
 			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
 			frm.set_value("naming_series","PRQS-.YY.-")
+		}
+		// if(frm.doc.company === "Gourmet Farm"){
+		// 	frm.set_df_property("cost_center", "reqd", 1);
+		// 	frm.set_df_property("project", "reqd", 1);
+		// 	frm.refresh_field('cost_center');
+		// 	frm.refresh_field('project');
+		// }
+		// else{
+		// 	frm.set_df_property("cost_center", "reqd", 0);
+		// 	frm.set_df_property("project", "reqd", 0);
+		// 	frm.refresh_field('cost_center');
+		// 	frm.refresh_field('project');
+		// }
+
+		if(frm.doc.company === "Gourmet Farm"){
+			frm.fields_dict.items.grid.toggle_reqd("project", true);
+			frm.fields_dict.items.grid.toggle_reqd("cost_center", true);
+			refresh_field("project");
+			refresh_field("cost_center");
+		}else{
+			frm.fields_dict.items.grid.toggle_reqd("cost_center", false);
+			frm.fields_dict.items.grid.toggle_reqd("project", false);
+			refresh_field("project");
+			refresh_field("cost_center");
 		}
 	},
 

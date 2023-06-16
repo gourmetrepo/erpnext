@@ -151,6 +151,7 @@ frappe.ui.form.on('Payment Entry', {
 	},
 
 	refresh: function(frm) {
+		console.log("refresh")
 		erpnext.hide_company();
 		frm.events.hide_unhide_fields(frm);
 		frm.events.set_dynamic_labels(frm);
@@ -166,7 +167,22 @@ frappe.ui.form.on('Payment Entry', {
 	company: function(frm) {
 		frm.events.hide_unhide_fields(frm);
 		frm.events.set_dynamic_labels(frm);
+		console.log("this is ")
+		if(frm.doc.company == "QuinTech Sciences")
+		{
+			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+			frm.set_value("naming_series","PAYQS-.YY.-")
+		}
+		if(frm.doc.company === "Gourmet Farm" && frm.doc.payment_type==="Receive"){
+			frm.set_df_property("project", "reqd", 1);
+			frm.refresh_field('project');
+		}
+		else{
+			frm.set_df_property("project", "reqd", 0);
+			frm.refresh_field('project');
+		}
 	},
+	
 
 	contact_person: function(frm) {
 		frm.set_value("contact_email", "");
@@ -276,6 +292,14 @@ frappe.ui.form.on('Payment Entry', {
 			if(frm.doc.mode_of_payment) {
 				frm.events.mode_of_payment(frm);
 			}
+		}
+		if(frm.doc.company === "Gourmet Farm" && frm.doc.payment_type==="Receive"){
+			frm.set_df_property("project", "reqd", 1);
+			frm.refresh_field('project');
+		}
+		else{
+			frm.set_df_property("project", "reqd", 0);
+			frm.refresh_field('project');
 		}
 	},
 
@@ -971,13 +995,14 @@ frappe.ui.form.on('Payment Entry', {
 		}
 	},
 	//umair added code for series automapped for Quintech Sciences
-	company: function(frm) {
-		if(frm.doc.company == "QuinTech Sciences")
-		{
-			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
-			frm.set_value("naming_series","PAYQS-.YY.-")
-		}
-	}
+	// company: function(frm) {
+	// 	console.log("adsfasdfads")
+	// 	if(frm.doc.company == "QuinTech Sciences")
+	// 	{
+	// 		// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
+	// 		frm.set_value("naming_series","PAYQS-.YY.-")
+	// 	}
+	// }
 });
 
 

@@ -73,6 +73,17 @@ frappe.ui.form.on("Sales Order", {
 			if(!d.delivery_date) d.delivery_date = frm.doc.delivery_date;
 		});
 		refresh_field("items");
+	},
+	company: function(frm){
+		if(frm.doc.company === "Gourmet Farm" ){
+			frm.set_df_property("cost_center", "reqd", 1);
+			frm.refresh_field('cost_center');
+		}
+		else{
+			frm.set_df_property("cost_center", "reqd", 0);
+			frm.refresh_field('cost_center');
+		}
+	
 	}
 });
 
