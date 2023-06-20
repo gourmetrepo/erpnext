@@ -104,6 +104,12 @@ frappe.ui.form.on("Customer", {
 	},
 
 	refresh: function(frm) {
+		frappe.require("assets/nerp/js/jquery.maskedinput.min.js", () => {
+            $.mask.definitions['3'] = null;
+            $('input[data-fieldname="cnic"]').mask(frappe.utils.get_config_by_name('CNIC_MASK','99999-9999999-9'),{autoclear: false});
+           // $('input[data-fieldname="phone_no"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
+        })
+
 		if(frappe.defaults.get_default("cust_master_name")!="Naming Series") {
 			frm.toggle_display("naming_series", false);
 		} else {
