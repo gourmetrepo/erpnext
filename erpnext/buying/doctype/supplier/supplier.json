@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_events_in_timeline": 1,
  "allow_import": 1,
  "allow_rename": 1,
@@ -384,9 +383,8 @@
  "icon": "fa fa-user",
  "idx": 370,
  "image_field": "image",
- "links": [],
- "modified": "2020-06-17 23:28:30",
- "modified_by": "Administrator",
+ "modified": "2023-06-05 11:29:24.265848",
+ "modified_by": "zubair@gourmetpakistan.com",
  "module": "Buying",
  "name": "Supplier",
  "name_case": "Title Case",
