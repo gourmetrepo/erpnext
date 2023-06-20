@@ -15,7 +15,7 @@ from erpnext.hr.doctype.expense_claim.expense_claim import update_reimbursed_amo
 from erpnext.accounts.doctype.bank_account.bank_account import get_party_bank_account, get_bank_account_details
 from erpnext.controllers.accounts_controller import AccountsController, get_supplier_block_status
 from erpnext.accounts.doctype.invoice_discounting.invoice_discounting import get_party_account_based_on_invoice_discounting
-
+from erpnext.exceptions import PartyDisabled
 from six import string_types, iteritems
 
 class InvalidPaymentEntry(ValidationError):
@@ -65,6 +65,10 @@ class PaymentEntry(AccountsController):
 		self.set_status()
 
 	def on_submit(self):
+		party = frappe.get_cached_value(self.party, ["is_frozen", "disabled"], as_dict=True)
+		if party.disabled:
+			frappe.throw(_("{0} {1} is disabled").format('Customer / Supplier',  self.party), PartyDisabled)
+		
 		self.setup_party_account_field()
 		if self.difference_amount:
 			frappe.throw(_("Difference Amount must be zero"))
