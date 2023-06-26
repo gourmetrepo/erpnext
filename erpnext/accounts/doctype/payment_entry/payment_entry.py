@@ -65,9 +65,12 @@ class PaymentEntry(AccountsController):
 		self.set_status()
 
 	def on_submit(self):
-		party = frappe.get_cached_value(self.party, ["is_frozen", "disabled","workflow_status"], as_dict=True)
-		if party.workflow_status!="Enabled":
-			frappe.throw(_("{0} {1} is not Enabled").format('Customer / Supplier',  self.party), PartyDisabled)
+		# frappe.db.get_value("", {"represents_company": doc.company}, "name")
+		party = frappe.get_cached_value(self.party_type,self.party, ["is_frozen", "disabled"], as_dict=True)
+		if party.disabled==1:
+			frappe.throw(_("{0} {1} is Disabled").format(self.party_type,  self.party), PartyDisabled)
+		if party.is_frozen==1:
+			frappe.throw(_("{0} {1} is Frozen").format(self.party_type,  self.party), PartyDisabled)
 		
 		self.setup_party_account_field()
 		if self.difference_amount:
