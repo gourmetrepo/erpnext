@@ -58,6 +58,14 @@ frappe.ui.form.on('Payment Order', {
 				})
 			},('Create'));
 		}
+		console.log(frm.doc)
+			if ( frm.doc.__unsaved){
+				console.log("Unsaved Document")
+			}else{
+			if (frm.doc.docstatus == 0 && frm.doc.docstatus != 1 ){
+			setTimeout(function() {
+				frm.trigger("balances_dashboard");
+			}, 100);}}
 	},
 
 	remove_row_if_empty: function(frm) {
@@ -164,4 +172,113 @@ frappe.ui.form.on('Payment Order', {
 
 		dialog.show();
 	},
+
+
+	balances_dashboard: function(frm) {
+		console.log("pmo triggered")
+		let balances;
+		if (frm.doc) {
+			frappe.call({
+				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_dashboard_balances", 
+				async: false,
+				args: {
+					data: frm.doc.name
+				},
+				callback: function(r) {
+					console.log(r.message)
+					if (r.message) {
+						balances = r.message;
+					}
+				}
+			});
+	
+
+			var myvar_pmo ='{% if balances %}' +
+			'{% if balances["mode_of_payment"] == "Cash" %}' +
+			'<div id="missing" style="position: relative; right: 18px;" class="container missing">' +
+			'<div class="row">' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Cash Balance before payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp' +
+			'<p style="display: inline;">Rs: {{ balances["balance_before_payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Cash Payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp' +
+			'<p style="display: inline;">Rs: {{ balances["payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'<div class="row">' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Cash Balance after Payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp' +
+			'<p style="display: inline;">Rs: {{ balances["balance_after_payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Consumed Cash Balance:</h6>&nbsp;&nbsp;&nbsp;&nbsp' +
+			'<p style="display: inline;">Rs: {{ balances["consumed_amount"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'{% endif %}' +
+			'{% if balances["mode_of_payment"] == "BANK" || balances["mode_of_payment"] == "Cheque" %}' +
+			'<div id="missing" style="position: relative; right: 18px;" class="container missing">' +
+			'<div class="row">' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Bank Balance before payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<p style="display: inline;">Rs: {{ balances["balance_before_payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Bank Payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<p style="display: inline;">Rs: {{ balances["payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'<div class="row">' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Bank Balance after payment:</h6>&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<p style="display: inline;">Rs: {{ balances["balance_after_payment"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'<div class="col-md-6">' +
+			'<div class="field">' +
+			'<h6 style="display: inline;">Consumed Bank Balance:</h6>&nbsp;&nbsp;&nbsp;&nbsp;' +
+			'<p style="display: inline;">Rs: {{ balances["consumed_amount"] }}</p>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'{% endif %}' +
+			'{% if balances["mode_of_payment"] == null %}' +
+			'<div id="missing" style="position: relative; right: 18px;" class="container missing">'+
+			'<h6 style="margin-top: 20px; display: inline;">There is some issue in Payment Order</h6>'+
+			'</div>'+
+			'{% endif %}'+
+			'{% endif %}';			
+			
+
+			
+		
+
+
+			$("div").remove(".pmo_dashboard");
+			console.log(balances)
+			frm.dashboard.add_section(
+				frappe.render_template(myvar_pmo, {
+					balances: balances
+				},"pmo_dashboard")
+			);
+			$(".form-dashboard").append( $(".pmo_dashboard") );
+			// frm.dashboard.show();
+		}
+	}
 });
