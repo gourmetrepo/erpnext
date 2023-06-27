@@ -16,13 +16,15 @@ class PeriodClosingVoucher(AccountsController):
 		self.validate_posting_date()
 
 	def on_submit(self):
-		#self.make_gl_entries()
-		try:
-			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
-		except Exception as e:
-			traceback = frappe.get_traceback()
-			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
-			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+		self.make_gl_entries()
+		# try:
+		# 	from nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue import process_single_stock_gl_queue
+		# 	process_single_stock_gl_queue(self.name,self.doctype)
+		# 	# frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+		# except Exception as e:
+		# 	traceback = frappe.get_traceback()
+		# 	frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+		# 	self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 
 	def on_cancel(self):
 		frappe.db.sql("""delete from `tabGL Entry`
@@ -118,4 +120,4 @@ class PeriodClosingVoucher(AccountsController):
 			and t2.docstatus < 2 and t2.company = %s
 			and t1.posting_date between %s and %s
 			group by t1.account, {dimension_fields}
-		""".format(dimension_fields = ', '.join(dimension_fields)), (self.company, self.get("year_start_date"), self.posting_date), as_dict=1)
+		""".format(dimension_fields = ', '.join(dimension_fields)), (self.company, self.get("year_start_date"), self.posting_date), as_dict=1,debug=True)
