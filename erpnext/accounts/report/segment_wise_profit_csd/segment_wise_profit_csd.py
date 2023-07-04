@@ -10,16 +10,16 @@ def execute(filters=None):
 	from_date = filters.get('from_date')
 	to_date = filters.get('to_date')
 	columns = [
-		("HEAD")+ "::250",
-		("ACCOUNT") + "::250",
+		("HEAD")+ "::160",
+		("ACCOUNT") + "::150",
         ("CSD") + ":Currency:120",
-        ("JUICES") + ":Currency:120",
-        ("WATER") + ":Currency:120",
-        ("CandyConfectionary") + ":Currency:150",
-        ("Concentrates") + ":Currency:120",
-        ("19LTR") + ":Currency:120",
-		("Other") + ":Currency:120",
-		("Total") + ":Currency:120"
+        ("JUICES") + ":Currency:80",
+        ("WATER") + ":Currency:80",
+        ("CandyConfectionary") + ":Currency:140",
+        ("Concentrates") + ":Currency:110",
+        ("19LTR") + ":Currency:80",
+		("Other") + ":Currency:80",
+		("Total") + ":Currency:80"
     ]
 	f_data = []
 	data = []

@@ -22,7 +22,13 @@ from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
 from erpnext.manufacturing.doctype.production_plan.production_plan import get_items_for_material_requests
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import validate_inter_company_party, update_linked_doc,\
 	unlink_inter_company_doc
-from nrp_manufacturing.utils import get_config_by_name
+from nrp_manufacturing.utils import get_config_by_name 
+import datetime
+import requests
+# from nrp_manufacturing.utils import get_config_by_name,get_status_of_sales_order
+# from nrp_manufacturing.modules.gourmet.delivery_note.delivery_note import get_status_of_sales_order
+# from erpnext.selling.doctype.sales_order.sales_order import SalesOrder
+
 
 form_grid_templates = {
 	"items": "templates/form_grid/item_grid.html"
@@ -367,9 +373,50 @@ class SalesOrder(SellingController):
 			update_bin_qty(item_code, warehouse, {
 				"reserved_qty": get_reserved_qty(item_code, warehouse)
 			})
+   
 
-	def on_update(self):
-		pass
+	# def on_update(self):
+	# 	pass
+
+	# Sale order update status API (Naqeeb and Umair)
+	# def on_update(self): 
+	# 	name = self.name
+	# 	status = self.status
+	# 	owner = self.owner
+	# 	workflow_state = self.workflow_state
+	# 	modification_time = datetime.datetime.now()
+	# 	payload = {
+	# 	"name":name,
+	# 	"workflow_state": workflow_state,
+	# 	"status": status,
+	# 	"owner": owner,
+	# 	"modification_time": modification_time
+	# 	}
+	# 	baseurl =  get_config_by_name("GSSM_BASE_URL")
+	# 	url = baseurl + 'UpdateOrderToPlant'
+	# 	response = requests.post(url, data=payload)
+
+	# 	if response.status_code == 200:
+	# 		frappe.msgprint("Workflow state data sent to the API successfully.")
+	# 	else:
+	# 		frappe.msgprint("Failed to send workflow state data to the API.")
+
+	
+
+
+	# def on_update(doc):
+	# 	if doc.workflow_state == "Approved By Accounts Manager":
+	# 		frappe.msgprint("Workflow state changed to Approved By Accounts Manager!")
+	# 	elif doc.workflow_state == "Approved By Accounts":
+	# 		frappe.msgprint("Workflow state changed to Approved By Accounts!")
+	# 	elif doc.workflow_state == "Approved By SSAM Manager":
+	# 		frappe.msgprint("Workflow state changed to New State!")
+	# 	elif doc.workflow_state == "Created":
+	# 		frappe.msgprint("Workflow state changed to Created!")
+	# 	elif doc.workflow_state == "Pending":
+	# 		frappe.msgprint("Workflow state changed to Pending!")
+	# 	else:
+	# 		frappe.msgprint("no workflow state found!")
 
 	def before_update_after_submit(self):
 		self.validate_po()
