@@ -66,11 +66,12 @@ class PaymentEntry(AccountsController):
 
 	def on_submit(self):
 		# frappe.db.get_value("", {"represents_company": doc.company}, "name")
-		party = frappe.get_cached_value(self.party_type,self.party, ["is_frozen", "disabled"], as_dict=True)
-		if party.disabled==1:
-			frappe.throw(_("{0} {1} is Disabled").format(self.party_type,  self.party), PartyDisabled)
-		if party.is_frozen==1:
-			frappe.throw(_("{0} {1} is Frozen").format(self.party_type,  self.party), PartyDisabled)
+		if self.party:
+			party = frappe.get_cached_value(self.party_type,self.party, ["is_frozen", "disabled"], as_dict=True)
+			if party.disabled==1:
+				frappe.throw(_("{0} {1} is Disabled").format(self.party_type,  self.party), PartyDisabled)
+			if party.is_frozen==1:
+				frappe.throw(_("{0} {1} is Frozen").format(self.party_type,  self.party), PartyDisabled)
 		
 		self.setup_party_account_field()
 		if self.difference_amount:
