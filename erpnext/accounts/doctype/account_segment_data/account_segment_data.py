@@ -21,8 +21,9 @@ def calculate_segmented_profit_date_range():
 
 		for i in range(0, 32):  # loop through 1 to 15 days
 			date = start_date + timedelta(days=i)
-			calculate_segment_profit(date)
+			# calculate_segment_profit(date)
 			print(date.strftime('%Y-%m-%d'))
+			frappe.enqueue("erpnext.accounts.doctype.account_segment_data.account_segment_data.calculate_segment_profit",f_date=date,queue="long",enqueue_after_commit=True)
    
    
 @frappe.whitelist()
