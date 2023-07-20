@@ -3,6 +3,7 @@
 
 
 import json
+import copy
 
 import frappe
 from frappe import _, msgprint
@@ -49,6 +50,50 @@ class PurchaseOrder(BuyingController):
 	def onload(self):
 		supplier_tds = frappe.db.get_value("Supplier", self.supplier, "tax_withholding_category")
 		self.set_onload("supplier_tds", supplier_tds)
+
+	def before_save(self):
+		purchase_order_type = self.get('purchase_order_type')
+		if purchase_order_type == "Inter Unit Purchase":
+			supplier = self.get('supplier')
+			supp_company = self.get('represents_company')
+			po_name = self.get('name')
+			po_items = self.get('items')
+			trans_date = self.get('transaction_date')
+			delivery_date = self.get('schedule_date')
+			cust_company = self.get('company')
+			cust = frappe.db.sql("""
+										SELECT name,customer_name FROM `tabCustomer` WHERE represents_company="{}"  
+									""".format(cust_company),as_dict=True)
+
+			customer = cust[0]['name']
+			customer_name = cust[0]['customer_name']
+
+
+			so_doc = frappe.new_doc('Sales Order')
+			so_doc.customer = customer
+			so_doc.cusomer_name = customer_name
+			so_doc.represents_company = cust_company
+			so_doc.order_type = 'Sales'
+			so_doc.company = supp_company
+			so_doc.po_no = po_name
+			so_doc.transaction_date = trans_date
+			so_doc.delivery_date = delivery_date
+			so_doc.po_date = trans_date
+
+			for po_item in po_items:
+				so_doc.append('items',
+					{
+						"item_code":po_item.item_code,
+						"delivery_date":po_item.schedule_date,
+						"item_name":po_item.item_name,
+						"qty":po_item.qty,
+						"uom":po_item.uom,
+						"stock_uom":po_item.stock_uom,
+						"conversion_factor":po_item.conversion_factor
+					}
+				)
+
+			so_doc.save()
 
 	def validate(self):
 		super(PurchaseOrder, self).validate()
