@@ -738,7 +738,7 @@ class BuyingController(StockController):
 			'calculate_depreciation': 1,
 			'purchase_receipt_amount': purchase_amount,
 			'gross_purchase_amount': purchase_amount,
-			'project':row.project,
+			'project_name':row.project,
 			'cost_center':row.cost_center,
 			'business_unit':row.business_unit,
 			'purchase_receipt': self.name if self.doctype == 'Purchase Receipt' else None,
