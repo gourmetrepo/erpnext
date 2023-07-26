@@ -304,6 +304,12 @@ def get_basic_details(args, item, overwrite_warehouse=True):
 		"transaction_date": args.get("transaction_date")
 	})
 
+
+	# Umair added check to add project name from item in materail request for DAD requirment
+	if args.get('doctype') == 'Material Request':
+		if (item.item_group == "DAD" and item.is_stock_item == 0) or (item.is_fixed_asset == 1 and item.asset_category == "FA-Land"):
+			out["project"] = item.project_name 
+
 	if item.get("enable_deferred_revenue") or item.get("enable_deferred_expense"):
 		out.update(calculate_service_end_date(args, item))
 
