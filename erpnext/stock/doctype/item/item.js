@@ -22,6 +22,15 @@ frappe.ui.form.on("Item", {
 		if (frm.doc.is_fixed_asset) {
 			frm.trigger("set_asset_naming_series");
 		}
+
+		frm.set_query('project_name', function(doc) {
+			return {
+				filters: {
+					"is_active":"Yes",
+					"company": "DAD"
+				}
+			};
+		});
 	},
 
 	refresh: function(frm) {
