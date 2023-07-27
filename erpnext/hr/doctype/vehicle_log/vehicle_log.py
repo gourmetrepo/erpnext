@@ -75,7 +75,7 @@ def make_material_request(self):
         i["conversion_factor"]= 1
         i["schedule_date"]= self.date 
         i["cost_center"]= self.cost_center
-        i["warehouse"]=warehouse[1]
+        i["warehouse"]=item.source_warehouse if item.source_warehouse else warehouse[1]
         mr.append("items", i)
     # mr.items=items
     mr.insert(ignore_permissions=True)
