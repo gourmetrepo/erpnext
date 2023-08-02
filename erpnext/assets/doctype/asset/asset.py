@@ -34,7 +34,10 @@ class Asset(AccountsController):
 		self.make_asset_movement()
 		if not self.booked_fixed_asset and self.validate_make_gl_entry():
 			self.make_gl_entries()
-
+	
+	def before_save(self):
+		verify_kanals(self)
+	
 	def before_cancel(self):
 		self.cancel_auto_gen_movement()
 
@@ -768,3 +771,10 @@ def get_total_days(date, frequency):
 		cint(frequency) * -1)
 
 	return date_diff(date, period_start_date)
+
+def verify_kanals(doc):
+	k = 0
+	for d in doc.owner_details_table:
+		k = k + d.kanals
+	if k > doc.total_kanals:
+		frappe.throw(_("Given kanals for owner details exceeds the total kanals. Please make corrections."))
