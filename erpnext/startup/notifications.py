@@ -39,7 +39,7 @@ def get_notification_config():
 	if frappe.session.user != 'zubair@gourmetpakistan.com':
 		user_roles = frappe.db.sql(f"""SELECT group_concat(CONCAT('"',ROLE,'"')) FROM `tabHas Role` WHERE parent = '{frappe.session.user}'""")
 		if user_roles[0][0] != None:
-			docper_user = frappe.db.sql(f"""SELECT parent FROM `tabDocPerm` WHERE ROLE IN ({user_roles[0][0]})""")
+			docper_user = frappe.db.sql(f"""SELECT group_concat(CONCAT('"',parent,'"')) FROM `tabDocPerm` WHERE ROLE IN ({user_roles[0][0]})""")
 			if docper_user[0][0] != None:
 				role_doctype = frappe.db.sql(f"""SELECT NAME FROM `tabDocType` WHERE NAME IN ({docper_user[0][0]})""",as_dict=True)
 				doctype = [d.NAME for d in role_doctype]
