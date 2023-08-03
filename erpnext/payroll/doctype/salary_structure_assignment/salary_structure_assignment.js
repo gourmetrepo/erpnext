@@ -41,6 +41,9 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			}
 		});
 	},
+	onload:function(frm){
+		frm.set_value('company',null)
+	},
 
 	refresh: function(frm) {
 		if(frm.doc.__onload){
