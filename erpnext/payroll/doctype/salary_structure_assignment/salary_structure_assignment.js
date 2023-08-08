@@ -52,6 +52,21 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		}
 	},
 
+	cash_salary: function(frm){
+		var cash = frm.doc.cash_salary
+		var bank = frm.doc.bank_salary
+		var base = cash + bank
+		console.log(base)
+		frm.set_value('base',base)
+	},
+
+	bank_salary: function(frm){
+		var cash = frm.doc.cash_salary
+		var bank = frm.doc.bank_salary
+		var base = cash + bank
+		frm.set_value('base',base)
+	},
+
 	employee: function(frm) {
 		if(frm.doc.employee){
 			frappe.call({
