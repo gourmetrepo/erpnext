@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Salary Structure Assignment', {
 	setup: function(frm) {
+		// frm.set_value('company',null)
 		frm.set_query("employee", function() {
 			return {
 				query: "erpnext.controllers.queries.employee_query",
@@ -56,7 +57,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		var cash = frm.doc.cash_salary
 		var bank = frm.doc.bank_salary
 		var base = cash + bank
-		console.log(base)
 		frm.set_value('base',base)
 	},
 
@@ -81,6 +81,27 @@ frappe.ui.form.on('Salary Structure Assignment', {
 				callback: function(data) {
 					if(data.message){
 						frm.set_value("company", data.message.company);
+						// frm.set_value('salary_structure',data.message.company)
+						frm.set_query("salary_structure", function() {
+							return {
+								filters: {
+									company: data.message.company,
+									docstatus: 1,
+									is_active: "Yes"
+								}
+							}
+						});
+
+						frm.set_query("income_tax_slab", function() {
+							return {
+								filters: {
+									company: data.message.company,
+									docstatus: 1,
+									disabled: 0,
+									currency: frm.doc.currency
+								}
+							};
+						});
 					}
 				}
 			});
