@@ -721,17 +721,3 @@ def create_pick_list(source_name, target_doc=None):
 	doc.set_item_locations()
 
 	return doc
-
-
-# umair added code to get chart of account to set expense account
-# start
-@frappe.whitelist()
-def get_expense_account_mi(company=None,parent=None,cost_center=None):
-	data = frappe.db.sql('''SELECT chart_of_account 
-							FROM `tabCost Type Item` 
-							WHERE parent="{}" 
-							and company="{}" 
-							AND cost_center="{}";
-						'''.format(parent,company,cost_center),as_dict=True)
-	return data[0]['chart_of_account']
-# end

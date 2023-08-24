@@ -3,7 +3,6 @@
 
 frappe.ui.form.on('Salary Structure Assignment', {
 	setup: function(frm) {
-		// frm.set_value('company',null)
 		frm.set_query("employee", function() {
 			return {
 				query: "erpnext.controllers.queries.employee_query",
@@ -42,29 +41,12 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			}
 		});
 	},
-	// onload:function(frm){
-	// 	frm.set_value('company',null)
-	// },
 
 	refresh: function(frm) {
 		if(frm.doc.__onload){
 			frm.unhide_earnings_and_taxation_section = frm.doc.__onload.earning_and_deduction_entries_does_not_exists;
 			frm.trigger("set_earnings_and_taxation_section_visibility");
 		}
-	},
-
-	cash_salary: function(frm){
-		var cash = frm.doc.cash_salary
-		var bank = frm.doc.bank_salary
-		var base = cash + bank
-		frm.set_value('base',base)
-	},
-
-	bank_salary: function(frm){
-		var cash = frm.doc.cash_salary
-		var bank = frm.doc.bank_salary
-		var base = cash + bank
-		frm.set_value('base',base)
 	},
 
 	employee: function(frm) {
@@ -81,27 +63,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 				callback: function(data) {
 					if(data.message){
 						frm.set_value("company", data.message.company);
-						// frm.set_value('salary_structure',data.message.company)
-						frm.set_query("salary_structure", function() {
-							return {
-								filters: {
-									company: data.message.company,
-									docstatus: 1,
-									is_active: "Yes"
-								}
-							}
-						});
-
-						frm.set_query("income_tax_slab", function() {
-							return {
-								filters: {
-									company: data.message.company,
-									docstatus: 1,
-									disabled: 0,
-									currency: frm.doc.currency
-								}
-							};
-						});
 					}
 				}
 			});

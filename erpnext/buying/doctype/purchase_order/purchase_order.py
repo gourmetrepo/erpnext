@@ -78,9 +78,6 @@ class PurchaseOrder(BuyingController):
 		)
 		self.reset_default_field_value("set_warehouse", "items", "warehouse")
 
-		if self.docstatus== 1:
-			make_so(self)
-
 	def validate_with_previous_doc(self):
 		super(PurchaseOrder, self).validate_with_previous_doc(
 			{
@@ -754,49 +751,3 @@ def add_items_in_ste(ste_doc, row, qty, po_details, batch_no=None):
 			"serial_no": "\n".join(row.serial_no) if row.serial_no else "",
 		}
 	)
-
-@frappe.whitelist()
-def make_so(po):
-	purchase_order_type = po.get('purchase_order_type')
-	if purchase_order_type == "Inter Unit Purchase":
-		supplier = po.get('supplier')
-		supp_company = po.get('represents_company')
-		po_name = po.get('name')
-		po_items = po.get('items')
-		trans_date = po.get('transaction_date')
-		delivery_date = po.get('schedule_date')
-		cust_company = po.get('company')
-		cust = frappe.db.sql("""
-									SELECT name,customer_name FROM `tabCustomer` WHERE represents_company="{}"  
-								""".format(cust_company),as_dict=True)
-
-		customer = cust[0]['name']
-		customer_name = cust[0]['customer_name']
-
-
-		so_doc = frappe.new_doc('Sales Order')
-		so_doc.customer = customer
-		so_doc.cusomer_name = customer_name
-		so_doc.represents_company = cust_company
-		so_doc.order_type = 'Sales'
-		so_doc.company = supp_company
-		so_doc.po_no = po_name
-		so_doc.transaction_date = trans_date
-		so_doc.delivery_date = delivery_date
-		so_doc.po_date = trans_date
-
-		for po_item in po_items:
-			so_doc.append('items',
-				{
-					"item_code":po_item.item_code,
-					"delivery_date":po_item.schedule_date,
-					"item_name":po_item.item_name,
-					"qty":po_item.qty,
-					"uom":po_item.uom,
-					"stock_uom":po_item.stock_uom,
-					"conversion_factor":po_item.conversion_factor
-				}
-			)
-
-		so_doc.save()
-		so_doc.submit()

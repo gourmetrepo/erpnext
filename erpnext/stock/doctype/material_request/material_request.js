@@ -71,32 +71,6 @@ frappe.ui.form.on('Material Request', {
 		erpnext.accounts.dimensions.setup_dimension_filters(frm, frm.doctype);
 	},
 
-	// Umair added code for cost type selection
-	// start
-	company: function(frm) {
-		erpnext.accounts.dimensions.update_dimension(frm, frm.doctype);
-		frm.set_query('cost_type', function() {
-            return {
-                filters: [
-                    ['cost_center', '=', frm.doc.cost_center],
-                    ['company', '=', frm.doc.company]
-                ]
-            };
-        });
-	},
-
-	cost_center: function(frm) {   
-        frm.set_query('cost_type', function() {
-            return {
-                filters: [
-                    ['cost_center', '=', frm.doc.cost_center],
-                    ['company', '=', frm.doc.company]
-                ]
-            };
-        });
-    },
-	// end
-
 	onload_post_render: function(frm) {
 		frm.get_field("items").grid.set_multiple_add("item_code", "qty");
 	},
@@ -217,102 +191,41 @@ frappe.ui.form.on('Material Request', {
 
 	get_item_data: function(frm, item, overwrite_warehouse=false) {
 		if (item && !item.item_code) { return; }
-		// Umair added code for adding cost center and expense account
-		// start
-		if(frm.doc.material_request_type == "Material Issue"){
-			frappe.call({
-				method: "erpnext.stock.doctype.material_request.material_request.get_expense_account_mi",
+		frm.call({
+			method: "erpnext.stock.get_item_details.get_item_details",
+			child: item,
+			args: {
 				args: {
-					company:frm.doc.company,
-					cost_center:frm.doc.cost_center,
-					parent:frm.doc.cost_type
+					item_code: item.item_code,
+					from_warehouse: item.from_warehouse,
+					warehouse: item.warehouse,
+					doctype: frm.doc.doctype,
+					buying_price_list: frappe.defaults.get_default('buying_price_list'),
+					currency: frappe.defaults.get_default('Currency'),
+					name: frm.doc.name,
+					qty: item.qty || 1,
+					stock_qty: item.stock_qty,
+					company: frm.doc.company,
+					conversion_rate: 1,
+					material_request_type: frm.doc.material_request_type,
+					plc_conversion_rate: 1,
+					rate: item.rate,
+					uom: item.uom,
+					conversion_factor: item.conversion_factor
 				},
-				callback: function(r) {
-					if(r.message) {
-						var e_account = r.message;
+				overwrite_warehouse: overwrite_warehouse
+			},
+			callback: function(r) {
+				const d = item;
+				const qty_fields = ['actual_qty', 'projected_qty', 'min_order_qty'];
 
-						frm.call({
-							method: "erpnext.stock.get_item_details.get_item_details",
-							child: item,
-							args: {
-								args: {
-									item_code: item.item_code,
-									from_warehouse: item.from_warehouse,
-									warehouse: item.warehouse,
-									doctype: frm.doc.doctype,
-									buying_price_list: frappe.defaults.get_default('buying_price_list'),
-									currency: frappe.defaults.get_default('Currency'),
-									name: frm.doc.name,
-									qty: item.qty || 1,
-									stock_qty: item.stock_qty,
-									company: frm.doc.company,
-									conversion_rate: 1,
-									material_request_type: frm.doc.material_request_type,
-									plc_conversion_rate: 1,
-									rate: item.rate,
-									uom: item.uom,
-									conversion_factor: item.conversion_factor,
-									cost_center:frm.doc.cost_center,
-									expense_account: e_account
-								},
-								overwrite_warehouse: overwrite_warehouse
-							},
-							callback: function(r) {
-								const d = item;
-								const qty_fields = ['actual_qty', 'projected_qty', 'min_order_qty'];
-				
-								if(!r.exc) {
-									$.each(r.message, function(k, v) {
-										if(!d[k] || in_list(qty_fields, k)) d[k] = v;
-									});
-								}
-							}
-						});
-					}
-
+				if(!r.exc) {
+					$.each(r.message, function(k, v) {
+						if(!d[k] || in_list(qty_fields, k)) d[k] = v;
+					});
 				}
-			});
-
-		}
-		else{
-		// end
-			frm.call({
-				method: "erpnext.stock.get_item_details.get_item_details",
-				child: item,
-				args: {
-					args: {
-						item_code: item.item_code,
-						from_warehouse: item.from_warehouse,
-						warehouse: item.warehouse,
-						doctype: frm.doc.doctype,
-						buying_price_list: frappe.defaults.get_default('buying_price_list'),
-						currency: frappe.defaults.get_default('Currency'),
-						name: frm.doc.name,
-						qty: item.qty || 1,
-						stock_qty: item.stock_qty,
-						company: frm.doc.company,
-						conversion_rate: 1,
-						material_request_type: frm.doc.material_request_type,
-						plc_conversion_rate: 1,
-						rate: item.rate,
-						uom: item.uom,
-						conversion_factor: item.conversion_factor
-					},
-					overwrite_warehouse: overwrite_warehouse
-				},
-				callback: function(r) {
-					const d = item;
-					const qty_fields = ['actual_qty', 'projected_qty', 'min_order_qty'];
-	
-					if(!r.exc) {
-						$.each(r.message, function(k, v) {
-							if(!d[k] || in_list(qty_fields, k)) d[k] = v;
-						});
-					}
-				}
-			});
-		}
-		
+			}
+		});
 	},
 
 	get_items_from_bom: function(frm) {
