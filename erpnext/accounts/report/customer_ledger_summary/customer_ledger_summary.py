@@ -48,6 +48,20 @@ class PartyLedgerSummaryReport(object):
 				"fieldname": "party_name",
 				"width": 110
 			})
+			if self.filters.party_type == 'Supplier':
+				columns.append({
+					"label" : "Supplier Group",
+					"fieldtype" : "Data",
+					"fieldname" : "party_group",
+					"width": 110
+				})
+			elif self.filters.party_type == 'Customer':
+				columns.append({
+					"label" : "Customer Group",
+					"fieldtype" : "Data",
+					"fieldname" : "party_group",
+					"width": 110
+				})
 
 		credit_or_debit_note = "Credit Note" if self.filters.party_type == "Customer" else "Debit Note"
 
@@ -121,6 +135,7 @@ class PartyLedgerSummaryReport(object):
 			self.party_data.setdefault(gle.party, frappe._dict({
 				"party": gle.party,
 				"party_name": gle.party_name,
+				"party_group": gle.party_group,
 				"opening_balance": 0,
 				"invoiced_amount": 0,
 				"paid_amount": 0,
@@ -160,10 +175,10 @@ class PartyLedgerSummaryReport(object):
 		conditions = self.prepare_conditions()
 		join = join_field = ""
 		if self.filters.party_type == "Customer":
-			join_field = ", p.customer_name as party_name"
+			join_field = ", p.customer_name as party_name, p.customer_group AS party_group"
 			join = "left join `tabCustomer` p on gle.party = p.name"
 		elif self.filters.party_type == "Supplier":
-			join_field = ", p.supplier_name as party_name"
+			join_field = ", p.supplier_name as party_name, p.supplier_group AS party_group"
 			join = "left join `tabSupplier` p on gle.party = p.name"
 
 		self.gl_entries = frappe.db.sql("""

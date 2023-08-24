@@ -53,8 +53,8 @@ frappe.query_reports["Batch-Wise Balance History"] = {
 						"company": company
 					}
 				}
-			},
-			"reqd" : 1
+			}
+			// "reqd" : 1
 		},
 		{
 			"fieldname":"batch_no",
