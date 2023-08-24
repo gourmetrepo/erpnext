@@ -753,9 +753,9 @@ def get_children(doctype, parent, company, is_root=False):
 	]
 	filters = [['docstatus', '<', 2]]
 
-	# filters.append(['ifnull(`{0}`,"")'.format(parent_fieldname), '=', '' if is_root else parent])
-	if not is_root:
-		filters.append(['`{0}`'.format(parent_fieldname), '=', parent])
+	filters.append(['ifnull(`{0}`,"")'.format(parent_fieldname), '=', '' if is_root else parent])
+	# if not is_root:
+	# 	filters.append(['`{0}`'.format(parent_fieldname), '=', parent])
 
 	if is_root:
 		fields += ['root_type', 'report_type', 'account_currency'] if doctype == 'Account' else []
