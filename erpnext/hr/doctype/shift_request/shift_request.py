@@ -76,19 +76,20 @@ class ShiftRequest(Document):
 		from datetime import timedelta
 
 		date_list = []
-		employee_holiday_list = []
+		# employee_holiday_list = []
 
-		employee_holidays = frappe.db.sql("""select holiday_date from `tabHoliday`
-								where parent in (select holiday_list from `tabEmployee`
-								where name = %s)""",self.employee,as_dict=1)
+		# employee_holidays = frappe.db.sql("""select holiday_date from `tabHoliday`
+		# 						where parent in (select holiday_list from `tabEmployee`
+		# 						where name = %s)""",self.employee,as_dict=1)
 
-		for d in employee_holidays:
-			employee_holiday_list.append(d.holiday_date)
+		# for d in employee_holidays:
+		# 	employee_holiday_list.append(d.holiday_date)
 
 		reference_date = start_date
 		
 		while reference_date <= end_date:
-			if reference_date not in employee_holiday_list:
+			#if reference_date not in employee_holiday_list:
+			if reference_date :
 				date_list.append(reference_date)
 			reference_date += timedelta(days=1)
 
