@@ -1064,6 +1064,8 @@ def get_payment_entry(dt, dn, party_amount=None, bank_account=None, bank_amount=
 	pe.paid_amount = paid_amount
 	pe.received_amount = received_amount
 	pe.letter_head = doc.get("letter_head")
+	if dt == "Purchase Order":
+		pe.business_unit = doc.items[0].business_unit
 
 	if pe.party_type in ["Customer", "Supplier"]:
 		bank_account = get_party_bank_account(pe.party_type, pe.party)
@@ -1162,11 +1164,14 @@ def make_payment_order(source_name, target_doc=None):
 
 
 	doclist = get_mapped_doc("Payment Entry", source_name,	{
-		"Payment Entry": {
+		"Payment Entry": { 
 			"doctype": "Payment Order",
 			"validation": {
 				"docstatus": ["=", 1]
-			}
+			},
+			"field_map": {
+				"business_unit": "business_unit"
+			},
 		},
 		"Payment Entry Reference": {
 			"doctype": "Payment Order Reference",
