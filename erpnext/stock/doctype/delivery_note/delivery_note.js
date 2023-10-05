@@ -9,6 +9,10 @@ frappe.provide("erpnext.stock");
 frappe.provide("erpnext.stock.delivery_note");
 
 frappe.ui.form.on("Delivery Note", {
+	onload:function(frm){
+		frm.set_df_property('business_unit','set_only_once',true);
+		refresh_field('business_unit');
+	},
 	setup: function(frm) {
 		frm.custom_make_buttons = {
 			'Packing Slip': 'Packing Slip',

@@ -33,6 +33,9 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			me.frm.refresh_fields();
 		}
 		erpnext.queries.setup_warehouse_query(this.frm);
+
+		frm.set_df_property('business_unit','set_only_once',true);
+		refresh_field('business_unit');
 	},
 
 	refresh: function(doc, dt, dn) {

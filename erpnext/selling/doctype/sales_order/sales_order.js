@@ -65,6 +65,9 @@ frappe.ui.form.on("Sales Order", {
 			}
 		});
 
+		frm.set_df_property('business_unit','set_only_once',true);
+		refresh_field('business_unit');
+
 		erpnext.queries.setup_warehouse_query(frm);
 	},
 
