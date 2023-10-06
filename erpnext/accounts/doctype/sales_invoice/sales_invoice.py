@@ -151,6 +151,11 @@ class SalesInvoice(SellingController):
 		set_account_for_mode_of_payment(self)
 	
 	def submit(self):
+		supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
+		if shipping_type == 'Palletized':
+			if self.freight_account is None or self.frieght_amount is None:
+				frappe.throw("Please enter the freight amount and freight account, for palletized shipping")
+
 		time.sleep(1)
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Queued' WHERE `name`='{docname}';".format(docname=self.name))
 		frappe.db.commit()
@@ -181,6 +186,55 @@ class SalesInvoice(SellingController):
 
 		# this sequence because outstanding may get -ve
 		#self.make_gl_entries()
+		supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
+		if shipping_type == 'Palletized':
+			from datetime import datetime
+			supplier_account = frappe.get_value('Party Account',filters={"parent":supplier,"company":self.company},fieldname='account')
+			if supplier_account == None:
+				supplier_account = frappe.get_value('Company',self.company,['default_payable_account'])
+			jv_accounts = []
+			jv_accounts.append({
+				"account": self.freight_account,
+				"party_type": "",
+				"party": "",
+				"debit_in_account_currency": self.frieght_amount,
+				"debit": self.frieght_amount,
+				"credit_in_account_currency": 0,
+				"credit": 0,
+				"is_advance": "No",
+				"against_account": "",
+				"user_remark": f"Against Sales Invoice {self.name}",
+				"doctype": "Journal Entry Account"
+			})
+			jv_accounts.append({
+				"account": supplier_account,
+				"party_type": "Supplier",
+				"party": supplier,
+				"debit_in_account_currency": 0,
+				"debit": 0,
+				"credit_in_account_currency": self.frieght_amount,
+				"credit": self.frieght_amount,
+				"is_advance": "No",
+				"against_account": "",
+				"user_remark": f"Against Sales Invoice {self.name}",
+				"doctype": "Journal Entry Account"
+			})
+			jv_payload = {
+				"title":f"Freight JV Against {self.name}",
+				"generated":"System Generated",
+				"voucher_type": "Journal Entry",
+				"naming_series": "ACC-JV-.YYYY.-",
+				"posting_date": datetime.now(),
+				"company": self.company,
+				"accounts":jv_accounts,
+				"doctype":'Journal Entry',
+			}        
+			jv_freight = frappe.get_doc(jv_payload)
+			jv_freight.save(ignore_permissions=True)
+			jv_freight.submit()
+			frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
+
+				
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
