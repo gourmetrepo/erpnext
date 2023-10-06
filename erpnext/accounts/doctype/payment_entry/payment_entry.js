@@ -12,6 +12,17 @@ frappe.ui.form.on('Payment Entry', {
 	},
 
 	setup: function(frm) {
+
+		frm.set_query('business_unit', function() {
+            return {
+                query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+				filters: {
+						'supplier': frm.doc.party
+				}
+
+            };
+        });
+		
 		frm.set_query("paid_from", function() {
 			frm.events.validate_company(frm);
 
