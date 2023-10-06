@@ -4,6 +4,7 @@
 frappe.ui.form.on("Supplier", {
 	setup: function (frm) {
 		frm.set_query('default_price_list', { 'buying': 1 });
+		frm.set_df_property('acre_wise_category', 'set_only_once', 1);
 		if (frm.doc.__islocal == 1) {
 			frm.set_value("represents_company", "");
 		}
