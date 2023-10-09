@@ -1,0 +1,31 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Reference Details",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2021-12-15 17:17:00.477153",
+   "default_value": null,
+   "doc_type": "Reference Details",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "occupation",
+   "idx": 0,
+   "modified": "2020-09-15 17:05:44.727593",
+   "modified_by": "Administrator",
+   "name": "Reference Details-occupation-options",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "options",
+   "property_type": "Text",
+   "value": "Government Employee\nPrivate Employee\nGourmet Employee\nOthers"
+  }
+ ],
+ "sync_on_migrate": 1
+}
