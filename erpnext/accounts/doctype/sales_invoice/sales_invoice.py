@@ -151,10 +151,11 @@ class SalesInvoice(SellingController):
 		set_account_for_mode_of_payment(self)
 	
 	def submit(self):
-		supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
-		if shipping_type == 'Palletized':
-			if self.freight_account is None or self.frieght_amount is None:
-				frappe.throw("Please enter the freight amount and freight account, for palletized shipping")
+		if self.delivery_note_reference:
+			supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
+			if shipping_type == 'Palletized':
+				if self.freight_account is None or self.frieght_amount is None:
+					frappe.throw("Please enter the freight amount and freight account, for palletized shipping")
 
 		time.sleep(1)
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Queued' WHERE `name`='{docname}';".format(docname=self.name))
