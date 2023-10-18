@@ -1,0 +1,31 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Family Details",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2021-08-10 11:54:19.002389",
+   "default_value": null,
+   "doc_type": "Family Details",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "relation",
+   "idx": 0,
+   "modified": "2021-08-10 11:54:19.002389",
+   "modified_by": "rameez.jamil@gourmetpakistan.com",
+   "name": "Family Details-relation-options",
+   "owner": "rameez.jamil@gourmetpakistan.com",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "options",
+   "property_type": "Text",
+   "value": "Father\nMother\nBrother\nSister\nSon\nDaughter\nNiece\nNephew\nUncle\nAunt\nGrandfather\nGrandmother\nWife\nHusband\nOther"
+  }
+ ],
+ "sync_on_migrate": 1
+}
