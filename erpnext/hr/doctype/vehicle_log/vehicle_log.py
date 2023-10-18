@@ -18,7 +18,8 @@ class VehicleLog(Document):
     def on_submit(self):
         frappe.db.set_value("Vehicle", self.license_plate, "last_odometer", self.odometer)
         if self.maintenance_type =="Internal":
-            make_material_request(self)
+            mr=make_material_request(self)
+            frappe.db.sql("""UPDATE `tabVehicle Log` set material_request_reference ='{mr_ref}' WHERE name ='{name}';""".format(mr_ref=mr.name,name =self.name))
         else:
             pass
             # make_expense_claim(self)
@@ -65,7 +66,7 @@ def make_material_request(self):
     mr.transaction_date=self.date
     mr.schedule_date=self.date
     mr.naming_series="MAT-MR-.YYYY.-"
-    mr.request_from="RMS"
+    mr.request_from="Vehicle Log"
     for item in self.service_detail:
         warehouse=get_warehouse(item.item_code,self.company)
         i={}

@@ -192,6 +192,7 @@ class SalesInvoice(SellingController):
 			supplier_account = frappe.get_value('Party Account',filters={"parent":supplier,"company":self.company},fieldname='account')
 			if supplier_account == None:
 				supplier_account = frappe.get_value('Company',self.company,['default_payable_account'])
+			cost_center = frappe.get_value('Company',self.company,['cost_center'])
 			jv_accounts = []
 			jv_accounts.append({
 				"account": self.freight_account,
@@ -200,6 +201,7 @@ class SalesInvoice(SellingController):
 				"debit_in_account_currency": self.frieght_amount,
 				"debit": self.frieght_amount,
 				"credit_in_account_currency": 0,
+				"cost_center": cost_center,
 				"credit": 0,
 				"is_advance": "No",
 				"against_account": "",
@@ -234,7 +236,6 @@ class SalesInvoice(SellingController):
 			jv_freight.submit()
 			frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
 
-				
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
