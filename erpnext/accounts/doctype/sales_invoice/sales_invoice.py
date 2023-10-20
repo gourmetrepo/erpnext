@@ -187,56 +187,56 @@ class SalesInvoice(SellingController):
 
 		# this sequence because outstanding may get -ve
 		#self.make_gl_entries()
-		if self.delivery_note_reference:
-			supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
-			if shipping_type == 'Palletized':
-				from datetime import datetime
-				supplier_account = frappe.get_value('Party Account',filters={"parent":supplier,"company":self.company},fieldname='account')
-				if supplier_account == None:
-					supplier_account = frappe.get_value('Company',self.company,['default_payable_account'])
-				cost_center = frappe.get_value('Company',self.company,['cost_center'])
-				jv_accounts = []
-				jv_accounts.append({
-					"account": self.freight_account,
-					"party_type": "",
-					"party": "",
-					"debit_in_account_currency": self.frieght_amount,
-					"debit": self.frieght_amount,
-					"credit_in_account_currency": 0,
-					"cost_center": cost_center,
-					"credit": 0,
-					"is_advance": "No",
-					"against_account": "",
-					"user_remark": f"Against Sales Invoice {self.name}",
-					"doctype": "Journal Entry Account"
-				})
-				jv_accounts.append({
-					"account": supplier_account,
-					"party_type": "Supplier",
-					"party": supplier,
-					"debit_in_account_currency": 0,
-					"debit": 0,
-					"credit_in_account_currency": self.frieght_amount,
-					"credit": self.frieght_amount,
-					"is_advance": "No",
-					"against_account": "",
-					"user_remark": f"Against Sales Invoice {self.name}",
-					"doctype": "Journal Entry Account"
-				})
-				jv_payload = {
-					"title":f"Freight JV Against {self.name}",
-					"generated":"System Generated",
-					"voucher_type": "Journal Entry",
-					"naming_series": "ACC-JV-.YYYY.-",
-					"posting_date": datetime.now(),
-					"company": self.company,
-					"accounts":jv_accounts,
-					"doctype":'Journal Entry',
-				}        
-				jv_freight = frappe.get_doc(jv_payload)
-				jv_freight.save(ignore_permissions=True)
-				jv_freight.submit()
-				frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
+		# if self.delivery_note_reference:
+			# supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
+			# if shipping_type == 'Palletized':
+			# 	from datetime import datetime
+			# 	supplier_account = frappe.get_value('Party Account',filters={"parent":supplier,"company":self.company},fieldname='account')
+			# 	if supplier_account == None:
+			# 		supplier_account = frappe.get_value('Company',self.company,['default_payable_account'])
+			# 	cost_center = frappe.get_value('Company',self.company,['cost_center'])
+			# 	jv_accounts = []
+			# 	jv_accounts.append({
+			# 		"account": self.freight_account,
+			# 		"party_type": "",
+			# 		"party": "",
+			# 		"debit_in_account_currency": self.frieght_amount,
+			# 		"debit": self.frieght_amount,
+			# 		"credit_in_account_currency": 0,
+			# 		"cost_center": cost_center,
+			# 		"credit": 0,
+			# 		"is_advance": "No",
+			# 		"against_account": "",
+			# 		"user_remark": f"Against Sales Invoice {self.name}",
+			# 		"doctype": "Journal Entry Account"
+			# 	})
+			# 	jv_accounts.append({
+			# 		"account": supplier_account,
+			# 		"party_type": "Supplier",
+			# 		"party": supplier,
+			# 		"debit_in_account_currency": 0,
+			# 		"debit": 0,
+			# 		"credit_in_account_currency": self.frieght_amount,
+			# 		"credit": self.frieght_amount,
+			# 		"is_advance": "No",
+			# 		"against_account": "",
+			# 		"user_remark": f"Against Sales Invoice {self.name}",
+			# 		"doctype": "Journal Entry Account"
+			# 	})
+			# 	jv_payload = {
+			# 		"title":f"Freight JV Against {self.name}",
+			# 		"generated":"System Generated",
+			# 		"voucher_type": "Journal Entry",
+			# 		"naming_series": "ACC-JV-.YYYY.-",
+			# 		"posting_date": datetime.now(),
+			# 		"company": self.company,
+			# 		"accounts":jv_accounts,
+			# 		"doctype":'Journal Entry',
+			# 	}        
+			# 	jv_freight = frappe.get_doc(jv_payload)
+			# 	jv_freight.save(ignore_permissions=True)
+			# 	jv_freight.submit()
+			# 	frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
 
 				
 		try:
