@@ -345,6 +345,20 @@ class PurchaseInvoice(BuyingController):
 					frappe.throw(_("Stock cannot be updated against Purchase Receipt {0}")
 						.format(item.purchase_receipt))
 
+	def before_submit(self):
+		from nrp_manufacturing.apis.purchase_invoice import loan_journal_entry
+		if len(self.customer_loan_deduction) > 0:
+			percentage = float()
+			p_value = self.customer_loan_deduction[0].allocation_percentage.strip('%')
+			if p_value == '':
+				percentage = 0.0
+			else:
+				percentage = float(self.customer_loan_deduction[0].allocation_percentage.strip('%'))
+
+			if percentage > 0:
+				if self.customer_loan_deduction[0].total_recieveable > 0 and percentage:
+					loan_journal_entry(self)
+
 	def on_submit(self):
 		super(PurchaseInvoice, self).on_submit()
 
