@@ -512,7 +512,7 @@
    "modified_by": "Administrator",
    "name": "Stock Entry-request_from",
    "no_copy": 0,
-   "options": "Manual\nRMS\nPOS 1.0\nGSSM",
+   "options": "Manual\nRMS\nPOS 1.0\nGSSM\nVehicle Log",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
