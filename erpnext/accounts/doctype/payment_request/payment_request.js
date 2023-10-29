@@ -10,15 +10,15 @@ frappe.ui.form.on("Payment Request", {
 			};
 		});
 
-		frm.set_query('business_unit', function() {
-            return {
-                query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-				filters: {
-						'supplier': frm.doc.party
-				}
+		// frm.set_query('business_unit', function() {
+        //     return {
+        //         query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+		// 		filters: {
+		// 				'supplier': frm.doc.party
+		// 		}
 
-            };
-        });
+        //     };
+        // });
 	}
 })
 

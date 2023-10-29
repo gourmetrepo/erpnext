@@ -8,20 +8,20 @@ frappe.ui.form.on('Payment Entry', {
 			if (!frm.doc.paid_from) frm.set_value("paid_from_account_currency", null);
 			if (!frm.doc.paid_to) frm.set_value("paid_to_account_currency", null);
 		}
-		frm.set_df_property("business_unit", "set_only_once", 1);
+		// frm.set_df_property("business_unit", "set_only_once", 1);
 	},
 
 	setup: function(frm) {
 
-		frm.set_query('business_unit', function() {
-            return {
-                query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-				filters: {
-						'supplier': frm.doc.party
-				}
+		// frm.set_query('business_unit', function() {
+        //     return {
+        //         query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+		// 		filters: {
+		// 				'supplier': frm.doc.party
+		// 		}
 
-            };
-        });
+        //     };
+        // });
 		
 		frm.set_query("paid_from", function() {
 			frm.events.validate_company(frm);

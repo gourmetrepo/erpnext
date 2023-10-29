@@ -28,14 +28,14 @@ frappe.ui.form.on("Purchase Order", {
 			}
 		});
 
-		frm.fields_dict['items'].grid.get_field('business_unit').get_query = function(doc) {
-			return {
-				query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-				filters: {
-						'supplier': doc.supplier
-				}
-			}
-		}
+		// frm.fields_dict['items'].grid.get_field('business_unit').get_query = function(doc) {
+		// 	return {
+		// 		query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+		// 		filters: {
+		// 				'supplier': doc.supplier
+		// 		}
+		// 	}
+		// }
 
 	},
 

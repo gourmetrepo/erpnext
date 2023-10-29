@@ -325,7 +325,7 @@ def make_payment_request(**args):
 			"party_type": args.get("party_type") or "Customer",
 			"party": args.get("party") or ref_doc.get("customer"),
 			"bank_account": bank_account,
-			"business_unit": ref_doc.items[0].business_unit
+			# "business_unit": ref_doc.items[0].business_unit
 		})
 
 		if args.order_type == "Shopping Cart" or args.mute_email:
@@ -487,10 +487,7 @@ def make_payment_order(source_name, target_doc=None):
 	doclist = get_mapped_doc("Payment Request", source_name,	{
 		"Payment Request": {
 			"doctype": "Payment Order",
-		},
-		"field_map": {
-				"business_unit": "business_unit"
-			},
+		}
 	}, target_doc, set_missing_values)
 
 	return doclist

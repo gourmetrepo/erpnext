@@ -499,24 +499,24 @@ frappe.ui.form.on("Purchase Invoice", {
 		}
 
 
-		frm.fields_dict['items'].grid.get_field('business_unit').get_query = function(doc) {
-			return {
-				query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-				filters: {
-						'supplier': doc.supplier
-				}
-			}
-		}
+		// frm.fields_dict['items'].grid.get_field('business_unit').get_query = function(doc) {
+		// 	return {
+		// 		query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+		// 		filters: {
+		// 				'supplier': doc.supplier
+		// 		}
+		// 	}
+		// }
 
-		frm.set_query('business_unit', function() {
-            return {
-                query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-				filters: {
-						'supplier': frm.doc.supplier
-				}
+		// frm.set_query('business_unit', function() {
+        //     return {
+        //         query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
+		// 		filters: {
+		// 				'supplier': frm.doc.supplier
+		// 		}
 
-            };
-        });
+        //     };
+        // });
 
 		frm.set_query("cost_center", function() {
 			return {

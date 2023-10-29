@@ -296,8 +296,7 @@ def make_purchase_order(source_name, target_doc=None):
 				["uom", "stock_uom"],
 				["uom", "uom"],
 				["sales_order", "sales_order"],
-				["sales_order_item", "sales_order_item"],
-				["business_unit","business_unit"]
+				["sales_order_item", "sales_order_item"]
 			],
 			"postprocess": update_item,
 			"condition": select_item
