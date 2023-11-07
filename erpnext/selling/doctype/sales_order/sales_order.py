@@ -215,11 +215,18 @@ class SalesOrder(SellingController):
 			temp_item.is_allways_return = returnable.is_allways_return
 
 	def submit(self):
+		# if self.request_from == 'RMS':
+		# 	if(self.section in get_config_by_name('dn_queue_section',[])):
+		# 		self.queue_action('submit',queue_name="dn_tertiary")
+		# 	else:
+		# 		self.queue_action('submit',queue_name="return")	
+		# else:
+		# 	self._submit()
 		if self.request_from == 'RMS':
 			if(self.section in get_config_by_name('dn_queue_section',[])):
-				self.queue_action('submit',queue_name="dn_tertiary")
+				self.queue_action('submit',queue_name="so_secondary")
 			else:
-				self.queue_action('submit',queue_name="return")	
+				self.queue_action('submit',queue_name="so_primary")	
 		else:
 			self._submit()
 
