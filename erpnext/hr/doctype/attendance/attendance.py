@@ -90,7 +90,8 @@ def mark_absent(employee, attendance_date, shift=None):
 			'attendance_date': attendance_date,
 			'status': 'Absent',
 			'company': employee_doc.company,
-			'shift': shift
+			'shift': shift,
+			'attendance_activation':employee_doc.attendance_activation
 		}
 		attendance = frappe.get_doc(doc_dict).insert()
 		attendance.submit()
