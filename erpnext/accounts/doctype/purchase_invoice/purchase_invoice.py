@@ -511,13 +511,16 @@ class PurchaseInvoice(BuyingController):
 
         if len(self.customer_loan_deduction) > 0:
             percentage = float()
-            p_value = self.customer_loan_deduction[0].allocation_percentage.strip("%")
-            if p_value == "":
-                percentage = 0.0
-            else:
-                percentage = float(
-                    self.customer_loan_deduction[0].allocation_percentage.strip("%")
-                )
+            p_value = self.customer_loan_deduction[0].allocation_percentage
+            # if p_value == "":
+            #     percentage = 0.0
+            # else:
+            #     percentage = float(
+            #         self.customer_loan_deduction[0].allocation_percentage.strip("%")
+            #     )
+
+            if p_value < 0 and p_value > 100:
+                frappe.throw("Percentage can only be in range of 0 to 100")
 
             if percentage > 0:
                 if self.customer_loan_deduction[0].total_recieveable > 0 and percentage:
