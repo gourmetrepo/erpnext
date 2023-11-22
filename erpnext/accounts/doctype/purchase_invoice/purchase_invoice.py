@@ -519,7 +519,7 @@ class PurchaseInvoice(BuyingController):
             #         self.customer_loan_deduction[0].allocation_percentage.strip("%")
             #     )
 
-            if p_value < 0 and p_value > 100:
+            if p_value < 0 or p_value > 100:
                 frappe.throw("Percentage can only be in range of 0 to 100")
 
             if percentage > 0:
