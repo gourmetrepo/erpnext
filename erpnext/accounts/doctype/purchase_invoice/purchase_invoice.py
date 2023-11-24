@@ -510,7 +510,6 @@ class PurchaseInvoice(BuyingController):
         from nrp_manufacturing.apis.purchase_invoice import loan_journal_entry
 
         if len(self.customer_loan_deduction) > 0:
-            percentage = float()
             p_value = self.customer_loan_deduction[0].allocation_percentage
             # if p_value == "":
             #     percentage = 0.0
@@ -522,9 +521,8 @@ class PurchaseInvoice(BuyingController):
             if p_value < 0 or p_value > 100:
                 frappe.throw("Percentage can only be in range of 0 to 100")
 
-            if percentage > 0:
-                if self.customer_loan_deduction[0].total_recieveable > 0 and percentage:
-                    loan_journal_entry(self)
+            if self.customer_loan_deduction[0].total_recieveable > 0 and p_value > 0:
+                loan_journal_entry(self)
 
     def on_submit(self):
         super(PurchaseInvoice, self).on_submit()
