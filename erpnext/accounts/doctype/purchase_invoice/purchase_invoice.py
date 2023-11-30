@@ -518,10 +518,10 @@ class PurchaseInvoice(BuyingController):
             #         self.customer_loan_deduction[0].allocation_percentage.strip("%")
             #     )
 
-            if p_value < 0 or p_value > 100:
+            if float(p_value) < 0 or float(p_value) > 100:
                 frappe.throw("Percentage can only be in range of 0 to 100")
 
-            if self.customer_loan_deduction[0].total_recieveable > 0 and p_value > 0:
+            if float(self.customer_loan_deduction[0].total_recieveable) > 0 and float(p_value) > 0:
                 loan_journal_entry(self)
 
     def on_submit(self):

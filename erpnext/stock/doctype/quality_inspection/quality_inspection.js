@@ -4,10 +4,10 @@
 cur_frm.cscript.refresh = cur_frm.cscript.inspection_type;
 
 frappe.ui.form.on("Quality Inspection", {
-	onload: function(frm){
-		// frm.set_df_property('business_unit','set_only_once',true);
-		// refresh_field('business_unit');
-	},
+	onload: function (frm, cdt, cdn) {	
+		var df = frappe.meta.get_docfield("Quality Inspection", "wariety", frm.doc.name);
+		df.options = frappe.utils.get_config_by_name("CANE_WARIETY");
+		   },
 	item_code: function(frm) {
 		if (frm.doc.item_code) {
 			return frm.call({
