@@ -290,7 +290,7 @@ scheduler_events = {
 		"erpnext.support.doctype.issue.issue.set_service_level_agreement_variance",
 	],
 	"daily": [
-		"erpnext.stock.reorder_item.reorder_item",
+		#"erpnext.stock.reorder_item.reorder_item",
 		#"erpnext.support.doctype.issue.issue.auto_close_tickets",
 		#"erpnext.crm.doctype.opportunity.opportunity.auto_close_opportunity",
 		"erpnext.controllers.accounts_controller.update_invoice_status",
