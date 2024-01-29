@@ -136,4 +136,25 @@ frappe.ui.form.on('Payment Order', {
 
 		dialog.show();
 	},
+	
+	before_submit: function(frm){
+		frappe.ui.form.is_saving = true;
+		frappe.call({
+			method:"nrp_manufacturing.modules.gourmet.payment_order.payment_order.enqueue_doc",
+			args: {docname: frm.doc.name},
+			callback: function(r){
+                me.frm.reload_doc();
+			},
+			always: function(){
+				frappe.ui.form.is_saving = false;
+                // frappe.throw("The delivery note has been enqueued as a background job. In case there is any issue on processing, the system will add a comment about the error on this delivery note and revert to the Draft stage")
+                frappe.throw({
+					title: __('Notification'),
+					indicator: 'red',
+					message: __('The Payment Order has been enqueued as a background job. In case there is any issue on processing, the system will add a comment about the error on this delivery note and revert to the Draft stage')
+				})
+				return false;
+            }
+		})
+    },
 });

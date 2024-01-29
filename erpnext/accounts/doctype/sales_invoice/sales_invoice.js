@@ -139,6 +139,25 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 			frm: cur_frm
 		})
 	},
+	before_submit : function(){
+		var me = this;
+		frappe.ui.form.is_saving = true;
+		frappe.call({
+			method:"nrp_manufacturing.modules.gourmet.sales_invoice.sales_invoice.enqueue_doc",
+			args: {docname: me.frm.doc.name},
+			callback: function(r){
+                me.frm.reload_doc();
+			},
+			always: function(){
+				frappe.ui.form.is_saving = false;
+                frappe.throw(
+					title='Notification',
+					msg='The Sales invoice has been enqueued as a background job. In case there is any issue on processing, the system will add a comment about the error on this sales invoice and revert to the Draft stage',
+				)
+				return false;
+            }
+		})
+    },
 
 	on_submit: function(doc, dt, dn) {
 		var me = this;

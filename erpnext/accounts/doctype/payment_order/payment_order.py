@@ -12,6 +12,8 @@ from frappe.model.document import Document
 class PaymentOrder(Document):
 	def on_submit(self):
 		self.update_payment_status()
+		frappe.db.sql("UPDATE `tabPayment Order` SET queue_status='Completed' WHERE name='{docname}';".format(docname=self.name))
+		frappe.db.commit()
 
 	def on_cancel(self):
 		self.update_payment_status(cancel=True)
