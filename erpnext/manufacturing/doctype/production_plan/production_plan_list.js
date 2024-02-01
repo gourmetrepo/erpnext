@@ -17,7 +17,6 @@ frappe.listview_settings['Production Plan'] = {
 		onload: function(me) {
 		if (Object.values(frappe.route_options).length == 0){
 			frappe.route_options = {
-				"status":["!=","Stopped"],
 				"company": frappe.get_cookie('company') ,
 				"creation":["Between",[frappe.datetime.add_days(frappe.datetime.get_today(), -10),frappe.datetime.add_days(frappe.datetime.get_today(), +10)]]
 			};
