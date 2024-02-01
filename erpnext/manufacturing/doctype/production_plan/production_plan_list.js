@@ -1,6 +1,6 @@
 frappe.listview_settings['Production Plan'] = {
 	add_fields: ["status"],
-	filters: [["status", "!=", "Stopped"]],
+	//filters: [["status", "!=", "Stopped"]],
 	get_indicator: function(doc) {
 		if(doc.status==="Submitted") {
 			return [__("Not Started"), "orange", "status,=,Submitted"];
