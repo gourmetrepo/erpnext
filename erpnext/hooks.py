@@ -293,14 +293,14 @@ scheduler_events = {
 		#"erpnext.stock.reorder_item.reorder_item",
 		#"erpnext.support.doctype.issue.issue.auto_close_tickets",
 		#"erpnext.crm.doctype.opportunity.opportunity.auto_close_opportunity",
-		"erpnext.controllers.accounts_controller.update_invoice_status",
+		#"erpnext.controllers.accounts_controller.update_invoice_status",
 		#"erpnext.accounts.doctype.fiscal_year.fiscal_year.auto_create_fiscal_year",
 		#"erpnext.hr.doctype.employee.employee.send_birthday_reminders",
 		#"erpnext.projects.doctype.task.task.set_tasks_as_overdue",
 		"erpnext.assets.doctype.asset.depreciation.post_depreciation_entries",
 		#"erpnext.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",
 		#"erpnext.stock.doctype.serial_no.serial_no.update_maintenance_status",
-		"erpnext.buying.doctype.supplier_scorecard.supplier_scorecard.refresh_scorecards",
+		#"erpnext.buying.doctype.supplier_scorecard.supplier_scorecard.refresh_scorecards",
 		"erpnext.setup.doctype.company.company.cache_companies_monthly_sales_history",
 		#"erpnext.assets.doctype.asset.asset.update_maintenance_status",
 		"erpnext.assets.doctype.asset.asset.make_post_gl_entry",
@@ -315,7 +315,7 @@ scheduler_events = {
 	],
 	"daily_long": [
 		#"erpnext.setup.doctype.email_digest.email_digest.send",
-		"erpnext.manufacturing.doctype.bom_update_tool.bom_update_tool.update_latest_price_in_all_boms",
+		
 		"erpnext.hr.doctype.leave_ledger_entry.leave_ledger_entry.process_expired_allocation",
 		#"erpnext.hr.utils.generate_leave_encashment",
         # "erpnext.accounts.doctype.gl_entry.gl_entry.rename_gle_sle_docs",
@@ -324,7 +324,14 @@ scheduler_events = {
 		"erpnext.accounts.deferred_revenue.convert_deferred_revenue_to_income",
 		"erpnext.accounts.deferred_revenue.convert_deferred_expense_to_expense",
 		"erpnext.hr.utils.allocate_earned_leaves"
-	]
+	],
+ "cron" : {
+     "0 02 * * *" : [
+        "erpnext.manufacturing.doctype.bom_update_tool.bom_update_tool.update_latest_price_in_all_boms",
+    	"erpnext.controllers.accounts_controller.update_invoice_status"
+
+	 ]
+     }
 }
 
 email_brand_image = "assets/erpnext/images/erpnext-logo.jpg"

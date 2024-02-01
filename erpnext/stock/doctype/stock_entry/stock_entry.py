@@ -111,6 +111,9 @@ class StockEntry(StockController):
 		for queue in se_bifurcations:
 			if se_type_section in se_bifurcations.get(queue):
 				break
+			else:
+				queue="primary"
+    
 		self.queue_action('submit',queue_name="se_"+queue)
 
 	def on_submit(self):
