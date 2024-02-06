@@ -41,6 +41,9 @@ class LeaveApplication(Document):
 		if self.status == "Open" and self.docstatus < 1:
 			# notify leave approver about creation
 			self.notify_leave_approver()
+   
+	def submit(self):
+		self.queue_action('submit',queue_name="hr_primary")
 
 	def on_submit(self):
 		if self.status == "Open":

@@ -15,7 +15,7 @@ class ShiftRequest(Document):
 		self.validate_dates()
 		self.validate_shift_request_overlap_dates()
 	def submit(self):
-		self.queue_action('submit',queue_name="sync")
+		self.queue_action('submit',queue_name="hr_primary")
 	def on_submit(self):
 		date_list = self.get_working_days(self.from_date, self.to_date)
 		for date in date_list:
