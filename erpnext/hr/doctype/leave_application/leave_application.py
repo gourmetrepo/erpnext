@@ -43,7 +43,7 @@ class LeaveApplication(Document):
 			self.notify_leave_approver()
    
 	def submit(self):
-		frappe.db.sql(f"update tabLeave Application set status = '{self.status}' where name = '{self.name}'",auto_commit=True)
+		frappe.db.sql(f"update `tabLeave Application` set status = '{self.status}' where name = '{self.name}'",auto_commit=True)
 		self.queue_action('submit',queue_name="hr_primary")
 
 	def on_submit(self):
