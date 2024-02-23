@@ -21,6 +21,13 @@ frappe.ui.form.on('Payment Order', {
 				frm.trigger("get_from_payment_entry");
 			}, __("Get Payments from"));
 
+			 frm.add_custom_button(__('Get Supplier Payment History'), function () {
+            // Function to open the blank pop-up
+			frm.trigger("openSupplierPaymentHistory");
+       			 });
+			
+
+
 			frm.trigger('remove_button');
 		}
 
@@ -280,5 +287,71 @@ frappe.ui.form.on('Payment Order', {
 			$(".form-dashboard").append( $(".pmo_dashboard") );
 			// frm.dashboard.show();
 		}
-	}
+	},
+	openSupplierPaymentHistory: function(frm) {
+		var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var maxWidth = Math.min(screenWidth - 50, 900);  // Set a maximum width (e.g., 900 pixels)
+    
+ var dialog = new frappe.ui.Dialog({
+        title: __('Supplier Payment History'),
+        fields: [
+          {
+                label: __('Supplier Payment Table:'),
+                fieldtype: 'HTML',
+                fieldname: 'payment_table',
+                options: "<table border='1'>"
+                    + "<tr> "
+					 + "<th>Sr. No</th>  "
+					  + "<th>Supplier</th>  "
+                    + "<th>Tot. Bal. Bef.</th>  "
+                    + "<th>Tot. Bal. After</th>"
+                    + "<th>Tot. Val. Curr. Docs</th>"
+                    + "<th>Tot. Pmts. Curr. PMO</th> "
+                    + "<th>% P TO P</th>  "
+                    + "<th>Tot. Other PMOs</th>"
+                    + "<th>Tot. OS Bal. Supp.</th>"
+                    + "</tr>"
+                    + "<tr> "
+					 + "<td>1</td>"
+					 + "<td>Ali</td>"
+                    + "<td>300,000</td>"
+                    + "<td>20,000</td> "
+                    + "<td>250,000</td>"
+                    + "<td>200,000</td>"
+                    + "<td>80%</td> "
+                    + "<td>80,000</td>"
+                    + "<td>50,000</td> "
+                    + "</tr>"
+                    + "</table>"
+            }
+        ],
+		 primary_action: null ,// Remove the submit button
+		// width: maxWidth + 'px'
+    });
+		dialog.$wrapper.find('.modal-dialog').css('width', maxWidth + 'px');
+    // Show the dialog
+    dialog.show();
+
+// 	  frappe.msgprint("<table border='1'>"
+// +"<tr> "
+// +"<th>Total Bal. Before</th>  "
+// +"<th>Total Bal. After</th>"
+// +"<th>Total Value Curr. Docs</th>"
+// +"<th>Total Payments Curr. PMO</th> "
+// +"<th>% Payable to Payment</th>  "
+// +"<th>Total Payments Other PMOs</th>"
+// +"<th>Total Outstanding Bal. Supplier</th>"
+// +"</tr>"
+// +"<tr> "
+// +"<td>300,000</td>"
+// +"<td>20,000</td> "
+// +"<td>250,000</td>"
+// +"<td>200,000</td>"
+// +"<td>80%</td> "
+// +"<td>80,000</td>"
+// +"<td>50,000</td> "
+// +"</tr>"
+// +"</table>", 'Supplier Payment History')
+    // You can customize this function to display your desired content in the pop-up
+}
 });
