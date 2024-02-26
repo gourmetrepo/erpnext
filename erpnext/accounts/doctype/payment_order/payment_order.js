@@ -189,7 +189,8 @@ frappe.ui.form.on('Payment Order', {
 				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_dashboard_balances", 
 				async: false,
 				args: {
-					data: frm.doc.name
+					pmono: frm.doc.name,
+					company:frm.doc.company
 				},
 				callback: function(r) {
 					console.log(r.message)
@@ -289,69 +290,72 @@ frappe.ui.form.on('Payment Order', {
 		}
 	},
 	openSupplierPaymentHistory: function(frm) {
-		var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-    var maxWidth = Math.min(screenWidth - 50, 900);  // Set a maximum width (e.g., 900 pixels)
-    
- var dialog = new frappe.ui.Dialog({
-        title: __('Supplier Payment History'),
-        fields: [
-          {
-                label: __('Supplier Payment Table:'),
-                fieldtype: 'HTML',
-                fieldname: 'payment_table',
-                options: "<table border='1'>"
-                    + "<tr> "
-					 + "<th>Sr. No</th>  "
-					  + "<th>Supplier</th>  "
-                    + "<th>Tot. Bal. Bef.</th>  "
-                    + "<th>Tot. Bal. After</th>"
-                    + "<th>Tot. Val. Curr. Docs</th>"
-                    + "<th>Tot. Pmts. Curr. PMO</th> "
-                    + "<th>% P TO P</th>  "
-                    + "<th>Tot. Other PMOs</th>"
-                    + "<th>Tot. OS Bal. Supp.</th>"
-                    + "</tr>"
-                    + "<tr> "
-					 + "<td>1</td>"
-					 + "<td>Ali</td>"
-                    + "<td>300,000</td>"
-                    + "<td>20,000</td> "
-                    + "<td>250,000</td>"
-                    + "<td>200,000</td>"
-                    + "<td>80%</td> "
-                    + "<td>80,000</td>"
-                    + "<td>50,000</td> "
-                    + "</tr>"
-                    + "</table>"
-            }
-        ],
-		 primary_action: null ,// Remove the submit button
-		// width: maxWidth + 'px'
-    });
-		dialog.$wrapper.find('.modal-dialog').css('width', maxWidth + 'px');
-    // Show the dialog
-    dialog.show();
-
-// 	  frappe.msgprint("<table border='1'>"
-// +"<tr> "
-// +"<th>Total Bal. Before</th>  "
-// +"<th>Total Bal. After</th>"
-// +"<th>Total Value Curr. Docs</th>"
-// +"<th>Total Payments Curr. PMO</th> "
-// +"<th>% Payable to Payment</th>  "
-// +"<th>Total Payments Other PMOs</th>"
-// +"<th>Total Outstanding Bal. Supplier</th>"
-// +"</tr>"
-// +"<tr> "
-// +"<td>300,000</td>"
-// +"<td>20,000</td> "
-// +"<td>250,000</td>"
-// +"<td>200,000</td>"
-// +"<td>80%</td> "
-// +"<td>80,000</td>"
-// +"<td>50,000</td> "
-// +"</tr>"
-// +"</table>", 'Supplier Payment History')
-    // You can customize this function to display your desired content in the pop-up
-}
+		console.log("payment period function called")
+		let payment_history;
+		if (frm.doc) {
+			frappe.call({
+				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_payment_history", 
+				async: false,
+				args: {
+					data: frm.doc.name
+				},
+				callback: function(r) {
+					console.log(r.message)
+					if (r.message) {
+						payment_history = r.message;
+					}
+				}
+			});
+			
+			var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var maxWidth = Math.min(screenWidth - 50, 900);  // Set a maximum width (e.g., 900 pixels)
+	
+			// Construct the HTML for the table
+			var optionsHTML = "<table border='1'>"
+							 + "<tr> "
+							 + "<th>Sr. No</th>  "
+							 + "<th>Supplier</th>  "
+							 + "<th>Tot. Bal. Bef.</th>  "
+							 + "<th>Tot. Val. Curr. Docs</th>"
+							 + "<th>Tot. Pmts. Curr. PMO</th> "
+							 + "<th>% P TO P</th>  "
+							 + "<th>Tot. Other PMOs</th>"
+							 + "<th>Tot. OS Bal. Supp.</th>"
+							 + "</tr>";
+			
+			// Populate table rows with payment history data
+			if (payment_history) {
+				payment_history.forEach(function(data, index) {
+					optionsHTML += "<tr>"
+								+ "<td>" + (index + 1) + "</td>"
+								+ "<td>" + data.supplier + "</td>"
+								+ "<td>" + data.tbb + "</td>"
+								+ "<td>" + data.tvcd + "</td>"
+								+ "<td>" + data.tpcp + "</td>"
+								+ "<td>" + data.ptop + "</td>"
+								+ "<td>" + data.top + "</td>"
+								+ "<td>" + data.tobs + "</td>"
+								+ "</tr>";
+				});
+			}
+			
+			optionsHTML += "</table>";
+	
+			var dialog = new frappe.ui.Dialog({
+				title: __('Supplier Payment History'),
+				fields: [
+					{
+						label: __('Supplier Payment Table:'),
+						fieldtype: 'HTML',
+						fieldname: 'payment_table',
+						options: optionsHTML  // Set the options HTML
+					}
+				],
+				primary_action: null , // Remove the submit button
+			});
+			dialog.$wrapper.find('.modal-dialog').css('width', maxWidth + 'px');
+			// Show the dialog
+			dialog.show();
+		}
+	}
 });
