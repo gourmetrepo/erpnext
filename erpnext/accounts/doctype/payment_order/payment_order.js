@@ -189,7 +189,7 @@ frappe.ui.form.on('Payment Order', {
 				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_dashboard_balances", 
 				async: false,
 				args: {
-					pmono: frm.doc.name,
+					data: frm.doc.name,
 					company:frm.doc.company
 				},
 				callback: function(r) {
