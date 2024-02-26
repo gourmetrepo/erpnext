@@ -297,7 +297,7 @@ frappe.ui.form.on('Payment Order', {
 				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_payment_history", 
 				async: false,
 				args: {
-					data: frm.doc.name,
+					Pmono: frm.doc.name,
 					company:frm.doc.company
 				},
 				callback: function(r) {
