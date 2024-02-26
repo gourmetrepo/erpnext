@@ -297,7 +297,8 @@ frappe.ui.form.on('Payment Order', {
 				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_payment_history", 
 				async: false,
 				args: {
-					data: frm.doc.name
+					data: frm.doc.name,
+					company:frm.doc.company
 				},
 				callback: function(r) {
 					console.log(r.message)
@@ -308,7 +309,7 @@ frappe.ui.form.on('Payment Order', {
 			});
 			
 			var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-			var maxWidth = Math.min(screenWidth - 50, 900);  // Set a maximum width (e.g., 900 pixels)
+			var maxWidth = Math.min(screenWidth - 50, 900);  /// Set a maximum width (e.g., 900 pixels)
 	
 			// Construct the HTML for the table
 			var optionsHTML = "<table border='1'>"
