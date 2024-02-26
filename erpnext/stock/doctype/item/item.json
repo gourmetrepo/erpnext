@@ -28,7 +28,7 @@
   "valuation_rate",
   "standard_rate",
   "is_fixed_asset",
-  "auto_create_assets",
+  "auto_create_assetsmainta",
   "asset_category",
   "asset_naming_series",
   "over_delivery_receipt_allowance",
@@ -910,13 +910,6 @@
    "label": "Over Billing Allowance (%)"
   },
   {
-   "default": "0",
-   "depends_on": "is_fixed_asset",
-   "fieldname": "auto_create_assets",
-   "fieldtype": "Check",
-   "label": "Auto Create Assets on Purchase"
-  },
-  {
    "fieldname": "default_item_manufacturer",
    "fieldtype": "Link",
    "label": "Default Item Manufacturer",
@@ -948,6 +941,13 @@
    "fieldname": "grant_commission",
    "fieldtype": "Check",
    "label": "Grant Commission"
+  },
+  {
+   "default": "0",
+   "depends_on": "is_fixed_asset",
+   "fieldname": "auto_create_assetsmainta",
+   "fieldtype": "Check",
+   "label": "Auto Create Assets on Purchase"
   }
  ],
  "icon": "fa fa-tag",
@@ -955,7 +955,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-04-28 04:52:10.272256",
+ "modified": "2024-02-23 16:05:00.227807",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Item",
