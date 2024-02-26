@@ -330,12 +330,12 @@ frappe.ui.form.on('Payment Order', {
 					optionsHTML += "<tr>"
 								+ "<td>" + (index + 1) + "</td>"
 								+ "<td>" + data.supplier + "</td>"
-								+ "<td>" + data.tbb + "</td>"
-								+ "<td>" + data.tvcd + "</td>"
-								+ "<td>" + data.tpcp + "</td>"
-								+ "<td>" + data.ptop + "</td>"
-								+ "<td>" + data.top + "</td>"
-								+ "<td>" + data.tobs + "</td>"
+								+ "<td style='text-align:right;'>" + data.tbb + "</td>"
+								+ "<td style='text-align:right;'>" + data.tvcd + "</td>"
+								+ "<td style='text-align:right;'>" + data.tpcp + "</td>"
+								+ "<td style='text-align:right;'>" + data.ptop + "</td>"
+								+ "<td style='text-align:right;'>" + data.top + "</td>"
+								+ "<td style='text-align:right;'>" + data.tobs + "</td>"
 								+ "</tr>";
 				});
 			}
