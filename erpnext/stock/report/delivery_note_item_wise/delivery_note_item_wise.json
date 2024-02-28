@@ -1,0 +1,115 @@
+{
+ "add_total_row": 0,
+ "creation": "2024-02-06 21:24:17.588515",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2024-02-06 21:38:00.718276",
+ "modified_by": "Administrator",
+ "module": "Stock",
+ "name": "Delivery Note Item Wise",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT \n    dn.name AS 'Name',\n    dn.territory AS 'Territory',\n    dn.customer AS 'Customer', \n    dn.customer_name AS 'Customer Name', \n    dn.posting_date AS 'Posting Date', \n    dn.posting_time AS 'Posting Time', \n    dni.against_sales_order AS 'Against Sales Order', \n    dn.status AS 'Status', \n    dni.item_name AS 'Item Name', \n    dni.qty AS 'Quantity', \n    dni.rate AS 'Rate', \n    dni.amount AS 'Amount'\nFROM \n    `tabDelivery Note` dn \nJOIN \n    `tabDelivery Note Item` dni ON dni.parent = dn.name \nWHERE \n    dn.company IN (\"Unit 6\", \"Unit 5\", \"Unit 5B\", \"Unit 15\", \"Unit 8\") \n    AND dn.docstatus = 1 \n   AND dn.posting_date >= CURDATE() - INTERVAL 1 DAY;\n",
+ "ref_doctype": "Delivery Note",
+ "report_name": "Delivery Note Item Wise",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "Sales User"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Shipping User"
+  },
+  {
+   "role": "Shipping Manager"
+  },
+  {
+   "role": "System Auditor"
+  },
+  {
+   "role": "SSAM Manager"
+  },
+  {
+   "role": "CEO"
+  },
+  {
+   "role": "CFO"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Auditor"
+  },
+  {
+   "role": "Head of Procurement"
+  },
+  {
+   "role": "Purchase User"
+  },
+  {
+   "role": "Sales Manager"
+  },
+  {
+   "role": "SSAM User"
+  },
+  {
+   "role": "Store User"
+  },
+  {
+   "role": "Store Manager"
+  },
+  {
+   "role": "Director IT"
+  },
+  {
+   "role": "Configuration Manager"
+  },
+  {
+   "role": "Gate Pass"
+  },
+  {
+   "role": "Director Finance"
+  },
+  {
+   "role": "Gate Manager"
+  },
+  {
+   "role": "Gate User"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Shop Return User"
+  },
+  {
+   "role": "Live Cake Shop Admin"
+  },
+  {
+   "role": "Manager Retail Operations"
+  }
+ ]
+}

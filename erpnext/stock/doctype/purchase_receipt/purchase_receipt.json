@@ -163,7 +163,6 @@
    "bold": 1,
    "fieldname": "supplier",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "label": "Supplier",
    "oldfieldname": "supplier",
    "oldfieldtype": "Link",
@@ -180,7 +179,7 @@
    "fetch_from": "supplier.supplier_name",
    "fieldname": "supplier_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
+   "in_list_view": 1,
    "label": "Supplier Name",
    "read_only": 1
   },
@@ -293,7 +292,6 @@
   {
    "fieldname": "contact_display",
    "fieldtype": "Small Text",
-   "in_global_search": 1,
    "label": "Contact",
    "read_only": 1
   },
@@ -512,6 +510,7 @@
   {
    "fieldname": "total_qty",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Total Quantity",
    "read_only": 1
   },
@@ -1071,9 +1070,8 @@
  "icon": "fa fa-truck",
  "idx": 261,
  "is_submittable": 1,
- "links": [],
- "modified": "2020-07-15 12:49:42.095297",
- "modified_by": "Administrator",
+ "modified": "2023-12-21 16:19:35.957962",
+ "modified_by": "dilnawaz.sajid@gourmetpakistan.com",
  "module": "Stock",
  "name": "Purchase Receipt",
  "owner": "Administrator",
