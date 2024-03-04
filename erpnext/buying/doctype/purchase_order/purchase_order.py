@@ -555,6 +555,6 @@ def make_inter_company_sales_order(source_name, target_doc=None):
 
 @frappe.whitelist()
 def close_old_po(supplier,po_no,company):
-		frappe.db.sql(f"""UPDATE `tabPurchase Order` SET  =  STATUS = 'Closed' WHERE STATUS NOT IN ('Closed','Expired') AND company='{company}' AND supplier='{supplier}' AND NAME!='{po_no}'""")
+		frappe.db.sql(f"""UPDATE `tabPurchase Order` SET STATUS = 'Closed' WHERE STATUS NOT IN ('Closed','Expired') AND company='{company}' AND supplier='{supplier}' AND NAME!='{po_no}'""")
 		frappe.db.commit()
     
