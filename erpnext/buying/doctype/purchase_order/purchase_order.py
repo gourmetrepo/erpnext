@@ -237,7 +237,9 @@ class PurchaseOrder(BuyingController):
 		self.update_blanket_order()
 
 		update_linked_doc(self.doctype, self.name, self.inter_company_order_reference)
-
+		if self.company=='Unit 6':
+			close_old_po(self.supplier,self.name,self.company)
+      
 	def on_cancel(self):
 		super(PurchaseOrder, self).on_cancel()
 
@@ -550,3 +552,9 @@ def update_status(status, name):
 def make_inter_company_sales_order(source_name, target_doc=None):
 	from erpnext.accounts.doctype.sales_invoice.sales_invoice import make_inter_company_transaction
 	return make_inter_company_transaction("Purchase Order", source_name, target_doc)
+
+@frappe.whitelist()
+def close_old_po(supplier,po_no,company):
+		frappe.db.sql(f"""UPDATE `tabPurchase Order` SET  =  STATUS = 'Closed' WHERE STATUS NOT IN ('Closed','Expired') AND company='{company}' AND supplier='{supplier}' AND NAME!='{po_no}'""")
+		frappe.db.commit()
+    
