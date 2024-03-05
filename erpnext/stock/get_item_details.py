@@ -585,6 +585,10 @@ def get_price_list_rate(args, item_doc, out):
 		if args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
 			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
                             'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+		elif args.doctype == 'Material Request':
+			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+                          'company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			
 
 		if  oblige_rate== None or oblige_rate == 0:
 			price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
