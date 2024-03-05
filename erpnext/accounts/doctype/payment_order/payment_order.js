@@ -316,12 +316,12 @@ frappe.ui.form.on('Payment Order', {
 							 + "<tr> "
 							 + "<th>Sr. No</th>  "
 							 + "<th>Supplier</th>  "
-							 + "<th>Tot. Bal. Bef.</th>  "
-							// + "<th>Tot. Val. Curr. Docs</th>"
-							 + "<th>Tot. Pmts. Curr. PMO</th> "
+							 + "<th>Total GL Balance Before Payment</th>  "
+							/// + "<th>Tot. Val. Curr. Docs</th>"
+							 + "<th>Request Payment Amount</th> "
 							// + "<th>% P TO P</th>  "
-							 + "<th>Tot. Other PMOs</th>"
-							 + "<th>Tot. OS Bal. Supp.</th>"
+							 + "<th>Reserve Balance in Other PMO (Not Paid)</th>"
+							 + "<th>Net Balance</th>"
 							 + "</tr>";
 			
 			// Populate table rows with payment history data
