@@ -587,7 +587,7 @@ def get_price_list_rate(args, item_doc, out):
                             'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
 		elif args.doctype == 'Material Request':
 			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                          'company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+                          'company':args.company, 'item_code': item_doc.name, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
 			
 
 		if  oblige_rate== None or oblige_rate == 0:
@@ -625,7 +625,12 @@ def get_price_list_rate(args, item_doc, out):
 		if not out.price_list_rate and args.transaction_type=="buying":
 			from erpnext.stock.doctype.item.item import get_last_purchase_details
 			out.update(get_last_purchase_details(args.company,item_doc.name,args.name, args.conversion_rate))
-
+	elif args.doctype == 'Material Request':
+			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+                          'company':args.company, 'item_code': item_doc.name, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			if oblige_rate:
+				out.price_list_rate = oblige_rate
+				price_list_rate=oblige_rate
 def insert_item_price(args):
 	"""Insert Item Price if Price List and Price List Rate are specified and currency is the same"""
 	if frappe.db.get_value("Price List", args.price_list, "currency", cache=True) == args.currency \
