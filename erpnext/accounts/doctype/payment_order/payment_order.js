@@ -317,9 +317,9 @@ frappe.ui.form.on('Payment Order', {
 							 + "<th>Sr. No</th>  "
 							 + "<th>Supplier</th>  "
 							 + "<th>Tot. Bal. Bef.</th>  "
-							 + "<th>Tot. Val. Curr. Docs</th>"
+							// + "<th>Tot. Val. Curr. Docs</th>"
 							 + "<th>Tot. Pmts. Curr. PMO</th> "
-							 + "<th>% P TO P</th>  "
+							// + "<th>% P TO P</th>  "
 							 + "<th>Tot. Other PMOs</th>"
 							 + "<th>Tot. OS Bal. Supp.</th>"
 							 + "</tr>";
@@ -331,9 +331,9 @@ frappe.ui.form.on('Payment Order', {
 								+ "<td>" + (index + 1) + "</td>"
 								+ "<td>" + data.supplier + "</td>"
 								+ "<td style='text-align:right;'>" + data.tbb + "</td>"
-								+ "<td style='text-align:right;'>" + data.tvcd + "</td>"
+								// + "<td style='text-align:right;'>" + data.tvcd + "</td>"
 								+ "<td style='text-align:right;'>" + data.tpcp + "</td>"
-								+ "<td style='text-align:right;'>" + data.ptop + "</td>"
+								//+ "<td style='text-align:right;'>" + data.ptop + "</td>"
 								+ "<td style='text-align:right;'>" + data.top + "</td>"
 								+ "<td style='text-align:right;'>" + data.tobs + "</td>"
 								+ "</tr>";
