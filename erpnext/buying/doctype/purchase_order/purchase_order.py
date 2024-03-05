@@ -562,7 +562,7 @@ def close_old_po(supplier,po_no,company):
 						"company": company,
 						"supplier": supplier,
 						"name": ["!=", po_no],
-						"doc_status":1
+						"docstatus": 1
 					},
 					fields=["name"]
 				)
