@@ -558,6 +558,7 @@ def close_old_po(supplier,po_no,company):
 		purchase_orders = frappe.get_list(
 					"Purchase Order",
 					filters={
+						"purchase_order_type" :["not in", ["Inter Unit Purchase", "Service"]],
 						"status": ["not in", ["Closed", "Expired"]],
 						"company": company,
 						"supplier": supplier,
