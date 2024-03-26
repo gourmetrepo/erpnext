@@ -82,7 +82,7 @@ def add_assignments(events, start, end, conditions=None):
 		if e not in events:
 			events.append(e)
 
-
+@frappe.whitelist()
 def get_employee_shift(employee, for_date=nowdate(), consider_default_shift=False, next_shift_direction=None):
 	"""Returns a Shift Type for the given employee on the given date. (excluding the holidays)
 
@@ -95,12 +95,12 @@ def get_employee_shift(employee, for_date=nowdate(), consider_default_shift=Fals
 	shift_type_name = frappe.db.get_value('Shift Assignment', {'employee':employee, 'date': for_date, 'docstatus': '1'}, 'shift_type')
 	if not shift_type_name and consider_default_shift:
 		shift_type_name = default_shift
-	if shift_type_name:
-		holiday_list_name = frappe.db.get_value('Shift Type', shift_type_name, 'holiday_list')
-		if not holiday_list_name:
-			holiday_list_name = get_holiday_list_for_employee(employee, False)
-		if holiday_list_name and is_holiday(holiday_list_name, for_date):
-			shift_type_name = None
+   	# if shift_type_name:
+	# 	holiday_list_name = frappe.db.get_value('Shift Type', shift_type_name, 'holiday_list')
+	# 	if not holiday_list_name:
+	# 		holiday_list_name = get_holiday_list_for_employee(employee, False)
+	# 	if holiday_list_name and is_holiday(holiday_list_name, for_date):
+	# 		shift_type_name = None
 
 	if not shift_type_name and next_shift_direction:
 		MAX_DAYS = 366
