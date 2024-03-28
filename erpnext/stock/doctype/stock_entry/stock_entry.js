@@ -268,6 +268,42 @@ frappe.ui.form.on('Stock Entry', {
 					}
 				})
 			}, __("Get items from"));
+
+			if (frm.doc.docstatus === 0) {
+				frm.add_custom_button(__('Shop Return Waste'), function() {
+					frappe.call({
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_from_query",
+						callback: function(r) {
+							
+							if (!r.exc && r.message) {
+								var items = r.message;
+								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
+								items.forEach(function(item) {
+									var row = frm.add_child("items");
+									row.item_code = item.item_code;
+									row.qty = item.qty;
+									row.s_warehouse =item.s_warehouse;
+									row.uom = item.uom;
+									row.stock_uom=item.uom;
+									row.conversion_factor=1;
+									row.transfer_qty=item.qty;
+
+								});
+									var row = frm.add_child("items");
+									row.item_code = "WS000367";
+									row.qty = totalQty;
+									row.t_warehouse ="Wastage Stores - U6";
+									row.uom = "Kg";
+									row.conversion_factor=1;
+									row.transfer_qty=totalQty;
+									row.stock_uom="Kg";
+									row.item_name="MIX CHOORA";
+								frm.refresh_field("items");
+							}
+						}
+					});
+				}, __("Get items from"));
+			}
 		}
 		if (frm.doc.docstatus===0 && frm.doc.purpose == "Material Issue") {
 			frm.add_custom_button(__('Expired Batches'), function() {
