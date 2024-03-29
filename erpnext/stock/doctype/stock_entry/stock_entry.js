@@ -271,6 +271,10 @@ frappe.ui.form.on('Stock Entry', {
 
 			if (frm.doc.docstatus === 0) {
 				frm.add_custom_button(__('Shop Return Waste'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_[entry_type !="Repack"]){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
+						
 					frappe.call({
 						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_shop_return_stock_items",
 						args: {"args": frm},
@@ -300,11 +304,6 @@ frappe.ui.form.on('Stock Entry', {
 									row.stock_uom="Kg";
 									row.item_name="MIX CHOORA";
 								frm.refresh_field("items");
-							}
-							else
-							{
-							frappe.msgprint(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
-	
 							}
 						}
 					});
