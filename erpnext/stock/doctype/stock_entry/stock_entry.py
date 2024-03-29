@@ -1631,19 +1631,16 @@ def validate_sample_quantity(item_code, sample_quantity, qty, batch_no = None):
 	return sample_quantity
 
 @frappe.whitelist()
-def get_shop_return_stock_items(frm_data):
-		if frm_data.stock_entry_type=='Repack' and frm_data.company=='Unit 6':
-			sql_query = """
-				SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, round(sum(sle.actual_qty),3) as qty, stock_uom AS uom
-				FROM `tabBatch`
-				JOIN `tabStock Ledger Entry` AS sle use index (item_code, batch_no, warehouse) on (`tabBatch`.batch_id = sle.batch_no and sle.item_code = `tabBatch`.item  and sle.warehouse = 'Shop Returns Warehouse - U6')
-				WHERE (`tabBatch`.expiry_date >= CURDATE() or `tabBatch`.expiry_date IS NULL) 
-				and sle.active_batch=1  
-				GROUP BY item_code
-				HAVING qty > 0.001
-				ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
-			"""
-			items = frappe.db.sql(sql_query, as_dict=True)
-		else:
-			items = '';
+def get_items_from_query():
+		sql_query = """
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, round(sum(sle.actual_qty),3) as qty, stock_uom AS uom
+            FROM `tabBatch`
+            JOIN `tabStock Ledger Entry` AS sle use index (item_code, batch_no, warehouse) on (`tabBatch`.batch_id = sle.batch_no and sle.item_code = `tabBatch`.item  and sle.warehouse = 'Shop Returns Warehouse - U6')
+            WHERE (`tabBatch`.expiry_date >= CURDATE() or `tabBatch`.expiry_date IS NULL) 
+            and sle.active_batch=1  
+            GROUP BY item_code
+            HAVING qty > 0.001
+            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+		"""
+		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
