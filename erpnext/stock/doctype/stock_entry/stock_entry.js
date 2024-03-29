@@ -268,13 +268,15 @@ frappe.ui.form.on('Stock Entry', {
 					}
 				})
 			}, __("Get items from"));
-
-			if (frm.doc.docstatus === 0) {
+			
+		if (frm.doc.docstatus === 0) {
 				frm.add_custom_button(__('Shop Return Waste'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
 					frappe.call({
 						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_from_query",
 						callback: function(r) {
-							
 							if (!r.exc && r.message) {
 								var items = r.message;
 								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
@@ -301,7 +303,7 @@ frappe.ui.form.on('Stock Entry', {
 								frm.refresh_field("items");
 							}
 						}
-					});
+					})
 				}, __("Get items from"));
 			}
 		}
