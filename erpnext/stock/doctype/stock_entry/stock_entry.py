@@ -1631,7 +1631,8 @@ def validate_sample_quantity(item_code, sample_quantity, qty, batch_no = None):
 	return sample_quantity
 
 @frappe.whitelist()
-def get_items_from_query():
+def get_items_from_query(data):
+		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, round(sum(sle.actual_qty),3) as qty, stock_uom AS uom
             FROM `tabBatch`

@@ -276,6 +276,9 @@ frappe.ui.form.on('Stock Entry', {
 						}
 					frappe.call({
 						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_from_query",
+						args:{
+							"data": frm.doc
+						},
 						callback: function(r) {
 							if (!r.exc && r.message) {
 								var items = r.message;
