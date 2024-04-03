@@ -1,30 +1,28 @@
 {
- "add_total_row": 0,
- "creation": "2023-11-07 10:17:25.815774",
+ "add_total_row": 1,
+ "creation": "2024-04-03 12:19:00.030769",
  "disable_prepared_report": 0,
  "disabled": 0,
  "docstatus": 0,
  "doctype": "Report",
- "idx": 1,
+ "idx": 0,
  "is_standard": "Yes",
- "modified": "2024-04-01 16:46:30.375459",
+ "modified": "2024-04-03 12:19:00.030769",
  "modified_by": "Administrator",
- "module": "Accounts",
- "name": "General Ledger",
+ "module": "Stock",
+ "name": "Stock Quantity Report",
  "owner": "Administrator",
  "prepared_report": 1,
- "ref_doctype": "GL Entry",
- "report_name": "General Ledger",
+ "query": "",
+ "ref_doctype": "Stock Ledger Entry",
+ "report_name": "Stock Quantity Report",
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Accounts User"
+   "role": "Stock User"
   },
   {
    "role": "Accounts Manager"
-  },
-  {
-   "role": "Auditor"
   }
  ]
 }
