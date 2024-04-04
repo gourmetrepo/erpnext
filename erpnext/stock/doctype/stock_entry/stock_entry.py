@@ -97,6 +97,13 @@ class StockEntry(StockController):
 		self.validate_serialized_batch()
 		self.set_actual_qty()
 		self.calculate_rate_and_amount(update_finished_item_rate=False)
+		# stock entry allow zero basic rate
+		if self.stock_entry_type == 'Material Receipt' and self.allow_zero_basic_rate:
+			for i in self.items:
+				i.basic_rate = 0.001
+				i.valuation_rate = 0.001
+				i.basic_amount = i.basic_rate * i.qty
+				i.amount = i.valuation_rate * i.qty
 
 	def submit(self):
 		import time
