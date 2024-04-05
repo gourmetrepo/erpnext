@@ -153,7 +153,7 @@ class SalesInvoice(SellingController):
 	def submit(self):
 		if self.delivery_note_reference:
 			supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
-			if shipping_type == 'Palletized':
+			if shipping_type == 'Palletized' and request_from!='RMS':
 				if self.freight_account is None or self.frieght_amount is None:
 					frappe.throw("Please enter the freight amount and freight account, for palletized shipping")
 
