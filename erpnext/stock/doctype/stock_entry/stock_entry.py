@@ -1641,7 +1641,7 @@ def validate_sample_quantity(item_code, sample_quantity, qty, batch_no = None):
 def get_items_from_query(data):
 		data=data
 		sql_query = """
-			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, round(sum(sle.actual_qty),3) as qty, stock_uom AS uom
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, FLOOR(SUM(sle.actual_qty))  as qty, stock_uom AS uom
             FROM `tabBatch`
             JOIN `tabStock Ledger Entry` AS sle use index (item_code, batch_no, warehouse) on (`tabBatch`.batch_id = sle.batch_no and sle.item_code = `tabBatch`.item  and sle.warehouse = 'Shop Returns Warehouse - U6')
             WHERE (`tabBatch`.expiry_date >= CURDATE() or `tabBatch`.expiry_date IS NULL) 
