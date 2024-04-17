@@ -1640,14 +1640,88 @@ def validate_sample_quantity(item_code, sample_quantity, qty, batch_no = None):
 	return sample_quantity
 
 @frappe.whitelist()
-def get_items_from_query(data):
+def get_items_return_allother(data):
 		data=data
 		sql_query = """
-			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code, FLOOR(SUM(sle.actual_qty))  as qty, stock_uom AS uom
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
             FROM `tabBatch`
-            JOIN `tabStock Ledger Entry` AS sle use index (item_code, batch_no, warehouse) on (`tabBatch`.batch_id = sle.batch_no and sle.item_code = `tabBatch`.item  and sle.warehouse = 'Shop Returns Warehouse - U6')
-            WHERE (`tabBatch`.expiry_date >= CURDATE() or `tabBatch`.expiry_date IS NULL) 
-            and sle.active_batch=1  
+            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+            AND i.`item_section` NOT IN ('FG Nimko','FG Mithae','FG Biscuit','FG Puff')
+            AND sle.active_batch=1  
+            GROUP BY item_code
+            HAVING qty > 0.001
+            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+		"""
+		items = frappe.db.sql(sql_query, as_dict=True)
+		return items
+
+@frappe.whitelist()
+def get_items_return_nimko(data):
+		data=data
+		sql_query = """
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
+            FROM `tabBatch`
+            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+            AND i.`item_section`='FG Nimko'
+            AND sle.active_batch=1  
+            GROUP BY item_code
+            HAVING qty > 0.001
+            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+		"""
+		items = frappe.db.sql(sql_query, as_dict=True)
+		return items
+
+@frappe.whitelist()
+def get_items_return_mithae(data):
+		data=data
+		sql_query = """
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
+            FROM `tabBatch`
+            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+            AND i.`item_section`='FG Mithae'
+            AND sle.active_batch=1  
+            GROUP BY item_code
+            HAVING qty > 0.001
+            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+		"""
+		items = frappe.db.sql(sql_query, as_dict=True)
+		return items
+
+@frappe.whitelist()
+def get_items_return_biscuit(data):
+		data=data
+		sql_query = """
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
+            FROM `tabBatch`
+            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+            AND i.`item_section`='FG Biscuit'
+            AND sle.active_batch=1  
+            GROUP BY item_code
+            HAVING qty > 0.001
+            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+		"""
+		items = frappe.db.sql(sql_query, as_dict=True)
+		return items
+
+@frappe.whitelist()
+def get_items_return_puff(data):
+		data=data
+		sql_query = """
+			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
+            FROM `tabBatch`
+            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+            AND i.`item_section`='FG Puff'
+            AND sle.active_batch=1  
             GROUP BY item_code
             HAVING qty > 0.001
             ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC

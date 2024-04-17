@@ -270,12 +270,12 @@ frappe.ui.form.on('Stock Entry', {
 			}, __("Get items from"));
 			
 		if (frm.doc.docstatus === 0) {
-				frm.add_custom_button(__('Shop Return Waste'), function() {
+				frm.add_custom_button(__('Shop Return Waste Other'), function() {
 					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
 						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
 						}
 					frappe.call({
-						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_from_query",
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_return_allother",
 						args:{
 							"data": frm.doc
 						},
@@ -286,6 +286,7 @@ frappe.ui.form.on('Stock Entry', {
 								items.forEach(function(item) {
 									var row = frm.add_child("items");
 									row.item_code = item.item_code;
+									row.item_name = item.item_name;
 									row.qty = item.qty;
 									row.s_warehouse =item.s_warehouse;
 									row.uom = item.uom;
@@ -309,6 +310,179 @@ frappe.ui.form.on('Stock Entry', {
 					})
 				}, __("Get items from"));
 			}
+
+	if (frm.doc.docstatus === 0) {
+				frm.add_custom_button(__('Shop Return Waste Nimko'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
+					frappe.call({
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_return_nimko",
+						args:{
+							"data": frm.doc
+						},
+						callback: function(r) {
+							if (!r.exc && r.message) {
+								var items = r.message;
+								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
+								items.forEach(function(item) {
+									var row = frm.add_child("items");
+									row.item_code = item.item_code;
+									row.item_name = item.item_name;
+									row.qty = item.qty;
+									row.s_warehouse =item.s_warehouse;
+									row.uom = item.uom;
+									row.stock_uom=item.uom;
+									row.conversion_factor=1;
+									row.transfer_qty=item.qty;
+
+								});
+									var row = frm.add_child("items");
+									row.item_code = "WS000403";
+									row.qty = totalQty;
+									row.t_warehouse ="SF Nimko - U6";
+									row.uom = "Kg";
+									row.conversion_factor=1;
+									row.transfer_qty=totalQty;
+									row.stock_uom="Kg";
+									row.item_name="Nimko Reuse";
+								frm.refresh_field("items");
+							}
+						}
+					})
+				}, __("Get items from"));
+			}
+
+
+if (frm.doc.docstatus === 0) {
+				frm.add_custom_button(__('Shop Return Waste Mithae'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
+					frappe.call({
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_return_mithae",
+						args:{
+							"data": frm.doc
+						},
+						callback: function(r) {
+							if (!r.exc && r.message) {
+								var items = r.message;
+								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
+								items.forEach(function(item) {
+									var row = frm.add_child("items");
+									row.item_code = item.item_code;
+									row.item_name = item.item_name;
+									row.qty = item.qty;
+									row.s_warehouse =item.s_warehouse;
+									row.uom = item.uom;
+									row.stock_uom=item.uom;
+									row.conversion_factor=1;
+									row.transfer_qty=item.qty;
+
+								});
+									var row = frm.add_child("items");
+									row.item_code = "WS000367";
+									row.qty = totalQty;
+									row.t_warehouse ="Wastage Stores - U6";
+									row.uom = "Kg";
+									row.conversion_factor=1;
+									row.transfer_qty=totalQty;
+									row.stock_uom="Kg";
+									row.item_name="MIX CHOORA";
+								frm.refresh_field("items");
+							}
+						}
+					})
+				}, __("Get items from"));
+			}
+
+if (frm.doc.docstatus === 0) {
+				frm.add_custom_button(__('Shop Return Waste Biscuit'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
+					frappe.call({
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_return_biscuit",
+						args:{
+							"data": frm.doc
+						},
+						callback: function(r) {
+							if (!r.exc && r.message) {
+								var items = r.message;
+								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
+								items.forEach(function(item) {
+									var row = frm.add_child("items");
+									row.item_code = item.item_code;
+									row.item_name = item.item_name;
+									row.qty = item.qty;
+									row.s_warehouse =item.s_warehouse;
+									row.uom = item.uom;
+									row.stock_uom=item.uom;
+									row.conversion_factor=1;
+									row.transfer_qty=item.qty;
+
+								});
+									var row = frm.add_child("items");
+									row.item_code = "WS000404";
+									row.qty = totalQty;
+									row.t_warehouse ="SF Biscuit - U6";
+									row.uom = "Kg";
+									row.conversion_factor=1;
+									row.transfer_qty=totalQty;
+									row.stock_uom="Kg";
+									row.item_name="Biscuit Reuse";
+								frm.refresh_field("items");
+							}
+						}
+					})
+				}, __("Get items from"));
+			}
+
+
+if (frm.doc.docstatus === 0) {
+				frm.add_custom_button(__('Shop Return Waste Puff'), function() {
+					if (frm.doc.company !="Unit 6" || frm.doc.stock_entry_type !="Repack"){
+						frappe.throw(__("The stock entry type must be 'Repack,' and the company must be 'Unit 6.'"));
+						}
+					frappe.call({
+						method: "erpnext.stock.doctype.stock_entry.stock_entry.get_items_return_puff",
+						args:{
+							"data": frm.doc
+						},
+						callback: function(r) {
+							if (!r.exc && r.message) {
+								var items = r.message;
+								let totalQty = items.reduce((acc, curr) => acc + curr.qty, 0);
+								items.forEach(function(item) {
+									var row = frm.add_child("items");
+									row.item_code = item.item_code;
+									row.item_name = item.item_name;
+									row.qty = item.qty;
+									row.s_warehouse =item.s_warehouse;
+									row.uom = item.uom;
+									row.stock_uom=item.uom;
+									row.conversion_factor=1;
+									row.transfer_qty=item.qty;
+
+								});
+									var row = frm.add_child("items");
+									row.item_code = "WS000405";
+									row.qty = totalQty;
+									row.t_warehouse ="SF Puff - U6";
+									row.uom = "Kg";
+									row.conversion_factor=1;
+									row.transfer_qty=totalQty;
+									row.stock_uom="Kg";
+									row.item_name="Cross Item Reuse";
+								frm.refresh_field("items");
+							}
+						}
+					})
+				}, __("Get items from"));
+			}
+
+
+
 		}
 		if (frm.doc.docstatus===0 && frm.doc.purpose == "Material Issue") {
 			frm.add_custom_button(__('Expired Batches'), function() {
