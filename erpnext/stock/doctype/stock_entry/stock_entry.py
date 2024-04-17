@@ -116,7 +116,9 @@ class StockEntry(StockController):
 			se_type_section = self.stock_entry_type
 		se_bifurcations = get_config_by_name('stock_entry_queues')
 		for queue in se_bifurcations:
-			if se_type_section in se_bifurcations.get(queue):
+			if self.request_from=='RMS':
+				queue="rms"
+			elif se_type_section in se_bifurcations.get(queue):
 				break
 			else:
 				queue="primary"
