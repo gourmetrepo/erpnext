@@ -117,13 +117,15 @@ class StockEntry(StockController):
 		se_bifurcations = get_config_by_name('stock_entry_queues')
 		for queue in se_bifurcations:
 			if self.request_from=='RMS':
-				queue="rms"
+				queue="sync"
 			elif se_type_section in se_bifurcations.get(queue):
 				break
 			else:
 				queue="primary"
-    
-		self.queue_action('submit',queue_name="se_"+queue)
+		if self.request_from=='RMS':
+			self.queue_action('submit',queue_name=queue)
+		else:
+			self.queue_action('submit',queue_name="se_"+queue)
 
 	def on_submit(self):
 
