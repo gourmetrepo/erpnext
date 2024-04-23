@@ -136,7 +136,14 @@ class StockController(AccountsController):
 		if self.get('is_return') and sle.item_code == 'SM007':
 				for items in self.items:
 					if(items.item_code == 'SM007'):
-						sle.valuation_rate = items.mix_choora_return_rate
+						sm007_rate=0.001
+						if(items.mix_choora_return_rate==0.00):
+							sm007_rate = 0.001
+						else:
+							sm007_rate = items.mix_choora_return_rate
+						
+						sle.valuation_rate = sm007_rate
+						sle.incoming_rate =  sm007_rate
 						break
 		else:
 			sle.valuation_rate = get_valuation_rate(sle.item_code, sle.warehouse,
