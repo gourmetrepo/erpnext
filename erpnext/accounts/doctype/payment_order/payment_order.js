@@ -22,6 +22,11 @@ frappe.ui.form.on('Payment Order', {
 			}, __("Get Payments from"));
 
 			frm.trigger('remove_button');
+			frm.add_custom_button(__('Get Supplier Payment History'), function () {
+				// Function to open the blank pop-up
+				frm.trigger("openSupplierPaymentHistory");
+			});
+	
 		}
 
 		// payment Entry
@@ -143,5 +148,77 @@ frappe.ui.form.on('Payment Order', {
 			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
 			frm.set_value("naming_series","PMOQS-.YY.-")
 		}
+	},
+	openSupplierPaymentHistory: function(frm) {
+		console.log("payment period function called")
+		let payment_history;
+		if (frm.doc) {
+			frappe.call({
+				method: "nrp_manufacturing.modules.gourmet.payment_order.payment_order.get_pmo_payment_history", 
+				async: false,
+				args: {
+					pmono: frm.doc.name,
+					company:frm.doc.company
+				},
+				callback: function(r) {
+					console.log(r.message)
+					if (r.message) {
+						payment_history = r.message;
+					}
+				}
+			});
+			
+			var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var maxWidth = Math.min(screenWidth - 50, 900);  /// Set a maximum width (e.g., 900 pixels)
+	
+			// Construct the HTML for the table
+			var optionsHTML = "<table border='1'>"
+							 + "<tr> "
+							 + "<th>Sr. No</th>  "
+							 + "<th>Supplier</th>  "
+							 + "<th>Total GL Balance Before Payment</th>  "
+							/// + "<th>Tot. Val. Curr. Docs</th>"
+							 + "<th>Request Payment Amount</th> "
+							// + "<th>% P TO P</th>  "
+							 + "<th>Reserve Balance in Other PMO (Not Paid)</th>"
+							 + "<th>Net Balance</th>"
+							 + "</tr>";
+			
+			// Populate table rows with payment history data
+			if (payment_history) {
+				payment_history.forEach(function(data, index) {
+					optionsHTML += "<tr>"
+								+ "<td>" + (index + 1) + "</td>"
+								+ "<td>" + data.supplier + "</td>"
+								+ "<td style='text-align:right;'>" + data.tbb + "</td>"
+								// + "<td style='text-align:right;'>" + data.tvcd + "</td>"
+								+ "<td style='text-align:right;'>" + data.tpcp + "</td>"
+								//+ "<td style='text-align:right;'>" + data.ptop + "</td>"
+								+ "<td style='text-align:right;'>" + data.top + "</td>"
+								+ "<td style='text-align:right;'>" + data.tobs + "</td>"
+								+ "</tr>";
+				});
+			}
+			
+			optionsHTML += "</table>";
+	
+			var dialog = new frappe.ui.Dialog({
+				title: __('Supplier Payment History'),
+				fields: [
+					{
+						label: __('Supplier Payment Table:'),
+						fieldtype: 'HTML',
+						fieldname: 'payment_table',
+						options: optionsHTML  // Set the options HTML
+					}
+				],
+				primary_action: null , // Remove the submit button
+			});
+			dialog.$wrapper.find('.modal-dialog').css('width', maxWidth + 'px');
+			// Show the dialog
+			dialog.show();
+		}
 	}
+
+
 });
