@@ -353,6 +353,8 @@ class SalesOrder(SellingController):
 			frappe.throw(_("{0} {1} has been modified. Please refresh.").format(self.doctype, self.name))
 
 	def update_status(self, status):
+		if status == 'Draft':
+			self.check_credit_limit()
 		self.check_modified_date()
 		self.set_status(update=True, status=status)
 		self.update_reserved_qty()
