@@ -594,7 +594,7 @@ def get_price_list_rate(args, item_doc, out):
 			if args.parenttype != 'Purchase Order':
 				price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
 			else:
-				if args.purchase_order_type not in ('Local', 'Import'):
+				if args.purchase_order_type in ('Local', 'Import'):
 					frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
 				else:
 					price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
@@ -603,7 +603,7 @@ def get_price_list_rate(args, item_doc, out):
 			if not price_list_rate and item_doc.variant_of and args.parenttype != 'Purchase Order' and args.purchase_order_type not in ('Local', 'Import'):
 				item_wise_rate = get_price_list_rate_for(args, item_doc.variant_of)
 			else:
-				if args.purchase_order_type not in ('Local', 'Import'):
+				if args.purchase_order_type in ('Local', 'Import'):
 					frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
 				else:
 					price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
