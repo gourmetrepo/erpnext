@@ -591,7 +591,7 @@ def get_price_list_rate(args, item_doc, out):
 			
 
 		if  oblige_rate== None or oblige_rate == 0:
-			if args.parenttype != 'Purchase Order':
+			if args.parenttype != 'Purchase Order' or args.doctype != 'Purchase Order':
 				price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
 			else:
 				if args.purchase_order_type in ('Local', 'Import'):
@@ -600,7 +600,7 @@ def get_price_list_rate(args, item_doc, out):
 					price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
      
    			# variant
-			if not price_list_rate and item_doc.variant_of and args.parenttype != 'Purchase Order' and args.purchase_order_type not in ('Local', 'Import'):
+			if not price_list_rate and item_doc.variant_of and (args.parenttype != 'Purchase Order'or args.doctype != 'Purchase Order') :
 				item_wise_rate = get_price_list_rate_for(args, item_doc.variant_of)
 			else:
 				if args.purchase_order_type in ('Local', 'Import'):
