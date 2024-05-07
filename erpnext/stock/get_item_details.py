@@ -591,11 +591,16 @@ def get_price_list_rate(args, item_doc, out):
 			
 
 		if  oblige_rate== None or oblige_rate == 0:
-			price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
-
-			# variant
-			if not price_list_rate and item_doc.variant_of:
+			if  args.doctype != 'Purchase Order':
+				price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+			else:
+				frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
+			
+   			# variant
+			if not price_list_rate and item_doc.variant_of and args.doctype != 'Purchase Order':
 				item_wise_rate = get_price_list_rate_for(args, item_doc.variant_of)
+			else:
+				frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
 
 			
 			out.price_list_rate = flt(price_list_rate) * flt(args.plc_conversion_rate) \
