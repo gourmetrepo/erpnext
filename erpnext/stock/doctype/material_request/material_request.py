@@ -278,8 +278,34 @@ def make_purchase_order(source_name, target_doc=None):
 		set_missing_values(source, target_doc)
 
 	def select_item(d):
-		return d.ordered_qty < d.stock_qty
-
+		import json
+		data_dict = json.loads(target_doc)
+		if data_dict['purchase_order_type'] in ('Local', 'Import'):
+			
+			sql_query = """
+					SELECT 
+						* 
+					FROM 
+						`tabMaterial Request Item` AS mri
+					INNER JOIN 
+						`tabItem Daily Rate Table` AS dri 
+					ON 
+						mri.item_code = dri.item_code 
+					WHERE 
+						mri.item_code = '{0}' 
+						AND mri.docstatus = 1 
+						AND dri.docstatus = 1 
+						AND dri.supplier_code = '{1}'
+				""".format(d.item_code, data_dict['supplier'])
+			buying_rate_check = frappe.db.sql(sql_query,as_dict=True,debug=True)
+			if buying_rate_check and d.ordered_qty < d.stock_qty:
+				return True
+			else:
+				return False
+		else:		
+			return d.ordered_qty < d.stock_qty
+				
+	
 	doclist = get_mapped_doc("Material Request", source_name, 	{
 		"Material Request": {
 			"doctype": "Purchase Order",
