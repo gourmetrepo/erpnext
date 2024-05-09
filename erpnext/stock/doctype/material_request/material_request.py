@@ -290,13 +290,12 @@ def make_purchase_order(source_name, target_doc=None):
 					INNER JOIN 
 						`tabItem Daily Rate Table` AS dri 
 					ON 
-						mri.item_code = dri.item_code 
+						mri.item_code = dri.item_code AND dri.company='{0}'  AND dri.supplier_code = '{1}' AND dri.docstatus = 1 
 					WHERE 
-						mri.item_code = '{0}' 
+						mri.item_code = '{2}' 
+      					AND mri.parent= '{3}'
 						AND mri.docstatus = 1 
-						AND dri.docstatus = 1 
-						AND dri.supplier_code = '{1}'
-				""".format(d.item_code, data_dict['supplier'])
+				""".format(data_dict['company'],data_dict['supplier'],d.item_code,source_name )
 			buying_rate_check = frappe.db.sql(sql_query,as_dict=True)
 			if buying_rate_check and d.ordered_qty < d.stock_qty:
 				return True
