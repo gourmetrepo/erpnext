@@ -16,7 +16,7 @@ from erpnext.stock.doctype.price_list.price_list import get_price_list_details
 from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
 from erpnext.setup.doctype.brand.brand import get_brand_defaults
 from erpnext.stock.doctype.item_manufacturer.item_manufacturer import get_item_manufacturer_part_no
-
+from nrp_manufacturing.utils import validate_qty_of_items, get_config_by_name
 from six import string_types, iteritems
 
 sales_doctypes = ['Quotation', 'Sales Order', 'Delivery Note', 'Sales Invoice']
@@ -582,7 +582,12 @@ def get_price_list_rate(args, item_doc, out):
 			validate_conversion_rate(args, meta)
 ## Oblige Rate Check company wise 
 		oblige_rate = 0
-		if args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
+  	#daily items list
+		daily_rate_item = get_config_by_name("DAILY_RATE_ITEMS", [])
+		if (args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order') and item_doc.name in daily_rate_item and args.company=='Unit 6':
+			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+                            'category':'Daily Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+		elif args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
 			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
                             'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
 		elif args.parenttype == 'Material Request' or args.doctype == 'Material Request':
