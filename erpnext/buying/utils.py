@@ -91,7 +91,7 @@ def get_linked_material_requests(items):
 			WHERE mr.name = mr_item.parent
 				AND mr_item.item_code = %(item)s
 				AND mr.material_request_type = 'Purchase'
-				AND mr.per_ordered < 99.99
+				AND mr.per_ordered < 100.0001
 				AND mr.docstatus = 1
 				AND mr.status != 'Stopped'
                         ORDER BY mr_item.item_code ASC""",{"item": item}, as_dict=1)
