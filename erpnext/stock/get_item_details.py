@@ -592,7 +592,7 @@ def get_price_list_rate(args, item_doc, out):
 			rate = frappe.db.sql("""
 				SELECT new_rate FROM `tabItem Daily Rate Table`
 				WHERE
-					(category = 'Buying Rate' OR category = 'Fresh Item Rate')
+					category IN ('Buying Rate','Fresh Item Rate')
 					AND company = %s
 					AND item_code = %s
 					AND supplier_code = %s
@@ -608,7 +608,7 @@ def get_price_list_rate(args, item_doc, out):
 			rate = frappe.db.sql("""
 				SELECT new_rate FROM `tabItem Daily Rate Table`
 				WHERE
-					(category = 'Buying Rate' OR category = 'Fresh Item Rate')
+					category IN ('Buying Rate','Fresh Item Rate')
 					AND company = %s
 					AND item_code = %s
 					AND supplier_code = %s
