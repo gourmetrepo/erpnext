@@ -582,11 +582,37 @@ def get_price_list_rate(args, item_doc, out):
 ## Oblige Rate Check company wise samad
 		oblige_rate = 0
 		if args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
-			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                            'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					(category = 'Buying Rate' OR category = 'Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
 		elif args.parenttype == 'Material Request' or args.doctype == 'Material Request':
-			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                          'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					(category = 'Buying Rate' OR category = 'Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
 			
 
 		if  oblige_rate== None or oblige_rate == 0:
