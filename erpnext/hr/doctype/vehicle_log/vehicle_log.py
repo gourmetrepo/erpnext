@@ -22,6 +22,17 @@ class VehicleLog(Document):
             frappe.db.sql("""UPDATE `tabVehicle Log` set material_request_reference ='{mr_ref}' WHERE name ='{name}';""".format(mr_ref=mr.name,name =self.name))
         else:
             pass
+        # Execute the query
+        for service in self.service_detail:
+            query = """
+                UPDATE `tabMaintenance Mileage Setup`
+                SET previous_odometer_reading = current_odometer_reading,
+                    current_odometer_reading = %s
+                WHERE parent = %s AND item_code = %s
+            """
+            # Execute the query with the value
+            frappe.db.sql(query, (service.current_odm, self.license_plate, service.item_code))
+            frappe.db.commit() 
             # make_expense_claim(self)
         
 
