@@ -505,7 +505,7 @@ def get_payroll_entry_bank_entries(payroll_entry_name):
 		'SELECT B.name FROM `tabJournal Entry Account` AS A '
 		' INNER JOIN `tabJournal Entry` AS B ON A.`parent` =B.`name`'
 		' WHERE reference_type="Payroll Entry"  AND voucher_type="Bank Entry"'
-		' and A.reference_name=%s and B.docstatus=1',
+		' and A.reference_name=%s and B.docstatus IN (0,1)',
 		payroll_entry_name,
 		as_dict=1
 	)
