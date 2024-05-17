@@ -35,16 +35,20 @@ frappe.ui.form.on("Purchase Order", {
 		frm.set_df_property('purchase_order_type','read_only',true);
 		if(frm.doc.purchase_order_type == "Local" || frm.doc.purchase_order_type == "Import"){
 			frm.set_value("items", []);
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
-			rate_field.read_only = 1;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
-			price_list_field.read_only = 1;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
+			// rate_field.read_only = 1;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
+			// price_list_field.read_only = 1;
+			frm.get_field("items").grid.toggle_enable("rate", 0);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
 			refresh_field("items");
 		}else{
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
-			rate_field.read_only = 0;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
-			price_list_field.read_only = 0;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
+			// rate_field.read_only = 0;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
+			// price_list_field.read_only = 0;
+			frm.get_field("items").grid.toggle_enable("rate", 1);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
 			refresh_field("items");
 		}
 		
@@ -98,16 +102,20 @@ frappe.ui.form.on("Purchase Order", {
 
 		if(frm.doc.purchase_order_type == "Local" || frm.doc.purchase_order_type == "Import"){
 			
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
-			rate_field.read_only = 1;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
-			price_list_field.read_only = 1;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
+			// rate_field.read_only = 1;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
+			// price_list_field.read_only = 1;
+			frm.get_field("items").grid.toggle_enable("rate", 0);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
 			refresh_field("items");
 		}else{
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
-			rate_field.read_only = 0;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
-			price_list_field.read_only = 0;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
+			// rate_field.read_only = 0;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", frm.doc.name);
+			// price_list_field.read_only = 0;
+			frm.get_field("items").grid.toggle_enable("rate", 1);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
 			refresh_field("items");
 		}
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
@@ -150,16 +158,20 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		var is_drop_ship = false;
 		if(this.frm.doc.purchase_order_type == "Local" || this.frm.doc.purchase_order_type == "Import"){
 			
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
-			rate_field.read_only = 1;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
-			price_list_field.read_only = 1;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
+			// rate_field.read_only = 1;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
+			// price_list_field.read_only = 1;
+			this.frm.get_field("items").grid.toggle_enable("rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
 			refresh_field("items");
 		}else{
-			var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
-			rate_field.read_only = 0;
-			var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
-			price_list_field.read_only = 0;
+			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
+			// rate_field.read_only = 0;
+			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
+			// price_list_field.read_only = 0;
+			this.frm.get_field("items").grid.toggle_enable("rate", 1);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
 			refresh_field("items");
 		}
 
