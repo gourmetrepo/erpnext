@@ -162,16 +162,16 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			// rate_field.read_only = 1;
 			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
 			// price_list_field.read_only = 1;
-			frm.get_field("items").grid.toggle_enable("rate", 0);
-			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
 			refresh_field("items");
 		}else{
 			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
 			// rate_field.read_only = 0;
 			// var price_list_field = frappe.meta.get_docfield("Purchase Order Item","price_list_rate", this.frm.doc.name);
 			// price_list_field.read_only = 0;
-			frm.get_field("items").grid.toggle_enable("rate", 1);
-			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
+			this.frm.get_field("items").grid.toggle_enable("rate", 1);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
 			refresh_field("items");
 		}
 
