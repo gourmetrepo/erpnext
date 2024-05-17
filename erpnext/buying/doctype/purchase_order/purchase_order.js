@@ -95,12 +95,12 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		var allow_receipt = false;
 		var is_drop_ship = false;
 		if(this.frm.doc.purchase_order_type == "Local" || this.frm.doc.purchase_order_type == "Import"){
-			frm.get_field("items").grid.toggle_enable("rate", 0);
-			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
 			refresh_field("items");
 		}else{
-			frm.get_field("items").grid.toggle_enable("rate", 1);
-			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
+			this.frm.get_field("items").grid.toggle_enable("rate", 1);
+			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
 			refresh_field("items");
 		}
 
