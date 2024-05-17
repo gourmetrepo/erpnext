@@ -44,7 +44,7 @@ class PurchaseOrder(BuyingController):
 			for d in self.get("items"):
 				if d.discount_percentage != 0.0:
 					frappe.throw(_("{0} Item rate is not according to buying & daily rate. Please contact to support team.")
-						.format(d.name))
+						.format(d.item_code))
      
 		if self.docstatus == 1 :
 			self.set_status()
