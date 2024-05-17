@@ -39,6 +39,27 @@ frappe.ui.form.on("Purchase Order", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+		if(frm.doc.purchase_order_type == "Local" || frm.doc.purchase_order_type == "Import"){
+			frm.get_field("items").grid.toggle_enable("rate", 0);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			refresh_field("items");
+		}else{
+			frm.get_field("items").grid.toggle_enable("rate", 1);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
+			refresh_field("items");
+		}
+	},
+	purchase_order_type: function(frm){
+		if(frm.doc.purchase_order_type == "Local" || frm.doc.purchase_order_type == "Import"){
+			frm.set_value("items", []);
+			frm.get_field("items").grid.toggle_enable("rate", 0);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			refresh_field("items");
+		}else{
+			frm.get_field("items").grid.toggle_enable("rate", 1);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
+			refresh_field("items");
+		}
 	}
 });
 
@@ -73,6 +94,16 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		this._super();
 		var allow_receipt = false;
 		var is_drop_ship = false;
+		if(this.frm.doc.purchase_order_type == "Local" || this.frm.doc.purchase_order_type == "Import"){
+			frm.get_field("items").grid.toggle_enable("rate", 0);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			refresh_field("items");
+		}else{
+			frm.get_field("items").grid.toggle_enable("rate", 1);
+			frm.get_field("items").grid.toggle_enable("price_list_rate", 1);
+			refresh_field("items");
+		}
+
 
 		for (var i in cur_frm.doc.items) {
 			var item = cur_frm.doc.items[i];
