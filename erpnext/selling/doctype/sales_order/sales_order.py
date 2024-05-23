@@ -741,7 +741,7 @@ def make_delivery_note(source_name, target_doc=None, skip_item_mapping=False):
 			},
 		}
 	target_doc = get_mapped_doc("Sales Order", source_name, mapper, target_doc, set_missing_values)
-
+	target_doc.printed = 0
 	return target_doc
 
 @frappe.whitelist()
