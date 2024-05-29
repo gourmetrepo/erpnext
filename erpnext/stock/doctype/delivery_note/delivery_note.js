@@ -145,13 +145,15 @@ frappe.ui.form.on("Delivery Note", {
 			frm.set_df_property('driver', 'reqd', 1);
 			frm.set_df_property('transporter', 'reqd', 0);
 		}else if(frm.doc.customer_type === 'Supplier'){
-			frm.set_df_property('vehicle_no','hidden', false);		
-			frm.set_df_property('vehicle','hidden', true);
-			frm.set_df_property('vehicle', 'read_only', 1);
-			frm.set_df_property('vehicle_no', 'read_only', 0);
-			frm.set_value("vehicle_no", null);
-			frm.set_df_property('vehicle', 'reqd', 0);
-			frm.set_df_property('vehicle_no', 'reqd', 1);
+			if (frm.doc.company === 'Unit 6') {
+				frm.set_df_property('vehicle_no','hidden', false);		
+				frm.set_df_property('vehicle','hidden', true);
+				frm.set_df_property('vehicle', 'read_only', 1);
+				frm.set_df_property('vehicle_no', 'read_only', 0);
+				frm.set_value("vehicle_no", null);
+				frm.set_df_property('vehicle', 'reqd', 0);
+				frm.set_df_property('vehicle_no', 'reqd', 1);
+			}
 			frm.set_df_property('transporter','hidden',false);
 			frm.set_df_property('transporter_name','hidden',false);		
 			frm.set_df_property('driver','hidden',true);
