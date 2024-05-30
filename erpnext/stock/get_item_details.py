@@ -15,6 +15,7 @@ from erpnext.stock.doctype.item.item import get_item_defaults, get_uom_conv_fact
 from erpnext.stock.doctype.price_list.price_list import get_price_list_details
 from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
 from erpnext.setup.doctype.brand.brand import get_brand_defaults
+from nrp_manufacturing.utils import validate_qty_of_items, get_config_by_name
 from erpnext.stock.doctype.item_manufacturer.item_manufacturer import get_item_manufacturer_part_no
 
 from six import string_types, iteritems
@@ -303,12 +304,6 @@ def get_basic_details(args, item, overwrite_warehouse=True):
 		"last_purchase_rate": item.last_purchase_rate if args.get("doctype") in ["Purchase Order"] else 0,
 		"transaction_date": args.get("transaction_date")
 	})
-
-
-	# Umair added check to add project name from item in materail request for DAD requirment
-	if args.get('doctype') == 'Material Request':
-		if (item.item_group == "DAD" and item.is_stock_item == 0) or (item.is_fixed_asset == 1 and item.asset_category == "FA-Land"):
-			out["project"] = item.project_name 
 
 	if item.get("enable_deferred_revenue") or item.get("enable_deferred_expense"):
 		out.update(calculate_service_end_date(args, item))
