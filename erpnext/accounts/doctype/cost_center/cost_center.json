@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_copy": 1,
  "allow_import": 1,
  "creation": "2013-01-23 19:57:17",
@@ -124,9 +123,8 @@
  "icon": "fa fa-money",
  "idx": 1,
  "is_tree": 1,
- "links": [],
- "modified": "2020-06-12 16:09:30.025214",
- "modified_by": "Administrator",
+ "modified": "2023-07-26 16:25:24.798984",
+ "modified_by": "dilnawaz.sajid@gournetpakistan.com",
  "module": "Accounts",
  "name": "Cost Center",
  "nsm_parent_field": "parent_cost_center",
