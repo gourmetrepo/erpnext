@@ -40,6 +40,12 @@ frappe.ui.form.on('Asset', {
 			};
 		});
 	},
+	validate: function(frm) {
+        $.each(frm.doc.owner_details_table,  function(i,  d) {
+			var percentage = (d.kanals/frm.doc.total_kanals) * 100
+			d.ownership_percentage = percentage
+        });
+    },
 
 	setup: function(frm) {
 		frm.make_methods = {

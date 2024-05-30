@@ -430,7 +430,16 @@ frappe.ui.form.on("Work Order", {
 	additional_operating_cost: function(frm) {
 		erpnext.work_order.calculate_cost(frm.doc);
 		erpnext.work_order.calculate_total_cost(frm);
+	},
+	company: function(frm) {
+	if(frm.doc.company === "Gourmet Farm" ){
+		frm.set_df_property("project", "reqd", 1);
+		frm.refresh_field('project');
 	}
+	else{
+		frm.set_df_property("project", "reqd", 0);
+		frm.refresh_field('project');
+	}}
 });
 
 frappe.ui.form.on("Work Order Item", {

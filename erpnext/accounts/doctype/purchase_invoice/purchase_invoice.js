@@ -509,6 +509,7 @@ frappe.ui.form.on("Purchase Invoice", {
 	},
 
 	onload: function(frm) {
+		frm.trigger("toggle_project_field");
 		if(frm.doc.__onload && frm.is_new()) {
 			if(frm.doc.supplier) {
 				frm.doc.apply_tds = frm.doc.__onload.supplier_tds ? 1 : 0;
@@ -531,11 +532,34 @@ frappe.ui.form.on("Purchase Invoice", {
 	},
 	//umair added code for series automapped for Quintech Sciences
 	company: function(frm) {
+		console.log("company")
 		frm.trigger("toggle_display_account_head");
+		frm.trigger("toggle_project_field");
 		if(frm.doc.company == "QuinTech Sciences")
 		{
 			// $('[data-fieldname="naming_series"] select').val("PRQS-.YY.-").trigger('change');
 			frm.set_value("naming_series","PIQS-.YY.-")
 		}
-	}
+		// if(frm.doc.company === "Gourmet Farm"){
+		// 	frm.set_df_property("project", "reqd", 1);
+		// 	frm.refresh_field('project');
+		// }
+		// else{
+		// 	frm.set_df_property("project", "reqd", 0);
+		// 	frm.refresh_field('project');
+		// }
+		
+	},
+	toggle_project_field : function(frm, cdt, cdn){
+		if(frm.doc.items){
+		if (frm.doc.items[0]["purchase_order_type"]){
+		var purchase_order_type = frm.doc.items[0]["purchase_order_type"];
+		if(frm.doc.company === "Gourmet Farm" && purchase_order_type==="Service"){
+			frm.fields_dict.items.grid.toggle_reqd("project", true);
+			refresh_field("project");
+		}else{
+			frm.fields_dict.items.grid.toggle_reqd("project", false);
+			refresh_field("project");
+		}
+	}}}
 })

@@ -738,8 +738,12 @@ class BuyingController(StockController):
 			'calculate_depreciation': 1,
 			'purchase_receipt_amount': purchase_amount,
 			'gross_purchase_amount': purchase_amount,
+			'project_name':row.project,
+			'cost_center':row.cost_center,
+			'business_unit':row.business_unit,
 			'purchase_receipt': self.name if self.doctype == 'Purchase Receipt' else None,
-			'purchase_invoice': self.name if self.doctype == 'Purchase Invoice' else None
+			'purchase_invoice': self.name if self.doctype == 'Purchase Invoice' else None,
+			# 'cost_center':
 		})
 
 		asset.flags.ignore_validate = True

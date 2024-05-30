@@ -22,6 +22,15 @@ frappe.ui.form.on("Item", {
 		if (frm.doc.is_fixed_asset) {
 			frm.trigger("set_asset_naming_series");
 		}
+
+		frm.set_query('project_name', function(doc) {
+			return {
+				filters: {
+					"is_active":"Yes",
+					"company": "DAD"
+				}
+			};
+		});
 	},
 
 	refresh: function(frm) {
@@ -167,6 +176,11 @@ frappe.ui.form.on("Item", {
 		});
 
 		frm.trigger('auto_create_assets');
+
+		// umair added code for field project name for project DAD
+		if(frm.doc.asset_category == "FA-Land" && frm.doc.is_fixed_asset == 1){
+			frm.set_df_property('project_name',"reqd",1)
+		}
 	},
 
 	set_asset_naming_series: function(frm) {
@@ -194,6 +208,26 @@ frappe.ui.form.on("Item", {
 			frm.set_value("has_batch_no", 0);
 			frm.set_value("create_new_batch", 0);
 			frm.set_value("has_serial_no", 0);
+		}
+
+		// umair added code for field project name for project DAD
+		if(frm.doc.item_group == "DAD" && frm.doc.is_stock_item == 0){
+			frm.set_df_property('project_name',"reqd",1)
+		}
+	},
+
+	asset_category:function(frm){
+		// umair added code for field project name for project DAD
+		if(frm.doc.asset_category == "FA-Land" && frm.doc.is_fixed_asset == 1){
+			frm.set_df_property('project_name',"reqd",1)
+		}
+	},
+
+	item_group:function(frm){
+
+		// umair added code for field project name for project DAD
+		if(frm.doc.item_group == "DAD" && frm.doc.is_stock_item == 0){
+			frm.set_df_property('project_name',"reqd",1)
 		}
 	},
 
