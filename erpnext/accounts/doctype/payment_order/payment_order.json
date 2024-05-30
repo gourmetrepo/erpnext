@@ -86,8 +86,7 @@
    "fieldname": "company_bank_account",
    "fieldtype": "Link",
    "label": "Company Bank Account",
-   "options": "Bank Account",
-   "reqd": 1
+   "options": "Bank Account"
   },
   {
    "depends_on": "company_bank_account",
@@ -107,7 +106,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-04-06 18:00:56.022642",
+ "modified": "2023-11-27 17:13:07.227267",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Order",

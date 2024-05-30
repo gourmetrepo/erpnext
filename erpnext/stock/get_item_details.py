@@ -578,12 +578,95 @@ def get_price_list_rate(args, item_doc, out):
 		args.update(pl_details)
 		if meta.get_field("currency"):
 			validate_conversion_rate(args, meta)
+## Oblige Rate Check company wise 
+		oblige_rate = 0
+  	#daily items list
+		daily_rate_item = get_config_by_name("DAILY_RATE_ITEMS", [])
+		if (args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order') and item_doc.name in daily_rate_item and args.company=='Unit 6':
+			# oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+            #                 'category':'Daily Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category='Daily Rate'
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
 
-		price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
+		elif args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
+			# Combined query for 'Buying Rate' and 'Fresh Item Rate'
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category IN ('Buying Rate','Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
 
-		# variant
-		if not price_list_rate and item_doc.variant_of:
-			price_list_rate = get_price_list_rate_for(args, item_doc.variant_of)
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
+		elif args.parenttype == 'Material Request' or args.doctype == 'Material Request':
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category IN ('Buying Rate','Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
+			
+
+		if  oblige_rate== None or oblige_rate == 0:
+			if args.parenttype != 'Purchase Order' or args.doctype != 'Purchase Order':
+				price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+			else:
+				if args.purchase_order_type in ('Local', 'Import'):
+					frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
+				else:
+					price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+     
+   			# variant
+			if not price_list_rate and item_doc.variant_of and (args.parenttype != 'Purchase Order'or args.doctype != 'Purchase Order') :
+				item_wise_rate = get_price_list_rate_for(args, item_doc.variant_of)
+			# else:
+			# 	if not price_list_rate and args.purchase_order_type in ('Local', 'Import'):
+			# 		frappe.throw(_("Item Buying Rate Not exist Against Item {0} and Supplier {1}").format(item_doc.name,args.supplier))
+				# else:
+				# 	price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+			
+			out.price_list_rate = flt(price_list_rate) * flt(args.plc_conversion_rate) \
+			/ flt(args.conversion_rate)
+		else:
+			out.price_list_rate = oblige_rate
+			price_list_rate=oblige_rate
+		#price_list_rate = get_price_list_rate_for(args, item_doc.name) or 0
+
+		# # variant
+		# if not price_list_rate and item_doc.variant_of:
+		# 	price_list_rate = get_price_list_rate_for(args, item_doc.variant_of)
+		#comment last rate not get in case of purchase 
+		# ##if item rate is zero
+		if price_list_rate == 0 and item_doc.get('last_purchase_rate') and (args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order'):
+			out.price_list_rate = item_doc.last_purchase_rate
 
 		# insert in database
 		if not price_list_rate:
@@ -596,9 +679,13 @@ def get_price_list_rate(args, item_doc, out):
 
 		if not out.price_list_rate and args.transaction_type=="buying":
 			from erpnext.stock.doctype.item.item import get_last_purchase_details
-			out.update(get_last_purchase_details(item_doc.name,
-				args.name, args.conversion_rate))
-
+			out.update(get_last_purchase_details(args.company,item_doc.name,args.name, args.conversion_rate))
+	elif args.doctype == 'Material Request':
+			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+                          'company':args.company, 'item_code': item_doc.name, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			if oblige_rate:
+				out.price_list_rate = oblige_rate
+				price_list_rate=oblige_rate
 def insert_item_price(args):
 	"""Insert Item Price if Price List and Price List Rate are specified and currency is the same"""
 	if frappe.db.get_value("Price List", args.price_list, "currency", cache=True) == args.currency \
