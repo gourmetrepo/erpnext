@@ -1908,6 +1908,10 @@ class StockEntry(StockController):
 		return [d.item_code for d in job_card_items]
 
 	def add_to_stock_entry_detail(self, item_dict, bom_no=None):
+		if self.production_plan != None:
+			cost_center = frappe._dict(frappe.db.sql("""SELECT cost_center FROM `tabSection Warehouse` AS sw
+			INNER JOIN `tabProduction Plan` AS pp ON pp.item_section =sw.`parent` AND pp.`name`= %s """,self.production_plan))
+
 		for d in item_dict:
 			item_row = item_dict[d]
 			stock_uom = item_row.get("stock_uom") or frappe.db.get_value("Item", d, "stock_uom")
@@ -1921,7 +1925,7 @@ class StockEntry(StockController):
 			se_child.qty = flt(item_row["qty"], se_child.precision("qty"))
 			se_child.allow_alternative_item = item_row.get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_row.get("main_item_code")
-			se_child.cost_center = item_row.get("cost_center") or get_default_cost_center(
+			se_child.cost_center = cost_center or item_row.get("cost_center") or get_default_cost_center(
 				item_row, company=self.company
 			)
 			se_child.is_finished_item = item_row.get("is_finished_item", 0)
