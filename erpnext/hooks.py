@@ -486,7 +486,7 @@ scheduler_events = {
 	"hourly_long": [
 		"erpnext.accounts.doctype.subscription.subscription.process_all",
 		"erpnext.stock.doctype.repost_item_valuation.repost_item_valuation.repost_entries",
-		"erpnext.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
+		#"erpnext.hr.doctype.shift_type.shift_type.process_auto_attendance_for_all_shifts",
 	],
 	"daily": [
 		"erpnext.support.doctype.issue.issue.auto_close_tickets",
