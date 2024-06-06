@@ -201,6 +201,12 @@ class DeliveryNote(SellingController):
 		else:
 			self.queue_action('submit',queue_name="dn_tertiary")
 	def before_save(self):
+		for item in self.items:
+			_cost_center = None
+			if self.section !=None:
+				_cost_center = frappe.db.sql(f"""SELECT cost_center FROM `tabSection Warehouse` where  `parent`='{self.section}' and company='{self.company}'""",as_dict=True)
+				if _cost_center != None:
+					item.cost_center = _cost_center[0]['cost_center']
 		## id returnable
 		if self.is_return:
 			return
