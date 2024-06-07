@@ -59,7 +59,7 @@ frappe.ui.form.on('Material Request', {
 		}
 	},
 
-	type: function(frm) {
+	material_request_type: function(frm) {
 		if(frm.doc.material_request_type == "Purchase"){
 			frm.get_field("items").grid.toggle_enable("uom", 0);
 			frm.get_field("items").grid.toggle_enable("item_name", 0);
