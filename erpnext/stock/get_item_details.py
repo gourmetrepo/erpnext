@@ -613,7 +613,7 @@ def get_price_list_rate(args, item_doc, out):
 					idr.category IN ('Buying Rate','Fresh Item Rate')
 					AND idr.company = %s
 					AND idrt.item_code = %s
-					AND idrt,supplier_code = %s
+					AND idrt.supplier_code = %s
 					AND idr.docstatus = 1
 					AND idr.rate_date <= %s
 				ORDER BY idr.rate_date DESC
