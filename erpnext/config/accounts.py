@@ -496,6 +496,12 @@ def get_data():
 			"label": _("Reports"),
 			"icon": "fa fa-table",
 			"items": [
+        		{
+					"type": "report",
+					"is_query_report": False,
+					"name": "Gate To Purchase Analysis",
+					"doctype": "Purchase Receipt"
+				},
 				{
 					"type": "report",
 					"name": "Trial Balance for Party",
