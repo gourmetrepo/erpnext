@@ -431,7 +431,20 @@ erpnext.utils.select_alternate_items = function(opts) {
 						frappe.model.set_value(row.doctype, row.name, 'qty', qty);
 						frappe.model.set_value(row.doctype, row.name,
 							opts.original_item_field, d.item_code);
-					});
+						frappe.call({
+							method: "frappe.client.get_value",
+							args: {
+								doctype: "Item",
+								fieldname: "item_name",
+								filters: { name: d.alternate_item },
+							},
+							callback: function(r, rt) {
+								if(r.message) {
+									frappe.model.set_value(row.doctype, row.name,'item_name', r.message.item_name);
+								}
+							}
+						});
+					});	
 			});
 
 			refresh_field(opts.child_docname);
