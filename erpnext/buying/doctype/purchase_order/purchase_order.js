@@ -41,6 +41,8 @@ frappe.ui.form.on("Purchase Order", {
 			// price_list_field.read_only = 1;
 			frm.get_field("items").grid.toggle_enable("rate", 0);
 			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			frm.get_field("items").grid.toggle_enable("uom", 0);
+			frm.get_field("items").grid.toggle_enable("item_name", 0);
 			refresh_field("items");
 		}else{
 			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
@@ -108,6 +110,8 @@ frappe.ui.form.on("Purchase Order", {
 			// price_list_field.read_only = 1;
 			frm.get_field("items").grid.toggle_enable("rate", 0);
 			frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			frm.get_field("items").grid.toggle_enable("uom", 0);
+			frm.get_field("items").grid.toggle_enable("item_name", 0);
 			refresh_field("items");
 		}else{
 			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", frm.doc.name);
@@ -164,6 +168,8 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			// price_list_field.read_only = 1;
 			this.frm.get_field("items").grid.toggle_enable("rate", 0);
 			this.frm.get_field("items").grid.toggle_enable("price_list_rate", 0);
+			this.frm.get_field("items").grid.toggle_enable("uom", 0);
+			this.frm.get_field("items").grid.toggle_enable("item_name", 0);
 			refresh_field("items");
 		}else{
 			// var rate_field = frappe.meta.get_docfield("Purchase Order Item","rate", this.frm.doc.name);
