@@ -626,7 +626,7 @@ def get_price_list_rate(args, item_doc, out):
 					category IN ('Buying Rate','Fresh Item Rate')
 					AND company = %s
 					AND item_code = %s
-					AND supplier_code = %s
+					-- AND supplier_code = %s
 					AND docstatus = 1
 					AND date <= %s
 				ORDER BY date DESC
