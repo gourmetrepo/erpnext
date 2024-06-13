@@ -596,7 +596,7 @@ def get_price_list_rate(args, item_doc, out):
 					AND supplier_code = %s
 					AND docstatus = 1
 					AND date <= %s
-				ORDER BY date DESC
+				ORDER BY date DESC,creation DESC
 				LIMIT 1
 			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
 
@@ -613,7 +613,7 @@ def get_price_list_rate(args, item_doc, out):
 					AND supplier_code = %s
 					AND docstatus = 1
 					AND date <= %s
-				ORDER BY date DESC
+				ORDER BY date DESC,creation DESC
 				LIMIT 1
 			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
 
@@ -626,10 +626,9 @@ def get_price_list_rate(args, item_doc, out):
 					category IN ('Buying Rate','Fresh Item Rate')
 					AND company = %s
 					AND item_code = %s
-					-- AND supplier_code = %s
 					AND docstatus = 1
 					AND date <= %s
-				ORDER BY date DESC
+				ORDER BY date DESC,creation DESC
 				LIMIT 1
 			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
 
