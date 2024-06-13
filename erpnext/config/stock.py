@@ -254,7 +254,7 @@ def get_data():
 			"items": [
       			 {
 					"type": "report",
-					"is_query_report": False,
+					"is_query_report": True,
 					"name": "Gate To Purchase Analysis",
 					"doctype": "Purchase Receipt",
 					"onboard": 1,
