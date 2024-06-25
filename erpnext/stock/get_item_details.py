@@ -585,14 +585,55 @@ def get_price_list_rate(args, item_doc, out):
   	#daily items list
 		daily_rate_item = get_config_by_name("DAILY_RATE_ITEMS", [])
 		if (args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order') and item_doc.name in daily_rate_item and args.company=='Unit 6':
-			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                            'category':'Daily Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			# oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
+            #                 'category':'Daily Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category='Daily Rate'
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC,creation DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
 		elif args.parenttype == 'Purchase Order' or args.doctype == 'Purchase Order':
-			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                            'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'supplier_code': args.supplier, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			# Combined query for 'Buying Rate' and 'Fresh Item Rate'
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category IN ('Buying Rate','Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND supplier_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC,creation DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, args.supplier, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
 		elif args.parenttype == 'Material Request' or args.doctype == 'Material Request':
-			oblige_rate = flt(frappe.db.get_value('Item Daily Rate Table', {
-                          'category':'Buying Rate','company':args.company, 'item_code': item_doc.name, 'docstatus': '1', 'date': ["<=", frappe.utils.now()]}, 'new_rate'))
+			rate = frappe.db.sql("""
+				SELECT new_rate FROM `tabItem Daily Rate Table`
+				WHERE
+					category IN ('Buying Rate','Fresh Item Rate')
+					AND company = %s
+					AND item_code = %s
+					AND docstatus = 1
+					AND date <= %s
+				ORDER BY date DESC,creation DESC
+				LIMIT 1
+			""", (args.company, item_doc.name, frappe.utils.now()), as_dict=True)
+
+			# Assign the oblige rate
+			oblige_rate = flt(rate[0].new_rate) if rate else None
 			
 
 		if  oblige_rate== None or oblige_rate == 0:

@@ -1282,6 +1282,13 @@ class StockEntry(StockController):
 
 	def add_to_stock_entry_detail(self, item_dict, bom_no=None):
 		for d in item_dict:
+			#samad comment cost_center
+			_cost_center = None
+			if self.work_order !=None:
+				_cost_center = frappe.db.sql(f"""SELECT cost_center FROM `tabSection Warehouse` AS sw
+												INNER JOIN `tabWork Order` AS wo ON wo.item_section =sw.`parent` AND wo.`name`='{self.work_order}' and sw.company='{self.company}'""",as_dict=True)
+			
+   			
 			stock_uom = item_dict[d].get("stock_uom") or frappe.db.get_value("Item", d, "stock_uom")
 
 			se_child = self.append('items')
@@ -1293,7 +1300,7 @@ class StockEntry(StockController):
 			se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
-			se_child.cost_center = (item_dict[d].get("cost_center") or
+			se_child.cost_center = _cost_center[0]['cost_center'] or (item_dict[d].get("cost_center") or
 				get_default_cost_center(item_dict[d], company = self.company))
 
 			for field in ["idx", "po_detail", "original_item",

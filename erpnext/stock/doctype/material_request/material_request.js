@@ -51,7 +51,22 @@ frappe.ui.form.on('Material Request', {
 				filters: {'company': doc.company}
 			};
 		});
+		
+		if(frm.doc.material_request_type == "Purchase"){
+			frm.get_field("items").grid.toggle_enable("uom", 0);
+			frm.get_field("items").grid.toggle_enable("item_name", 0);
+			refresh_field("items");
+		}
 	},
+
+	material_request_type: function(frm) {
+		if(frm.doc.material_request_type == "Purchase"){
+			frm.get_field("items").grid.toggle_enable("uom", 0);
+			frm.get_field("items").grid.toggle_enable("item_name", 0);
+			refresh_field("items");
+		}
+	},
+
 	company:function(frm){
 		frm.set_value("items",[]);
 		refresh_field("items");
@@ -70,6 +85,12 @@ frappe.ui.form.on('Material Request', {
 	refresh: function(frm) {
 		frm.events.make_custom_buttons(frm);
 		frm.toggle_reqd('customer', frm.doc.material_request_type=="Customer Provided");
+
+		if(frm.doc.material_request_type == "Purchase"){
+			frm.get_field("items").grid.toggle_enable("uom", 0);
+			frm.get_field("items").grid.toggle_enable("item_name", 0);
+			refresh_field("items");
+		}
 	},
 
 	make_custom_buttons: function(frm) {
@@ -399,6 +420,12 @@ erpnext.buying.MaterialRequestController = erpnext.buying.BuyingController.exten
 				}
 			}
 		});
+		
+		if(this.frm.doc.material_request_type == "Purchase"){
+			this.frm.get_field("items").grid.toggle_enable("uom", 0);
+			this.frm.get_field("items").grid.toggle_enable("item_name", 0);
+			refresh_field("items");
+		}
 	},
 
 	items_add: function(doc, cdt, cdn) {

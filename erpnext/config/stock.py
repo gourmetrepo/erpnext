@@ -252,6 +252,13 @@ def get_data():
 			"label": _("Key Reports"),
 			"icon": "fa fa-table",
 			"items": [
+      			 {
+					"type": "report",
+					"is_query_report": True,
+					"name": "Gate To Purchase Analysis",
+					"doctype": "Purchase Receipt",
+					"onboard": 1,
+				},
 				{
 					"type": "report",
 					"is_query_report": False,

@@ -44,7 +44,7 @@ class LeaveApplication(Document):
    
 	def submit(self):
 		frappe.db.sql(f"update `tabLeave Application` set status = 'Approved' where name = '{self.name}'",auto_commit=True)
-		self.queue_action('submit',queue_name="hr_primary")
+		self.queue_action('submit',queue_name="hr_secondary")
 
 	def on_submit(self):
 		if self.status == "Open":

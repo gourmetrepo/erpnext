@@ -40,6 +40,12 @@ class PurchaseOrder(BuyingController):
 		}]
 
 	def validate(self):
+		if self.purchase_order_type in ('Local','Import'):
+			for d in self.get("items"):
+				if d.discount_percentage != 0.0:
+					frappe.throw(_("{0} Item rate is not according to buying & daily rate. Please contact to support team.")
+						.format(d.item_code))
+     
 		if self.docstatus == 1 :
 			self.set_status()
 			self.check_on_hold_or_closed_status()

@@ -496,6 +496,7 @@ def get_data():
 			"label": _("Reports"),
 			"icon": "fa fa-table",
 			"items": [
+        		
 				{
 					"type": "report",
 					"name": "Trial Balance for Party",
