@@ -85,7 +85,9 @@ class LeaveApplication(Document):
 			if frappe.db.get_single_value("HR Settings", "send_leave_notification"):
 				self.notify_leave_approver()
 
-		share_doc_with_approver(self, self.leave_approver)
+	def submit(self):
+		frappe.db.sql(f"update `tabLeave Application` set status = 'Approved' where name = '{self.name}'",auto_commit=True)
+		self.queue_action('submit', queue="long")
 
 	def on_submit(self):
 		if self.status in ["Open", "Cancelled"]:
