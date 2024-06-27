@@ -259,6 +259,13 @@ def get_data():
 					"doctype": "Purchase Receipt",
 					"onboard": 1,
 				},
+         		  {
+					"type": "report",
+					"is_query_report": True,
+					"name": "Stock Value Report",
+					"doctype": "GL Entry",
+					"onboard": 1,
+				},
 				{
 					"type": "report",
 					"is_query_report": False,
