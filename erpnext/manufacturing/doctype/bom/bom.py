@@ -219,9 +219,32 @@ class BOM(WebsiteGenerator):
 					if self.rm_cost_as_per == 'Valuation Rate':
 						rate = self.get_valuation_rate(arg) * (arg.get("conversion_factor") or 1)
 					elif self.rm_cost_as_per == 'Last Purchase Rate':
-						rate = flt(arg.get('last_purchase_rate') \
-							or frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")) \
-								* (arg.get("conversion_factor") or 1)
+						last_purchase_rate = None
+						last_purchase_rate_result = frappe.db.sql("""
+															SELECT incoming_rate 
+															FROM `tabStock Ledger Entry` 
+															WHERE voucher_type='Purchase Receipt' 
+															AND item_code=%s 
+															AND company=%s
+															ORDER BY creation DESC 
+															LIMIT 1""",
+															(arg['item_code'], self.company), 
+															as_dict=True)
+
+						if last_purchase_rate_result:
+							last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
+						
+						if not last_purchase_rate:
+							last_purchase_rate = frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")
+
+						conversion_factor = arg.get("conversion_factor") or 1
+						rate = flt(last_purchase_rate) * flt(conversion_factor)
+      
+						#comment by samad to add company wise rate 
+						# rate = flt(last_purchase_rate['incoming_rate']) \
+						# 		or flt(arg.get('last_purchase_rate') \
+						# 		or frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")) \
+						# 		* (arg.get("conversion_factor") or 1)
 					elif self.rm_cost_as_per == "Price List":
 						if not self.buying_price_list:
 							frappe.throw(_("Please select Price List"))
