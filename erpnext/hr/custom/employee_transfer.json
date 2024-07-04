@@ -1,0 +1,31 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Employee Transfer",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2024-06-26 14:07:06.941341",
+   "default_value": null,
+   "doc_type": "Employee Transfer",
+   "docstatus": 0,
+   "doctype_or_field": "DocType",
+   "field_name": null,
+   "idx": 0,
+   "modified": "2024-06-26 14:07:06.941341",
+   "modified_by": "muhammad.rauf@gourmetpakistan.com",
+   "name": "Employee Transfer-allow_import",
+   "owner": "muhammad.rauf@gourmetpakistan.com",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "allow_import",
+   "property_type": "Check",
+   "value": "1"
+  }
+ ],
+ "sync_on_migrate": 1
+}

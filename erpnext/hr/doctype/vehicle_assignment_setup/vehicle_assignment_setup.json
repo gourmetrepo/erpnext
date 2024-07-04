@@ -1,0 +1,60 @@
+{
+ "creation": "2024-05-10 11:52:54.406284",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vehicle_code",
+  "company",
+  "maintenance_items",
+  "section_break_4"
+ ],
+ "fields": [
+  {
+   "fieldname": "vehicle_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Vehicle Code",
+   "options": "Vehicle",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "vehicle_code.company",
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "maintenance_items",
+   "fieldtype": "Table",
+   "label": "Maintanance Items",
+   "options": "Maintenance Mileage Setup"
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "modified": "2024-05-10 11:55:56.801724",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Vehicle Assignment Setup",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
