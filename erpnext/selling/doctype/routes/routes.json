@@ -1,0 +1,57 @@
+{
+ "creation": "2024-02-07 14:54:38.962084",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "route_title",
+  "data_2",
+  "data_3",
+  "data_4"
+ ],
+ "fields": [
+  {
+   "fieldname": "route_title",
+   "fieldtype": "Text",
+   "ignore_user_permissions": 1,
+   "in_list_view": 1,
+   "label": "Route Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "data_2",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "data_3",
+   "fieldtype": "Data"
+  },
+  {
+   "fieldname": "data_4",
+   "fieldtype": "Data"
+  }
+ ],
+ "modified": "2024-02-07 14:54:45.843186",
+ "modified_by": "Administrator",
+ "module": "Selling",
+ "name": "Routes",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

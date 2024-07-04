@@ -1,0 +1,91 @@
+{
+ "autoname": "hash",
+ "creation": "2024-05-10 11:36:28.233067",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_code",
+  "item_name",
+  "mileage",
+  "current_odometer_reading",
+  "previous_odometer_reading",
+  "caution_alert",
+  "replace_it_alert",
+  "red_alert",
+  "mileage_uom"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "item_code.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "mileage",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Mileage",
+   "reqd": 1
+  },
+  {
+   "fieldname": "current_odometer_reading",
+   "fieldtype": "Int",
+   "label": "Current Odometer Reading"
+  },
+  {
+   "fieldname": "previous_odometer_reading",
+   "fieldtype": "Int",
+   "label": "Previous Odometer Reading"
+  },
+  {
+   "fieldname": "caution_alert",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Caution Alert",
+   "reqd": 1
+  },
+  {
+   "fieldname": "replace_it_alert",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Replace It Alert",
+   "reqd": 1
+  },
+  {
+   "fieldname": "red_alert",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Red Alert",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mileage_uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Mileage UOM",
+   "options": "UOM",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2024-05-10 14:49:10.261137",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Maintenance Mileage Setup",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
