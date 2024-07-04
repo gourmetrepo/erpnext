@@ -93,7 +93,7 @@ class BOM(WebsiteGenerator):
 
 	def get_item_det(self, item_code):
 		item = frappe.db.sql("""SELECT 
-						NAME, 
+						name, 
 						item_name, 
 						docstatus, 
 						description, 
@@ -115,7 +115,7 @@ class BOM(WebsiteGenerator):
 					FROM 
 						`tabItem` AS item
 					WHERE 
-						NAME=%s""", item_code,self.company,item_code, as_dict = 1)
+						name=%s""", (item_code,self.company,item_code), as_dict = 1)
 
 		if not item:
 			frappe.throw(_("Item: {0} does not exist in the system").format(item_code))
