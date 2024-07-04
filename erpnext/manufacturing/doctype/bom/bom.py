@@ -109,6 +109,19 @@ class BOM(WebsiteGenerator):
 							AND company=%s
 							ORDER BY creation DESC 
 							LIMIT 1),
+					   		(SELECT incoming_rate 
+							FROM `tabStock Ledger Entry` 
+							WHERE voucher_type='Stock Entry' 
+							AND item_code=%s 
+							AND company=%s
+							ORDER BY creation DESC 
+							LIMIT 1),
+					   		(SELECT incoming_rate 
+							FROM `tabStock Ledger Entry` 
+							WHERE item_code=%s 
+							AND company=%s
+							ORDER BY creation DESC 
+							LIMIT 1),
 							item.last_purchase_rate
 						) AS last_purchase_rate, 
 						include_item_in_manufacturing
