@@ -219,24 +219,8 @@ class BOM(WebsiteGenerator):
 					if self.rm_cost_as_per == 'Valuation Rate':
 						rate = self.get_valuation_rate(arg) * (arg.get("conversion_factor") or 1)
 					elif self.rm_cost_as_per == 'Last Purchase Rate':
-						last_purchase_rate = None
-						last_purchase_rate_result = frappe.db.sql("""
-															SELECT incoming_rate 
-															FROM `tabStock Ledger Entry` 
-															WHERE voucher_type='Purchase Receipt' 
-															AND item_code=%s 
-															AND company=%s
-															ORDER BY creation DESC 
-															LIMIT 1""",
-															(arg['item_code'], self.company), 
-															as_dict=True)
-
-						if last_purchase_rate_result:
-							last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
+						last_purchase_rate = get_item_rate(arg['item_code'], self.company)
 						
-						if not last_purchase_rate:
-							last_purchase_rate = frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")
-
 						conversion_factor = arg.get("conversion_factor") or 1
 						rate = flt(last_purchase_rate) * flt(conversion_factor)
       
@@ -276,6 +260,7 @@ class BOM(WebsiteGenerator):
 								.format(self.rm_cost_as_per, arg["item_code"]), alert=True)
 
 		return flt(rate) * flt(self.plc_conversion_rate or 1) / (self.conversion_rate or 1)
+	
 
 	def update_cost(self, update_parent=True, from_child_bom=False, save=True):
 		if self.docstatus == 2:
@@ -954,3 +939,60 @@ def get_bom_diff(bom1, bom2):
 					out.removed.append([df.fieldname, d.as_dict()])
 
 	return out
+
+
+
+
+
+
+def get_item_rate(item_code, company):
+		last_purchase_rate = None
+		last_purchase_rate_result = frappe.db.sql("""
+										SELECT incoming_rate 
+										FROM `tabStock Ledger Entry` 
+										WHERE voucher_type='Purchase Receipt' 
+										AND item_code=%s 
+										AND company=%s
+										ORDER BY creation DESC 
+										LIMIT 1""",
+										(item_code, company), 
+										as_dict=True)
+		if last_purchase_rate_result:
+			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
+						
+		if not last_purchase_rate:
+			last_stock_entry_rate_result = frappe.db.sql("""
+								SELECT incoming_rate 
+								FROM `tabStock Ledger Entry` 
+								WHERE voucher_type='Stock Entry' 
+								AND item_code=%s 
+								AND company=%s
+								ORDER BY creation DESC 
+								LIMIT 1""",
+								(item_code, company), 
+								as_dict=True)
+			if last_stock_entry_rate_result:
+				last_purchase_rate = last_stock_entry_rate_result[0].get('incoming_rate')
+			
+			if not last_purchase_rate:
+				last_stock_ledger_rate_result = frappe.db.sql("""
+								SELECT incoming_rate 
+								FROM `tabStock Ledger Entry` 
+								AND item_code=%s 
+								AND company=%s
+								ORDER BY creation DESC 
+								LIMIT 1""",
+								(item_code, company), 
+								as_dict=True)
+				if last_stock_ledger_rate_result:
+					last_purchase_rate = last_stock_ledger_rate_result[0].get('incoming_rate')
+
+				if not last_purchase_rate:
+					last_purchase_rate = frappe.db.get_value("Item", item_code, "last_purchase_rate")
+					return last_purchase_rate
+				else:
+					return last_purchase_rate
+			else:
+				return last_purchase_rate				
+		else:
+			return last_purchase_rate
