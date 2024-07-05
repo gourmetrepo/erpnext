@@ -950,11 +950,11 @@ def get_item_rate(item_code, company):
 		last_purchase_rate_result = frappe.db.sql("""
 										SELECT incoming_rate 
 										FROM `tabStock Ledger Entry` 
-										WHERE item_code=%s 
-										AND company=%s
+										WHERE company=%s
+										AND	item_code=%s 
 										ORDER BY creation DESC 
 										LIMIT 1""",
-										(item_code, company), 
+										(company,item_code), 
 										as_dict=True)
 		if last_purchase_rate_result:
 			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
