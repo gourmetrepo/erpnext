@@ -1,0 +1,163 @@
+{
+ "creation": "2024-07-05 13:27:26.684405",
+ "doctype": "DocType",
+ "document_type": "Setup",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_name",
+  "column_break_3",
+  "section_break_5",
+  "description",
+  "col_break1",
+  "image",
+  "image_view",
+  "quantity_and_rate",
+  "qty",
+  "uom",
+  "column_break_11",
+  "rate_amount_section",
+  "rate",
+  "base_rate",
+  "column_break_21",
+  "amount",
+  "base_amount",
+  "qty_consumed_per_unit"
+ ],
+ "fields": [
+  {
+   "columns": 3,
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_5",
+   "fieldtype": "Section Break",
+   "label": "Description"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Item Description",
+   "oldfieldname": "description",
+   "oldfieldtype": "Text",
+   "print_width": "250px",
+   "width": "250px"
+  },
+  {
+   "fieldname": "col_break1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "image",
+   "fieldtype": "Attach",
+   "hidden": 1,
+   "label": "Image",
+   "print_hide": 1
+  },
+  {
+   "fieldname": "image_view",
+   "fieldtype": "Image",
+   "label": "Image View",
+   "options": "image"
+  },
+  {
+   "fieldname": "quantity_and_rate",
+   "fieldtype": "Section Break",
+   "label": "Quantity and Rate"
+  },
+  {
+   "columns": 2,
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty",
+   "oldfieldname": "qty",
+   "oldfieldtype": "Currency",
+   "reqd": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "UOM",
+   "options": "UOM",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_11",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rate_amount_section",
+   "fieldtype": "Section Break",
+   "label": "Rate & Amount"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate",
+   "options": "currency",
+   "reqd": 1
+  },
+  {
+   "fieldname": "base_rate",
+   "fieldtype": "Currency",
+   "label": "Basic Rate (Company Currency)",
+   "options": "Company:company:default_currency",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount",
+   "oldfieldname": "amount_as_per_mar",
+   "oldfieldtype": "Currency",
+   "options": "currency",
+   "print_width": "150px",
+   "read_only": 1,
+   "width": "150px"
+  },
+  {
+   "fieldname": "base_amount",
+   "fieldtype": "Currency",
+   "label": "Amount (Company Currency)",
+   "options": "Company:company:default_currency",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "qty_consumed_per_unit",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "label": "Qty Consumed Per Unit",
+   "oldfieldname": "qty_consumed_per_unit",
+   "oldfieldtype": "Float",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2024-07-05 13:27:26.684405",
+ "modified_by": "Administrator",
+ "module": "Manufacturing",
+ "name": "BOM Other Items",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
