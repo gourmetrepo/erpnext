@@ -1,5 +1,5 @@
 {
- "creation": "2024-07-05 13:27:26.684405",
+ "creation": "2024-07-02 16:27:28.894988",
  "doctype": "DocType",
  "document_type": "Setup",
  "editable_grid": 1,
@@ -15,21 +15,21 @@
   "quantity_and_rate",
   "qty",
   "uom",
-  "column_break_11",
+  "col_break2",
   "rate_amount_section",
   "rate",
   "base_rate",
   "column_break_21",
   "amount",
-  "base_amount",
-  "qty_consumed_per_unit"
+  "base_amount"
  ],
  "fields": [
   {
    "columns": 3,
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "label": "Item Name"
+   "label": "Item Name",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_3",
@@ -92,7 +92,7 @@
    "reqd": 1
   },
   {
-   "fieldname": "column_break_11",
+   "fieldname": "col_break2",
    "fieldtype": "Column Break"
   },
   {
@@ -139,20 +139,10 @@
    "options": "Company:company:default_currency",
    "print_hide": 1,
    "read_only": 1
-  },
-  {
-   "fieldname": "qty_consumed_per_unit",
-   "fieldtype": "Float",
-   "hidden": 1,
-   "label": "Qty Consumed Per Unit",
-   "oldfieldname": "qty_consumed_per_unit",
-   "oldfieldtype": "Float",
-   "print_hide": 1,
-   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2024-07-05 13:27:26.684405",
+ "modified": "2024-07-02 16:30:36.968350",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "BOM Other Items",

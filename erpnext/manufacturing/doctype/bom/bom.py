@@ -92,13 +92,34 @@ class BOM(WebsiteGenerator):
 		self.manage_default_bom()
 
 	def get_item_det(self, item_code):
-		item = frappe.db.sql("""select name, item_name, docstatus, description, image,
-			is_sub_contracted_item, stock_uom, default_bom, last_purchase_rate, include_item_in_manufacturing
-			from `tabItem` where name=%s""", item_code, as_dict = 1)
-
+		
+		item = frappe.db.sql("""SELECT 
+				name, 
+				item_name, 
+				docstatus, 
+				description, 
+				image,
+				is_sub_contracted_item, 
+				stock_uom, 
+				default_bom, 
+				COALESCE(
+					(SELECT incoming_rate 
+					FROM `tabStock Ledger Entry` 
+					WHERE voucher_type='Purchase Receipt' 
+					AND item_code=%s 
+					AND company=%s
+					ORDER BY creation DESC 
+					LIMIT 1),
+					item.last_purchase_rate
+				) AS last_purchase_rate, 
+				include_item_in_manufacturing
+			FROM 
+				`tabItem` AS item
+			WHERE 
+				name=%s""", (item_code,self.company,item_code), as_dict = 1)
 		if not item:
 			frappe.throw(_("Item: {0} does not exist in the system").format(item_code))
-
+			
 		return item
 
 	def get_routing(self):
@@ -198,9 +219,16 @@ class BOM(WebsiteGenerator):
 					if self.rm_cost_as_per == 'Valuation Rate':
 						rate = self.get_valuation_rate(arg) * (arg.get("conversion_factor") or 1)
 					elif self.rm_cost_as_per == 'Last Purchase Rate':
-						rate = flt(arg.get('last_purchase_rate') \
-							or frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")) \
-								* (arg.get("conversion_factor") or 1)
+						last_purchase_rate = get_item_rate(arg['item_code'], self.company)
+						
+						conversion_factor = arg.get("conversion_factor") or 1
+						rate = flt(last_purchase_rate) * flt(conversion_factor)
+      
+						#comment by samad to add company wise rate 
+						# rate = flt(last_purchase_rate['incoming_rate']) \
+						# 		or flt(arg.get('last_purchase_rate') \
+						# 		or frappe.db.get_value("Item", arg['item_code'], "last_purchase_rate")) \
+						# 		* (arg.get("conversion_factor") or 1)
 					elif self.rm_cost_as_per == "Price List":
 						if not self.buying_price_list:
 							frappe.throw(_("Please select Price List"))
@@ -232,6 +260,7 @@ class BOM(WebsiteGenerator):
 								.format(self.rm_cost_as_per, arg["item_code"]), alert=True)
 
 		return flt(rate) * flt(self.plc_conversion_rate or 1) / (self.conversion_rate or 1)
+	
 
 	def update_cost(self, update_parent=True, from_child_bom=False, save=True):
 		if self.docstatus == 2:
@@ -910,3 +939,47 @@ def get_bom_diff(bom1, bom2):
 					out.removed.append([df.fieldname, d.as_dict()])
 
 	return out
+
+
+
+
+
+
+def get_item_rate(item_code, company):
+		last_purchase_rate = None
+		last_purchase_rate_result = frappe.db.sql("""
+										SELECT incoming_rate, voucher_no 
+										FROM `tabStock Ledger Entry` 
+										WHERE voucher_type = "Purchase Receipt" 
+										AND company=%s
+										AND	item_code=%s 
+										ORDER BY creation DESC 
+										LIMIT 1""",
+										(company,item_code), 
+										as_dict=True)
+		
+		# Don't consider incoming_rate coming from purchase receipts for opening balance suppliers
+		if len(last_purchase_rate_result) > 0 and frappe.db.get_value("Purchase Receipt", last_purchase_rate_result[0]['voucher_no'], 'supplier') != "SUP-2021-00001":
+			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
+			return last_purchase_rate
+		
+		if not last_purchase_rate:
+			last_purchase_stock_entry_result = frappe.db.sql("""
+										SELECT valuation_rate 
+										FROM `tabStock Ledger Entry` 
+										WHERE voucher_type = "Stock Entry" 
+										AND company=%s
+										AND	item_code=%s 
+										ORDER BY creation DESC 
+										LIMIT 1""",
+										(company,item_code), 
+										as_dict=True)
+			
+			if last_purchase_stock_entry_result:
+				last_purchase_rate = last_purchase_stock_entry_result[0].get('valuation_rate')
+				return last_purchase_rate
+				
+			if not last_purchase_rate:
+				last_purchase_rate = frappe.db.get_value("Item", item_code, "last_purchase_rate")
+				return last_purchase_rate
+
