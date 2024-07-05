@@ -948,15 +948,18 @@ def get_bom_diff(bom1, bom2):
 def get_item_rate(item_code, company):
 		last_purchase_rate = None
 		last_purchase_rate_result = frappe.db.sql("""
-										SELECT incoming_rate 
+										SELECT incoming_rate, voucher_no 
 										FROM `tabStock Ledger Entry` 
-										WHERE company=%s
+										WHERE voucher_type = "Purchase Receipt" 
+										AND company=%s
 										AND	item_code=%s 
 										ORDER BY creation DESC 
 										LIMIT 1""",
 										(company,item_code), 
 										as_dict=True)
-		if last_purchase_rate_result:
+		
+		# Don't consider incoming_rate coming from purchase receipts for opening balance suppliers
+		if frappe.db.get_value("Purchase Receipt", last_purchase_rate_result[0]['voucher_no'], 'supplier') != "SUP-2021-00001":
 			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
 						
 		if not last_purchase_rate:
