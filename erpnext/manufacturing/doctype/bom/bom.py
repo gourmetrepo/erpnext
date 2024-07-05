@@ -93,25 +93,33 @@ class BOM(WebsiteGenerator):
 
 	def get_item_det(self, item_code):
 		
-		last_purchase_rate_from_stock_ledger = frappe.get_value('Stock Ledger Entry', 
-			{
-				'voucher_type': 'Purchase Receipt',
-				'item_code': item_code,
-				'company': self.company
-			},
-			'incoming_rate',
-			order_by='creation desc'
-		)
-
-		item = frappe.db.sql("""select name, item_name, docstatus, description, image,
-			is_sub_contracted_item, stock_uom, default_bom, last_purchase_rate, include_item_in_manufacturing
-			from `tabItem` where name=%s""", item_code, as_dict = 1)				
-
+		item = frappe.db.sql("""SELECT 
+				name, 
+				item_name, 
+				docstatus, 
+				description, 
+				image,
+				is_sub_contracted_item, 
+				stock_uom, 
+				default_bom, 
+				COALESCE(
+					(SELECT incoming_rate 
+					FROM `tabStock Ledger Entry` 
+					WHERE voucher_type='Purchase Receipt' 
+					AND item_code=%s 
+					AND company=%s
+					ORDER BY creation DESC 
+					LIMIT 1),
+					item.last_purchase_rate
+				) AS last_purchase_rate, 
+				include_item_in_manufacturing
+			FROM 
+				`tabItem` AS item
+			WHERE 
+				name=%s""", (item_code,self.company,item_code), as_dict = 1)
 		if not item:
 			frappe.throw(_("Item: {0} does not exist in the system").format(item_code))
-
-		if last_purchase_rate_from_stock_ledger is not None:
-			item[0]['last_purchase_rate'] = last_purchase_rate_from_stock_ledger
+			
 		return item
 
 	def get_routing(self):
@@ -942,8 +950,7 @@ def get_item_rate(item_code, company):
 		last_purchase_rate_result = frappe.db.sql("""
 										SELECT incoming_rate 
 										FROM `tabStock Ledger Entry` 
-										WHERE voucher_type='Purchase Receipt' 
-										AND item_code=%s 
+										WHERE item_code=%s 
 										AND company=%s
 										ORDER BY creation DESC 
 										LIMIT 1""",
@@ -953,38 +960,7 @@ def get_item_rate(item_code, company):
 			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
 						
 		if not last_purchase_rate:
-			last_stock_entry_rate_result = frappe.db.sql("""
-								SELECT incoming_rate 
-								FROM `tabStock Ledger Entry` 
-								WHERE voucher_type='Stock Entry' 
-								AND item_code=%s 
-								AND company=%s
-								ORDER BY creation DESC 
-								LIMIT 1""",
-								(item_code, company), 
-								as_dict=True)
-			if last_stock_entry_rate_result:
-				last_purchase_rate = last_stock_entry_rate_result[0].get('incoming_rate')
-			
-			if not last_purchase_rate:
-				last_stock_ledger_rate_result = frappe.db.sql("""
-								SELECT incoming_rate 
-								FROM `tabStock Ledger Entry` 
-								WHERE item_code=%s 
-								AND company=%s
-								ORDER BY creation DESC 
-								LIMIT 1""",
-								(item_code, company), 
-								as_dict=True)
-				if last_stock_ledger_rate_result:
-					last_purchase_rate = last_stock_ledger_rate_result[0].get('incoming_rate')
-
-				if not last_purchase_rate:
-					last_purchase_rate = frappe.db.get_value("Item", item_code, "last_purchase_rate")
-					return last_purchase_rate
-				else:
-					return last_purchase_rate
-			else:
-				return last_purchase_rate				
+			last_purchase_rate = frappe.db.get_value("Item", item_code, "last_purchase_rate")
+			return last_purchase_rate
 		else:
 			return last_purchase_rate
