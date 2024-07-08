@@ -66,6 +66,7 @@ class BOM(WebsiteGenerator):
 		self.validate_operations()
 		self.calculate_cost()
 		self.update_cost(update_parent=False, from_child_bom=True, save=False)
+		
 
 	def get_context(self, context):
 		context.parents = [{'name': 'boms', 'title': _('All BOMs') }]
@@ -93,6 +94,24 @@ class BOM(WebsiteGenerator):
 
 	def get_item_det(self, item_code):
 		
+		"""
+
+		Note: 
+		Reason to use separate queries is that db was working slow when applying limit on 
+		query while fetching incoming rates, so we decided to allow all records for now 
+		and pick the first record from code (if exists) and replace it with item 
+		last purchase rate (working of COALESCE)
+		
+		"""
+
+		incoming_rate = frappe.db.sql("""SELECT incoming_rate 
+					FROM `tabStock Ledger Entry` 
+					WHERE voucher_type='Purchase Receipt' 
+					AND voucher_no not in (select name from `tabPurchase Receipt` where supplier = "SUP-2021-00001")
+					AND item_code=%s 
+					AND company=%s
+					ORDER BY creation DESC
+					""", (item_code,self.company), as_dict = 1)
 		item = frappe.db.sql("""SELECT 
 				name, 
 				item_name, 
@@ -102,21 +121,14 @@ class BOM(WebsiteGenerator):
 				is_sub_contracted_item, 
 				stock_uom, 
 				default_bom, 
-				COALESCE(
-					(SELECT incoming_rate 
-					FROM `tabStock Ledger Entry` 
-					WHERE voucher_type='Purchase Receipt' 
-					AND item_code=%s 
-					AND company=%s
-					ORDER BY creation DESC 
-					LIMIT 1),
-					item.last_purchase_rate
-				) AS last_purchase_rate, 
+				last_purchase_rate, 
 				include_item_in_manufacturing
 			FROM 
 				`tabItem` AS item
 			WHERE 
-				name=%s""", (item_code,self.company,item_code), as_dict = 1)
+				name=%s""", (item_code), as_dict = 1)
+		if len(incoming_rate) > 0 and incoming_rate[0].get('incoming_rate'):
+			item[0].last_purchase_rate = incoming_rate[0].get('incoming_rate')
 		if not item:
 			frappe.throw(_("Item: {0} does not exist in the system").format(item_code))
 			
@@ -666,6 +678,7 @@ class BOM(WebsiteGenerator):
 					d.description = frappe.db.get_value('Operation', d.operation, 'description')
 				if not d.batch_size or d.batch_size <= 0:
 					d.batch_size = 1
+	
 
 def get_list_context(context):
 	context.title = _("Bill of Materials")
@@ -951,15 +964,16 @@ def get_item_rate(item_code, company):
 										SELECT incoming_rate, voucher_no 
 										FROM `tabStock Ledger Entry` 
 										WHERE voucher_type = "Purchase Receipt" 
+										AND voucher_no not in (select name from `tabPurchase Receipt` where supplier = "SUP-2021-00001")
 										AND company=%s
-										AND	item_code=%s 
+										AND	item_code=%s
 										ORDER BY creation DESC 
-										LIMIT 1""",
+										""",
 										(company,item_code), 
 										as_dict=True)
 		
 		# Don't consider incoming_rate coming from purchase receipts for opening balance suppliers
-		if len(last_purchase_rate_result) > 0 and frappe.db.get_value("Purchase Receipt", last_purchase_rate_result[0]['voucher_no'], 'supplier') != "SUP-2021-00001":
+		if len(last_purchase_rate_result) > 0:
 			last_purchase_rate = last_purchase_rate_result[0].get('incoming_rate')
 			return last_purchase_rate
 		
