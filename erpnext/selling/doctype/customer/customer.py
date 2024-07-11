@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 import frappe
+import requests
+import json
 from frappe.model.naming import set_name_by_naming_series
 from frappe import _, msgprint, throw
 import frappe.defaults
@@ -13,6 +15,10 @@ from erpnext.accounts.party import validate_party_accounts, get_dashboard_info, 
 from frappe.contacts.address_and_contact import load_address_and_contact, delete_contact_and_address
 from frappe.model.rename_doc import update_linked_doctypes
 from frappe.model.mapper import get_mapped_doc
+from nrp_manufacturing.utils import get_config_by_name, json_error_response
+from nrp_manufacturing.constants.globals import PERMISSION_ERROR_MSG, ERROR_MSG
+from frappe.exceptions import ValidationError
+
 
 class Customer(TransactionBase):
 	def get_feed(self):
@@ -225,6 +231,63 @@ class Customer(TransactionBase):
 			self.loyalty_program = loyalty_program[0]
 		else:
 			frappe.msgprint(_("Multiple Loyalty Program found for the Customer. Please select manually."))
+
+	def before_save(self):
+		try:
+			if self.customer_group == "Key-Account Customer":
+				from datetime import datetime
+				today =  datetime.now()
+				credit_limit = ''
+				address = ''
+				
+				baseurl =  get_config_by_name("GSSM_BASE_URL")
+				url = baseurl + 'PostKeyAccountCustomer'
+
+				if len(self.credit_limits) > 0:
+					credit_limit = self.credit_limits[0].credit_limit
+
+				if self.customer_primary_address:
+					address_query = f""" SELECT * FROM `tabAddress` WHERE name='{self.customer_primary_address}' """
+					address_obj = frappe.db.sql(address_query, as_dict=True)
+					if len(address_obj) > 0:
+						address = address_obj[0].get("address_line1")
+
+				payload = {
+					"customerName": self.customer_name if self.customer_name else '',
+					"cnic": self.cnic if self.cnic else '',
+					"address": address,
+					"customerCode": self.name if self.name else '',
+					"phoneNumber": self.mobile_no if self.mobile_no else '',
+					"creditLimit": credit_limit
+				}
+
+				# Maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Customer",
+					"doctype": "Nrp Integration",
+					"request": str(payload)
+				}
+				nrp_integeration["title"] = "Key-Account Customer GSSM " + str(today)
+				nrp_logs = frappe.get_doc(nrp_integeration)
+				nrp_logs.save(ignore_permissions=True)
+				response_gssm = []
+
+				data = json.dumps(payload, default=str)
+				headers = {'Content-Type': 'application/json'}
+				response = requests.request("POST", url , headers=headers, data=data)
+				response_gssm.append(response.text)
+				
+				# Maintain logs
+				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+		except ValidationError as error:
+			return json_error_response(str(error))
+		except frappe.PermissionError as error:
+			return json_error_response(PERMISSION_ERROR_MSG)
+		except Exception as error:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback, title="Error While Sync Key-Account Customer")
+			return json_error_response(ERROR_MSG)
+
 
 @frappe.whitelist()
 def make_quotation(source_name, target_doc=None):
