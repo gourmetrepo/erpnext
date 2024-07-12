@@ -146,13 +146,13 @@ frappe.ui.form.on("Delivery Note", {
 			frm.set_df_property('transporter', 'reqd', 0);
 		}else if(frm.doc.customer_type === 'Supplier'){
 			if (frm.doc.company === 'Unit 6') {
-				frm.set_df_property('vehicle_no','hidden', false);		
-				frm.set_df_property('vehicle','hidden', true);
-				frm.set_df_property('vehicle', 'read_only', 1);
-				frm.set_df_property('vehicle_no', 'read_only', 0);
-				frm.set_value("vehicle_no", null);
-				frm.set_df_property('vehicle', 'reqd', 0);
-				frm.set_df_property('vehicle_no', 'reqd', 1);
+				frm.set_df_property('vehicle_no', 'hidden', true);		
+				frm.set_df_property('vehicle', 'hidden', false);
+				frm.set_df_property('vehicle', 'read_only', 0);
+				frm.set_df_property('vehicle_no', 'read_only', 1);
+				frm.set_value("vehicle_no", '');
+				frm.set_df_property('vehicle', 'reqd', 1);
+				frm.set_df_property('vehicle_no', 'reqd', 0);
 			}
 			frm.set_df_property('transporter','hidden',false);
 			frm.set_df_property('transporter_name','hidden',false);		
@@ -165,7 +165,7 @@ frappe.ui.form.on("Delivery Note", {
 		}
 	},
 	vehicle: function(frm) {
-		if (frm.doc.customer_type === 'Employee' && frm.doc.company === 'Unit 6'){
+		if (frm.doc.company === 'Unit 6'){
 				frm.set_df_property('vehicle_no', 'hidden', false);		
 				frm.set_value("vehicle_no", frm.doc.vehicle);
 				frm.set_df_property('vehicle_no', 'read_only', 1);
