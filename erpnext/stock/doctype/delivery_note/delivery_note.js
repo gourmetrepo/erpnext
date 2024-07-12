@@ -165,7 +165,7 @@ frappe.ui.form.on("Delivery Note", {
 		}
 	},
 	vehicle: function(frm) {
-		if (frm.doc.customer_type === 'Employee' && frm.doc.company === 'Unit 6'){
+		if (frm.doc.company === 'Unit 6'){
 				frm.set_df_property('vehicle_no', 'hidden', false);		
 				frm.set_value("vehicle_no", frm.doc.vehicle);
 				frm.set_df_property('vehicle_no', 'read_only', 1);
