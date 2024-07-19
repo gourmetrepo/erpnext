@@ -534,22 +534,44 @@ erpnext.work_order = {
 							consumption_btn.addClass('btn-primary');
 						}
 					}
+					
+					if(frm.doc.company in ["Unit 5", "Unit 8", "Unit 11"]){
+						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+							erpnext.work_order.make_se(frm, 'Return WIP Damage');
+						});
+						damage_return_btn.addClass('btn-secondary');
+					}
+
 
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
+
+					
 
 					if(doc.material_transferred_for_manufacturing>=doc.qty) {
 						// all materials transferred for manufacturing, make this primary
 						finish_btn.addClass('btn-primary');
 					}
+
+
 				}
 			} else {
 				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
+
+					if(frm.doc.company in ["Unit 5", "Unit 8", "Unit 11"]){
+						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+							erpnext.work_order.make_se(frm, 'Return WIP Damage');
+						});
+						damage_return_btn.addClass('btn-secondary');
+					}
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
 					finish_btn.addClass('btn-primary');
+
+
+
 				}
 			}
 		}
