@@ -535,12 +535,12 @@ erpnext.work_order = {
 						}
 					}
 					
-			
+					
 						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
-							erpnext.work_order.make_se(frm, 'Return WIP Damage');
+							erpnext.work_order.make_damage_return_se(frm, 'Return WIP Damage');
 						});
 						damage_return_btn.addClass('btn-secondary');
-				
+					
 
 
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
@@ -559,9 +559,9 @@ erpnext.work_order = {
 			} else {
 				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
 
-					
+				
 						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
-							erpnext.work_order.make_se(frm, 'Return WIP Damage');
+							erpnext.work_order.make_damage_return_se(frm, 'Return WIP Damage');
 						});
 						damage_return_btn.addClass('btn-secondary');
 					
@@ -655,10 +655,37 @@ erpnext.work_order = {
 					'qty': data.qty
 				});
 			}).then(stock_entry => {
+				console.log("new entry: ",stock_entry)
 				frappe.model.sync(stock_entry);
 				frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
 			});
 
+	},
+
+	make_damage_return_se: async function(frm, purpose) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'erpnext.manufacturing.doctype.work_order.work_order.make_damage_return_stock_entry',
+				args: {
+					'work_order_id': frm.doc.name,
+					'purpose': purpose
+				}
+			});
+	
+			if (r && r.message) {
+				console.log("Stock entry:", r.message.doctype);
+	
+				// Sync the returned stock entry with the local model
+				frappe.model.sync(r.message);
+	
+				// Open the form for the newly created stock entry
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making damage return stock entry:', error);
+			// Optionally handle error display or recovery
+		}
 	},
 
 	create_pick_list: function(frm, purpose='Material Transfer for Manufacture') {

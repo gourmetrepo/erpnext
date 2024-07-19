@@ -684,6 +684,41 @@ def make_stock_entry(work_order_id, purpose, qty=None):
 	return stock_entry.as_dict()
 
 @frappe.whitelist()
+def make_damage_return_stock_entry(work_order_id, purpose):
+	work_order = frappe.get_doc("Work Order", work_order_id)
+	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group") \
+			and not work_order.skip_transfer:
+		wip_warehouse = work_order.wip_warehouse
+	else:
+		wip_warehouse = None
+
+	stock_entry = frappe.new_doc("Stock Entry")
+	stock_entry.purpose = purpose
+	stock_entry.work_order = work_order_id
+	stock_entry.company = work_order.company
+	stock_entry.from_bom = 1
+	stock_entry.bom_no = work_order.bom_no
+	stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
+	if work_order.bom_no:
+		stock_entry.inspection_required = frappe.db.get_value('BOM',
+			work_order.bom_no, 'inspection_required')
+
+	if purpose=="Return WIP Damage":
+		damage_warehouse = frappe.db.sql("""
+                                    SELECT damage_warehouse FROM `tabSection Warehouse` 
+								   WHERE parent = '{section}' 
+								   AND company = '{company}';
+                                    """.format( section = work_order.item_section, company = work_order.company), as_dict=1)
+		stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
+		stock_entry.from_warehouse = wip_warehouse
+
+	stock_entry.set_stock_entry_type()
+	stock_entry.get_items()
+	return stock_entry.as_dict()
+
+
+
+@frappe.whitelist()
 def get_default_warehouse():
 	wip_warehouse = frappe.db.get_single_value("Manufacturing Settings",
 		"default_wip_warehouse")
