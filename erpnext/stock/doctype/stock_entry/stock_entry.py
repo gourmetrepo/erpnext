@@ -106,10 +106,6 @@ class StockEntry(StockController):
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
 	
-	def before_submit(self):
-		# Code by Moeiz to validate stock entry at CSD to allow only 1 percent of extra stock to be transferred (1 percent extra of required)
-		if self.purpose == "Material Transfer for Manufacture" and self.company in ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5']:
-			validate_extra_stock_to_be_transferred(self)
 	def on_submit(self):
 
 		self.update_stock_ledger()
@@ -1745,16 +1741,3 @@ def create_compensation_stock_entry_for_wip_damage(damage_stock_entry):
 	stock_entry.items = stock_entry_items
 	stock_entry.fg_completed_qty = 0
 	stock_entry.save(ignore_permissions=True)
-
-
-
-# This function is to be executed in the case of Material Transfer for Manufacture
-def validate_extra_stock_to_be_transferred(stock_entry):
-	work_order = frappe.get_doc("Work Order", stock_entry.work_order)
-	for stock_entry_item in stock_entry.items:
-		for work_order_item in work_order.required_items:
-			if stock_entry_item.item_code == work_order_item.item_code:
-				quantity_to_be_updated = stock_entry_item.qty + work_order_item.transferred_qty
-				threshold_qty = (0.01 * work_order_item.required_qty) + work_order_item.required_qty
-				if quantity_to_be_updated > threshold_qty:
-					frappe.throw("Quantity for Item {0} cannot be greater than 1 percent of required qty mentioned in work order. You cannot transfer more than {1}".format(work_order_item.item_code, threshold_qty, ))
