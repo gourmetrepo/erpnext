@@ -106,6 +106,30 @@ class StockEntry(StockController):
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
 	
+
+	def submit(self):
+		import time
+		from nrp_manufacturing.utils import get_config_by_name
+		time.sleep(1)
+		se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
+		if se_type:
+			se_type_section = se_type[0][0]+self.stock_entry_type
+		else:
+			se_type_section = self.stock_entry_type
+		se_bifurcations = get_config_by_name('stock_entry_queues')
+		for queue in se_bifurcations:
+			if self.request_from=='RMS':
+				queue="sync"
+			elif se_type_section in se_bifurcations.get(queue):
+				break
+			else:
+				queue="primary"
+		if self.request_from=='RMS':
+			self.queue_action('submit',queue_name=queue)
+		else:
+			self.queue_action('submit',queue_name="se_"+queue)
+
+	
 	def on_submit(self):
 
 		self.update_stock_ledger()
@@ -1735,8 +1759,14 @@ def create_compensation_stock_entry_for_wip_damage(damage_stock_entry):
 	stock_entry_items = []
 	for item in damage_stock_entry.items:
 		stock_entry_item = item
-		stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": item.item_code}, ["source_warehouse"])
+
+		if stock_entry_item.original_item is not None:
+			stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": stock_entry_item.original_item}, ["source_warehouse"])
+		else:	
+			stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": stock_entry_item.item_code}, ["source_warehouse"])
+
 		stock_entry_item.t_warehouse = damage_stock_entry.from_warehouse
+
 		stock_entry_items.append(stock_entry_item)
 	stock_entry.items = stock_entry_items
 	stock_entry.fg_completed_qty = 0
