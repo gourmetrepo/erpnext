@@ -534,13 +534,18 @@ erpnext.work_order = {
 							consumption_btn.addClass('btn-primary');
 						}
 					}
-					
-					
-						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
-							erpnext.work_order.make_damage_return_se(frm, 'Return WIP Damage');
-						});
-						damage_return_btn.addClass('btn-secondary');
-					
+
+
+					let companies_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
+					let company = frm.doc.company
+
+						if (companies_list.includes(company)){
+							var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+								erpnext.work_order.make_damage_return_se(frm);
+							});
+							damage_return_btn.addClass('btn-secondary');	
+						}
+
 
 
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
@@ -559,11 +564,14 @@ erpnext.work_order = {
 			} else {
 				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
 
-				
+					let companies_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
+					let company = frm.doc.company
+					if (companies_list.includes(company)){
 						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
-							erpnext.work_order.make_damage_return_se(frm, 'Return WIP Damage');
+							erpnext.work_order.make_damage_return_se(frm);
 						});
-						damage_return_btn.addClass('btn-secondary');
+						damage_return_btn.addClass('btn-secondary');	
+					}
 					
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
@@ -662,23 +670,19 @@ erpnext.work_order = {
 
 	},
 
-	make_damage_return_se: async function(frm, purpose) {
+	make_damage_return_se: async function(frm) {
 		try {
 			// Call the server-side function directly using frappe.call
 			const r = await frappe.call({
-				method: 'erpnext.manufacturing.doctype.work_order.work_order.make_damage_return_stock_entry',
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_damage_stock_entry',
 				args: {
-					'work_order_id': frm.doc.name,
-					'purpose': purpose
+					'work_order': frm.doc.name
 				}
 			});
 	
 			if (r && r.message) {
-				console.log("Stock entry:", r.message.doctype);
-	
 				// Sync the returned stock entry with the local model
 				frappe.model.sync(r.message);
-	
 				// Open the form for the newly created stock entry
 				frappe.set_route('Form', r.message.doctype, r.message.name);
 			}

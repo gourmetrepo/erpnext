@@ -501,21 +501,28 @@ class WorkOrder(Document):
 	def update_transaferred_qty_for_required_items(self):
 		'''update transferred qty from submitted stock entries for that item against
 			the work order'''
-
 		for d in self.required_items:
-			transferred_qty = frappe.db.sql('''select sum(qty)
-				from `tabStock Entry` entry, `tabStock Entry Detail` detail
-				where
+			transferred_qty = frappe.db.sql('''
+				SELECT 
+					SUM(CASE WHEN entry.purpose = 'Material Transfer for Manufacture' THEN detail.qty ELSE 0 END) AS material_consumed,
+					SUM(CASE WHEN entry.purpose = 'Return WIP Damage' THEN detail.qty ELSE 0 END) AS wip_damage_returned
+				FROM 
+					`tabStock Entry` entry, `tabStock Entry Detail` detail
+				WHERE
 					entry.work_order = %(name)s
-					and entry.purpose = "Material Transfer for Manufacture"
 					and entry.docstatus = 1
 					and detail.parent = entry.name
-					and (detail.item_code = %(item)s or detail.original_item = %(item)s)''', {
-						'name': self.name,
-						'item': d.item_code
-					})[0][0]
-
-			d.db_set('transferred_qty', flt(transferred_qty), update_modified = False)
+					and (detail.item_code = %(item)s or detail.original_item = %(item)s)
+			''', {
+				'name': self.name,
+				'item': d.item_code
+			},as_dict=True)
+			if transferred_qty and len(transferred_qty) > 0:
+				material_transferred = flt(transferred_qty[0]['material_consumed'])
+				wip_damage_returned = flt(transferred_qty[0]['wip_damage_returned'])
+				difference = material_transferred - wip_damage_returned
+				d.db_set('transferred_qty', flt(difference), update_modified = False)
+	
 
 	def update_consumed_qty_for_required_items(self):
 		'''update consumed qty from submitted stock entries for that item against
@@ -536,6 +543,7 @@ class WorkOrder(Document):
 					})[0][0]
 
 			d.db_set('consumed_qty', flt(consumed_qty), update_modified = False)
+		
 
 	def make_bom(self):
 		data = frappe.db.sql(""" select sed.item_code, sed.qty, sed.s_warehouse
@@ -561,6 +569,35 @@ class WorkOrder(Document):
 
 		bom.set_bom_material_details()
 		return bom
+
+	def update_work_order_for_wip_damage(self):
+		'''update consumed qty from submitted stock entries for that item against
+			the work order for damaged return. Would be decreasing the work order'''
+
+		for d in self.required_items:
+			transferred_qty = frappe.db.sql('''
+				SELECT 
+					SUM(CASE WHEN entry.purpose = 'Material Transfer for Manufacture' THEN detail.qty ELSE 0 END) AS material_consumed,
+					SUM(CASE WHEN entry.purpose = 'Return WIP Damage' THEN detail.qty ELSE 0 END) AS wip_damage_returned
+				FROM 
+					`tabStock Entry` entry, `tabStock Entry Detail` detail
+				WHERE
+					entry.work_order = %(name)s
+					and entry.docstatus = 1
+					and detail.parent = entry.name
+					and (detail.item_code = %(item)s or detail.original_item = %(item)s)
+			''', {
+				'name': self.name,
+				'item': d.item_code
+			},as_dict=True)
+			if transferred_qty and len(transferred_qty) > 0:
+				material_transferred = flt(transferred_qty[0]['material_consumed'])
+				wip_damage_returned = flt(transferred_qty[0]['wip_damage_returned'])
+				difference = material_transferred - wip_damage_returned
+				d.db_set('transferred_qty', flt(difference), update_modified = False)
+
+
+
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
@@ -683,38 +720,38 @@ def make_stock_entry(work_order_id, purpose, qty=None):
 	stock_entry.get_items()
 	return stock_entry.as_dict()
 
-@frappe.whitelist()
-def make_damage_return_stock_entry(work_order_id, purpose):
-	work_order = frappe.get_doc("Work Order", work_order_id)
-	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group") \
-			and not work_order.skip_transfer:
-		wip_warehouse = work_order.wip_warehouse
-	else:
-		wip_warehouse = None
+# @frappe.whitelist()
+# def make_damage_return_stock_entry(work_order_id, purpose):
+# 	work_order = frappe.get_doc("Work Order", work_order_id)
+# 	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group") \
+# 			and not work_order.skip_transfer:
+# 		wip_warehouse = work_order.wip_warehouse
+# 	else:
+# 		wip_warehouse = None
 
-	stock_entry = frappe.new_doc("Stock Entry")
-	stock_entry.purpose = purpose
-	stock_entry.work_order = work_order_id
-	stock_entry.company = work_order.company
-	stock_entry.from_bom = 1
-	stock_entry.bom_no = work_order.bom_no
-	stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
-	if work_order.bom_no:
-		stock_entry.inspection_required = frappe.db.get_value('BOM',
-			work_order.bom_no, 'inspection_required')
+# 	stock_entry = frappe.new_doc("Stock Entry")
+# 	stock_entry.purpose = purpose
+# 	stock_entry.work_order = work_order_id
+# 	stock_entry.company = work_order.company
+# 	stock_entry.from_bom = 1
+# 	stock_entry.bom_no = work_order.bom_no
+# 	stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
+# 	if work_order.bom_no:
+# 		stock_entry.inspection_required = frappe.db.get_value('BOM',
+# 			work_order.bom_no, 'inspection_required')
 
-	if purpose=="Return WIP Damage":
-		damage_warehouse = frappe.db.sql("""
-                                    SELECT damage_warehouse FROM `tabSection Warehouse` 
-								   WHERE parent = '{section}' 
-								   AND company = '{company}';
-                                    """.format( section = work_order.item_section, company = work_order.company), as_dict=1)
-		stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
-		stock_entry.from_warehouse = wip_warehouse
+# 	if purpose=="Return WIP Damage":
+# 		damage_warehouse = frappe.db.sql("""
+#                                     SELECT damage_warehouse FROM `tabSection Warehouse` 
+# 								   WHERE parent = '{section}' 
+# 								   AND company = '{company}';
+#                                     """.format( section = work_order.item_section, company = work_order.company), as_dict=1)
+# 		stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
+# 		stock_entry.from_warehouse = wip_warehouse
 
-	stock_entry.set_stock_entry_type()
-	stock_entry.get_items()
-	return stock_entry.as_dict()
+# 	stock_entry.set_stock_entry_type()
+# 	stock_entry.get_items()
+# 	return stock_entry.as_dict()
 
 
 

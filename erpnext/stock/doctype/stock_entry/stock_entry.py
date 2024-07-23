@@ -21,6 +21,7 @@ from frappe.model.mapper import get_mapped_doc
 from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit, get_serial_nos
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import OpeningEntryAccountError
 
+
 import json
 
 from six import string_types, itervalues, iteritems
@@ -104,29 +105,11 @@ class StockEntry(StockController):
 				i.valuation_rate = 0.001
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
-
-	def submit(self):
-		import time
-		from nrp_manufacturing.utils import get_config_by_name
-		time.sleep(1)
-		se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
-		if se_type:
-			se_type_section = se_type[0][0]+self.stock_entry_type
-		else:
-			se_type_section = self.stock_entry_type
-		se_bifurcations = get_config_by_name('stock_entry_queues')
-		for queue in se_bifurcations:
-			if self.request_from=='RMS':
-				queue="sync"
-			elif se_type_section in se_bifurcations.get(queue):
-				break
-			else:
-				queue="primary"
-		if self.request_from=='RMS':
-			self.queue_action('submit',queue_name=queue)
-		else:
-			self.queue_action('submit',queue_name="se_"+queue)
-
+	
+	def before_submit(self):
+		# Code by Moeiz to validate stock entry at CSD to allow only 1 percent of extra stock to be transferred (1 percent extra of required)
+		if self.purpose == "Material Transfer for Manufacture" and self.company in ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5']:
+			validate_extra_stock_to_be_transferred(self)
 	def on_submit(self):
 
 		self.update_stock_ledger()
@@ -144,6 +127,10 @@ class StockEntry(StockController):
 		# stock_gl = frappe.new_doc('Stock GL Queue')
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
+		
+	# Changes by Moeiz for Return WIP Damage for CSD to create new stock entry once wip damage return stock entry has been submitted
+		if self.purpose == "Return WIP Damage":
+			create_compensation_stock_entry_for_wip_damage(self)
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
@@ -206,7 +193,7 @@ class StockEntry(StockController):
 				frappe.bold(item[args["target_ref_field"]]),
 				'<br>',
 				message
-                ), ExtraMaterialReceived, title = _('Extra Materials Transferred'))
+				), ExtraMaterialReceived, title = _('Extra Materials Transferred'))
 
 	def validate_work_order_status(self):
 		pro_doc = frappe.get_doc("Work Order", self.work_order)
@@ -1082,7 +1069,7 @@ class StockEntry(StockController):
 		wo_items = frappe.get_all('Work Order Item',
 			filters={'parent': self.work_order},
 			fields=["item_code", "required_qty", "consumed_qty", "transferred_qty", "source_warehouse"]
-                )
+				)
 
 		work_order_qty = wo.material_transferred_for_manufacturing or wo.qty
 		for item in wo_items:
@@ -1093,7 +1080,7 @@ class StockEntry(StockController):
 
 			req_qty_each = (
 				(flt(wo_item_qty) - flt(item.consumed_qty)) /
-                       					(flt(work_order_qty) - flt(wo.produced_qty))
+					   					(flt(work_order_qty) - flt(wo.produced_qty))
 			)
 
 			qty = req_qty_each * flt(self.fg_completed_qty)
@@ -1157,7 +1144,7 @@ class StockEntry(StockController):
 			req_items = frappe.get_all('Work Order Item',
 				filters={'parent': self.work_order, 'item_code': item_code},
 				fields=["required_qty", "consumed_qty"]
-                        )
+						)
 			if not req_items:
 				frappe.msgprint(_("Did not found transfered item {0} in Work Order {1}, the item not added in Stock Entry")
 					.format(item_code, self.work_order))
@@ -1653,15 +1640,15 @@ def get_items_return_allother(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section` NOT IN ('FG Nimko','FG Mithae','FG Biscuit','FG Puff')
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section` NOT IN ('FG Nimko','FG Mithae','FG Biscuit','FG Puff')
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1671,15 +1658,15 @@ def get_items_return_nimko(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Nimko'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Nimko'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1689,15 +1676,15 @@ def get_items_return_mithae(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Mithae'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Mithae'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1707,15 +1694,15 @@ def get_items_return_biscuit(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Biscuit'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Biscuit'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1725,15 +1712,49 @@ def get_items_return_puff(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Puff'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Puff'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
+
+
+@frappe.whitelist()
+def create_compensation_stock_entry_for_wip_damage(damage_stock_entry):
+	stock_entry = frappe.new_doc('Stock Entry')
+	stock_entry.stock_entry_type = 'Material Transfer for Manufacture'
+	stock_entry.company = damage_stock_entry.company
+	stock_entry.work_order = damage_stock_entry.work_order
+	stock_entry.to_warehouse =  damage_stock_entry.from_warehouse
+	stock_entry.production_plan = damage_stock_entry.production_plan
+	stock_entry.from_bom = 1
+	stock_entry.bom_no = damage_stock_entry.bom_no
+	stock_entry_items = []
+	for item in damage_stock_entry.items:
+		stock_entry_item = item
+		stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": item.item_code}, ["source_warehouse"])
+		stock_entry_item.t_warehouse = damage_stock_entry.from_warehouse
+		stock_entry_items.append(stock_entry_item)
+	stock_entry.items = stock_entry_items
+	stock_entry.fg_completed_qty = 0
+	stock_entry.save(ignore_permissions=True)
+
+
+
+# This function is to be executed in the case of Material Transfer for Manufacture
+def validate_extra_stock_to_be_transferred(stock_entry):
+	work_order = frappe.get_doc("Work Order", stock_entry.work_order)
+	for stock_entry_item in stock_entry.items:
+		for work_order_item in work_order.required_items:
+			if stock_entry_item.item_code == work_order_item.item_code:
+				quantity_to_be_updated = stock_entry_item.qty + work_order_item.transferred_qty
+				threshold_qty = (0.01 * work_order_item.required_qty) + work_order_item.required_qty
+				if quantity_to_be_updated > threshold_qty:
+					frappe.throw("Quantity for Item {0} cannot be greater than 1 percent of required qty mentioned in work order. You cannot transfer more than {1}".format(work_order_item.item_code, threshold_qty, ))
