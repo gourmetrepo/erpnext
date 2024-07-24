@@ -41,7 +41,7 @@ def insertData(from_date,to_date,heads,companies):
 											(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
 											WHERE ACCOUNT = "{account}" AND company = '{company}' AND posting_date < '{current_date}') AS opening,
 											(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
-											WHERE ACCOUNT = "{account}" AND company = '{company}' AND posting_date = '{current_date}') AS value """
+											WHERE voucher_type!='Period Closing Voucher' and ACCOUNT = "{account}" AND company = '{company}' AND posting_date = '{current_date}') AS value """
 											,as_dict=True
 								)
 								if data:

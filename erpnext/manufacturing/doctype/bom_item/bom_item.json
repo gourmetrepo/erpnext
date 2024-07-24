@@ -3,6 +3,7 @@
  "doctype": "DocType",
  "document_type": "Setup",
  "editable_grid": 1,
+ "engine": "InnoDB",
  "field_order": [
   "item_code",
   "item_name",
@@ -26,6 +27,7 @@
   "rate_amount_section",
   "rate",
   "base_rate",
+  "mandatory",
   "column_break_21",
   "amount",
   "base_amount",
@@ -122,7 +124,7 @@
    "label": "Quantity and Rate"
   },
   {
-   "columns": 2,
+   "columns": 1,
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -258,11 +260,18 @@
    "label": "Original Item",
    "options": "Item",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "mandatory",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Mandatory"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2019-11-22 11:38:52.087303",
+ "modified": "2024-07-05 20:33:20.927623",
  "modified_by": "Administrator",
  "module": "Manufacturing",
  "name": "BOM Item",

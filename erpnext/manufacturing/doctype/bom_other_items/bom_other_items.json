@@ -1,5 +1,5 @@
 {
- "creation": "2024-07-02 16:27:28.894988",
+ "creation": "2024-07-05 13:27:26.684405",
  "doctype": "DocType",
  "document_type": "Setup",
  "editable_grid": 1,
@@ -14,22 +14,15 @@
   "image_view",
   "quantity_and_rate",
   "qty",
-  "uom",
-  "col_break2",
-  "rate_amount_section",
-  "rate",
-  "base_rate",
-  "column_break_21",
-  "amount",
-  "base_amount"
+  "uom"
  ],
  "fields": [
   {
-   "columns": 3,
+   "columns": 2,
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "label": "Item Name",
-   "reqd": 1
+   "in_list_view": 1,
+   "label": "Item Name"
   },
   {
    "fieldname": "column_break_3",
@@ -73,7 +66,7 @@
    "label": "Quantity and Rate"
   },
   {
-   "columns": 2,
+   "columns": 3,
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
@@ -83,67 +76,18 @@
    "reqd": 1
   },
   {
-   "columns": 1,
+   "columns": 2,
    "fieldname": "uom",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "UOM",
    "options": "UOM",
    "reqd": 1
-  },
-  {
-   "fieldname": "col_break2",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "rate_amount_section",
-   "fieldtype": "Section Break",
-   "label": "Rate & Amount"
-  },
-  {
-   "fieldname": "rate",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Rate",
-   "options": "currency",
-   "reqd": 1
-  },
-  {
-   "fieldname": "base_rate",
-   "fieldtype": "Currency",
-   "label": "Basic Rate (Company Currency)",
-   "options": "Company:company:default_currency",
-   "print_hide": 1,
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_21",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "amount",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Amount",
-   "oldfieldname": "amount_as_per_mar",
-   "oldfieldtype": "Currency",
-   "options": "currency",
-   "print_width": "150px",
-   "read_only": 1,
-   "width": "150px"
-  },
-  {
-   "fieldname": "base_amount",
-   "fieldtype": "Currency",
-   "label": "Amount (Company Currency)",
-   "options": "Company:company:default_currency",
-   "print_hide": 1,
-   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2024-07-02 16:30:36.968350",
- "modified_by": "Administrator",
+ "modified": "2024-07-18 10:33:55.331806",
+ "modified_by": "moeiz.shahzad@gourmetpakistan.com",
  "module": "Manufacturing",
  "name": "BOM Other Items",
  "owner": "Administrator",
