@@ -279,7 +279,11 @@ def make_purchase_order(source_name, target_doc=None):
 
 	def select_item(d):
 		import json
-		data_dict = json.loads(target_doc)
+		if isinstance(target_doc, str):
+			data_dict = json.loads(target_doc)
+		else:
+			data_dict = json.loads(frappe.as_json(target_doc))
+
 		if data_dict['purchase_order_type'] in ('Local', 'Import'):
 			
 			sql_query = """
@@ -304,7 +308,6 @@ def make_purchase_order(source_name, target_doc=None):
 		else:		
 			return d.ordered_qty < d.stock_qty
 				
-	
 	doclist = get_mapped_doc("Material Request", source_name, 	{
 		"Material Request": {
 			"doctype": "Purchase Order",
@@ -327,7 +330,6 @@ def make_purchase_order(source_name, target_doc=None):
 			"condition": select_item
 		}
 	}, target_doc, postprocess)
-
 	return doclist
 
 @frappe.whitelist()
