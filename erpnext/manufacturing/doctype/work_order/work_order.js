@@ -289,7 +289,7 @@ frappe.ui.form.on("Work Order", {
 		// pending qty
 		if(!frm.doc.skip_transfer){
 			var pending_complete = frm.doc.material_transferred_for_manufacturing - frm.doc.produced_qty;
-			if(pending_complete) {
+			if(pending_complete > 0) {
 				var width = ((pending_complete / frm.doc.qty * 100) - added_min);
 				title = __('{0} items in progress', [pending_complete]);
 				bars.push({
