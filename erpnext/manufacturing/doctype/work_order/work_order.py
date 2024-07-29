@@ -651,7 +651,7 @@ def set_work_order_ops(name):
 	po.save()
 
 @frappe.whitelist()
-def make_stock_entry(work_order_id, purpose, qty=None, swo=0):
+def make_stock_entry(work_order_id, purpose, qty=None):
 	work_order = frappe.get_doc("Work Order", work_order_id)
 	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group") \
 			and not work_order.skip_transfer:
@@ -681,8 +681,6 @@ def make_stock_entry(work_order_id, purpose, qty=None, swo=0):
 
 	stock_entry.set_stock_entry_type()
 	stock_entry.get_items()
-	if swo:
-		return stock_entry
 	return stock_entry.as_dict()
 
 @frappe.whitelist()
