@@ -537,22 +537,14 @@ erpnext.work_order = {
 
 
 					let companies_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
-					let company = frm.doc.company;
+					let company = frm.doc.company
 
-					if (companies_list.includes(company)){
-						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
-							erpnext.work_order.make_damage_return_se(frm);
-						});
-						damage_return_btn.addClass('btn-secondary');	
-					}
-				
-					if (companies_list.includes(company)) {
-						var work_activity_report = frm.add_custom_button(__('Work Order Activity Report'), function() {
-							const work_order_name = frm.doc.name;
-							window.open(`/desk#query-report/CSD%20Work%20Order%20Activity%20Report?work_order_id=${encodeURIComponent(work_order_name)}`, '_blank');
-						});
-						work_activity_report.addClass('btn-secondary');
-					}
+						if (companies_list.includes(company)){
+							var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+								erpnext.work_order.make_damage_return_se(frm);
+							});
+							damage_return_btn.addClass('btn-secondary');	
+						}
 
 
 
@@ -579,14 +571,6 @@ erpnext.work_order = {
 							erpnext.work_order.make_damage_return_se(frm);
 						});
 						damage_return_btn.addClass('btn-secondary');	
-					}
-
-					if (companies_list.includes(company)) {
-						var work_activity_report = frm.add_custom_button(__('Work Order Activity Report'), function() {
-							const work_order_name = frm.doc.name;
-							window.open(`/desk#query-report/CSD%20Work%20Order%20Activity%20Report?work_order_id=${encodeURIComponent(work_order_name)}`, '_blank');
-						});
-						work_activity_report.addClass('btn-secondary');
 					}
 					
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
