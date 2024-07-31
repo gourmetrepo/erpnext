@@ -125,6 +125,69 @@ frappe.ui.form.on("Purchase Order", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+	},
+
+
+	get_clubbed_items: function(frm){
+		let clubbed_items;
+		if (frm.doc) {
+			frappe.call({
+				method: "nrp_manufacturing.modules.gourmet.purchase_order.purchase_order.get_clubbed_items", 
+				async: false,
+				args: {
+					doc: frm.doc
+				},
+				callback: function(r) {
+					if (r.message) {
+						clubbed_items = r.message;
+					}
+				}
+			});
+			
+			var screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+			var maxWidth = Math.min(screenWidth - 50, 900);
+	
+			// Construct the HTML for the table with styles
+			var optionsHTML = "<table border='1' style='width:100%; border-collapse: collapse;'>"
+                        + "<tr style='background-color: rgb(247,250,252);'>"
+                        + "<th style='padding: 8px; text-align: left;'>#</th>"
+                        + "<th style='padding: 8px; text-align: left;'>Item Code</th>"
+                        + "<th style='padding: 8px; text-align: right;'>Quantity</th>"
+                        + "<th style='padding: 8px; text-align: right;'>Rate</th>"
+                        + "<th style='padding: 8px; text-align: right;'>Amount</th>"
+                        + "</tr>";
+
+			// Populate table rows with items clubbed data
+			if (clubbed_items) {
+				clubbed_items.forEach(function(data, index) {
+					optionsHTML += "<tr style='background-color: rgb(255,253,244);'>"
+								+ "<td style='padding: 8px;'>" + (index + 1) + "</td>"
+								+ "<td style='padding: 8px; font-weight: bold;'>" + data.item_code + "</td>"
+								+ "<td style='padding: 8px; text-align: right;'>" + data.qty + "</td>"
+								+ "<td style='padding: 8px; text-align: right;'>" + data.rate + "</td>"
+								+ "<td style='padding: 8px; text-align: right;'>" + data.amount + "</td>"
+								+ "</tr>";
+				});
+			}
+
+			optionsHTML += "</table>";
+	
+			var dialog = new frappe.ui.Dialog({
+				title: __('Purchase Order Clubbed Items'),
+				fields: [
+					{
+						label: __('Clubbed Item Table:'),
+						fieldtype: 'HTML',
+						fieldname: 'get_clubbed_items',
+						options: optionsHTML  // Set the options HTML
+					}
+				],
+				primary_action: null, // Remove the submit button
+			});
+			dialog.$wrapper.find('.modal-dialog').css('width', maxWidth + 'px');
+			// Show the dialog
+			dialog.show();
+		}
 	}
 });
 
@@ -638,7 +701,9 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 
 	schedule_date: function() {
 		set_schedule_date(this.frm);
-	}
+	},
+
+
 });
 
 // for backward compatibility: combine new and previous states
