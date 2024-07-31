@@ -312,35 +312,32 @@ frappe.ui.form.on('Payment Order', {
 			var maxWidth = Math.min(screenWidth - 50, 900);  /// Set a maximum width (e.g., 900 pixels)
 	
 			// Construct the HTML for the table
-			var optionsHTML = "<table border='1'>"
-							 + "<tr> "
-							 + "<th>Sr. No</th>  "
-							 + "<th>Supplier</th>  "
-							 + "<th>Total GL Balance Before Payment</th>  "
-							/// + "<th>Tot. Val. Curr. Docs</th>"
-							 + "<th>Request Payment Amount</th> "
-							// + "<th>% P TO P</th>  "
-							 + "<th>Reserve Balance in Other PMO (Not Paid)</th>"
-							 + "<th>Net Balance</th>"
-							 + "</tr>";
-			
+			var optionsHTML = "<table border='1' style='width:100%; border-collapse: collapse;'>"
+			+ "<tr style='background-color: rgb(247,250,252);'>"
+			+ "<th style='padding: 8px; text-align: left;'>Sr. No</th>"
+			+ "<th style='padding: 8px; text-align: left;'>Supplier</th>"
+			+ "<th style='padding: 8px; text-align: right;'>Total GL Balance Before Payment</th>"
+			+ "<th style='padding: 8px; text-align: right;'>Request Payment Amount</th>"
+			+ "<th style='padding: 8px; text-align: right;'>Reserve Balance in Other PMO (Not Paid)</th>"
+			+ "<th style='padding: 8px; text-align: right;'>Net Balance</th>"
+			+ "</tr>";
+
 			// Populate table rows with payment history data
 			if (payment_history) {
-				payment_history.forEach(function(data, index) {
-					optionsHTML += "<tr>"
-								+ "<td>" + (index + 1) + "</td>"
-								+ "<td>" + data.supplier + "</td>"
-								+ "<td style='text-align:right;'>" + data.tbb + "</td>"
-								// + "<td style='text-align:right;'>" + data.tvcd + "</td>"
-								+ "<td style='text-align:right;'>" + data.tpcp + "</td>"
-								//+ "<td style='text-align:right;'>" + data.ptop + "</td>"
-								+ "<td style='text-align:right;'>" + data.top + "</td>"
-								+ "<td style='text-align:right;'>" + data.tobs + "</td>"
-								+ "</tr>";
-				});
+			payment_history.forEach(function(data, index) {
+			optionsHTML += "<tr style='background-color: rgb(255,253,244);'>"
+				+ "<td style='padding: 8px;'>" + (index + 1) + "</td>"
+				+ "<td style='padding: 8px;'>" + data.supplier + "</td>"
+				+ "<td style='padding: 8px; text-align: right;'>" + data.tbb + "</td>"
+				+ "<td style='padding: 8px; text-align: right;'>" + data.tpcp + "</td>"
+				+ "<td style='padding: 8px; text-align: right;'>" + data.top + "</td>"
+				+ "<td style='padding: 8px; text-align: right;'>" + data.tobs + "</td>"
+				+ "</tr>";
+			});
 			}
-			
+
 			optionsHTML += "</table>";
+
 	
 			var dialog = new frappe.ui.Dialog({
 				title: __('Supplier Payment History'),
