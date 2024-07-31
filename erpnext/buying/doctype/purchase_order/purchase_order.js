@@ -162,7 +162,7 @@ frappe.ui.form.on("Purchase Order", {
 				clubbed_items.forEach(function(data, index) {
 					optionsHTML += "<tr style='background-color: rgb(255,253,244);'>"
 								+ "<td style='padding: 8px;'>" + (index + 1) + "</td>"
-								+ "<td style='padding: 8px; font-weight: bold;'>" + data.item_code + "</td>"
+								+ "<td style='padding: 8px; font-weight: bold;'>" + data.item_code +": "+ data.item_name + "</td>"
 								+ "<td style='padding: 8px; text-align: right;'>" + data.qty + "</td>"
 								+ "<td style='padding: 8px; text-align: right;'>" + data.rate + "</td>"
 								+ "<td style='padding: 8px; text-align: right;'>" + data.amount + "</td>"
