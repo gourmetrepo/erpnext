@@ -7,33 +7,45 @@ import frappe
 from frappe import _, _dict
 from frappe.model.document import Document
 import json
-from datetime import datetime
+from datetime import datetime,timedelta
 class Cashflowaccountdatacsd(Document):
 	pass
 
 @frappe.whitelist()
 def insertDataQueue(from_date,to_date,heads,companies):
-	if not from_date:
-		from_date = datetime.now().strftime('%Y-%m-%d')
-	if not to_date:
-		to_date = datetime.now().strftime('%Y-%m-%d')
-		
-	j_companies = json.loads(companies)
-	companies_tuple = tuple(j_companies)
-	frappe.db.sql(f"""DELETE FROM `tabCashflow account data csd` WHERE `date`>='{from_date}' AND `date`<='{to_date}' and company IN ({companies_tuple})""")
-	frappe.db.commit()	
-	while from_date <= to_date:
-		frappe.enqueue(
-			"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
-			from_date=from_date.strftime('%Y-%m-%d'),
-			to_date=from_date.strftime('%Y-%m-%d'),
-			heads=heads,
-			companies=companies,
-			queue="long",
-			timeout=13000,
-			enqueue_after_commit=True
-		)
-		from_date += timedelta(days=1)
+    if not from_date:
+        from_date = datetime.now().strftime('%Y-%m-%d')
+    if not to_date:
+        to_date = datetime.now().strftime('%Y-%m-%d')
+
+    j_companies = json.loads(companies)
+    companies_tuple = tuple(j_companies)
+
+    query = """
+        DELETE FROM `tabCashflow account data csd`
+        WHERE `date` >= %(from_date)s
+        AND `date` <= %(to_date)s
+        AND company IN %(companies)s
+    """
+    frappe.db.sql(query, {'from_date': from_date, 'to_date': to_date, 'companies': companies_tuple})
+    frappe.db.commit()
+    
+    from_date = datetime.strptime(from_date, '%Y-%m-%d')
+    to_date = datetime.strptime(to_date, '%Y-%m-%d')
+    
+    while from_date <= to_date:
+        frappe.enqueue(
+            "erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
+            from_date=from_date.strftime('%Y-%m-%d'),
+            to_date=from_date.strftime('%Y-%m-%d'),
+            heads=heads,
+            companies=companies,
+            queue="long",
+            timeout=13000,
+            enqueue_after_commit=True
+        )
+        from_date += timedelta(days=1)
+
 
 @frappe.whitelist()
 def insertData(from_date,to_date,heads,companies):
