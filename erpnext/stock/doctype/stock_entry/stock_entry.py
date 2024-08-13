@@ -20,6 +20,7 @@ from erpnext.stock.utils import get_bin
 from frappe.model.mapper import get_mapped_doc
 from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit, get_serial_nos
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import OpeningEntryAccountError
+import math
 
 import json
 
@@ -1297,7 +1298,12 @@ class StockEntry(StockController):
 			se_child.item_code = item_dict[d].get('item_code') or cstr(d)
 			se_child.uom = item_dict[d]["uom"] if item_dict[d].get("uom") else stock_uom
 			se_child.stock_uom = stock_uom
-			se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+			# se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+
+			# Code by Moeiz to take floor of qty used in manufacturing to avoid batch decimal issue upto three decimal places
+			# Suggested by Shoaib Rehmat Ali Rajput Janjua
+			
+			se_child.qty = math.floor(item_dict[d]["qty"] * 1000) / 1000
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
 			se_child.cost_center = _cost_center[0]['cost_center'] or (item_dict[d].get("cost_center") or
