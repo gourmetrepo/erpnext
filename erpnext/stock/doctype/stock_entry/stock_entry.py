@@ -236,9 +236,11 @@ class StockEntry(StockController):
 		# Code Updated by Moeiz to allow more and less manufacturing from material consumed for stock entry with swo = 1
 		# Requirment and changes made during Single Work Order Development
 		production_item = None
-		if self.swo and self.work_order and self.stock_entry_type == "Manufacture":
-			production_item = frappe.db.get_value("Work Order",self.work_order, "production_item")
-		
+		if self.work_order:
+			single_work_order_flag = frappe.db.get_value("Work Order", {"name": self.work_order}, "skip_transfer")
+			if single_work_order_flag and self.work_order and self.stock_entry_type == "Manufacture":
+				production_item = frappe.db.get_value("Work Order",self.work_order, "production_item")
+			
 		for item in self.get("items"):
 			if not flt(item.qty):
 				frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
