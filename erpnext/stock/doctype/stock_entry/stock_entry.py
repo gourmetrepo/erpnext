@@ -233,13 +233,19 @@ class StockEntry(StockController):
 				frappe.delete_doc("Stock Entry", d.name)
 
 	def set_transfer_qty(self):
+		# Code Updated by Moeiz to allow more and less manufacturing from material consumed
+		# Requirment and changes made during Single Work Order Development
+		if self.work_order and self.stock_entry_type == "Manufacture":
+			production_item = frappe.db.get_value("Work Order",
+				self.work_order, "production_item")
 		for item in self.get("items"):
 			if not flt(item.qty):
 				frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
 			if not flt(item.conversion_factor):
 				frappe.throw(_("Row {0}: UOM Conversion Factor is mandatory").format(item.idx))
-			item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
-				self.precision("transfer_qty", item))
+			if production_item and production_item != item.item_code:
+				item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
+					self.precision("transfer_qty", item))
 
 	def update_cost_in_project(self):
 		if (self.work_order and not frappe.db.get_value("Work Order",
