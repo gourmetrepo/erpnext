@@ -72,14 +72,8 @@ class Employee(NestedSet):
 		frappe.utils.nestedset.update_nsm(self)
 
 	def on_update(self):
-		frappe.enqueue(self.update_employee, queue='hr_secondary')
-	
-	def update_employee(self):
-		self.update_nsm_model()
-		if self.user_id:
-			self.update_user()
-			self.update_user_permissions()
-		self.reset_employee_emails_cache()
+		frappe.enqueue(update_employee, employee=self, queue='hr_secondary')
+
 
 	def update_user_permissions(self):
 		if not self.create_user_permission: return
@@ -449,3 +443,13 @@ def has_user_permission_for_employee(user_name, employee_name):
 		'allow': 'Employee',
 		'for_value': employee_name
 	})
+
+
+
+@frappe.whitelist()
+def update_employee(employee):
+	employee.update_nsm_model()
+	if employee.user_id:
+		employee.update_user()
+		employee.update_user_permissions()
+	employee.reset_employee_emails_cache()
