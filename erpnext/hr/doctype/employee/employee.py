@@ -72,6 +72,9 @@ class Employee(NestedSet):
 		frappe.utils.nestedset.update_nsm(self)
 
 	def on_update(self):
+		frappe.enqueue(self.update_employee, queue='hr_secondary')
+	
+	def update_employee(self):
 		self.update_nsm_model()
 		if self.user_id:
 			self.update_user()
