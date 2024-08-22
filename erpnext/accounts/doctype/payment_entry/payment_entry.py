@@ -64,6 +64,10 @@ class PaymentEntry(AccountsController):
 		self.ensure_supplier_is_not_blocked()
 		self.set_status()
 
+		# Moeiz Check to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
+		
+
 	def on_submit(self):
 		# frappe.db.get_value("", {"represents_company": doc.company}, "name")
 		if self.party:
@@ -1201,3 +1205,32 @@ def make_payment_order(source_name, target_doc=None):
 	}, target_doc, set_missing_values)
 
 	return doclist
+
+
+
+
+# Moeiz Code to validate company cost center and accounts
+def validate_company_cost_center_and_accounts(payment_entry):
+	"""Validate that the company's accounts and cost centers are used."""
+
+	company = payment_entry.company
+	
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+	
+	if payment_entry.paid_from and payment_entry.paid_from not in accounts:
+		frappe.throw(_("Paid From: {0} does not belong to company {1}").format(payment_entry.paid_from, company))
+	if payment_entry.paid_to and payment_entry.paid_to not in accounts:
+		frappe.throw(_("Paid To: {0} does not belong to company {1}").format(payment_entry.paid_to, company))
+
+	if payment_entry.deductions:
+		for deduction in payment_entry.deductions:
+			if deduction.account and deduction.account not in accounts:
+				frappe.throw(_("Row {0} Deduction Account: {1} does not belong to company {2}").format(deduction.idx, deduction.account, company))
+			if deduction.cost_center and deduction.cost_center not in cost_centers:
+				frappe.throw(_("Row {0} Deduction Cost Center: {1} does not belong to company {2}").format(deduction.idx,deduction.cost_center, company))
+	
