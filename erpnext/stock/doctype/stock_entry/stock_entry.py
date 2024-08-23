@@ -105,7 +105,9 @@ class StockEntry(StockController):
 				i.valuation_rate = 0.001
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
-	
+		
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
 
 	def submit(self):
 		import time
@@ -1785,3 +1787,23 @@ def create_compensation_stock_entry_for_wip_damage(damage_stock_entry):
 	stock_entry.items = stock_entry_items
 	stock_entry.fg_completed_qty = 0
 	stock_entry.save(ignore_permissions=True)
+
+
+def validate_company_cost_center_and_accounts(stock_entry):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = stock_entry.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if stock_entry.items:
+		for item in stock_entry.items:
+			if item.expense_account and item.expense_account not in accounts:
+				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
+			
+			if item.cost_center and item.cost_center not in cost_centers:
+				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))

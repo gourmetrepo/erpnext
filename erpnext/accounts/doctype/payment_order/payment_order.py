@@ -10,6 +10,12 @@ from erpnext.accounts.party import get_party_account
 from frappe.model.document import Document
 
 class PaymentOrder(Document):
+
+	# Moeiz Code to validate company cost center and accounts
+	def validate(self):
+		validate_company_cost_center_and_accounts(self)
+
+
 	def before_save(self):
 		suppliers = frappe.db.sql("""
 		SELECT
@@ -347,3 +353,27 @@ def make_payment_entry_on_single_click(name, mode_of_payment=None):
 			je.save()
 		
 		frappe.msgprint(_("Payment Entries created."))
+
+
+
+def validate_company_cost_center_and_accounts(payment_order):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = payment_order.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+
+	bank_accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabBank Account` WHERE company = %s", (company))
+	bank_accounts = set(bank_accounts_data[0][0].split(',')) if bank_accounts_data and bank_accounts_data[0][0] else set()
+
+	if payment_order.company_bank_account and payment_order.company_bank_account not in bank_accounts:
+		frappe.throw(_("Bank Account {0} does not belong to company {1}").format(payment_order.company_bank_account, company))
+
+	if payment_order.references:
+		for reference in payment_order.references:
+			if reference.account and reference.account not in accounts:
+				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(reference.idx, reference.account, company))
+			
+			if reference.bank_account and reference.bank_account not in bank_accounts:
+				frappe.throw(_("Row {0} Bank Account: {1} does not belong to company {2}").format(reference.idx, reference.bank_account, company))
