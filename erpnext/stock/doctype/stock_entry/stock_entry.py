@@ -104,6 +104,9 @@ class StockEntry(StockController):
 				i.valuation_rate = 0.001
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
+		
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
 
 	def submit(self):
 		import time
@@ -206,7 +209,7 @@ class StockEntry(StockController):
 				frappe.bold(item[args["target_ref_field"]]),
 				'<br>',
 				message
-                ), ExtraMaterialReceived, title = _('Extra Materials Transferred'))
+				), ExtraMaterialReceived, title = _('Extra Materials Transferred'))
 
 	def validate_work_order_status(self):
 		pro_doc = frappe.get_doc("Work Order", self.work_order)
@@ -1082,7 +1085,7 @@ class StockEntry(StockController):
 		wo_items = frappe.get_all('Work Order Item',
 			filters={'parent': self.work_order},
 			fields=["item_code", "required_qty", "consumed_qty", "transferred_qty", "source_warehouse"]
-                )
+				)
 
 		work_order_qty = wo.material_transferred_for_manufacturing or wo.qty
 		for item in wo_items:
@@ -1093,7 +1096,7 @@ class StockEntry(StockController):
 
 			req_qty_each = (
 				(flt(wo_item_qty) - flt(item.consumed_qty)) /
-                       					(flt(work_order_qty) - flt(wo.produced_qty))
+					   					(flt(work_order_qty) - flt(wo.produced_qty))
 			)
 
 			qty = req_qty_each * flt(self.fg_completed_qty)
@@ -1157,7 +1160,7 @@ class StockEntry(StockController):
 			req_items = frappe.get_all('Work Order Item',
 				filters={'parent': self.work_order, 'item_code': item_code},
 				fields=["required_qty", "consumed_qty"]
-                        )
+						)
 			if not req_items:
 				frappe.msgprint(_("Did not found transfered item {0} in Work Order {1}, the item not added in Stock Entry")
 					.format(item_code, self.work_order))
@@ -1653,15 +1656,15 @@ def get_items_return_allother(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section` NOT IN ('FG Nimko','FG Mithae','FG Biscuit','FG Puff')
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section` NOT IN ('FG Nimko','FG Mithae','FG Biscuit','FG Puff')
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1671,15 +1674,15 @@ def get_items_return_nimko(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Nimko'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Nimko'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1689,15 +1692,15 @@ def get_items_return_mithae(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Mithae'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Mithae'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1707,15 +1710,15 @@ def get_items_return_biscuit(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Biscuit'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Biscuit'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
@@ -1725,15 +1728,37 @@ def get_items_return_puff(data):
 		data=data
 		sql_query = """
 			SELECT 'Shop Returns Warehouse - U6' AS s_warehouse,sle.item_code,i.`item_name`, FLOOR(SUM(sle.actual_qty))  AS qty, sle.stock_uom AS uom
-            FROM `tabBatch`
-            INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
-            INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
-            WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
-            AND i.`item_section`='FG Puff'
-            AND sle.active_batch=1  
-            GROUP BY item_code
-            HAVING qty > 0.001
-            ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
+			FROM `tabBatch`
+			INNER JOIN `tabStock Ledger Entry` AS sle USE INDEX (item_code, batch_no, warehouse) ON (`tabBatch`.batch_id = sle.batch_no AND sle.item_code = `tabBatch`.item  AND sle.warehouse = 'Shop Returns Warehouse - U6')
+			INNER JOIN `tabItem` AS i ON i.`name` =tabBatch.`item`
+			WHERE (`tabBatch`.expiry_date >= CURDATE() OR `tabBatch`.expiry_date IS NULL) 
+			AND i.`item_section`='FG Puff'
+			AND sle.active_batch=1  
+			GROUP BY item_code
+			HAVING qty > 0.001
+			ORDER BY `tabBatch`.expiry_date ASC, `tabBatch`.creation ASC
 		"""
 		items = frappe.db.sql(sql_query, as_dict=True)
 		return items
+
+
+
+
+def validate_company_cost_center_and_accounts(stock_entry):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = stock_entry.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if stock_entry.items:
+		for item in stock_entry.items:
+			if item.expense_account and item.expense_account not in accounts:
+				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
+			
+			if item.cost_center and item.cost_center not in cost_centers:
+				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
