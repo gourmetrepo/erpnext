@@ -20,6 +20,7 @@ from erpnext.stock.utils import get_bin
 from frappe.model.mapper import get_mapped_doc
 from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit, get_serial_nos
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import OpeningEntryAccountError
+import math
 
 import json
 
@@ -240,13 +241,22 @@ class StockEntry(StockController):
 				frappe.delete_doc("Stock Entry", d.name)
 
 	def set_transfer_qty(self):
+		# Code Updated by Moeiz to allow more and less manufacturing from material consumed for stock entry with swo = 1
+		# Requirment and changes made during Single Work Order Development
+		production_item = None
+		if self.work_order:
+			single_work_order_flag = frappe.db.get_value("Work Order", {"name": self.work_order}, "skip_transfer")
+			if single_work_order_flag and self.work_order and self.stock_entry_type == "Manufacture":
+				production_item = frappe.db.get_value("Work Order",self.work_order, "production_item")
+			
 		for item in self.get("items"):
 			if not flt(item.qty):
 				frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
 			if not flt(item.conversion_factor):
 				frappe.throw(_("Row {0}: UOM Conversion Factor is mandatory").format(item.idx))
-			item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
-				self.precision("transfer_qty", item))
+			if production_item and production_item != item.item_code:
+				item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
+					self.precision("transfer_qty", item))
 
 	def update_cost_in_project(self):
 		if (self.work_order and not frappe.db.get_value("Work Order",
@@ -1305,7 +1315,12 @@ class StockEntry(StockController):
 			se_child.item_code = item_dict[d].get('item_code') or cstr(d)
 			se_child.uom = item_dict[d]["uom"] if item_dict[d].get("uom") else stock_uom
 			se_child.stock_uom = stock_uom
-			se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+			# se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+
+			# Code by Moeiz to take floor of qty used in manufacturing to avoid batch decimal issue upto three decimal places
+			# Suggested by Shoaib Rehmat Ali Rajput Janjua
+			
+			se_child.qty = math.floor(item_dict[d]["qty"] * 1000) / 1000
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
 			se_child.cost_center = _cost_center[0]['cost_center'] or (item_dict[d].get("cost_center") or
