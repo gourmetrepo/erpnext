@@ -1311,8 +1311,7 @@ class StockEntry(StockController):
 
 			# Code by Moeiz to take floor of qty used in manufacturing to avoid batch decimal issue upto three decimal places
 			# Suggested by Shoaib Rehmat Ali Rajput Janjua
-			if not isinstance(item_dict[d]["qty"], float):
-				item_dict[d]["qty"] = float(item_dict[d]["qty"])
+			
 			se_child.qty = math.floor(item_dict[d]["qty"] * 1000) / 1000
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
