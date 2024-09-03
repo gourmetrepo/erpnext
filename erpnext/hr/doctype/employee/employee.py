@@ -69,14 +69,15 @@ class Employee(NestedSet):
 		self.validate_duplicate_user_id()
 
 	def update_nsm_model(self):
-		#frappe.utils.nestedset.update_nsm(self)
-		frappe.enqueue(frappe.utils.nestedset.update_nsm(self), queue='hr_secondary')
+		frappe.utils.nestedset.update_nsm(self)
 
 
 	def on_update(self):
-		#frappe.enqueue(update_employee, employee=self, queue='hr_secondary')
-		update_employee(self)
-
+		frappe.enqueue("frappe.utils.nestedset.update_nsm", doc=self, queue="hr_secondary")
+		if self.user_id:
+			self.update_user()
+			self.update_user_permissions()
+		self.reset_employee_emails_cache()
 
 	def update_user_permissions(self):
 		if not self.create_user_permission: return
