@@ -41,8 +41,8 @@ frappe.listview_settings['Purchase Order'] = {
 			listview.call_for_selected_items(method, { "status": "Closed" });
 		});
 
-		listview.page.add_menu_item(__("Re-open"), function () {
-			listview.call_for_selected_items(method, { "status": "Submitted" });
-		});
+		// listview.page.add_menu_item(__("Re-open"), function () {
+		// 	listview.call_for_selected_items(method, { "status": "Submitted" });
+		// });
 	}
 };
