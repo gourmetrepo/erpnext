@@ -91,6 +91,11 @@ frappe.ui.form.on('Material Request', {
 			frm.get_field("items").grid.toggle_enable("item_name", 0);
 			refresh_field("items");
 		}
+
+		if (frm.doc.material_request_type == "Material Issue"){
+            frm.get_field("items").grid.toggle_enable("expense_account", 0);
+            refresh_field("items");
+        }
 	},
 
 	make_custom_buttons: function(frm) {
@@ -382,7 +387,15 @@ frappe.ui.form.on("Material Request Item", {
 				set_schedule_date(frm);
 			}
 		}
+	},
+
+	form_render(frm, cdt, cdn){
+		if (frm.doc.material_request_type == "Material Issue"){
+			frm.get_field("items").grid.toggle_enable("expense_account", 0);
+			refresh_field("items");
+		}
 	}
+	
 });
 
 erpnext.buying.MaterialRequestController = erpnext.buying.BuyingController.extend({
