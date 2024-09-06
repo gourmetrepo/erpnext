@@ -195,7 +195,7 @@ class DeliveryNote(SellingController):
 			self.queue_action('submit',queue_name="return")
 		elif(self.company=='Unit 6'):
 			if self.section in ("FG Mithae", "FG Bulk Water"):
-				self.queue_action('submit',queue_name="so_primary")
+				self.queue_action('submit',queue_name="return")
 			elif(self.section in get_config_by_name('dn_queue_section',[])):
 				self.queue_action('submit',queue_name="dn_primary")
 			else:
