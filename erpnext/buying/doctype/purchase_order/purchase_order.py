@@ -562,7 +562,7 @@ def make_inter_company_sales_order(source_name, target_doc=None):
 @frappe.whitelist()
 def close_old_po(supplier,po_no,company):
 		current_date = today()
-		check_date = add_days(current_date, -3) # close PO's older than 3 days (includes current date)
+		check_date = add_days(current_date, -4) # close PO's older than 3 days (includes current date)
 		purchase_orders = frappe.get_list(
 					"Purchase Order",
 					filters={
