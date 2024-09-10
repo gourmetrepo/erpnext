@@ -13161,3 +13161,334 @@ Traceback (most recent call last):
 redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
     raise ConnectionError(self._error_message(e))
 redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+18:59:45 RQ worker 'rq:worker:280604335d0a432ebdc70101fd5e96f8.grmtnext.65149.slu_secondary' started, version 0.12.0
+18:59:45 *** Listening on slu_secondary...
+18:59:45 Cleaning registries for queue: slu_secondary
+18:59:45 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309005076475', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.507206'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (a7a1da7e-2831-46e2-bdd4-ec7feba921c4)
+18:59:49 RQ worker 'rq:worker:d1d389dd78c444a4aa32ac8941c2f0d0.grmtnext.65160.slu_secondary' started, version 0.12.0
+18:59:49 *** Listening on slu_secondary...
+18:59:49 Cleaning registries for queue: slu_secondary
+18:59:49 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309005455463', 'warehouse': 'Shop Returnable Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.545091'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (8bffbe56-c853-4b50-a98d-2aba6fa9d056)
+18:59:55 slu_secondary: Job OK (a7a1da7e-2831-46e2-bdd4-ec7feba921c4)
+18:59:55 Result is kept for 500 seconds
+18:59:55 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '1725630900618946', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.618510'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (e0c8d282-589d-4afb-a587-aea2c833f648)
+18:59:55 slu_secondary: Job OK (8bffbe56-c853-4b50-a98d-2aba6fa9d056)
+18:59:55 Result is kept for 500 seconds
+18:59:55 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '1725630900707084', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.706635'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (79d08fac-d529-4df7-a9db-4435341dffa9)
+19:00:05 slu_secondary: Job OK (79d08fac-d529-4df7-a9db-4435341dffa9)
+19:00:05 Result is kept for 500 seconds
+19:00:05 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309008140967', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.813702'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (ee1c78e9-1261-468f-9ad8-923ca598c895)
+19:00:06 slu_secondary: Job OK (e0c8d282-589d-4afb-a587-aea2c833f648)
+19:00:06 Result is kept for 500 seconds
+19:00:06 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309008450534', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.844676'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (e5bcfadf-f266-4302-8603-83e0f41c8799)
+19:00:16 slu_secondary: Job OK (ee1c78e9-1261-468f-9ad8-923ca598c895)
+19:00:16 Result is kept for 500 seconds
+19:00:16 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309009420295', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:00.941624'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (93c27530-021a-4e07-b30b-2945fda3652a)
+19:00:16 slu_secondary: Job OK (e5bcfadf-f266-4302-8603-83e0f41c8799)
+19:00:16 Result is kept for 500 seconds
+19:00:16 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309010006764', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.000270'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (b2637a54-4a18-47a5-8064-0c13b1144448)
+19:00:27 slu_secondary: Job OK (b2637a54-4a18-47a5-8064-0c13b1144448)
+19:00:27 Result is kept for 500 seconds
+19:00:27 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309010992284', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.098826'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (fd1e9372-0f8b-4bb3-aefe-1e5ba6f41524)
+19:00:27 slu_secondary: Job OK (93c27530-021a-4e07-b30b-2945fda3652a)
+19:00:27 Result is kept for 500 seconds
+19:00:28 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309011340325', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.133612'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (97dbb596-f52c-4c2b-b2ed-3a4ab90538d2)
+19:00:38 slu_secondary: Job OK (fd1e9372-0f8b-4bb3-aefe-1e5ba6f41524)
+19:00:38 Result is kept for 500 seconds
+19:00:38 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309012407408', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.240337'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (ad8e2905-dfff-4982-bd94-e542469b9098)
+19:00:38 slu_secondary: Job OK (97dbb596-f52c-4c2b-b2ed-3a4ab90538d2)
+19:00:38 Result is kept for 500 seconds
+19:00:38 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '1725630901274165', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.273754'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (d7203e24-fe44-4c47-8c6b-96cca5dd515f)
+19:00:50 slu_secondary: Job OK (d7203e24-fe44-4c47-8c6b-96cca5dd515f)
+19:00:50 Result is kept for 500 seconds
+19:00:50 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309013721008', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.371680'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (cefb51a8-0897-4925-a3d3-5e3d2e2c0557)
+19:00:50 slu_secondary: Job OK (ad8e2905-dfff-4982-bd94-e542469b9098)
+19:00:50 Result is kept for 500 seconds
+19:00:50 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309014053862', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.404955'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (60f85a3d-0d3d-4c60-bba5-ea38c506ef40)
+19:01:01 slu_secondary: Job OK (60f85a3d-0d3d-4c60-bba5-ea38c506ef40)
+19:01:01 Result is kept for 500 seconds
+19:01:01 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309015418344', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.541363'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (03945ca6-3d34-464e-9bc5-457c3741f64c)
+19:01:01 slu_secondary: Job OK (cefb51a8-0897-4925-a3d3-5e3d2e2c0557)
+19:01:01 Result is kept for 500 seconds
+19:01:01 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309015751755', 'warehouse': 'Returnable In-Transit Warehouse - U6', 'item_code': 'RI018', 'created_on': '2024-09-06 18:55:01.574777'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='adnan.arshed@gourmetpakistan.com') (664ccc15-ff68-4e27-a104-230d68a03d79)
+19:01:13 slu_secondary: Job OK (03945ca6-3d34-464e-9bc5-457c3741f64c)
+19:01:13 Result is kept for 500 seconds
+19:01:13 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '1725630951078147', 'warehouse': 'RM Main Store 1 - U6', 'item_code': 'RM000632', 'created_on': '2024-09-06 18:55:51.076743'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='khizar.hayyat@gourmetpakistan.com') (261d769c-ade0-4931-b8f4-c0e0d87caa56)
+19:01:13 slu_secondary: Job OK (664ccc15-ff68-4e27-a104-230d68a03d79)
+19:01:13 Result is kept for 500 seconds
+19:01:13 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309741479206', 'warehouse': 'RM Main Store 1 - U6', 'item_code': 'RM000632', 'created_on': '2024-09-06 18:56:14.146681'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='khizar.hayyat@gourmetpakistan.com') (0cbf890c-b51a-4688-b964-8c6f6a347259)
+19:01:14 slu_secondary: Job OK (261d769c-ade0-4931-b8f4-c0e0d87caa56)
+19:01:14 Result is kept for 500 seconds
+19:01:14 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '1725630985528105', 'warehouse': 'Finished Goods CSD - U11', 'item_code': 'FV002-P07', 'created_on': '2024-09-06 18:56:25.527540'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='fakhar.u11@gourmetpakistan.com') (ef3df792-10ec-4eff-94d3-e6babe9fa141)
+19:01:14 slu_secondary: Job OK (0cbf890c-b51a-4688-b964-8c6f6a347259)
+19:01:14 Result is kept for 500 seconds
+19:01:14 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256309855663207', 'warehouse': 'Finished Goods CSD - U11', 'item_code': 'FV004-P07', 'created_on': '2024-09-06 18:56:25.565701'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='fakhar.u11@gourmetpakistan.com') (41b4b06f-8a83-4c80-9cef-b37b80d8a0f4)
+19:01:15 slu_secondary: Job OK (41b4b06f-8a83-4c80-9cef-b37b80d8a0f4)
+19:01:15 Result is kept for 500 seconds
+19:01:15 slu_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', kwargs={'sle_name': '17256310505239944', 'warehouse': 'Shipping Store - U5', 'item_code': 'FW001-P05', 'created_on': '2024-09-06 18:57:30.523296'}, method='nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value', site='nrp.live', user='imran.shippingu5@gourmetpakistan.com') (7e4c9d4c-4015-4007-8c9b-1d0c29ef8c5f)
+19:01:16 slu_secondary: Job OK (ef3df792-10ec-4eff-94d3-e6babe9fa141)
+19:01:16 Result is kept for 500 seconds
+19:01:17 slu_secondary: Job OK (7e4c9d4c-4015-4007-8c9b-1d0c29ef8c5f)
+19:01:17 Result is kept for 500 seconds
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 177, in _read_from_socket
+    raise socket.error(SERVER_CLOSED_CONNECTION_ERROR)
+OSError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 668, in execute_command
+    return self.parse_response(connection, command_name, **options)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 680, in parse_response
+    response = connection.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 624, in read_response
+    response = self._parser.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 284, in read_response
+    response = self._buffer.readline()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 216, in readline
+    self._read_from_socket()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 191, in _read_from_socket
+    (e.args,))
+redis.exceptions.ConnectionError: Error while reading from socket: ('Connection closed by server.',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 486, in work
+    result = self.dequeue_job_and_maintain_ttl(timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 519, in dequeue_job_and_maintain_ttl
+    job_class=self.job_class)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 460, in dequeue_any
+    result = cls.lpop(queue_keys, timeout, connection=connection)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 410, in lpop
+    result = connection.blpop(queue_keys, timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 1269, in blpop
+    return self.execute_command('BLPOP', *keys)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2879, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 99, in <module>
+    main()
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 18, in main
+    click.Group(commands=commands)(prog_name='bench')
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 764, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 717, in main
+    rv = self.invoke(ctx)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 956, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 555, in invoke
+    return callback(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/commands/scheduler.py", line 167, in start_worker
+    start_worker(queue, quiet = quiet)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/background_jobs.py", line 176, in start_worker
+    Worker(queues, name=get_worker_name(queue)).work(logging_level = logging_level)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 502, in work
+    self.register_death()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 300, in register_death
+    p.execute()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2894, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 177, in _read_from_socket
+    raise socket.error(SERVER_CLOSED_CONNECTION_ERROR)
+OSError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 668, in execute_command
+    return self.parse_response(connection, command_name, **options)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 680, in parse_response
+    response = connection.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 624, in read_response
+    response = self._parser.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 284, in read_response
+    response = self._buffer.readline()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 216, in readline
+    self._read_from_socket()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 191, in _read_from_socket
+    (e.args,))
+redis.exceptions.ConnectionError: Error while reading from socket: ('Connection closed by server.',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 486, in work
+    result = self.dequeue_job_and_maintain_ttl(timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 519, in dequeue_job_and_maintain_ttl
+    job_class=self.job_class)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 460, in dequeue_any
+    result = cls.lpop(queue_keys, timeout, connection=connection)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 410, in lpop
+    result = connection.blpop(queue_keys, timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 1269, in blpop
+    return self.execute_command('BLPOP', *keys)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2879, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 99, in <module>
+    main()
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 18, in main
+    click.Group(commands=commands)(prog_name='bench')
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 764, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 717, in main
+    rv = self.invoke(ctx)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 956, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 555, in invoke
+    return callback(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/commands/scheduler.py", line 167, in start_worker
+    start_worker(queue, quiet = quiet)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/background_jobs.py", line 176, in start_worker
+    Worker(queues, name=get_worker_name(queue)).work(logging_level = logging_level)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 502, in work
+    self.register_death()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 300, in register_death
+    p.execute()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2894, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
