@@ -519,10 +519,10 @@ def create_salary_slips_for_employees(employees, args, publish_progress=True):
 	for emp in employees:
 		if emp not in salary_slips_exists_for:
 			count+=1
-			frappe.enqueue(create_salary_slip_for_employee, queue='short', emp=emp, employees=employees, args=args, 
+			frappe.enqueue(create_salary_slip_for_employee, queue='hr_secondary', emp=emp, employees=employees, args=args, 
 			count=count, ss_exists_for=salary_slips_exists_for, publish_progress=publish_progress, enqueue_after_commit=True)
 
-	frappe.enqueue(after_salary_slips_creation, queue='short', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
+	frappe.enqueue(after_salary_slips_creation, queue='hr_secondary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
 
 def get_existing_salary_slips(employees, args):
 	return frappe.db.sql_list("""
@@ -555,10 +555,10 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 	count = 0
 	for ss in salary_slips:
 		count+=1
-		frappe.enqueue(submit_salary_slip_for_employee, queue='short', ss=ss, count=count, publish_progress=publish_progress, 
+		frappe.enqueue(submit_salary_slip_for_employee, queue='hr_secondary', ss=ss, count=count, publish_progress=publish_progress, 
 		salary_slips=salary_slips, enqueue_after_commit=True)
 
-	frappe.enqueue(after_salary_slip_submission, queue='short', payroll_entry=payroll_entry, enqueue_after_commit=True)
+	frappe.enqueue(after_salary_slip_submission, queue='hr_secondary', payroll_entry=payroll_entry, enqueue_after_commit=True)
 
 def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
 	ss_obj = frappe.get_doc("Salary Slip",ss[0])
