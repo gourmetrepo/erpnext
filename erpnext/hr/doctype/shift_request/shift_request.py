@@ -25,8 +25,8 @@ class ShiftRequest(Document):
 			assignment_doc.employee = self.employee
 			assignment_doc.date = date
 			assignment_doc.shift_request = self.name
-			assignment_doc.insert()
-			assignment_doc.submit()
+			self.create_shift_assignment(assignment_doc)
+			self.submit_shift_assignment(assignment_doc)
 
 	def on_cancel(self):
 		shift_assignment_list = frappe.get_list("Shift Assignment", {'employee': self.employee, 'shift_request': self.name})
@@ -94,3 +94,15 @@ class ShiftRequest(Document):
 			reference_date += timedelta(days=1)
 
 		return date_list
+
+	def create_shift_assignment(self, shift_assignment):
+		try:
+			frappe.enqueue(shift_assignment.insert(), queue="hr_secondary")
+		except Exception as e:
+			frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while shift assignment: {e}")
+
+	def submit_shift_assignment(self, shift_assignment):
+		try:
+			frappe.enqueue(shift_assignment.submit(), queue="hr_secondary")
+		except Exception as e:
+			frappe.log_error(title="Shift Assignment Submission Exception", message=f"An exception occurred while shift assignment submission: {e}")
