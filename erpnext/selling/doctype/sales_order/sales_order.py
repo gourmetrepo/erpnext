@@ -190,7 +190,7 @@ class SalesOrder(SellingController):
 			existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and `status` not in ('Closed','Cancelled')""", self.customer, as_dict=True)
 			if existing_sales_order_against_customer:
 				existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
-				frappe.throw(_("Cannot create Sales Order. Sales Orders: {0} are already at draft for this Customer.").format(", ".join(existing_sales_order_links)))
+				frappe.throw(_("Cannot create Sales Order. Kindly close the following sale orders first: {0}").format(", ".join(existing_sales_order_links)))
 
 		from nrp_manufacturing.utils import returnable_items
 		returnables = returnable_items(self.items,self.company)
