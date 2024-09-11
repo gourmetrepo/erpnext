@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 import json
-from frappe.utils import cstr, flt, cint
+from frappe.utils import cstr, flt, cint, today, add_days
 from frappe import msgprint, _
 from frappe.model.mapper import get_mapped_doc
 from erpnext.controllers.buying_controller import BuyingController
@@ -561,6 +561,8 @@ def make_inter_company_sales_order(source_name, target_doc=None):
 
 @frappe.whitelist()
 def close_old_po(supplier,po_no,company):
+		current_date = today()
+		check_date = add_days(current_date, -3) # close PO's older than 3 days (includes current date)
 		purchase_orders = frappe.get_list(
 					"Purchase Order",
 					filters={
@@ -569,7 +571,8 @@ def close_old_po(supplier,po_no,company):
 						"company": company,
 						"supplier": supplier,
 						"name": ["!=", po_no],
-						"docstatus": 1
+						"docstatus": 1,
+						"creation": ["<=", check_date] 
 					},
 					fields=["name"]
 				)
