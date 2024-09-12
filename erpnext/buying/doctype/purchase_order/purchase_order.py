@@ -225,7 +225,8 @@ class PurchaseOrder(BuyingController):
 
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
-
+		self.transaction_date = today()
+		self.save()
 		if self.is_against_so():
 			self.update_status_updater()
 
@@ -572,7 +573,7 @@ def close_old_po(supplier,po_no,company):
 						"supplier": supplier,
 						"name": ["!=", po_no],
 						"docstatus": 1,
-						"creation": ["<=", check_date] 
+						"transaction_date": ["<=", check_date] 
 					},
 					fields=["name"]
 				)
