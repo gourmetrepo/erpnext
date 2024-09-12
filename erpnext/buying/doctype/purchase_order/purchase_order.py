@@ -226,7 +226,7 @@ class PurchaseOrder(BuyingController):
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
 		self.transaction_date = today()
-		self.save()
+		
 		if self.is_against_so():
 			self.update_status_updater()
 
