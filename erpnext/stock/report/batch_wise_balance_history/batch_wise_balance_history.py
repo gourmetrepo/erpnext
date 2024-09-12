@@ -71,9 +71,9 @@ def get_stock_ledger_entries(filters):
 	return frappe.db.sql("""
 		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no,sle.valuation_rate,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
 		from `tabStock Ledger Entry` as sle
-		LEFT JOIN `tabBatch` as b ON b.name = sle.batch_no
+		INNER JOIN `tabBatch` as b ON b.name = sle.batch_no
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
-		where sle.docstatus < 2 and ifnull(sle.batch_no, '') != '' %s
+		where sle.docstatus != 2 and ifnull(sle.batch_no, '') != '' %s
 		group by sle.voucher_no, sle.batch_no, sle.item_code, sle.warehouse
 		order by sle.item_code, sle.warehouse""" %
 		conditions, as_dict=1,debug=True)
