@@ -225,7 +225,8 @@ class PurchaseOrder(BuyingController):
 
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
-
+		self.transaction_date = today()
+		self.save()
 		if self.is_against_so():
 			self.update_status_updater()
 
@@ -562,7 +563,7 @@ def make_inter_company_sales_order(source_name, target_doc=None):
 @frappe.whitelist()
 def close_old_po(supplier,po_no,company):
 		current_date = today()
-		check_date = add_days(current_date, -3) # close PO's older than 3 days (includes current date)
+		check_date = add_days(current_date, -4) # close PO's older than 3 days (includes current date)
 		purchase_orders = frappe.get_list(
 					"Purchase Order",
 					filters={
@@ -572,7 +573,7 @@ def close_old_po(supplier,po_no,company):
 						"supplier": supplier,
 						"name": ["!=", po_no],
 						"docstatus": 1,
-						"creation": ["<=", check_date] 
+						"transaction_date": ["<=", check_date] 
 					},
 					fields=["name"]
 				)
