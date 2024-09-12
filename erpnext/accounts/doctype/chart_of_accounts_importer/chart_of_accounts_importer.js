@@ -131,7 +131,7 @@ var create_import_button = function(frm) {
 				company: frm.doc.company
 			},
 			freeze: true,
-			freeze_message: __("Creating Accounts..."),
+			freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			callback: function(r) {
 				if(!r.exc) {
 					clearInterval(frm.page["interval"]);

@@ -211,7 +211,7 @@ frappe.ui.form.on('Payroll Entry', {
 				},
 				doc: frm.doc,
 				freeze: true,
-				freeze_message: __('Validating Employee Attendance...')
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			});
 		}else{
 			frm.fields_dict.attendance_detail_html.html("");
@@ -235,7 +235,7 @@ const submit_salary_slip = function (frm) {
 				callback: function() {frm.events.refresh(frm);},
 				doc: frm.doc,
 				freeze: true,
-				freeze_message: __('Submitting Salary Slips and creating Journal Entry...')
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			});
 		},
 		function() {
@@ -259,7 +259,7 @@ let make_bank_entry = function (frm) {
 				);
 			},
 			freeze: true,
-			freeze_message: __("Creating Payment Entries......")
+			freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 		});
 	} else {
 		frappe.msgprint(__("Payment Account is mandatory"));
