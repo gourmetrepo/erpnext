@@ -32,7 +32,7 @@ frappe.ui.form.on("Payment Request", "refresh", function(frm) {
 				method: "erpnext.accounts.doctype.payment_request.payment_request.resend_payment_email",
 				args: {"docname": frm.doc.name},
 				freeze: true,
-				freeze_message: __("Sending"),
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 				callback: function(r){
 					if(!r.exc) {
 						frappe.msgprint(__("Message Sent"));
