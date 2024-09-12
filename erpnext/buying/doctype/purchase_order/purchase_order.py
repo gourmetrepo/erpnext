@@ -223,10 +223,13 @@ class PurchaseOrder(BuyingController):
 		self.notify_update()
 		clear_doctype_notifications(self)
 
+	def before_save(self):
+		self.transaction_date = today()
+
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
-		self.transaction_date = today()
 		
+
 		if self.is_against_so():
 			self.update_status_updater()
 
