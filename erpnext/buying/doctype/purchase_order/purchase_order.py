@@ -70,6 +70,8 @@ class PurchaseOrder(BuyingController):
 		self.create_raw_materials_supplied("supplied_items")
 		self.set_received_qty_for_drop_ship_items()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_order_reference)
+		
+
 
 	def validate_with_previous_doc(self):
 		super(PurchaseOrder, self).validate_with_previous_doc({
@@ -222,13 +224,13 @@ class PurchaseOrder(BuyingController):
 
 		self.notify_update()
 		clear_doctype_notifications(self)
-
-	def before_save(self):
-		self.transaction_date = today()
+	
+	
 
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
-		
+		frappe.db.sql("UPDATE `tabPurchase Order` SET `transaction_date`='{todaydate}' WHERE `name`='{docname}';".format(todaydate=today(),docname=self.name))
+		frappe.db.commit()
 
 		if self.is_against_so():
 			self.update_status_updater()
