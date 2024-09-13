@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 import json
-from frappe.utils import cstr, flt, cint
+from frappe.utils import cstr, flt, cint, today, add_days
 from frappe import msgprint, _
 from frappe.model.mapper import get_mapped_doc
 from erpnext.controllers.buying_controller import BuyingController
@@ -70,6 +70,8 @@ class PurchaseOrder(BuyingController):
 		self.create_raw_materials_supplied("supplied_items")
 		self.set_received_qty_for_drop_ship_items()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_order_reference)
+		
+
 
 	def validate_with_previous_doc(self):
 		super(PurchaseOrder, self).validate_with_previous_doc({
@@ -222,9 +224,13 @@ class PurchaseOrder(BuyingController):
 
 		self.notify_update()
 		clear_doctype_notifications(self)
+	
+	
 
 	def on_submit(self):
 		super(PurchaseOrder, self).on_submit()
+		frappe.db.sql("UPDATE `tabPurchase Order` SET `transaction_date`='{todaydate}' WHERE `name`='{docname}';".format(todaydate=today(),docname=self.name))
+		frappe.db.commit()
 
 		if self.is_against_so():
 			self.update_status_updater()
@@ -561,6 +567,8 @@ def make_inter_company_sales_order(source_name, target_doc=None):
 
 @frappe.whitelist()
 def close_old_po(supplier,po_no,company):
+		current_date = today()
+		check_date = add_days(current_date, -4) # close PO's older than 3 days (includes current date)
 		purchase_orders = frappe.get_list(
 					"Purchase Order",
 					filters={
@@ -569,7 +577,8 @@ def close_old_po(supplier,po_no,company):
 						"company": company,
 						"supplier": supplier,
 						"name": ["!=", po_no],
-						"docstatus": 1
+						"docstatus": 1,
+						"transaction_date": ["<=", check_date] 
 					},
 					fields=["name"]
 				)
