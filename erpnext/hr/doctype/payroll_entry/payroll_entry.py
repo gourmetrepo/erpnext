@@ -574,9 +574,10 @@ def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
 		frappe.publish_progress(count*100/len(salary_slips), title = _("Submitting Salary Slips..."))
 
 def after_salary_slip_submission(payroll_entry):
+	from nerp.modules.gourmet.payroll_entry.payroll_entry import make_accrual_jv_entry
 	ss_count = frappe.db.sql(f"Select count(*) as submitted_ss_count From `tabSalary Slip` where payroll_entry='{payroll_entry.name}' and docstatus=1;", as_dict=True)
 	if ss_count and ss_count[0].submitted_ss_count > 0:
-		payroll_entry.make_accrual_jv_entry()
+		make_accrual_jv_entry(payroll_entry)
 		payroll_entry.db_set("salary_slips_submitted", 1)
 		payroll_entry.notify_update()
 
