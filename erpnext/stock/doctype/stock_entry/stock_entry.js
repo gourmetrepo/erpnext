@@ -4,7 +4,13 @@ frappe.provide("erpnext.stock");
 
 frappe.ui.form.on('Stock Entry', {
 	cost_association:function(frm){
-		frm.set_df_property('cost_association','read_only',1);
+		if (frm.doc.cost_association) {
+			frm.set_df_property('cost_association','read_only',1);
+		}
+		else{
+			frm.set_df_property('cost_association','read_only',0);
+		}
+		
 	},
 	setup: function(frm) {
 		frm.set_query('work_order', function() {
