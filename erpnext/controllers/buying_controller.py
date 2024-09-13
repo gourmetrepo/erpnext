@@ -748,9 +748,9 @@ class BuyingController(StockController):
 		})
 		if self.project:
 			asset.update({'project': self.project})
-		if self.cost_center:
-			asset.update({'cost_center': self.cost_center})
-			
+		if item_data.cost_center:
+			asset.update({'cost_center': item_data.cost_center})
+
 		asset.flags.ignore_validate = True
 		asset.flags.ignore_mandatory = True
 		asset.set_missing_values()
