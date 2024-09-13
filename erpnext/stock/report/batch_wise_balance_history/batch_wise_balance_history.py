@@ -36,7 +36,7 @@ def get_columns(filters):
 	"""return columns based on filters"""
 
 	columns = [_("Supplier") + ":Link/Supplier:100"] +[_("Supplier Group") + ":Link/Supplier Group:100"] +[_("Item") + ":Link/Item:100"] + [_("Item Name") + "::150"] + [_("Description") + "::150"] + \
-	[_("Warehouse") + ":Link/Warehouse:100"] + [_("Batch") + ":Link/Batch:100"] + [_("Incoming Rate") + ":Float:120"]+ [_("Outgoing Rate") + ":Float:120"]+ [_("Valuation Rate") + ":Float:120"] + [_("Opening Qty") + ":Float:120"] + \
+	[_("Warehouse") + ":Link/Warehouse:100"] + [_("Batch") + ":Link/Batch:100"]+ [_("Expiry_Date") + ":Date:120"]  + [_("Incoming Rate") + ":Float:120"]+ [_("Outgoing Rate") + ":Float:120"]+ [_("Valuation Rate") + ":Float:120"] + [_("Opening Qty") + ":Float:120"] + \
 	[_("In Qty") + ":Float:80"] + [_("Out Qty") + ":Float:80"] + [_("Balance Qty") + ":Float:90"] + \
 	[_("UOM") + "::90"]
 
@@ -69,10 +69,11 @@ def get_conditions(filters):
 def get_stock_ledger_entries(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no,sle.valuation_rate,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
+		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no,pri.expiry_date,sle.valuation_rate,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
 		from `tabStock Ledger Entry` as sle
 		INNER JOIN `tabBatch` as b ON b.name = sle.batch_no
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
+		LEFT JOIN `tabPurchase Receipt Item` AS pri ON 	pri.parent =sle.voucher_no AND sle.item_code = pri.item_code
 		where sle.docstatus != 2  %s
 		group by sle.voucher_no, sle.batch_no, sle.item_code, sle.warehouse
 		order by sle.item_code, sle.warehouse""" %
