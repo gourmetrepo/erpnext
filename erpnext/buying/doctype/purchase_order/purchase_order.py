@@ -45,7 +45,7 @@ class PurchaseOrder(BuyingController):
 				if d.discount_percentage != 0.0:
 					frappe.throw(_("{0} Item rate is not according to buying & daily rate. Please contact to support team.")
 						.format(d.item_code))
-     
+	 
 		if self.docstatus == 1 :
 			self.set_status()
 			self.check_on_hold_or_closed_status()
@@ -252,7 +252,7 @@ class PurchaseOrder(BuyingController):
 		update_linked_doc(self.doctype, self.name, self.inter_company_order_reference)
 		if self.company=='Unit 6':
 			close_old_po(self.supplier,self.name,self.company)
-      
+	  
 	def on_cancel(self):
 		super(PurchaseOrder, self).on_cancel()
 
@@ -387,7 +387,7 @@ def make_purchase_receipt(source_name, target_doc=None):
 			"doctype": "Purchase Receipt",
 			"field_map": {
 				"supplier_warehouse":"supplier_warehouse",
-    		},
+			},
 			"validation": {
 				"docstatus": ["=", 1],
 			}
@@ -592,18 +592,27 @@ def close_old_po(supplier,po_no,company):
 
 # Moeiz Code to validate company cost center and accounts
 def validate_company_cost_center_and_accounts(purchase_order):
-    """Validate that the company's accounts and cost centers are used."""
-    company = purchase_order.company
+	"""Validate that the company's accounts and cost centers are used."""
+	company = purchase_order.company
 
-    # Fetch the company's accounts and cost centers
-    accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
-    cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
 
-    accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
-    cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
 
-    for tax in purchase_order.taxes: 
-        if tax.account_head and tax.account_head not in accounts:
-            frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
-        if tax.cost_center and tax.cost_center not in cost_centers:
-            frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
+
+	for item in purchase_order.items:
+		if item.expense_account and item.expense_account not in accounts:
+			frappe.throw(_("Row {0}: Expense Account {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
+		if item.cost_center and item.cost_center not in cost_centers:
+			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
+		if item.deferred_expense_account and item.deferred_expense_account not in accounts:
+			frappe.throw(_("Row {0}: Deferred Expense Account {1} does not belong to company {2}").format(item.idx, item.deferred_expense_account, company))
+
+	for tax in purchase_order.taxes: 
+		if tax.account_head and tax.account_head not in accounts:
+			frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
+		if tax.cost_center and tax.cost_center not in cost_centers:
+			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
