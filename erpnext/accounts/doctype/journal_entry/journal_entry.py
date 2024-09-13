@@ -42,6 +42,9 @@ class JournalEntry(AccountsController):
 		self.validate_inter_company_accounts()
 		if not self.title:
 			self.title = self.get_title()
+		
+		# Moeiz Check to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
 
 	def on_submit(self):
 		self.validate_cheque_info()
@@ -1072,3 +1075,25 @@ def settlement_reference(doctype, txt, searchfield, start, page_len, filters):
 	# 	cond = "and account_type = '%s'" % account_type
 
 	return frappe.db.sql("""SELECT name from `tabJournal Entry` WHERE provision_type = 'Booking' and voucher_type = 'Provisions Booking & Settlement' and settlement_reference is null """)
+
+
+
+
+# Moeiz Code to validate company cost center and accounts
+def validate_company_cost_center_and_accounts(journal_entry):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = journal_entry.company
+	
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if journal_entry.accounts:
+		for account in journal_entry.accounts: 
+			if account.account and account.account not in accounts:
+				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(account.idx, account.account, company))
+			if account.cost_center and account.cost_center not in cost_centers:
+				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(account.idx, account.cost_center, company))

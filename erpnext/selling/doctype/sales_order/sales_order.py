@@ -73,6 +73,9 @@ class SalesOrder(SellingController):
 		if not self.billing_status: self.billing_status = 'Not Billed'
 		if not self.delivery_status: self.delivery_status = 'Not Delivered'
 
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
+
 	def validate_po(self):
 		# validate p.o date v/s delivery date
 		if self.po_date and not self.skip_delivery_note:
@@ -1243,3 +1246,24 @@ def update_produced_qty_in_so_item(sales_order, sales_order_item):
 	if not total_produced_qty and frappe.flags.in_patch: return
 
 	frappe.db.set_value('Sales Order Item', sales_order_item, 'produced_qty', total_produced_qty)
+
+
+
+
+# Moeiz Code to validate company cost center and accounts
+def validate_company_cost_center_and_accounts(sales_order):
+    """Validate that the company's accounts and cost centers are used."""
+    company = sales_order.company
+
+    # Fetch the company's accounts and cost centers
+    accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+    cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+    accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+    cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+    for tax in sales_order.taxes: 
+        if tax.account_head and tax.account_head not in accounts:
+            frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
+        if tax.cost_center and tax.cost_center not in cost_centers:
+            frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))

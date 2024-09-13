@@ -616,7 +616,7 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 				return frappe.call({
 					method: "erpnext.selling.doctype.sales_order.sales_order." + method,
 					freeze: true,
-					freeze_message: __("Creating Purchase Order ..."),
+					freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 					args: {
 						"source_name": me.frm.doc.name,
 						"selected_items": selected_items
