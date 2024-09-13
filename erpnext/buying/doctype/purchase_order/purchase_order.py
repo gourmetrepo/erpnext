@@ -74,6 +74,9 @@ class PurchaseOrder(BuyingController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
+
 	def validate_with_previous_doc(self):
 		super(PurchaseOrder, self).validate_with_previous_doc({
 			"Supplier Quotation": {
