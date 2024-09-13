@@ -102,7 +102,9 @@ class PurchaseInvoice(BuyingController):
 		self.set_status()
 		self.validate_purchase_receipt_if_update_stock()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_invoice_reference)
-
+		
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
 	def validate_release_date(self):
 		if self.release_date and getdate(nowdate()) >= getdate(self.release_date):
 			frappe.throw(_('Release date must be in the future'))
@@ -1105,3 +1107,39 @@ def make_inter_company_sales_invoice(source_name, target_doc=None):
 
 def on_doctype_update():
 	frappe.db.add_index("Purchase Invoice", ["supplier", "is_return", "return_against"])
+
+
+
+
+
+# Moeiz Code to validate company cost center
+def validate_company_cost_center_and_accounts(purchase_invoice):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = purchase_invoice.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if purchase_invoice.credit_to and purchase_invoice.credit_to not in accounts:
+		frappe.throw(_("Credit to Account: {0} does not belong to company {1}").format(purchase_invoice.debit_to, company))
+
+
+	if purchase_invoice.items:
+		for item in purchase_invoice.items:
+			if item.expense_account and item.expense_account not in accounts:
+				frappe.throw(_("Row {0}: Expense Account {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
+			if item.cost_center and item.cost_center not in cost_centers:
+				frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
+			if item.deferred_expense_account and item.deferred_expense_account not in accounts:
+				frappe.throw(_("Row {0}: Deferred Expense Account {1} does not belong to company {2}").format(item.idx, item.deferred_expense_account, company))
+
+	if purchase_invoice.taxes:
+		for tax in purchase_invoice.taxes: 
+			if tax.account_head and tax.account_head not in accounts:
+				frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
+			if tax.cost_center and tax.cost_center not in cost_centers:
+				frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
