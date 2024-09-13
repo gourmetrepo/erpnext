@@ -73,7 +73,7 @@ def get_stock_ledger_entries(filters):
 		from `tabStock Ledger Entry` as sle
 		INNER JOIN `tabBatch` as b ON b.name = sle.batch_no
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
-		where sle.docstatus != 2 and ifnull(sle.batch_no, '') != '' %s
+		where sle.docstatus != 2  %s
 		group by sle.voucher_no, sle.batch_no, sle.item_code, sle.warehouse
 		order by sle.item_code, sle.warehouse""" %
 		conditions, as_dict=1,debug=True)
