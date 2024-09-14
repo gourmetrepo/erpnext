@@ -367,16 +367,16 @@ class SalesOrder(SellingController):
 	def update_status(self, status):
 		# Code by Moeiz
 		# Ticket # 120338 (Validate no existing Delivery Note and sales invoices on draft level for this sales order)
-		if status == "Closed":
-			existing_draft_level_dn = frappe.db.sql("""select name from `tabDelivery Note` where sale_order_refrence = %s and docstatus=0""", self.name, as_dict=True)
-			if existing_draft_level_dn:
-				existing_delivery_note_links = ["""<a href="#Form/Delivery Note/{0}">{1}</a>""".format(dn.name, dn.name) for dn in existing_draft_level_dn]
-				frappe.throw(_("Cannot close Sales Order. Delivery Notes: {0} are already at draft for this Sales Order.").format(", ".join(existing_delivery_note_links)))
+		# if status == "Closed":
+		# 	existing_draft_level_dn = frappe.db.sql("""select name from `tabDelivery Note` where sale_order_refrence = %s and docstatus=0""", self.name, as_dict=True)
+		# 	if existing_draft_level_dn:
+		# 		existing_delivery_note_links = ["""<a href="#Form/Delivery Note/{0}">{1}</a>""".format(dn.name, dn.name) for dn in existing_draft_level_dn]
+		# 		frappe.throw(_("Cannot close Sales Order. Delivery Notes: {0} are already at draft for this Sales Order.").format(", ".join(existing_delivery_note_links)))
 			
-			existing_draft_level_si = frappe.db.sql("""select name from `tabSales Invoice` where sale_order_reference = %s and docstatus=0""", self.name, as_dict=True)
-			if existing_draft_level_si:
-				existing_sales_invoice_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_draft_level_si]
-				frappe.throw(_("Cannot close Sales Order. Sales Invoices: {0} are already at draft for this Sales Order.").format(", ".join(existing_sales_invoice_links)))
+		# 	existing_draft_level_si = frappe.db.sql("""select name from `tabSales Invoice` where sale_order_reference = %s and docstatus=0""", self.name, as_dict=True)
+		# 	if existing_draft_level_si:
+		# 		existing_sales_invoice_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_draft_level_si]
+		# 		frappe.throw(_("Cannot close Sales Order. Sales Invoices: {0} are already at draft for this Sales Order.").format(", ".join(existing_sales_invoice_links)))
 		self.check_modified_date()
 		self.set_status(update=True, status=status)
 		self.update_reserved_qty()
