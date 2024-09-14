@@ -187,14 +187,13 @@ class SalesOrder(SellingController):
 	def before_save(self):
 		# Code by Moeiz
 		# Ticket # 120338 (Validate no existing Sales Order is already created for this customer at draft level. If yes, those sales order should be closed)
-		# Only for CSD
-		csd_companies = ("Unit 5", "Unit 5B", "Unit 5C", "Unit 5D", "Unit 8", "Unit 11", "Unit 17", "Unit 17B", "Unit 17C")
-		if self.company and self.company in csd_companies and self.is_new():
-			existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and `company` = %s and `status` not in ('Closed','Cancelled')""", (self.customer, self.company), as_dict=True, debug=True)
-			if existing_sales_order_against_customer:
-				existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
-				frappe.throw(_("Cannot create Sales Order. Kindly close the following sale orders first: {0}").format(", ".join(existing_sales_order_links)))
-		
+
+		# if self.is_new():
+		# 	existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and docstatus=0""", self.customer, as_dict=True)
+		# 	if existing_sales_order_against_customer:
+		# 		existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
+		# 		frappe.throw(_("Cannot create Sales Order. Sales Orders: {0} are already at draft for this Customer.").format(", ".join(existing_sales_order_links)))
+
 		from nrp_manufacturing.utils import returnable_items
 		returnables = returnable_items(self.items,self.company)
 		self.returnable_items = {} # reset		
