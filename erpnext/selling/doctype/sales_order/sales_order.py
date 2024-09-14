@@ -188,11 +188,11 @@ class SalesOrder(SellingController):
 		# Code by Moeiz
 		# Ticket # 120338 (Validate no existing Sales Order is already created for this customer at draft level. If yes, those sales order should be closed)
 
-		if self.is_new():
-			existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and docstatus=0""", self.customer, as_dict=True)
-			if existing_sales_order_against_customer:
-				existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
-				frappe.throw(_("Cannot create Sales Order. Sales Orders: {0} are already at draft for this Customer.").format(", ".join(existing_sales_order_links)))
+		# if self.is_new():
+		# 	existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and docstatus=0""", self.customer, as_dict=True)
+		# 	if existing_sales_order_against_customer:
+		# 		existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
+		# 		frappe.throw(_("Cannot create Sales Order. Sales Orders: {0} are already at draft for this Customer.").format(", ".join(existing_sales_order_links)))
 
 		from nrp_manufacturing.utils import returnable_items
 		returnables = returnable_items(self.items,self.company)
