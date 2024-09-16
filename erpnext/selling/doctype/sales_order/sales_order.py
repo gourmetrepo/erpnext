@@ -190,7 +190,7 @@ class SalesOrder(SellingController):
 		# Only for CSD
 		csd_companies = ("Unit 5", "Unit 5B", "Unit 5C", "Unit 5D", "Unit 8", "Unit 11", "Unit 17", "Unit 17B", "Unit 17C")
 		if self.company and self.company in csd_companies and self.is_new():
-			existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and `company` in %s and `status` not in ('Closed','Cancelled')""", (self.customer, csd_companies), as_dict=True, debug=True)
+			existing_sales_order_against_customer = frappe.db.sql("""select name from `tabSales Order` where customer = %s and `company` = %s and `status` not in ('Closed','Cancelled')""", (self.customer, self.company), as_dict=True, debug=True)
 			if existing_sales_order_against_customer:
 				existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
 				frappe.throw(_("Cannot create Sales Order. Kindly close the following sale orders first: {0}").format(", ".join(existing_sales_order_links)))
