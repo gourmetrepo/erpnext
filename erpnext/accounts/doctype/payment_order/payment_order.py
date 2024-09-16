@@ -14,8 +14,7 @@ class PaymentOrder(Document):
 	# Moeiz Code to validate company cost center and accounts
 	def validate(self):
 		validate_company_cost_center_and_accounts(self)
-
-
+		
 	def before_save(self):
 		suppliers = frappe.db.sql("""
 		SELECT
@@ -353,8 +352,6 @@ def make_payment_entry_on_single_click(name, mode_of_payment=None):
 			je.save()
 		
 		frappe.msgprint(_("Payment Entries created."))
-
-
 
 def validate_company_cost_center_and_accounts(payment_order):
 	"""Validate that the company's accounts and cost centers are used."""

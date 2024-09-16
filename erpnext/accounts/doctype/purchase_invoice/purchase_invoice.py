@@ -102,10 +102,9 @@ class PurchaseInvoice(BuyingController):
 		self.set_status()
 		self.validate_purchase_receipt_if_update_stock()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_invoice_reference)
-
+		
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
-
 	def validate_release_date(self):
 		if self.release_date and getdate(nowdate()) >= getdate(self.release_date):
 			frappe.throw(_('Release date must be in the future'))
@@ -1108,6 +1107,9 @@ def make_inter_company_sales_invoice(source_name, target_doc=None):
 
 def on_doctype_update():
 	frappe.db.add_index("Purchase Invoice", ["supplier", "is_return", "return_against"])
+
+
+
 
 
 # Moeiz Code to validate company cost center
