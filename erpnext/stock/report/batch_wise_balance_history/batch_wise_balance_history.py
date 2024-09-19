@@ -24,7 +24,7 @@ def execute(filters=None):
 			for batch in sorted(iwb_map[item][wh]):
 				qty_dict = iwb_map[item][wh][batch]
 				if qty_dict.opening_qty or qty_dict.in_qty or qty_dict.out_qty or qty_dict.bal_qty:
-					data.append([qty_dict.supplier_name,qty_dict.supplier_group,item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,expiry_date,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
+					data.append([qty_dict.supplier_name,qty_dict.supplier_group,item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,qty_dict.expiry_date,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
 						flt(qty_dict.opening_qty, float_precision), flt(qty_dict.in_qty, float_precision),
 						flt(qty_dict.out_qty, float_precision), flt(qty_dict.bal_qty, float_precision),
 						 item_map[item]["stock_uom"]
@@ -69,10 +69,14 @@ def get_conditions(filters):
 def get_stock_ledger_entries(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no,CONCAT(
-        TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ', 
-        DATEDIFF(CURDATE(), DATE_ADD(pri.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()) MONTH)), ' D'
-    ) AS expiry_date,sle.cdate,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
+		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no, 
+					  IF(pri.expiry_date IS NOT NULL, 
+        CONCAT(
+            TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ', 
+            DATEDIFF(CURDATE(), DATE_ADD(pri.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()) MONTH)), ' D'
+        ), 
+        'No Expiry Date'
+    ) AS expiry_date,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
 		from `tabStock Ledger Entry` as sle
 		INNER JOIN `tabBatch` as b ON b.name = sle.batch_no
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
