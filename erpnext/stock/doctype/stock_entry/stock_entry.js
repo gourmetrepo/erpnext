@@ -518,6 +518,11 @@ if (frm.doc.docstatus === 0) {
 			});
 		}
 
+		if (frm.doc.stock_entry_type == "Material Issue"){
+            frm.get_field("items").grid.toggle_enable("expense_account", 0);
+            refresh_field("items");
+        }
+
 		frm.trigger("setup_quality_inspection");
 	},
 
@@ -822,6 +827,13 @@ frappe.ui.form.on('Stock Entry Detail', {
 	batch_no: function(frm, cdt, cdn) {
 		validate_sample_quantity(frm, cdt, cdn);
 	},
+	
+	form_render(frm, cdt, cdn){
+		if (frm.doc.stock_entry_type == "Material Issue"){
+			frm.get_field("items").grid.toggle_enable("expense_account", 0);
+			refresh_field("items");
+		}
+	}
 });
 
 var validate_sample_quantity = function(frm, cdt, cdn) {
