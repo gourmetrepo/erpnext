@@ -24,7 +24,7 @@ def execute(filters=None):
 			for batch in sorted(iwb_map[item][wh]):
 				qty_dict = iwb_map[item][wh][batch]
 				if qty_dict.opening_qty or qty_dict.in_qty or qty_dict.out_qty or qty_dict.bal_qty:
-					data.append([qty_dict.supplier_name,qty_dict.supplier_group,item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,expiry_date,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
+					data.append([qty_dict.supplier_name,qty_dict.supplier_group,item, item_map[item]["item_name"], item_map[item]["description"], wh, batch,qty_dict.expiry_date,flt(qty_dict.incoming_rate),flt(qty_dict.outgoing_rate),flt(qty_dict.valuation_rate),
 						flt(qty_dict.opening_qty, float_precision), flt(qty_dict.in_qty, float_precision),
 						flt(qty_dict.out_qty, float_precision), flt(qty_dict.bal_qty, float_precision),
 						 item_map[item]["stock_uom"]
