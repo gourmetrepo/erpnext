@@ -76,6 +76,7 @@ class MaterialRequest(BuyingController):
 		validate_for_items(self)
 
 		self.set_title()
+		validate_company_cost_center_and_accounts(self)
 		# self.validate_qty_against_so()
 		# NOTE: Since Item BOM and FG quantities are combined, using current data, it cannot be validated
 		# Though the creation of Material Request from a Production Plan can be rethought to fix this
@@ -568,3 +569,22 @@ def create_pick_list(source_name, target_doc=None):
 	doc.set_item_locations()
 
 	return doc
+
+def validate_company_cost_center_and_accounts(self):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = self.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if self.items:
+		for item in self.items:
+			if item.expense_account and item.expense_account not in accounts:
+				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
+			
+			if item.cost_center and item.cost_center not in cost_centers:
+				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))

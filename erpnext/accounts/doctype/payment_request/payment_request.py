@@ -24,6 +24,9 @@ class PaymentRequest(Document):
 		self.validate_currency()
 		self.validate_subscription_details()
 
+		# Code by Moeiz to validate company cost centers and accounts
+		validate_company_cost_center_and_accounts(self)
+
 	def validate_reference_document(self):
 		if not self.reference_doctype or not self.reference_name:
 			frappe.throw(_("To create a Payment Request reference document is required"))
@@ -490,3 +493,17 @@ def make_payment_order(source_name, target_doc=None):
 	}, target_doc, set_missing_values)
 
 	return doclist
+
+
+
+
+def validate_company_cost_center_and_accounts(payment_request):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = payment_request.company
+
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+
+	if payment_request.cash_account and payment_request.cash_account not in accounts:
+		frappe.throw(_("Cash Account {0} does not belong to company {1}").format(payment_request.cash_account, company))

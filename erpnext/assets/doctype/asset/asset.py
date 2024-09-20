@@ -28,6 +28,9 @@ class Asset(AccountsController):
 
 		self.status = self.get_status()
 
+		# Code by Moeiz to validate company cost center and accounts
+		validate_company_cost_center_and_accounts(self)
+
 	def on_submit(self):
 		self.validate_in_use_date()
 		self.set_status()
@@ -780,3 +783,17 @@ def get_total_days(date, frequency):
 		cint(frequency) * -1)
 
 	return date_diff(date, period_start_date)
+
+
+
+# Moeiz Code to validate company cost center and accounts
+def validate_company_cost_center_and_accounts(asset):
+	"""Validate that the company's accounts and cost centers are used."""
+	company = asset.company
+
+	# Fetch the company's accounts and cost centers
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+
+	if asset.cost_center and asset.cost_center not in cost_centers:
+		frappe.throw(_("Cost Center {0} does not belong to company {1}").format(asset.cost_center, company))

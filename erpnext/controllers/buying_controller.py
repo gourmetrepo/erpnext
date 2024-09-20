@@ -746,6 +746,10 @@ class BuyingController(StockController):
 			'purchase_receipt': self.name if self.doctype == 'Purchase Receipt' else None,
 			'purchase_invoice': self.name if self.doctype == 'Purchase Invoice' else None
 		})
+		if self.project:
+			asset.update({'project': self.project})
+		if item_data.cost_center:
+			asset.update({'cost_center': item_data.cost_center})
 
 		asset.flags.ignore_validate = True
 		asset.flags.ignore_mandatory = True
