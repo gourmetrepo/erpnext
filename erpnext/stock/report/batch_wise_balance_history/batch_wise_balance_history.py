@@ -69,7 +69,7 @@ def get_conditions(filters):
 def get_stock_ledger_entries(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
-		select s.supplier_name,s.supplier_group,sle.item_code, sle.batch_no, 
+		select s.supplier_name,s.supplier_group,sle.item_code, sle.valuation_rate,sle.batch_no, 
 					  IF(pri.expiry_date IS NOT NULL, 
         CONCAT(
             TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ', 
