@@ -154,29 +154,10 @@ class LeaveApplication(Document):
 
 	def cancel_attendance(self):
 		if self.docstatus == 2:
-			emp_data = frappe.db.get_value('Employee', self.employee, ['holiday_list', 'company'], as_dict=True)
-			company = emp_data.get("company", "")
-			holiday_list = emp_data.get("holiday_list", "")
-			if not holiday_list:
-				holiday_list = frappe.get_cached_value('Company', company, "default_holiday_list")
-
-			holiday_dates_list = frappe.db.sql(f"""SELECT holiday_date from `tabHoliday` WHERE parent='{holiday_list}' and holiday_date BETWEEN '{self.from_date}' AND '{self.to_date}';""", as_list=True)
-			holiday_dates = [item for sublist in holiday_dates_list for item in sublist]
-			employee_attendance = frappe.db.sql("""select name, attendance_date from `tabAttendance` where employee = %s\
+			attendance = frappe.db.sql("""select name from `tabAttendance` where employee = %s\
 				and (attendance_date between %s and %s) and docstatus < 2 and status in ('On Leave', 'Half Day')""",(self.employee, self.from_date, self.to_date), as_dict=1)
-			for att in employee_attendance:
-				attendance_date = att.get("attendance_date", "")
-				if attendance_date in holiday_dates:
-					attendance = frappe.get_doc("Attendance", att.get("name", ""))
-					if attendance:
-						attendance.cancel()
-						attendance.delete()
-				else:
-					frappe.db.set_value("Attendance", att.get("name", ""), {
-						"status": "Absent",
-						"leave_type": "",
-						"leave_application": ""
-					})
+			for name in attendance:
+				frappe.db.set_value("Attendance", name, "docstatus", 2)
 
 	def validate_salary_processed_days(self):
 		if not frappe.db.get_value("Leave Type", self.leave_type, "is_lwp"):
