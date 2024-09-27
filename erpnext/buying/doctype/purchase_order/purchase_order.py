@@ -616,8 +616,8 @@ def validate_company_cost_center_and_accounts(purchase_order):
 			frappe.throw(_("Row {0}: Expense Account {1} does not belong to company {2}").format(item.idx, item.expense_account, company))
 		if item.cost_center and item.cost_center not in cost_centers:
 			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
-		if item.deferred_expense_account and item.deferred_expense_account not in accounts:
-			frappe.throw(_("Row {0}: Deferred Expense Account {1} does not belong to company {2}").format(item.idx, item.deferred_expense_account, company))
+		# if item.deferred_expense_account and item.deferred_expense_account not in accounts:
+		# 	frappe.throw(_("Row {0}: Deferred Expense Account {1} does not belong to company {2}").format(item.idx, item.deferred_expense_account, company))
 
 	for tax in purchase_order.taxes: 
 		if tax.account_head and tax.account_head not in accounts:
