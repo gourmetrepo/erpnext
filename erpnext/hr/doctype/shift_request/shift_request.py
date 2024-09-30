@@ -19,14 +19,7 @@ class ShiftRequest(Document):
 	def on_submit(self):
 		date_list = self.get_working_days(self.from_date, self.to_date)
 		for date in date_list:
-			assignment_doc = frappe.new_doc("Shift Assignment")
-			assignment_doc.company = self.company
-			assignment_doc.shift_type = self.shift_type
-			assignment_doc.employee = self.employee
-			assignment_doc.date = date
-			assignment_doc.shift_request = self.name
-			self.create_shift_assignment(assignment_doc)
-			self.submit_shift_assignment(assignment_doc)
+			frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.create_shift_assignment", queue='hr_secondary', doc=self, date=date, enqueue_after_commit=True)
 
 	def on_cancel(self):
 		shift_assignment_list = frappe.get_list("Shift Assignment", {'employee': self.employee, 'shift_request': self.name})
@@ -95,14 +88,18 @@ class ShiftRequest(Document):
 
 		return date_list
 
-	def create_shift_assignment(self, shift_assignment):
-		try:
-			frappe.enqueue(shift_assignment.insert(), queue="hr_secondary")
-		except Exception as e:
-			frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while shift assignment: {e}")
 
-	def submit_shift_assignment(self, shift_assignment):
-		try:
-			frappe.enqueue(shift_assignment.submit(), queue="hr_secondary")
-		except Exception as e:
-			frappe.log_error(title="Shift Assignment Submission Exception", message=f"An exception occurred while shift assignment submission: {e}")
+@frappe.whitelist()
+def create_shift_assignment(doc, date):
+	try:
+		assignment_doc = frappe.new_doc("Shift Assignment")
+		assignment_doc.company = doc.company
+		assignment_doc.shift_type = doc.shift_type
+		assignment_doc.employee = doc.employee
+		assignment_doc.date = date
+		assignment_doc.shift_request = doc.name
+		assignment_doc.save()
+		frappe.db.commit()
+		assignment_doc.submit()
+	except Exception as e:
+		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while shift assignment: {e}")
