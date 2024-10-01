@@ -468,6 +468,7 @@ def get_exploded_items(item_details, company, bom_no, include_non_stock_items, p
 
 def get_subitems(doc, data, item_details, bom_no, company, include_non_stock_items,
 	include_subcontracted_items, parent_qty, planned_qty=1):
+	from nrp_manufacturing.utils import round_decimals_down
 	items = frappe.db.sql("""
 		SELECT
 			bom_item.item_code, default_material_request_type, item.item_name,
@@ -496,6 +497,7 @@ def get_subitems(doc, data, item_details, bom_no, company, include_non_stock_ite
 		}, as_dict=1)
 
 	for d in items:
+		d.qty = round_decimals_down(d.qty, 3)
 		if not data.get('include_exploded_items') or not d.default_bom:
 			if d.item_code in item_details:
 				item_details[d.item_code].qty = item_details[d.item_code].qty + d.qty
