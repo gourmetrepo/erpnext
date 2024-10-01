@@ -26,6 +26,18 @@ frappe.ui.form.on("Quality Inspection", {
 				}
 			});
 		}
+	},
+
+	reference_name: function(frm) {
+		if (frm.doc.reference_type == "Purchase Receipt" || frm.doc.reference_type == "Purchase Invoice" || frm.doc.reference_type == "Stock Entry") {
+			frappe.call({
+				doc: frm.doc,
+				method: "set_supplier_fields",
+				callback: function(r){
+					frm.refresh();
+				}
+			});
+		}
 	}
 })
 

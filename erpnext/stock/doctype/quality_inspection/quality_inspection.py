@@ -72,6 +72,15 @@ class QualityInspection(Document):
 			""".format(parent_doc=self.reference_type, child_doc=doctype, conditions=conditions),
 				(quality_inspection, self.modified, self.reference_name, self.item_code))
 
+	# Add method to avoid fetch_from in supplier and supplier_name fields
+	def set_supplier_fields(self):
+		if self.reference_type in ("Purchase Receipt", "Purchase Invoice", "Stock Entry"):
+			sup_info = frappe.db.sql(f""" SELECT supplier, supplier_name FROM `tab{self.reference_type}` WHERE name="{self.reference_name}";""", as_dict=True)
+
+			if sup_info:
+				self.supplier = sup_info[0].get("supplier", "")
+				self.supplier_name = sup_info[0].get("supplier_name", "")
+
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def item_query(doctype, txt, searchfield, start, page_len, filters):
