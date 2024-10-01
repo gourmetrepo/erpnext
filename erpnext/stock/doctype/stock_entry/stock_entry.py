@@ -20,7 +20,7 @@ from erpnext.stock.utils import get_bin
 from frappe.model.mapper import get_mapped_doc
 from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit, get_serial_nos
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import OpeningEntryAccountError
-
+from nrp_manufacturing.utils import round_decimals_down
 import json
 
 from six import string_types, itervalues, iteritems
@@ -1049,6 +1049,31 @@ class StockEntry(StockController):
 		# item dict = { item_code: {qty, description, stock_uom} }
 		item_dict = get_bom_items_as_dict(self.bom_no, self.company, qty=qty,
 			fetch_exploded = self.use_multi_level_bom, fetch_qty_in_stock_uom=False)
+		
+		# check if single work order
+		wo_skip_transfer = frappe.db.get_value("Work Order", {"name": self.work_order}, ["name", "skip_transfer"], as_dict=1)
+		if wo_skip_transfer and wo_skip_transfer.skip_transfer == 1:
+			for details in item_dict.values():
+				# Warehouse checking against item category and item section
+				warehouse = details.source_warehouse
+				_warehouse = None
+				_item_category = frappe.db.get_value("Item",details["item_code"],["item_category"])
+				production_item = frappe.db.get_value("Work Order",self.work_order,["production_item"])
+				_item_section = frappe.db.get_value("Item",production_item,["item_section"])
+				
+				if _item_section:
+					_rm_ods, _pm_ods, _sf_ods, _fg_ods = frappe.db.get_value("Section Warehouse",{'company':self.company,"parent":_item_section},["rm_ods","pm_ods","sf_ods","fg_ods"])
+					if _item_category == "Raw Material" and _rm_ods and len(_rm_ods) > 0:
+						_warehouse = _rm_ods
+					elif _item_category == "Packing Material" and _pm_ods and len(_pm_ods) > 0:
+						_warehouse = _pm_ods
+					elif _item_category == "Semi Finished Good" and _sf_ods and len(_sf_ods) > 0:
+						_warehouse = _sf_ods
+					elif _item_category == "Finished Good" and _fg_ods and len(_fg_ods) > 0:
+						_warehouse = _fg_ods
+				else:
+					_warehouse = warehouse
+				details.source_warehouse = _warehouse
 
 		used_alternative_items = get_used_alternative_items(work_order = self.work_order)
 		for item in itervalues(item_dict):
@@ -1300,7 +1325,8 @@ class StockEntry(StockController):
 			se_child.item_code = item_dict[d].get('item_code') or cstr(d)
 			se_child.uom = item_dict[d]["uom"] if item_dict[d].get("uom") else stock_uom
 			se_child.stock_uom = stock_uom
-			se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+			# se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+			se_child.qty = round_decimals_down(item_dict[d]["qty"], se_child.precision("qty"))
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
 			se_child.cost_center = _cost_center[0]['cost_center'] or (item_dict[d].get("cost_center") or
