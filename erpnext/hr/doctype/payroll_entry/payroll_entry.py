@@ -124,7 +124,7 @@ class PayrollEntry(Document):
 				"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
 				"payroll_entry": self.name
 			})
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slips_for_employees", timeout=13600, employees=emp_list, args=args)
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, employees=emp_list, args=args)
 
 	def get_sal_slip_list(self, ss_status, as_dict=False):
 		"""
@@ -142,7 +142,7 @@ class PayrollEntry(Document):
 	def submit_salary_slips(self):
 		self.check_permission('write')
 		ss_list = self.get_sal_slip_list(ss_status=0)
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", timeout=13600, payroll_entry=self, salary_slips=ss_list)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry=self, salary_slips=ss_list)
 
 	def email_salary_slip(self, submitted_ss):
 		if frappe.db.get_single_value("HR Settings", "email_salary_slip_to_employee"):
@@ -520,10 +520,10 @@ def create_salary_slips_for_employees(employees, args, publish_progress=True):
 	for emp in employees:
 		if emp not in salary_slips_exists_for:
 			count+=1
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slip_for_employee", queue='hr_secondary', emp=emp, employees=employees, args=args, 
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slip_for_employee", queue='hr_tertiary', emp=emp, employees=employees, args=args, 
 			count=count, ss_exists_for=salary_slips_exists_for, publish_progress=publish_progress, enqueue_after_commit=True)
 
-	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_secondary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
+	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_tertiary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
 
 def get_existing_salary_slips(employees, args):
 	return frappe.db.sql_list("""
@@ -559,10 +559,10 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 	count = 0
 	for ss in salary_slips:
 		count+=1
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_secondary', ss=ss, count=count, publish_progress=publish_progress, 
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
 		salary_slips=salary_slips, enqueue_after_commit=True)
 
-	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_secondary', payroll_entry=payroll_entry, enqueue_after_commit=True)
+	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry=payroll_entry, enqueue_after_commit=True)
 
 @frappe.whitelist()
 def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
