@@ -85,6 +85,8 @@ class QualityInspection(Document):
 @frappe.validate_and_sanitize_search_inputs
 def item_query(doctype, txt, searchfield, start, page_len, filters):
 	if filters.get("from"):
+		if filters.get("from") == "Work Order Item":
+			return frappe.db.sql(f"""select production_item from `tabWork Order` where name="{filters.get("parent")}" and docstatus < 2;""")
 		from frappe.desk.reportview import get_match_cond
 		mcond = get_match_cond(filters["from"])
 		cond, qi_condition = "", "and (quality_inspection is null or quality_inspection = '')"
@@ -110,6 +112,13 @@ def item_query(doctype, txt, searchfield, start, page_len, filters):
 			parent=filters.get('parent'), cond = cond, mcond = mcond, start = start,
 			page_len = page_len, qi_condition = qi_condition),
 			{'parent': filters.get('parent'), 'txt': "%%%s%%" % txt})
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def wo_item_query(doctype, txt, searchfield, start, page_len, filters):
+	if filters.get("doctype"):
+		if filters.get("doctype") == "Work Order":
+			return frappe.db.sql(f"""select production_item from `tabWork Order` where name="{filters.get("name")}" and docstatus < 2""")
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
