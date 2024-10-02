@@ -15,7 +15,7 @@ class ShiftRequest(Document):
 		self.validate_dates()
 		self.validate_shift_request_overlap_dates()
 	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary")
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
 	def on_submit(self):
 		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.create_shift_assignment", queue='hr_secondary', doc=self, enqueue_after_commit=True)
 
@@ -101,12 +101,11 @@ def create_shift_assignment(doc):
 			assignment_doc.shift_request = doc.name
 			assignment_doc.save()
 			doc_list.append(assignment_doc.name)
-		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.submit_shift_assignment", queue='hr_secondary', doc_names=doc_list, enqueue_after_commit=True)
+		submit_shift_assignment(doc_list)
 	except Exception as e:
 		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while saving shift assignment: {e}")
 
 
-@frappe.whitelist()
 def submit_shift_assignment(doc_names):
 	if doc_names:
 		try:			
