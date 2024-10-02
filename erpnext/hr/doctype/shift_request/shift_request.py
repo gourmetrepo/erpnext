@@ -99,7 +99,6 @@ def create_shift_assignment(doc, date):
 		assignment_doc.date = date
 		assignment_doc.shift_request = doc.name
 		assignment_doc.save()
-		frappe.db.commit()
 		assignment_doc.submit()
 	except Exception as e:
 		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while shift assignment: {e}")
