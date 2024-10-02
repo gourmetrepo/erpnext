@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 import frappe
+import json
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import formatdate, getdate
@@ -103,6 +104,14 @@ def create_shift_assignment(doc):
 			doc_list.append(assignment_doc.name)
 		submit_shift_assignment(doc_list)
 	except Exception as e:
+		frappe.db.rollback()
+		# add a comment (?)
+		if frappe.local.message_log:
+			msg = json.loads(frappe.local.message_log[-1]).get('message')
+		else:
+			msg = '<pre><code>' + frappe.get_traceback() + '</pre></code>'
+
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + msg)
 		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while saving shift assignment: {e}")
 
 
