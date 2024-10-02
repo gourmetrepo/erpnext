@@ -22,7 +22,7 @@ from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_su
 from erpnext.stock.doctype.stock_reconciliation.stock_reconciliation import OpeningEntryAccountError
 from nrp_manufacturing.utils import round_decimals_down
 import json
-
+import math
 from six import string_types, itervalues, iteritems
 
 class IncorrectValuationRateError(frappe.ValidationError):
@@ -1340,6 +1340,10 @@ class StockEntry(StockController):
 			se_child.uom = item_dict[d]["uom"] if item_dict[d].get("uom") else stock_uom
 			se_child.stock_uom = stock_uom
 			# se_child.qty = flt(item_dict[d]["qty"], se_child.precision("qty"))
+			# Code by Moeiz to take floor of qty used in manufacturing to avoid batch decimal issue upto three decimal places
+			# Suggested by Shoaib Rehmat Ali Rajput Janjua
+			if not isinstance(item_dict[d]["qty"], float):
+				item_dict[d]["qty"] = float(item_dict[d]["qty"])
 			se_child.qty = round_decimals_down(item_dict[d]["qty"], se_child.precision("qty"))
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
