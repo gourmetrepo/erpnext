@@ -1095,5 +1095,11 @@ def validate_company_cost_center_and_accounts(journal_entry):
 		for account in journal_entry.accounts: 
 			if account.account and account.account not in accounts:
 				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(account.idx, account.account, company))
-			if account.cost_center and account.cost_center not in cost_centers:
-				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(account.idx, account.cost_center, company))
+			if account.cost_center:
+				if account.cost_center not in cost_centers:
+					frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(account.idx, account.cost_center, company))
+			else:
+				account_type = frappe.get_cached_value("Account", account.account, "account_type")
+				if (account_type in ('Expense Account','Income Account')):
+					default_cost_center = frappe.get_cached_value('Company',  journal_entry.company,  "cost_center")
+					account.cost_center=default_cost_center
