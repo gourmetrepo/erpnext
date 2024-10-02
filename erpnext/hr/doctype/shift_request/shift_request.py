@@ -102,7 +102,7 @@ def create_shift_assignment(doc):
 			assignment_doc.shift_request = doc.name
 			assignment_doc.save()
 			doc_list.append(assignment_doc.name)
-		submit_shift_assignment(doc_list)
+		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.submit_shift_assignment", queue='hr_secondary', doc_names=doc_list, enqueue_after_commit=True)
 	except Exception as e:
 		frappe.db.rollback()
 		# add a comment (?)
@@ -115,6 +115,7 @@ def create_shift_assignment(doc):
 		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while saving shift assignment: {e}")
 
 
+@frappe.whitelist()
 def submit_shift_assignment(doc_names):
 	if doc_names:
 		try:			
