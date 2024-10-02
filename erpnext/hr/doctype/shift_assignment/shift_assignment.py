@@ -17,7 +17,7 @@ class ShiftAssignment(Document):
 	def validate(self):
 		self.validate_overlapping_dates()
 	def submit(self):
-		self.queue_action('submit',queue_name="hr_tertiary")
+		self.queue_action('submit',queue_name="hr_secondary")
 	def validate_overlapping_dates(self):
 			if not self.name:
 				self.name = "New Shift Assignment"
