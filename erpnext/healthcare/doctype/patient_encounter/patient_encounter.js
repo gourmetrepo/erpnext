@@ -116,7 +116,7 @@ var schedule_inpatient = function(frm) {
 			}
 		},
 		freeze: true,
-		freeze_message: __("Process Inpatient Scheduling")
+		freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 	});
 };
 
@@ -130,7 +130,7 @@ var schedule_discharge = function(frm) {
 			}
 		},
 		freeze: true,
-		freeze_message: __("Process Discharge")
+		freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 	});
 };
 

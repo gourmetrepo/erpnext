@@ -281,7 +281,7 @@ var check_and_set_availability = function(frm) {
 					}
 				},
 				freeze: true,
-				freeze_message: __("Fetching records......")
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			});
 		}else{
 			fd.available_slots.html("Appointment date and Healthcare Practitioner are Mandatory".bold());
