@@ -536,13 +536,16 @@ def get_valuation_rate(item_code, warehouse, voucher_type, voucher_no,
 		# if  item_code in price_for_gl_entry:
 		# 	return  price_for_gl_entry[item_code]
 		# else:
+
+
+
 		last_valuation_rate = frappe.db.sql("""select valuation_rate
 			from `tabStock Ledger Entry`
 			where
 			item_code = %s
 			AND valuation_rate > 0
 			AND voucher_no like %s 
-			order by posting_date desc, posting_time desc,batch_no desc, name desc limit 1""", (item_code,"%STE%"))
+			order by concat(posting_date,posting_time,batch_no,name) desc limit 1""", (item_code,"%STE%"))
 	else:
 		last_valuation_rate = frappe.db.sql("""select valuation_rate
 			from `tabStock Ledger Entry`
@@ -551,7 +554,7 @@ def get_valuation_rate(item_code, warehouse, voucher_type, voucher_no,
 				AND warehouse = %s
 				AND valuation_rate >= 0
 				AND NOT (voucher_no = %s AND voucher_type = %s)
-			order by posting_date desc, posting_time desc, name desc limit 1""", (item_code, warehouse, voucher_no, voucher_type))
+			ORDER BY concat(posting_date,posting_time,NAME) DESC LIMIT 1""", (item_code, warehouse, voucher_no, voucher_type))
 
 		if not last_valuation_rate:
 			# Get valuation rate from last sle for the item against any warehouse
@@ -561,7 +564,7 @@ def get_valuation_rate(item_code, warehouse, voucher_type, voucher_no,
 					item_code = %s
 					AND valuation_rate > 0
 					AND NOT(voucher_no = %s AND voucher_type = %s)
-				order by posting_date desc, posting_time desc, name desc limit 1""", (item_code, voucher_no, voucher_type))
+				ORDER BY concat(posting_date,posting_time,NAME) DESC LIMIT 1""", (item_code, voucher_no, voucher_type))
 
 	if last_valuation_rate:
 		return flt(last_valuation_rate[0][0]) # as there is previous records, it might come with zero rate
