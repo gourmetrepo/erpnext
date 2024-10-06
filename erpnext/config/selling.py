@@ -281,6 +281,17 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
+					"name": "Gate Sales Report",
+					"label": _("Gate Sales Report"),
+					"doctype": "Gate Pass",
+					"route_options": {
+						"gatepasstype": "Shop Dispatch",
+						"company":"Unit 6"
+					}
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
 					"name": "BOM Search",
 					"doctype": "BOM"
 				},
