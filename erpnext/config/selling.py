@@ -285,7 +285,6 @@ def get_data():
 					"label": _("Gate Sales Report"),
 					"doctype": "Gate Pass",
 					"route_options": {
-						"gatepasstype": "Shop Dispatch",
 						"company":"Unit 6"
 					}
 				},
