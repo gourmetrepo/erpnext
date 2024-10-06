@@ -283,10 +283,7 @@ def get_data():
 					"is_query_report": True,
 					"name": "Gate Sales Report",
 					"label": _("Gate Sales Report"),
-					"doctype": "Gate Pass",
-					"route_options": {
-						"company":"Unit 6"
-					}
+					"doctype": "Gate Pass"
 				},
 				{
 					"type": "report",
