@@ -288,6 +288,13 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
+					"name": "Vehicle Wise DN",
+					"label": _("Vehicle Wise DN"),
+					"doctype": "Delivery Note"
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
 					"name": "BOM Search",
 					"doctype": "BOM"
 				},
