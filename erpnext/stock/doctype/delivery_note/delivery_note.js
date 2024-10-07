@@ -34,7 +34,14 @@ frappe.ui.form.on("Delivery Note", {
 				}
 			}
 		})
-
+		frm.set_query('vehicle',function(doc){
+			return {
+				filters: {
+					enable:1, 
+					company : doc.company
+				}
+			}
+		});
 		frm.set_query('transporter', function() {
 			return {
 				filters: {
