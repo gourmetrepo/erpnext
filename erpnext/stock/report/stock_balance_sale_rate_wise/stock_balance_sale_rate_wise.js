@@ -57,23 +57,14 @@ frappe.query_reports["Stock Balance Sale Rate Wise"] = {
 			"reqd": 1,
 			get_query: () => {
 				var warehouse_type = frappe.query_report.get_filter_value('warehouse_type');
-				var company = frappe.query_reports.get_filter_value('company');
-				if(warehouse_type){
-					return {
-						filters: {
-							'warehouse_type': warehouse_type,
-							'company':company
-						}
-					};
-				}
-				else{
-					return {
-						filters: {
-							'warehouse_type': 'Finished Good Store',
-							'company':company
-						}
-					};
-				}
+				var company = frappe.query_report.get_filter_value('company');
+			 
+				return {
+					filters: {
+						'warehouse_type': warehouse_type || 'Finished Good Store',  // Default to 'Finished Good Store' if no warehouse_type is selected
+						'company': company
+					}
+				};
 			}
 		},
 		{
