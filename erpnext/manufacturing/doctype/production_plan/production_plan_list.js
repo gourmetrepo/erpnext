@@ -9,6 +9,7 @@ frappe.listview_settings['Production Plan'] = {
 				"Draft": "red",
 				"In Process": "orange",
 				"Completed": "green",
+				"Closed by Single Work Order": "green",
 				"Material Requested": "darkgrey",
 				"Cancelled": "darkgrey"
 			}[doc.status], "status,=," + doc.status];
