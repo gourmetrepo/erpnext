@@ -36,7 +36,7 @@ def insertDataQueue(from_date,to_date,heads,companies):
 		
 		while from_date <= to_date:
 			frappe.enqueue(
-				"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
+				"erpnext.erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
 				from_date=from_date.strftime('%Y-%m-%d'),
 				to_date=from_date.strftime('%Y-%m-%d'),
 				heads=heads,
