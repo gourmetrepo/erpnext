@@ -235,13 +235,15 @@ class StockEntry(StockController):
 				frappe.delete_doc("Stock Entry", d.name)
 
 	def set_transfer_qty(self):
-		for item in self.get("items"):
-			if not flt(item.qty):
-				frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
-			if not flt(item.conversion_factor):
-				frappe.throw(_("Row {0}: UOM Conversion Factor is mandatory").format(item.idx))
-			item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
-				self.precision("transfer_qty", item))
+		skip_transfer = frappe.get_value('Work Order', self.work_order, ['skip_transfer'])		
+		if skip_transfer == None or skip_transfer == 0:
+			for item in self.get("items"):
+				if not flt(item.qty):
+					frappe.throw(_("Row {0}: Qty is mandatory").format(item.idx))
+				if not flt(item.conversion_factor):
+					frappe.throw(_("Row {0}: UOM Conversion Factor is mandatory").format(item.idx))
+				item.transfer_qty = flt(flt(item.qty) * flt(item.conversion_factor),
+					self.precision("transfer_qty", item))
 
 	def update_cost_in_project(self):
 		if (self.work_order and not frappe.db.get_value("Work Order",
