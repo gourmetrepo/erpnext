@@ -28,7 +28,7 @@ def insertDataQueue(from_date,to_date,heads,companies):
 			AND `date` <= %(to_date)s
 			AND company IN %(companies)s
 		"""
-		frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': companies_tuple})
+		frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': companies_tuple},debug=1)
 		frappe.db.commit()
 		from_date = from_date.strip()  
 		to_date = to_date.strip() 
@@ -46,8 +46,9 @@ def insertDataQueue(from_date,to_date,heads,companies):
 				timeout=13000,
 				enqueue_after_commit=True
 			)
+			frappe.db.commit()
 			from_date += timedelta(days=1)
-		frappe.db.commit()
+		
 	except Exception as e:
 		title = "CSD Cash Flow Data"
 		traceback = frappe.get_traceback()
