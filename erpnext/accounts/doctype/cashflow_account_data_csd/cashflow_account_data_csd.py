@@ -28,9 +28,10 @@ def insertDataQueue(from_date,to_date,heads,companies):
 			AND `date` <= %(to_date)s
 			AND company IN %(companies)s
 		"""
-		frappe.db.sql(query, {'from_date': from_date, 'to_date': to_date, 'companies': companies_tuple})
+		frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': companies_tuple})
 		frappe.db.commit()
-		
+		from_date = from_date.strip()  
+		to_date = to_date.strip() 
 		from_date = datetime.strptime(from_date, '%Y-%m-%d')
 		to_date = datetime.strptime(to_date, '%Y-%m-%d')
 		
