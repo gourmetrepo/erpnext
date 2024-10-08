@@ -47,6 +47,7 @@ def insertDataQueue(from_date,to_date,heads,companies):
 				enqueue_after_commit=True
 			)
 			from_date += timedelta(days=1)
+		frappe.db.commit()
 	except Exception as e:
 		title = "CSD Cash Flow Data"
 		traceback = frappe.get_traceback()
