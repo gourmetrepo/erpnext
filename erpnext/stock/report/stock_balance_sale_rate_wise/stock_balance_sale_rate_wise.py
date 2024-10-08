@@ -143,7 +143,7 @@ def get_conditions(filters):
 			filters.get("warehouse"), ["lft", "rgt"], as_dict=1)
 		if warehouse_details:
 			conditions += " and exists (select name from `tabWarehouse` wh \
-				where wh.lft >= %s and wh.rgt <= %s and sle.warehouse = wh.name)"%(warehouse_details.lft,
+				where wh.lft >= %s and wh.rgt <= %s and sle.warehouse = wh.name and wh.parent_warehouse LIKE '%Finished Goods%' and wh.parent_warehouse LIKE '%Shipping%')"%(warehouse_details.lft,
 				warehouse_details.rgt)
 
 	if filters.get("warehouse_type") and not filters.get("warehouse"):
