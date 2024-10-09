@@ -709,11 +709,16 @@ def make_damage_return_stock_entry(work_order_id, purpose):
 								   WHERE parent = '{section}' 
 								   AND company = '{company}';
                                     """.format( section = work_order.item_section, company = work_order.company), as_dict=1)
-		stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
+		if len(damage_warehouse) > 0 and "damage_warehouse" in damage_warehouse[0]:
+			stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
+		else:
+			frappe.throw(f'Damage Warehouse not mapped in section warehouse for {work_order.item_section}')
 		stock_entry.from_warehouse = wip_warehouse
 
 	stock_entry.set_stock_entry_type()
 	stock_entry.get_items()
+	
+
 	return stock_entry.as_dict()
 
 

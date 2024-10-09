@@ -674,8 +674,7 @@ erpnext.work_order = {
 			});
 	
 			if (r && r.message) {
-				console.log("Stock entry:", r.message.doctype);
-	
+
 				// Sync the returned stock entry with the local model
 				frappe.model.sync(r.message);
 	
