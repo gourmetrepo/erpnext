@@ -1075,7 +1075,8 @@ class StockEntry(StockController):
 						_warehouse = _fg_ods
 				else:
 					_warehouse = warehouse
-				details.source_warehouse = _warehouse
+				if _warehouse is not None:
+					details.source_warehouse = _warehouse
 
 		used_alternative_items = get_used_alternative_items(work_order = self.work_order)
 		for item in itervalues(item_dict):
