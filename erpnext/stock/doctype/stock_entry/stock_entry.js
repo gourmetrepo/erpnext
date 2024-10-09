@@ -534,6 +534,8 @@ if (frm.doc.docstatus === 0) {
 
 		frm.trigger("setup_quality_inspection");
 
+		debugger;
+
 		// Code by Moeiz for WIP Damage Return to disable fields
 		if(this.frm.doc.purpose == "Return WIP Damage") {
 			this.frm.set_df_property("fg_completed_qty", "hidden", 1);
