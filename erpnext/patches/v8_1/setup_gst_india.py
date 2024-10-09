@@ -34,20 +34,20 @@ def delete_custom_field_tax_id_if_exists():
 def send_gst_update_email():
 	message = """Hello,
 
-<p>ERPNext is now GST Ready!</p>
+<p>GERP is now GST Ready!</p>
 
 <p>To start making GST Invoices from 1st of July, you just need to create new Tax Accounts,
 Templates and update your Customer's and Supplier's GST Numbers.</p>
 
-<p>Please refer {gst_document_link} to know more about how to setup and implement GST in ERPNext.</p>
+<p>Please refer {gst_document_link} to know more about how to setup and implement GST in GERP.</p>
 
-<p>Please contact us at support@erpnext.com, if you have any questions.</p>
+<p>Please contact us at support@gicoh.com, if you have any questions.</p>
 
 <p>Thanks,</p>
-ERPNext Team.
-	""".format(gst_document_link="<a href='http://frappe.github.io/erpnext/user/manual/en/regional/india/'> ERPNext GST Document </a>")
+GERP Team.
+	""".format(gst_document_link="<a href='http://frappe.github.io/erpnext/user/manual/en/regional/india/'> GERP GST Document </a>")
 
 	try:
-		sendmail_to_system_managers("[Important] ERPNext GST updates", message)
+		sendmail_to_system_managers("[Important] GERP GST updates", message)
 	except Exception as e:
 		pass

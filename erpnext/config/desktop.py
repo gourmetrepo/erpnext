@@ -206,6 +206,6 @@ def get_data():
 			"link": '#marketplace/home',
 			"color": '#FF4136',
 			'standard': 1,
-			"description": "Publish items to other ERPNext users."
+			"description": "Publish items to other GERP users."
 		},
 	]
