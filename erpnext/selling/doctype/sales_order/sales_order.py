@@ -198,7 +198,8 @@ class SalesOrder(SellingController):
 
 		if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
 			returnables = returnable_items(self.items,self.company, "CSD")
-			self.returnable_items = {} # reset		
+			self.returnable_items = {} # reset
+			clubbed_returnable_items = {}
 			for returnable in returnables:
 				ordered_qty = 0
 				for item in self.items:
@@ -220,13 +221,28 @@ class SalesOrder(SellingController):
 				# 		minus_qty = i.qty
 				# 		break
 				# qty -= minus_qty
-				temp_item = self.append('returnable_items',{})
-				temp_item.item_code = returnable.returnable_item
-				temp_item.item_name = returnable.returnable_item_name
-				temp_item.rate = returnable.sale_price
-				temp_item.item_group = returnable.item_group
-				temp_item.qty = qty
-				temp_item.is_allways_return = returnable.is_allways_return
+
+				if returnable.returnable_item not in clubbed_returnable_items.keys():
+					clubbed_returnable_items[returnable.returnable_item] = {'item_name': returnable.returnable_item_name, 'rate': returnable.sale_price, 'qty': qty, 'is_allways_return': returnable.is_allways_return}
+				else:
+					clubbed_returnable_items[returnable.returnable_item]['qty'] += qty
+				
+			for item, returnable in clubbed_returnable_items.items():
+				returnable_doc = frappe.new_doc("Sale Order Returnable Item")
+				returnable_doc.item_code = item
+				returnable_doc.item_name = returnable['item_name']
+				returnable_doc.rate = returnable['rate']
+				returnable_doc.qty = returnable['qty']
+				returnable_doc.is_allways_return = returnable['is_allways_return']
+				self.append('returnable_items', returnable_doc)
+				
+				# temp_item = self.append('returnable_items',{})
+				# temp_item.item_code = returnable.returnable_item
+				# temp_item.item_name = returnable.returnable_item_name
+				# temp_item.rate = returnable.sale_price
+				# temp_item.item_group = returnable.item_group
+				# temp_item.qty = qty
+				# temp_item.is_allways_return = returnable.is_allways_return
 		else:
 			returnables = returnable_items(self.items,self.company)
 			self.returnable_items = {} # reset		
