@@ -208,11 +208,7 @@ class SalesOrder(SellingController):
 						break
 				if ordered_qty == 0:
 					frappe.throw(f"Item Group {returnable.item_group} qty must be greater then zero")
-				if returnable.returnable_qty == 1:
-					qty = ordered_qty / returnable.item_qty
-				else:
-					res = returnable.item_qty / returnable.returnable_qty
-					qty = ordered_qty * res
+				qty = ordered_qty / returnable.item_qty
 				qty = math.ceil(qty)
 				# check if item is ordered then please adjust the RI quantity
 				# minus_qty = 0
