@@ -216,12 +216,36 @@ class DeliveryNote(SellingController):
 			return
 		# umair added returnable total quantity
 		returnables = self.get("returnable_items")
+		returnable_items_code = list({returnable.item_code for returnable in returnables})
 
 
 		# Validation Code for returnable items to check whether their clubbed total is equal to the delivered total
-	
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.manually_manage_return_items:
+				returnable_items_code = list({returnable.item_code for returnable in returnables})
+
+				item_codes_str = ", ".join(f"'{item}'" for item in returnable_items_code)
+				returnable_items_list = frappe.db.sql(
+					f"""SELECT  item_code, item_group FROM `tabItem` WHERE name IN ({item_codes_str}) """,
+					as_dict=True
+				)
 
 
+				returnable_items_dict = {returnable_item['item_code']: returnable_item['item_group'] for returnable_item in returnable_items_list}
+				
+				grouped_returnable_items = {}
+				for item_returnable in self.returnable_items:
+					returnable_item_group = returnable_items_dict.get(item_returnable.item_code, None)
+					if returnable_item_group:
+						if returnable_item_group not in grouped_returnable_items.keys():
+							grouped_returnable_items[returnable_item_group] = {"so_qty": float(item_returnable.so_qty), "added_qty": float(item_returnable.actual_qty)}
+							
+						else:
+							grouped_returnable_items[returnable_item_group]["added_qty"] += float(item_returnable.actual_qty)
+				
+
+				for group, item in grouped_returnable_items.items():
+					if item["so_qty"] < item["added_qty"]:
+						frappe.throw(f"Total returnable item quantity of the item group {group} is not equal to the delivered quantity added manually. Please check the returnable items of the item group {group}")
 
 		if len(returnables) != 0:
 			returnable_total_quantity = 0.0
