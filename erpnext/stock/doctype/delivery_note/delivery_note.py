@@ -189,21 +189,21 @@ class DeliveryNote(SellingController):
 				if bin_qty:
 					d.actual_qty = flt(bin_qty.actual_qty)
 					d.projected_qty = flt(bin_qty.projected_qty)
-	# def submit(self):
-	# 	time.sleep(1)
-	# 	if(self.is_return==1):
-	# 		self.queue_action('submit',queue_name="return")
-	# 	elif(self.company=='Unit 6'):
-	# 		if self.section and self.section in ("FG Mithae"):
-	# 			self.queue_action('submit',queue_name="fg_mithae")
-	# 		elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
-	# 			self.queue_action('submit',queue_name="return")
-	# 		elif self.section and (self.section in get_config_by_name('dn_queue_section',[])):
-	# 			self.queue_action('submit',queue_name="dn_primary")
-	# 		else:
-	# 			self.queue_action('submit',queue_name="dn_secondary")
-	# 	else:
-	# 		self.queue_action('submit',queue_name="dn_tertiary")
+	def submit(self):
+		time.sleep(1)
+		if(self.is_return==1):
+			self.queue_action('submit',queue_name="return")
+		elif(self.company=='Unit 6'):
+			if self.section and self.section in ("FG Mithae"):
+				self.queue_action('submit',queue_name="fg_mithae")
+			elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
+				self.queue_action('submit',queue_name="return")
+			elif self.section and (self.section in get_config_by_name('dn_queue_section',[])):
+				self.queue_action('submit',queue_name="dn_primary")
+			else:
+				self.queue_action('submit',queue_name="dn_secondary")
+		else:
+			self.queue_action('submit',queue_name="dn_tertiary")
 	def before_save(self):
 		for item in self.items:
 			_cost_center = None
