@@ -189,21 +189,21 @@ class DeliveryNote(SellingController):
 				if bin_qty:
 					d.actual_qty = flt(bin_qty.actual_qty)
 					d.projected_qty = flt(bin_qty.projected_qty)
-	def submit(self):
-		time.sleep(1)
-		if(self.is_return==1):
-			self.queue_action('submit',queue_name="return")
-		elif(self.company=='Unit 6'):
-			if self.section and self.section in ("FG Mithae"):
-				self.queue_action('submit',queue_name="fg_mithae")
-			elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
-				self.queue_action('submit',queue_name="return")
-			elif self.section and (self.section in get_config_by_name('dn_queue_section',[])):
-				self.queue_action('submit',queue_name="dn_primary")
-			else:
-				self.queue_action('submit',queue_name="dn_secondary")
-		else:
-			self.queue_action('submit',queue_name="dn_tertiary")
+	# def submit(self):
+	# 	time.sleep(1)
+	# 	if(self.is_return==1):
+	# 		self.queue_action('submit',queue_name="return")
+	# 	elif(self.company=='Unit 6'):
+	# 		if self.section and self.section in ("FG Mithae"):
+	# 			self.queue_action('submit',queue_name="fg_mithae")
+	# 		elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
+	# 			self.queue_action('submit',queue_name="return")
+	# 		elif self.section and (self.section in get_config_by_name('dn_queue_section',[])):
+	# 			self.queue_action('submit',queue_name="dn_primary")
+	# 		else:
+	# 			self.queue_action('submit',queue_name="dn_secondary")
+	# 	else:
+	# 		self.queue_action('submit',queue_name="dn_tertiary")
 	def before_save(self):
 		for item in self.items:
 			_cost_center = None
@@ -216,6 +216,13 @@ class DeliveryNote(SellingController):
 			return
 		# umair added returnable total quantity
 		returnables = self.get("returnable_items")
+
+
+		# Validation Code for returnable items to check whether their clubbed total is equal to the delivered total
+	
+
+
+
 		if len(returnables) != 0:
 			returnable_total_quantity = 0.0
 			for returnable in returnables:
@@ -246,53 +253,88 @@ class DeliveryNote(SellingController):
 					_item = copy(item)
 					club_items.append(_item)
 
-			returnables = returnable_items(club_items,self.company)			
-			for returnable in returnables:
-				ordered_qty = 0
-				for item in club_items:
-					if item.item_code == returnable.item:
-						ordered_qty = item.qty
-						break
-				if ordered_qty == 0:
-					frappe.throw(f"Item {returnable.item_name} qty must be greater then zero")
-				if returnable.returnable_qty == 1:
-					qty = ordered_qty / returnable.item_qty
-				else:
-					res = returnable.item_qty / returnable.returnable_qty
-					qty = ordered_qty * res
-				qty = math.ceil(qty)
-								# check if item is ordered then please adjust the RI quantity
-				minus_qty = 0
-				for i in self.items:
-					if i.item_code == returnable.returnable_item:
-						minus_qty = i.qty
-						break
-				qty -= minus_qty
-				
-				temp_item = self.append('returnable_items',{})
-				temp_item.is_allways_return = returnable.is_allways_return
-				temp_item.item_code = returnable.returnable_item
-				temp_item.item_name = returnable.returnable_item_name
-				temp_item.rate = returnable.sale_price
-				temp_item.item_reference = returnable.item
-				temp_item.actual_qty = qty
-				temp_item.so_qty = qty
-				temp_item.in_transit_qty = qty
-				if self.is_return == True:
-						temp_item.return_qty = qty
-						temp_item.so_qty = 0 # in case of return
-				# if len(self.get('returnable_items')) != len(returnables): # need to change
-				# 	temp_item = self.append('returnable_items',{})
-				# 	temp_item.item_code = returnable.returnable_item
-				# 	temp_item.item_name = returnable.returnable_item_name
-				# 	temp_item.rate = returnable.sale_price
-				# 	temp_item.actual_qty = qty
-				# 	temp_item.so_qty = qty
-				# else:
-				# 	for ritems in self.get('returnable_items'):
-				# 		if ritems.item_reference == returnable.item:
-				# 			ritems.actual_qty = qty
-				# 			break
+			if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
+				returnables = returnable_items(self.items,self.company, "CSD")
+				self.returnable_items = {} # reset
+				clubbed_returnable_items = {}
+				for returnable in returnables:
+					ordered_qty = 0
+					for item in self.items:
+						if item.item_group == returnable.item_group:
+							ordered_qty = item.qty
+							break
+					if ordered_qty == 0:
+						frappe.throw(f"Item Group {returnable.item_group} qty must be greater then zero")
+					qty = (ordered_qty / returnable.item_qty) * returnable.returnable_qty
+					qty = math.ceil(qty)
+
+					if returnable.returnable_item not in clubbed_returnable_items.keys():
+						clubbed_returnable_items[returnable.returnable_item] = {'item_name': returnable.returnable_item_name, 'rate': returnable.sale_price, 'qty': qty, 'is_allways_return': returnable.is_allways_return}
+					else:
+						clubbed_returnable_items[returnable.returnable_item]['qty'] += qty
+					
+				for item, returnable in clubbed_returnable_items.items():
+					returnable_doc = frappe.new_doc("Delivery Note Returnable Item")
+					returnable_doc.item_code = item
+					returnable_doc.item_name = returnable['item_name']
+					returnable_doc.rate = returnable['rate']
+					returnable_doc.qty = returnable['qty']
+					returnable_doc.is_allways_return = returnable['is_allways_return']
+					returnable_doc.in_transit_qty = returnable['qty']
+					if self.is_return == True:
+							returnable_doc.return_qty = qty
+							returnable_doc.so_qty = 0
+					
+					self.append('returnable_items', returnable_doc)
+
+			else:
+				returnables = returnable_items(club_items,self.company)			
+				for returnable in returnables:
+					ordered_qty = 0
+					for item in club_items:
+						if item.item_code == returnable.item:
+							ordered_qty = item.qty
+							break
+					if ordered_qty == 0:
+						frappe.throw(f"Item {returnable.item_name} qty must be greater then zero")
+					if returnable.returnable_qty == 1:
+						qty = ordered_qty / returnable.item_qty
+					else:
+						res = returnable.item_qty / returnable.returnable_qty
+						qty = ordered_qty * res
+					qty = math.ceil(qty)
+									# check if item is ordered then please adjust the RI quantity
+					minus_qty = 0
+					for i in self.items:
+						if i.item_code == returnable.returnable_item:
+							minus_qty = i.qty
+							break
+					qty -= minus_qty
+					
+					temp_item = self.append('returnable_items',{})
+					temp_item.is_allways_return = returnable.is_allways_return
+					temp_item.item_code = returnable.returnable_item
+					temp_item.item_name = returnable.returnable_item_name
+					temp_item.rate = returnable.sale_price
+					temp_item.item_reference = returnable.item
+					temp_item.actual_qty = qty
+					temp_item.so_qty = qty
+					temp_item.in_transit_qty = qty
+					if self.is_return == True:
+							temp_item.return_qty = qty
+							temp_item.so_qty = 0 # in case of return
+					# if len(self.get('returnable_items')) != len(returnables): # need to change
+					# 	temp_item = self.append('returnable_items',{})
+					# 	temp_item.item_code = returnable.returnable_item
+					# 	temp_item.item_name = returnable.returnable_item_name
+					# 	temp_item.rate = returnable.sale_price
+					# 	temp_item.actual_qty = qty
+					# 	temp_item.so_qty = qty
+					# else:
+					# 	for ritems in self.get('returnable_items'):
+					# 		if ritems.item_reference == returnable.item:
+					# 			ritems.actual_qty = qty
+					# 			break
 
 			if self.get('remove_return_items'):	
 				alwayes_returnable_items = []
@@ -303,6 +345,9 @@ class DeliveryNote(SellingController):
 					self.set("returnable_items", alwayes_returnable_items)
 				else:
 					self.set("returnable_items", [])
+		
+		
+
 		
 	def on_submit(self):
 		self.validate_packed_qty()
