@@ -7,11 +7,16 @@ from frappe.model.document import Document
 from erpnext.stock.doctype.quality_inspection_template.quality_inspection_template \
 	import get_template_details
 from frappe.model.mapper import get_mapped_doc
+from nerp.apis.login import get_ip, get_config_by_name
+
+
 
 class QualityInspection(Document):
 	def validate(self):
 		if not self.readings and self.item_code:
 			self.get_item_specification_details()
+		
+		validate_quality_inspection_ip()
 
 	def get_item_specification_details(self):
 		if not self.quality_inspection_template:
@@ -137,3 +142,15 @@ def make_quality_inspection(source_name, target_doc=None):
 	}, target_doc, postprocess)
 
 	return doc
+
+
+
+
+def validate_quality_inspection_ip():
+	user_ip = get_ip()
+	white_listed_ips = get_config_by_name('SUGAR_MILL_WHITELISTED_IPS')
+	if white_listed_ips and white_listed_ips.get("lab_recovery", None):
+		if user_ip != white_listed_ips.get("lab_recovery"):
+			frappe.throw("You are not allowed to perform quality inspection from this IP address")
+	else:
+		frappe.throw("IP address not mapped for quality inspection in Configuration Settings")
