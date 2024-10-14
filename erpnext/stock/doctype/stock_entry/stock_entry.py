@@ -147,6 +147,10 @@ class StockEntry(StockController):
 		# stock_gl = frappe.new_doc('Stock GL Queue')
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
+		
+		# Changes by Moeiz for Return WIP Damage for CSD to create new stock entry once wip damage return stock entry has been submitted
+		if self.purpose == "Return WIP Damage":
+			create_compensation_stock_entry_for_wip_damage(self)
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
@@ -1775,6 +1779,32 @@ def get_items_return_puff(data):
 		return items
 
 
+
+@frappe.whitelist()
+def create_compensation_stock_entry_for_wip_damage(damage_stock_entry):
+	stock_entry = frappe.new_doc('Stock Entry')
+	stock_entry.stock_entry_type = 'Material Transfer for Manufacture'
+	stock_entry.company = damage_stock_entry.company
+	stock_entry.work_order = damage_stock_entry.work_order
+	stock_entry.to_warehouse =  damage_stock_entry.from_warehouse
+	stock_entry.production_plan = damage_stock_entry.production_plan
+	stock_entry.from_bom = 1
+	stock_entry.bom_no = damage_stock_entry.bom_no
+	stock_entry_items = []
+	for item in damage_stock_entry.items:
+		stock_entry_item = item
+
+		if stock_entry_item.original_item is not None:
+			stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": stock_entry_item.original_item}, ["source_warehouse"])
+		else:	
+			stock_entry_item.s_warehouse = frappe.db.get_value("Work Order Item", {"parent": damage_stock_entry.work_order, "item_code": stock_entry_item.item_code}, ["source_warehouse"])
+
+		stock_entry_item.t_warehouse = damage_stock_entry.from_warehouse
+
+		stock_entry_items.append(stock_entry_item)
+	stock_entry.items = stock_entry_items
+	stock_entry.fg_completed_qty = 0
+	stock_entry.save(ignore_permissions=True)
 
 def validate_company_cost_center_and_accounts(stock_entry):
 	"""Validate that the company's accounts and cost centers are used."""
