@@ -72,10 +72,21 @@ class QualityInspection(Document):
 			""".format(parent_doc=self.reference_type, child_doc=doctype, conditions=conditions),
 				(quality_inspection, self.modified, self.reference_name, self.item_code))
 
+	# Add method to avoid fetch_from in supplier and supplier_name fields
+	def set_supplier_fields(self):
+		if self.reference_type in ("Purchase Receipt", "Purchase Invoice", "Stock Entry"):
+			sup_info = frappe.db.sql(f""" SELECT supplier, supplier_name FROM `tab{self.reference_type}` WHERE name="{self.reference_name}";""", as_dict=True)
+
+			if sup_info:
+				self.supplier = sup_info[0].get("supplier", "")
+				self.supplier_name = sup_info[0].get("supplier_name", "")
+
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def item_query(doctype, txt, searchfield, start, page_len, filters):
 	if filters.get("from"):
+		if filters.get("from") == "Work Order Item":
+			return frappe.db.sql(f"""select production_item from `tabWork Order` where name="{filters.get("parent")}" and docstatus < 2;""")
 		from frappe.desk.reportview import get_match_cond
 		mcond = get_match_cond(filters["from"])
 		cond, qi_condition = "", "and (quality_inspection is null or quality_inspection = '')"
@@ -101,6 +112,13 @@ def item_query(doctype, txt, searchfield, start, page_len, filters):
 			parent=filters.get('parent'), cond = cond, mcond = mcond, start = start,
 			page_len = page_len, qi_condition = qi_condition),
 			{'parent': filters.get('parent'), 'txt': "%%%s%%" % txt})
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def wo_item_query(doctype, txt, searchfield, start, page_len, filters):
+	if filters.get("doctype"):
+		if filters.get("doctype") == "Work Order":
+			return frappe.db.sql(f"""select production_item from `tabWork Order` where name="{filters.get("name")}" and docstatus < 2""")
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
