@@ -499,23 +499,29 @@ class WorkOrder(Document):
 			self.set_available_qty()
 
 	def update_transaferred_qty_for_required_items(self):
-		'''update transferred qty from submitted stock entries for that item against
-			the work order'''
-
-		for d in self.required_items:
-			transferred_qty = frappe.db.sql('''select sum(qty)
-				from `tabStock Entry` entry, `tabStock Entry Detail` detail
-				where
-					entry.work_order = %(name)s
-					and entry.purpose = "Material Transfer for Manufacture"
-					and entry.docstatus = 1
-					and detail.parent = entry.name
-					and (detail.item_code = %(item)s or detail.original_item = %(item)s)''', {
-						'name': self.name,
-						'item': d.item_code
-					})[0][0]
-
-			d.db_set('transferred_qty', flt(transferred_qty), update_modified = False)
+			'''update transferred qty from submitted stock entries for that item against
+				the work order'''
+			for d in self.required_items:
+				transferred_qty = frappe.db.sql('''
+					SELECT 
+						SUM(CASE WHEN entry.purpose = 'Material Transfer for Manufacture' THEN detail.qty ELSE 0 END) AS material_consumed,
+						SUM(CASE WHEN entry.purpose = 'Return WIP Damage' THEN detail.qty ELSE 0 END) AS wip_damage_returned
+					FROM 
+						`tabStock Entry` entry, `tabStock Entry Detail` detail
+					WHERE
+						entry.work_order = %(name)s
+						and entry.docstatus = 1
+						and detail.parent = entry.name
+						and (detail.item_code = %(item)s or detail.original_item = %(item)s)
+				''', {
+					'name': self.name,
+					'item': d.item_code
+				},as_dict=True)
+				if transferred_qty and len(transferred_qty) > 0:
+					material_transferred = flt(transferred_qty[0]['material_consumed'])
+					wip_damage_returned = flt(transferred_qty[0]['wip_damage_returned'])
+					difference = material_transferred - wip_damage_returned
+					d.db_set('transferred_qty', flt(difference), update_modified = False)
 
 	def update_consumed_qty_for_required_items(self):
 		'''update consumed qty from submitted stock entries for that item against
@@ -561,6 +567,32 @@ class WorkOrder(Document):
 
 		bom.set_bom_material_details()
 		return bom
+	
+	def update_work_order_for_wip_damage(self):
+		'''update consumed qty from submitted stock entries for that item against
+			the work order for damaged return. Would be decreasing the work order'''
+
+		for d in self.required_items:
+			transferred_qty = frappe.db.sql('''
+				SELECT 
+					SUM(CASE WHEN entry.purpose = 'Material Transfer for Manufacture' THEN detail.qty ELSE 0 END) AS material_consumed,
+					SUM(CASE WHEN entry.purpose = 'Return WIP Damage' THEN detail.qty ELSE 0 END) AS wip_damage_returned
+				FROM 
+					`tabStock Entry` entry, `tabStock Entry Detail` detail
+				WHERE
+					entry.work_order = %(name)s
+					and entry.docstatus = 1
+					and detail.parent = entry.name
+					and (detail.item_code = %(item)s or detail.original_item = %(item)s)
+			''', {
+				'name': self.name,
+				'item': d.item_code
+			},as_dict=True)
+			if transferred_qty and len(transferred_qty) > 0:
+				material_transferred = flt(transferred_qty[0]['material_consumed'])
+				wip_damage_returned = flt(transferred_qty[0]['wip_damage_returned'])
+				difference = material_transferred - wip_damage_returned
+				d.db_set('transferred_qty', flt(difference), update_modified = False)
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
