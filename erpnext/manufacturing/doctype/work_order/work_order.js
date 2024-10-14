@@ -659,6 +659,28 @@ erpnext.work_order = {
 
 	},
 
+	make_damage_return_se: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_damage_stock_entry',
+				args: {
+					'work_order': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				// Sync the returned stock entry with the local model
+				frappe.model.sync(r.message);
+				// Open the form for the newly created stock entry
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making damage return stock entry:', error);
+			// Optionally handle error display or recovery
+		}
+	},
+
 	create_pick_list: function(frm, purpose='Material Transfer for Manufacture') {
 		this.show_prompt_for_qty_input(frm, purpose)
 			.then(data => {
