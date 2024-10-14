@@ -492,7 +492,7 @@ erpnext.work_order = {
 				}, __("Status"));
 			}
 
-			let csd_company_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
+			let csd_company_list = ['Unit 11','Unit 8','Unit 5'];
 			let company = frm.doc.company;
 
 			if (csd_company_list.includes(company)) {
@@ -546,7 +546,7 @@ erpnext.work_order = {
 						}
 					}
 
-					let companies_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
+					let companies_list = ['Unit 11','Unit 8','Unit 5'];
 					let company = frm.doc.company
 
 						if (companies_list.includes(company)){
@@ -568,7 +568,7 @@ erpnext.work_order = {
 			} else {
 				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
 
-					let companies_list = ['Unit 17C','Unit 5D','Unit 5C','Unit 17','Unit 17B','Unit 5B','Unit 11','Unit 8','Unit 5'];
+					let companies_list = ['Unit 11','Unit 8','Unit 5'];
 					let company = frm.doc.company
 					if (companies_list.includes(company)){
 						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
