@@ -151,6 +151,6 @@ def validate_quality_inspection_ip():
 	white_listed_ips = get_config_by_name('SUGAR_MILL_WHITELISTED_IPS')
 	if white_listed_ips and white_listed_ips.get("lab_recovery", None):
 		if user_ip != white_listed_ips.get("lab_recovery"):
-			frappe.throw("You are not allowed to perform quality inspection from this IP address")
+			frappe.throw(f"You are not allowed to perform quality inspection from this IP address: {user_ip}")
 	else:
-		frappe.throw("IP address not mapped for quality inspection in Configuration Settings")
+		frappe.throw(f"IP address not mapped for quality inspection in Configuration Settings: {user_ip}")
