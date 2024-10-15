@@ -7,7 +7,21 @@ frappe.ui.form.on("Quality Inspection", {
 	onload: function (frm, cdt, cdn) {	
 		var df = frappe.meta.get_docfield("Quality Inspection", "wariety", frm.doc.name);
 		df.options = frappe.utils.get_config_by_name("CANE_WARIETY");
-		   },
+		frappe.call({
+            method: "nerp.utils.get_ip",
+            callback: function(r) {
+                if(r.message) {
+					let restricted_ips = frappe.utils.get_config_by_name("SUGAR_MILL_WHITELISTED_IPS");
+					
+					if (restricted_ips.lab_recovery != r.message){
+						frm.toggle_display('brix_value', false);
+						frm.toggle_display('pol_value', false);
+						frm.toggle_display('cake_weight', false);	
+					}
+                }
+            }
+        });
+	},
 	item_code: function(frm) {
 		if (frm.doc.item_code) {
 			return frm.call({
