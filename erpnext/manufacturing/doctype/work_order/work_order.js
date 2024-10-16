@@ -492,6 +492,17 @@ erpnext.work_order = {
 				}, __("Status"));
 			}
 
+			let csd_company_list = ['Unit 11','Unit 8','Unit 5'];
+			let company = frm.doc.company;
+
+			if (csd_company_list.includes(company)) {
+				var work_activity_report = frm.add_custom_button(__('Work Order Activity Report'), function() {
+					const work_order_name = frm.doc.name;
+					window.open(`/desk#query-report/CSD%20Work%20Order%20Activity%20Report?work_order_id=${encodeURIComponent(work_order_name)}`, '_blank');
+				});
+				work_activity_report.addClass('btn-secondary');
+			}
+
 			const show_start_btn = (frm.doc.skip_transfer
 				|| frm.doc.transfer_material_against == 'Job Card') ? 0 : 1;
 
@@ -535,6 +546,16 @@ erpnext.work_order = {
 						}
 					}
 
+					let companies_list = ['Unit 11','Unit 8','Unit 5'];
+					let company = frm.doc.company
+
+						if (companies_list.includes(company)){
+							var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+								erpnext.work_order.make_damage_return_se(frm);
+							});
+							damage_return_btn.addClass('btn-secondary');	
+						}
+
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
@@ -546,6 +567,16 @@ erpnext.work_order = {
 				}
 			} else {
 				if ((flt(doc.produced_qty) < flt(doc.qty)) && frm.doc.status != 'Stopped') {
+
+					let companies_list = ['Unit 11','Unit 8','Unit 5'];
+					let company = frm.doc.company
+					if (companies_list.includes(company)){
+						var damage_return_btn = frm.add_custom_button(__('Return WIP Damage'), function() {
+							erpnext.work_order.make_damage_return_se(frm);
+						});
+						damage_return_btn.addClass('btn-secondary');	
+					}
+					
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
 					});
@@ -637,6 +668,28 @@ erpnext.work_order = {
 				frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
 			});
 
+	},
+
+	make_damage_return_se: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_damage_stock_entry',
+				args: {
+					'work_order': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				// Sync the returned stock entry with the local model
+				frappe.model.sync(r.message);
+				// Open the form for the newly created stock entry
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making damage return stock entry:', error);
+			// Optionally handle error display or recovery
+		}
 	},
 
 	create_pick_list: function(frm, purpose='Material Transfer for Manufacture') {

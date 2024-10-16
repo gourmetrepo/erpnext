@@ -524,6 +524,16 @@ if (frm.doc.docstatus === 0) {
         }
 
 		frm.trigger("setup_quality_inspection");
+
+		// Code by Moeiz for WIP Damage Return to disable fields
+		if(frm.doc.stock_entry_type == "Return WIP Damage") {
+			frm.set_df_property("fg_completed_qty", "hidden", 1);
+			frm.set_df_property("company", "read_only", 1);
+			frm.set_df_property("stock_entry_type", "read_only", 1);
+
+			frm.fields_dict['items'].grid.toggle_enable('uom', false);
+			
+		}
 	},
 
 	purpose: function(frm) {
