@@ -120,6 +120,13 @@ frappe.ui.form.on("Journal Entry", {
 				}
 			}
 		});
+	},
+
+	exchange_rate: function(frm){
+		if(frm.doc.exchange_currency){
+			frm.set_value('exchange_total_debit', Math.abs(frm.doc.exchange_rate * frm.doc.total_debit));
+			frm.set_value('exchange_total_credit', Math.abs(frm.doc.exchange_rate * frm.doc.total_credit));
+		}
 	}
 });
 
