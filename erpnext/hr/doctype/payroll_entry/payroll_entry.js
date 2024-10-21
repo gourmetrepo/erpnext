@@ -20,6 +20,13 @@ frappe.ui.form.on('Payroll Entry', {
 	},
 
 	refresh: function(frm) {
+		if (frm.doc.queue_status == 'Queued'){
+			frappe.workflow.get_transitions(frm.doc).then(() => {
+				frm.page.hide_actions_menu();
+				frm.remove_custom_button("Submit Salary Slip");
+			});
+        }
+
 		if (frm.doc.docstatus == 0) {
 			if(!frm.is_new()) {
 				frm.page.clear_primary_action();

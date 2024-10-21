@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from dateutil.relativedelta import relativedelta
 from frappe.utils import cint, flt, nowdate, add_days, getdate, fmt_money, add_to_date, DATE_FORMAT, date_diff
+from nerp.utils import change_queue_status
 from frappe import _
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
@@ -111,6 +112,7 @@ class PayrollEntry(Document):
 		"""
 		self.check_permission('write')
 		self.created = 1
+		change_queue_status(self.doctype, self.name, "Queued")
 		emp_list = [d.employee for d in self.get_emp_list()]
 		if emp_list:
 			args = frappe._dict({
@@ -125,6 +127,7 @@ class PayrollEntry(Document):
 				"payroll_entry": self.name
 			})
 			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, employees=emp_list, args=args)
+		self.reload()
 
 	def get_sal_slip_list(self, ss_status, as_dict=False):
 		"""
@@ -143,6 +146,8 @@ class PayrollEntry(Document):
 		self.check_permission('write')
 		ss_list = self.get_sal_slip_list(ss_status=0)
 		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry=self, salary_slips=ss_list)
+		change_queue_status(self.doctype, self.name, "Queued")
+		self.reload()
 
 	def email_salary_slip(self, submitted_ss):
 		if frappe.db.get_single_value("HR Settings", "email_salary_slip_to_employee"):
@@ -564,6 +569,7 @@ def after_salary_slips_creation(payroll_entry):
 		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
 		payroll_entry.db_set("salary_slips_created", 1)
 		payroll_entry.notify_update()
+		change_queue_status("Payroll Entry", payroll_entry.name, "Salary Slip Created")
 	except Exception as error:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
@@ -613,6 +619,7 @@ def after_salary_slip_submission(payroll_entry):
 			make_accrual_jv_entry(payroll_entry)
 			payroll_entry.db_set("salary_slips_submitted", 1)
 			payroll_entry.notify_update()
+		change_queue_status("Payroll Entry", payroll_entry.name, "Completed")
 	except Exception as error:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
