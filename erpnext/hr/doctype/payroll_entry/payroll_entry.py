@@ -215,6 +215,7 @@ class PayrollEntry(Document):
 		return payroll_payable_account
 
 	def make_accrual_jv_entry(self):
+		frappe.log_error(message=f"In Custom jv method", title="ERPNEXT jv method")
 		self.check_permission('write')
 		earnings = self.get_salary_component_total(component_type = "earnings") or {}
 		deductions = self.get_salary_component_total(component_type = "deductions") or {}
