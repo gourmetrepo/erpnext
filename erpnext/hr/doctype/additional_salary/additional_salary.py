@@ -14,6 +14,9 @@ class AdditionalSalary(Document):
 			"amount": self.amount, "payroll_date": self.payroll_date, "company": self.company, "docstatus": 1}):
 
 			frappe.throw(_("Additional Salary Component Exists."))
+	
+	def submit(self):
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
 
 	def validate(self):
 		self.validate_dates()
