@@ -161,7 +161,7 @@ class PayrollEntry(Document):
 		try:
 			self.check_permission('write')
 			ss_list = self.get_sal_slip_list(ss_status=0)
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry=self.name, salary_slips=ss_list)
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry_name=self.name, salary_slips=ss_list)
 			change_queue_status(self.doctype, self.name, "Queued")
 			self.reload()
 		except Exception as error:
@@ -427,8 +427,6 @@ class PayrollEntry(Document):
 
 		return jv_name
 
-
-
 	def make_payment_entry(self):
 		self.check_permission('write')
 
@@ -659,7 +657,7 @@ def create_salary_slips_for_employees(employees, args, publish_progress=True):
 				frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slip_for_employee", queue='hr_tertiary', emp=emp, employees=employees, args=args, 
 				count=count, ss_exists_for=salary_slips_exists_for, publish_progress=publish_progress, enqueue_after_commit=True)
 
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_tertiary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_tertiary', payroll_entry_name=args.payroll_entry, enqueue_after_commit=True)
 	except Exception as error:
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip creation from payroll")
@@ -683,6 +681,8 @@ def create_salary_slip_for_employee(emp, employees, args, count, ss_exists_for, 
 		})
 		ss = frappe.get_doc(args)
 		ss.insert()
+
+		# Comment code to block the foreground progress
 		# if publish_progress:
 		# 	frappe.publish_progress(count*100/len(set(employees) - set(ss_exists_for)),
 		# 		title = _("Creating Salary Slips..."))
@@ -693,9 +693,9 @@ def create_salary_slip_for_employee(emp, employees, args, count, ss_exists_for, 
 
 
 @frappe.whitelist()
-def after_salary_slips_creation(payroll_entry):
+def after_salary_slips_creation(payroll_entry_name):
 	try:
-		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
+		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 		payroll_entry.db_set("salary_slips_created", 1)
 		payroll_entry.notify_update()
 		change_queue_status("Payroll Entry", payroll_entry.name, "Salary Slip Created")
@@ -706,8 +706,8 @@ def after_salary_slips_creation(payroll_entry):
 
 
 @frappe.whitelist()
-def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=True):
-	payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
+def submit_salary_slips_for_employees(payroll_entry_name, salary_slips, publish_progress=True):
+	# payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 	try:
 		frappe.flags.via_payroll_entry = True
 
@@ -717,7 +717,7 @@ def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progr
 			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
 			salary_slips=salary_slips, enqueue_after_commit=True)
 
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry=payroll_entry.name, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry_name=payroll_entry_name, enqueue_after_commit=True)
 	except Exception as error:
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip submission from payroll")
@@ -732,6 +732,7 @@ def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
 		else:
 			ss_obj.submit()
 
+		# Comment code to block the foreground progress
 		# if publish_progress:
 		# 	frappe.publish_progress(count*100/len(salary_slips), title = _("Submitting Salary Slips..."))
 	except Exception as error:
@@ -741,8 +742,8 @@ def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
 
 
 @frappe.whitelist()
-def after_salary_slip_submission(payroll_entry):
-	payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
+def after_salary_slip_submission(payroll_entry_name):
+	payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 	
 	try:
 		ss_count = frappe.db.sql(f"Select count(*) as submitted_ss_count From `tabSalary Slip` where payroll_entry='{payroll_entry.name}' and docstatus=1;", as_dict=True)
