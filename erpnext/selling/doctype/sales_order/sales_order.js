@@ -117,7 +117,7 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 					   this.frm.add_custom_button(__('Close'), () => this.close_sales_order(), __("Status"))
 				   }
 				}
-			   	else if(doc.status === 'Closed' && (!['Unit 5', 'Unit 8','Unit 11'].includes(doc.company) || frappe.session.user_email=='national.ssam@gourmetpakistan.com')) {
+			   	else if(doc.status === 'Closed' && (!['Unit 5', 'Unit 8','Unit 11'].includes(doc.company) || frappe.session.user_email=='national.ssam@gourmetpakistan.com'|| frappe.session.user_email=='samswl.exec4@gourmetpakistan.com'|| frappe.session.user_email=='asif.iqbal@gourmetpakistan.com' || frappe.session.user_email=='m.farhan1@gourmetpakistan.com')) {
 				   // un-close
 				   this.frm.add_custom_button(__('Re-open'), function() {
 					   me.frm.cscript.update_status('Re-open', 'Draft')
