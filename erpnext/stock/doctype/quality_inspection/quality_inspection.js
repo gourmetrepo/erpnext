@@ -26,6 +26,18 @@ frappe.ui.form.on("Quality Inspection", {
 				}
 			});
 		}
+	},
+
+	reference_name: function(frm) {
+		if (frm.doc.reference_type == "Purchase Receipt" || frm.doc.reference_type == "Purchase Invoice" || frm.doc.reference_type == "Stock Entry") {
+			frappe.call({
+				doc: frm.doc,
+				method: "set_supplier_fields",
+				callback: function(r){
+					frm.refresh();
+				}
+			});
+		}
 	}
 })
 
@@ -35,6 +47,15 @@ cur_frm.fields_dict['item_code'].get_query = function(doc, cdt, cdn) {
 		"Stock Entry Detail" : doc.reference_type + " Item";
 
 	if (doc.reference_type && doc.reference_name) {
+		if(doc.reference_type == "Work Order") {
+			return {
+				query: "erpnext.stock.doctype.quality_inspection.quality_inspection.wo_item_query",
+				filters: {
+					"doctype": doc.reference_type,
+					"name": doc.reference_name
+				}
+			};
+		}
 		return {
 			query: "erpnext.stock.doctype.quality_inspection.quality_inspection.item_query",
 			filters: {
