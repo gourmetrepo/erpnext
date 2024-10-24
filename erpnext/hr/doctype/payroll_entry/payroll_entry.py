@@ -513,17 +513,22 @@ def payroll_entry_has_bank_entries(name):
 
 	return response
 
+
 @frappe.whitelist()
 def create_salary_slips_for_employees(employees, args, publish_progress=True):
-	salary_slips_exists_for = get_existing_salary_slips(employees, args)
-	count=0
-	for emp in employees:
-		if emp not in salary_slips_exists_for:
-			count+=1
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slip_for_employee", queue='hr_tertiary', emp=emp, employees=employees, args=args, 
-			count=count, ss_exists_for=salary_slips_exists_for, publish_progress=publish_progress, enqueue_after_commit=True)
+	try:
+		salary_slips_exists_for = get_existing_salary_slips(employees, args)
+		count=0
+		for emp in employees:
+			if emp not in salary_slips_exists_for:
+				count+=1
+				frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slip_for_employee", queue='hr_tertiary', emp=emp, employees=employees, args=args, 
+				count=count, ss_exists_for=salary_slips_exists_for, publish_progress=publish_progress, enqueue_after_commit=True)
 
-	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_tertiary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slips_creation", queue='hr_tertiary', payroll_entry=args.payroll_entry, enqueue_after_commit=True)
+	except Exception as error:
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip creation from payroll")
 
 def get_existing_salary_slips(employees, args):
 	return frappe.db.sql_list("""
@@ -534,58 +539,85 @@ def get_existing_salary_slips(employees, args):
 	""" % ('%s', '%s', '%s', ', '.join(['%s']*len(employees))),
 		[args.company, args.start_date, args.end_date] + employees)
 
+
 @frappe.whitelist()
 def create_salary_slip_for_employee(emp, employees, args, count, ss_exists_for, publish_progress):
-	args.update({
-		"doctype": "Salary Slip",
-		"employee": emp
-	})
-	ss = frappe.get_doc(args)
-	ss.insert()
-	if publish_progress:
-		frappe.publish_progress(count*100/len(set(employees) - set(ss_exists_for)),
-			title = _("Creating Salary Slips..."))
+	try:
+		args.update({
+			"doctype": "Salary Slip",
+			"employee": emp
+		})
+		ss = frappe.get_doc(args)
+		ss.insert()
+		if publish_progress:
+			frappe.publish_progress(count*100/len(set(employees) - set(ss_exists_for)),
+				title = _("Creating Salary Slips..."))
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Creating Salary Slip from payroll")
+
 
 @frappe.whitelist()
 def after_salary_slips_creation(payroll_entry):
-	payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
-	payroll_entry.db_set("salary_slips_created", 1)
-	payroll_entry.notify_update()
+	try:
+		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry)
+		payroll_entry.db_set("salary_slips_created", 1)
+		payroll_entry.notify_update()
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="After creating Salary Slip from payroll")
+
 
 @frappe.whitelist()
 def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=True):
-	frappe.flags.via_payroll_entry = True
+	try:
+		frappe.flags.via_payroll_entry = True
 
-	count = 0
-	for ss in salary_slips:
-		count+=1
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
-		salary_slips=salary_slips, enqueue_after_commit=True)
+		count = 0
+		for ss in salary_slips:
+			count+=1
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
+			salary_slips=salary_slips, enqueue_after_commit=True)
 
-	frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry=payroll_entry, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry=payroll_entry, enqueue_after_commit=True)
+	except Exception as error:
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip submission from payroll")
+
 
 @frappe.whitelist()
 def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
-	ss_obj = frappe.get_doc("Salary Slip",ss[0])
-	if ss_obj.net_pay<0:
-		frappe.log_error(title="Salary Slip Submission", message="Employee net pay less than zero.")
-	else:
-		try:
+	try:
+		ss_obj = frappe.get_doc("Salary Slip",ss[0])
+		if ss_obj.net_pay<0:
+			frappe.log_error(title="Salary Slip Submission", message="Employee net pay less than zero.")
+		else:
 			ss_obj.submit()
-		except frappe.ValidationError:
-			frappe.log_error(title="Salary Slip Exception", message="An exception occured while salary slip submission.")
 
-	if publish_progress:
-		frappe.publish_progress(count*100/len(salary_slips), title = _("Submitting Salary Slips..."))
+		if publish_progress:
+			frappe.publish_progress(count*100/len(salary_slips), title = _("Submitting Salary Slips..."))
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Submitting Salary Slip from payroll")
+
 
 @frappe.whitelist()
 def after_salary_slip_submission(payroll_entry):
 	from nerp.modules.gourmet.payroll_entry.payroll_entry import make_accrual_jv_entry
-	ss_count = frappe.db.sql(f"Select count(*) as submitted_ss_count From `tabSalary Slip` where payroll_entry='{payroll_entry.name}' and docstatus=1;", as_dict=True)
-	if ss_count and ss_count[0].submitted_ss_count > 0:
-		make_accrual_jv_entry(payroll_entry)
-		payroll_entry.db_set("salary_slips_submitted", 1)
-		payroll_entry.notify_update()
+	try:
+		ss_count = frappe.db.sql(f"Select count(*) as submitted_ss_count From `tabSalary Slip` where payroll_entry='{payroll_entry.name}' and docstatus=1;", as_dict=True)
+		if ss_count and ss_count[0].submitted_ss_count > 0:
+			make_accrual_jv_entry(payroll_entry)
+			payroll_entry.db_set("salary_slips_submitted", 1)
+			payroll_entry.notify_update()
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="After submitting Salary Slip from payroll")
+
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
