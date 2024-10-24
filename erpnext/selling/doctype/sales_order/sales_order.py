@@ -73,6 +73,10 @@ class SalesOrder(SellingController):
 		if not self.billing_status: self.billing_status = 'Not Billed'
 		if not self.delivery_status: self.delivery_status = 'Not Delivered'
 
+		# Code by Moeiz to validate palletize development at CSD
+		if self.palletized == 0 and self.company in ("Unit 5", "Unit 8", "Unit 11") and len(self.returnable_items) > 0:
+			frappe.throw(_("The customer is not marked as palletized and cannot have returnable items. Please update the customer to be palletized in the customer master data before proceeding"))
+
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
