@@ -220,7 +220,7 @@ class DeliveryNote(SellingController):
 
 
 		# Validation Code for returnable items to check whether their clubbed total is equal to the delivered total
-		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.manually_manage_return_items:
+		if self.palletized and self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.manually_manage_return_items:
 				returnable_items_code = list({returnable.item_code for returnable in returnables})
 
 				item_codes_str = ", ".join(f"'{item}'" for item in returnable_items_code)
