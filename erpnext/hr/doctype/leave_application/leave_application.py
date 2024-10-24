@@ -858,7 +858,7 @@ def push_leave_application_to_rms(docname):
 	try:
 		leave_application_data = leave_application_submit(docname)
 		baseurl = get_config_by_name("ATT_EXE_SHIFTS_PUSH_API_URL")
-		url  = f'{baseurl}/EmployeeLeave/SubmitEmployeeLeaves'
+		url  = f'{baseurl}EmployeeLeave/SubmitEmployeeLeaves'
 		data = json.dumps(leave_application_data, default=str)
 
 		nrp_integration = {
