@@ -194,9 +194,12 @@ class SalesOrder(SellingController):
 		# 		existing_sales_order_links = ["""<a href="#Form/Sales Order/{0}">{1}</a>""".format(so.name, so.name) for so in existing_sales_order_against_customer]
 		# 		frappe.throw(_("Cannot create Sales Order. Sales Orders: {0} are already at draft for this Customer.").format(", ".join(existing_sales_order_links)))
 
+
+
+		# Check for palletize
 		from nrp_manufacturing.utils import returnable_items
 
-		if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
+		if self.palletized and self.company in ["Unit 5", "Unit 8", "Unit 11"]:
 			returnables = returnable_items(self.items,self.company, "CSD")
 			self.returnable_items = {} # reset
 			clubbed_returnable_items = {}

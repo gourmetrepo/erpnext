@@ -82,7 +82,6 @@ frappe.ui.form.on("Delivery Note", {
 			}
 		});
 
-
 	},
 
 	print_without_amount: function(frm) {
@@ -114,8 +113,20 @@ frappe.ui.form.on("Delivery Note", {
 			}
 		}
 		frm.refresh_field('driver');
+
+
+		debugger
+		// Code by Moeiz to set shipping type to Palletized and read only for CSD Units
+		if(frm.doc.palletized === 1 && ['Unit 5', 'Unit 8', 'Unit 11'].includes(frm.doc.company)) {
+			frm.set_value('shipping_type', 'Palletized');
+            frm.set_df_property('shipping_type', 'read_only', 1);
+			frm.refresh_field('shipping_type');
+		}else{
+			frm.set_df_property('shipping_type', 'read_only', 0);
+		}
 		
 	},
+
 	customer_type:function(frm) {
 		if (frm.doc.customer_type === 'Employee'){
 			if (frm.doc.company === 'Unit 6'){
