@@ -146,7 +146,7 @@ class Loan(AccountsController):
 			select posting_date, ifnull(sum(credit_in_account_currency), 0) as disbursed_amount
 			from `tabGL Entry`
 			where against_voucher_type = 'Loan' and against_voucher = %s
-		""", (self.payment_account, self.name), as_dict=1)[0]
+		""", (self.name), as_dict=1)[0]
 
 def validate_repayment_method(repayment_method, loan_amount, monthly_repayment_amount, repayment_periods):
 	if repayment_method == "Repay Over Number of Periods" and not repayment_periods:
