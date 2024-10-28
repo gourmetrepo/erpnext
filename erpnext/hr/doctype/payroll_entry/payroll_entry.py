@@ -817,6 +817,37 @@ def get_salary_component_total_native(self, component_type = None):
 		return account_details
 
 
+def get_account_custom(self, component_dict = None):
+    account_dict = {}
+    for s, a in component_dict.items():
+        account = self.get_salary_component_account(s)
+        #account_dict[account] = {"Component":s,"Amount":account_dict.get(account, 0) + a}
+        if type(a) is list:                
+            if account in account_dict.keys():
+                if self.employee == None:
+                    for obj in a:
+                        employee = next(iter(obj))
+                        found = False
+                        for key, acc in enumerate(account_dict[account]):
+                            if employee in acc.keys():
+                                account_dict[account][key] = {employee: acc[employee] + obj[employee]}
+                                found = True
+                        if found == False:
+                            account_dict[account].append({employee:obj[employee]})
+                    # for employee in self.employees:
+                    #     for key, obj in enumerate(account_dict[account]):
+                    #         if employee.employee in obj.keys():
+                    #             account_dict[account][key] = {employee.employee:obj[employee.employee] + a[0][self.employee]}]                    
+                    # account_dict[account] = a                    
+                else:
+                    account_dict[account] = [{self.employee:account_dict[account][0][self.employee] + a[0][self.employee]}]
+            else:
+                account_dict[account] = a
+        else:
+            account_dict[account] = account_dict.get(account, 0) + a			
+    return account_dict
+
+
 def get_expense_account(sub_branch=None):
 	account = frappe.db.sql("""
 		SELECT
