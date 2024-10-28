@@ -325,7 +325,7 @@ class JournalEntry(AccountsController):
 					formatted_voucher_total = fmt_money(voucher_total, order.precision("grand_total"),
 						currency=account_currency)
 
-				if flt(voucher_total) < (flt(order.advance_paid) + total):
+				if flt(round(voucher_total)) < (flt(order.advance_paid) + total):
 					frappe.throw(_("Advance paid against {0} {1} cannot be greater \
 						than Grand Total {2}").format(reference_type, reference_name, formatted_voucher_total))
 
