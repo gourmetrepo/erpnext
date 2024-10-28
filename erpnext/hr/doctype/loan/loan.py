@@ -119,7 +119,7 @@ class Loan(AccountsController):
 			self.status = "Sanctioned"
 		if disbursement:
 			self.validate_disbursed_amount_and_loan_amount(disbursement.disbursed_amount)
-			if disbursement.disbursed_amount == self.loan_amount and disbursement.disbursed_amount != 0:
+			if disbursement.disbursed_amount == self.loan_amount and disbursement.disbursed_amount != 0 and self.status != "Disbursed":
 				self.status = "Disbursed"
 				disbursement_date = disbursement.posting_date
 				self.validate_disbursement_date(disbursement_date, self.status)
