@@ -141,6 +141,8 @@ def insert_record(records):
 				raise
 
 def welcome_email():
-	site_name = get_default_company() or "ERPNext"
+	# Code by Moeiz to update the title to Gourmet Pakistan
+	# site_name = get_default_company() or "ERPNext"
+	site_name = "GERP"
 	title = _("Welcome to {0}").format(site_name)
 	return title
