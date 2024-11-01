@@ -31,6 +31,9 @@ class Asset(AccountsController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
+	def submit(self):
+		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amount	
+
 	def on_submit(self):
 		self.validate_in_use_date()
 		self.set_status()
