@@ -128,6 +128,11 @@ class DeliveryNote(SellingController):
 
 		self.update_current_stock()
 
+		# Code by Moeiz to validate palletize development at CSD
+		if self.palletized == 0 and self.company in ("Unit 5", "Unit 8", "Unit 11") and len(self.returnable_items) > 0:
+			frappe.throw(_("The customer is not marked as palletized and cannot have returnable items. Please update the customer to be palletized in the customer master data before proceeding"))
+
+
 		if not self.installation_status: self.installation_status = 'Not Installed'
 
 	def validate_with_previous_doc(self):
@@ -220,7 +225,7 @@ class DeliveryNote(SellingController):
 
 
 		# Validation Code for returnable items to check whether their clubbed total is equal to the delivered total
-		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.manually_manage_return_items:
+		if self.palletized and self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.manually_manage_return_items:
 				returnable_items_code = list({returnable.item_code for returnable in returnables})
 
 				item_codes_str = ", ".join(f"'{item}'" for item in returnable_items_code)

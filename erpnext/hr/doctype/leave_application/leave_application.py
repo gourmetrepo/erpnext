@@ -11,6 +11,9 @@ from erpnext.hr.doctype.leave_block_list.leave_block_list import get_applicable_
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 from erpnext.buying.doctype.supplier_scorecard.supplier_scorecard import daterange
 from erpnext.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leave_ledger_entry
+from datetime import timedelta, datetime
+import requests
+import json
 
 class LeaveDayBlockedError(frappe.ValidationError): pass
 class OverlapError(frappe.ValidationError): pass
@@ -44,6 +47,7 @@ class LeaveApplication(Document):
    
 	def submit(self):
 		frappe.db.sql(f"update `tabLeave Application` set status = 'Approved' where name = '{self.name}'",auto_commit=True)
+		enqueue_leave_application(self)
 		self.queue_action('submit',queue_name="hr_secondary")
 
 	def on_submit(self):
@@ -821,3 +825,78 @@ def get_leave_approver(employee):
 			'parentfield': 'leave_approvers', 'idx': 1}, 'approver')
 
 	return leave_approver
+
+def leave_application_submit(docname):
+	from datetime import timedelta, datetime
+	leaves_detail = []
+	
+	leave_application = frappe.get_doc("Leave Application", docname)
+	from_date = leave_application.from_date 
+	to_date = leave_application.to_date	
+	cnic = frappe.get_value("Employee", leave_application.employee, "cnic_no")
+	total_days = (to_date - from_date).days + 1
+
+	for day in range(total_days):
+		leave_date = from_date + timedelta(days=day)
+		leaves_detail.append({
+			"leave_date": leave_date.strftime("%Y-%m-%d"),
+			"status": 1
+		})
+
+	return {
+		"emp_no": leave_application.employee,
+		"cnic": cnic,
+		"leaves_detail": leaves_detail
+	}
+
+@frappe.whitelist()
+def push_leave_application_to_rms(docname):
+	from datetime import timedelta, datetime
+	import requests
+	import json
+
+	try:
+		leave_application_data = leave_application_submit(docname)
+		baseurl = get_config_by_name("ATT_EXE_SHIFTS_PUSH_API_URL")
+		url  = f'{baseurl}/EmployeeLeave/SubmitEmployeeLeaves'
+		data = json.dumps(leave_application_data, default=str)
+
+		nrp_integration = {
+			"ref_doctype": "Leave Application",
+			"doctype": "Nrp Integration",
+			"request": str(data),
+			"title": "Sync Leave Application to RMS"
+		}
+
+		nrp_logs = frappe.get_doc(nrp_integration)
+		nrp_logs.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		headers = {'Content-Type': 'application/json'}
+		response = requests.post(url, headers=headers, data=data)
+		
+		if response.status_code == 200:
+			frappe.log("Successfully sent leave application to RMS.")
+			response_data = response.json()
+		else:
+			frappe.log_error(message=response.text, title="RMS Response Error")
+			raise Exception(f"Failed to send data to RMS. Status Code: {response.status_code}")
+
+		frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', response.text)
+
+	except Exception as error:
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title="Error While Sync Leave Application Job")
+		error_message = f"Error occurred while syncing leave application: {str(error)}"
+		frappe.get_doc({
+			"doctype": "Comment",
+			"comment_type": "Comment",
+			"reference_doctype": "Leave Application",
+			"reference_name": docname,
+			"content": error_message
+		}).insert(ignore_permissions=True)
+
+		return {"status": "error", "message": error_message}
+
+def enqueue_leave_application(self):
+    frappe.enqueue('erpnext.hr.doctype.leave_application.leave_application.push_leave_application_to_rms', docname=self.name, queue="rms_push_queue")
