@@ -1,0 +1,235 @@
+{
+ "creation": "2024-11-01 12:07:33.395430",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "task",
+  "cip_type",
+  "cip_category",
+  "maintenance_type",
+  "maintenance_category",
+  "section",
+  "change_flavour_from",
+  "flavour_change_to",
+  "standard_time",
+  "cip_steps",
+  "column_break_8",
+  "work_order_id",
+  "work_order_item",
+  "work_order_quantity",
+  "quantity_produced",
+  "remaining_quantity",
+  "section_break_14",
+  "company",
+  "location",
+  "project",
+  "notification_datetime",
+  "section_break_21",
+  "asset_id",
+  "asset_name",
+  "capacity",
+  "amended_from",
+  "section_break_26",
+  "bill_of_material_and_services",
+  "maintenance_order_jobs_assignment",
+  "items_replacement_and_repair"
+ ],
+ "fields": [
+  {
+   "fieldname": "task",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Task",
+   "options": "CIP\nMachine Breakdown\nMaintenance",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.task == \"CIP\"",
+   "fieldname": "cip_type",
+   "fieldtype": "Select",
+   "label": "CIP Type",
+   "options": "Flavour Change\nPack Change\nGeneral"
+  },
+  {
+   "depends_on": "eval:doc.task == \"CIP\"",
+   "fieldname": "cip_category",
+   "fieldtype": "Select",
+   "label": "CIP Category",
+   "options": "Planned CIP\nUnplanned CIP"
+  },
+  {
+   "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
+   "fieldname": "maintenance_type",
+   "fieldtype": "Select",
+   "label": "Maintenance Type",
+   "options": "Corrective Maintenance\nPreventive Maintenance"
+  },
+  {
+   "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
+   "fieldname": "maintenance_category",
+   "fieldtype": "Select",
+   "label": "Maintenance Category",
+   "options": "Planned Maintenance\nUnplanned Maintenance"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "section",
+   "fieldtype": "Select",
+   "label": "Section",
+   "options": "Sugar Room\nSyrup Room\nProduction Room"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "change_flavour_from",
+   "fieldtype": "Select",
+   "label": "Change Flavour From",
+   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "flavour_change_to",
+   "fieldtype": "Select",
+   "label": "Flavour Change to",
+   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "standard_time",
+   "fieldtype": "Select",
+   "label": "Standard Time"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "cip_steps",
+   "fieldtype": "Select",
+   "label": "CIP Steps"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "work_order_id",
+   "fieldtype": "Data",
+   "label": "Work Order ID"
+  },
+  {
+   "fieldname": "work_order_item",
+   "fieldtype": "Data",
+   "label": "Work Order Item"
+  },
+  {
+   "fieldname": "work_order_quantity",
+   "fieldtype": "Data",
+   "label": "Work Order Quantity"
+  },
+  {
+   "fieldname": "quantity_produced",
+   "fieldtype": "Data",
+   "label": "Quantity Produced"
+  },
+  {
+   "fieldname": "remaining_quantity",
+   "fieldtype": "Data",
+   "label": "Remaining Quantity"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Data",
+   "label": "Project"
+  },
+  {
+   "fieldname": "notification_datetime",
+   "fieldtype": "Data",
+   "label": "Notification Date/Time"
+  },
+  {
+   "fieldname": "section_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "asset_id",
+   "fieldtype": "Data",
+   "label": "Asset ID"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "Asset Name"
+  },
+  {
+   "fieldname": "capacity",
+   "fieldtype": "Data",
+   "label": "Capacity"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Maintenance",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_26",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "bill_of_material_and_services",
+   "fieldtype": "Table",
+   "label": "Bill of Material and Services",
+   "options": "Bill of Material and Services"
+  },
+  {
+   "fieldname": "maintenance_order_jobs_assignment",
+   "fieldtype": "Table",
+   "label": "Maintenance Order Jobs Assignment",
+   "options": "Maintenance Order Jobs Assignment"
+  },
+  {
+   "fieldname": "items_replacement_and_repair",
+   "fieldtype": "Table",
+   "label": "Items Replacement and Repair",
+   "options": "Items Replacement and Repair"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2024-11-04 14:21:05.071470",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Maintenance",
+ "owner": "ali.ahsan@gourmetpakistan.com",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
