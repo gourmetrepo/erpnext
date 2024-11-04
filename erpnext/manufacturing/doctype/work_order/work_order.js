@@ -556,7 +556,15 @@ erpnext.work_order = {
 							});
 							damage_return_btn.addClass('btn-secondary');	
 						}
-
+					
+					// Code by Moeiz to allow maintenance CIP button for Unit 5 only
+					let maintenance_allowed_companies = ['Unit 5']
+					if (maintenance_allowed_companies.includes(company)){
+						var maintenance_btn = frm.add_custom_button(__('Maintenance CIP'), function() {
+							erpnext.work_order.make_cip_maintenance_document(frm);
+						});
+						maintenance_btn.addClass('btn-secondary');
+					}
 
 
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
@@ -582,6 +590,15 @@ erpnext.work_order = {
 							erpnext.work_order.make_damage_return_se(frm);
 						});
 						damage_return_btn.addClass('btn-secondary');	
+					}
+
+					// Code by Moeiz to allow maintenance CIP button for Unit 5 only
+					let maintenance_allowed_companies = ['Unit 5']
+					if (maintenance_allowed_companies.includes(company)){
+						var maintenance_btn = frm.add_custom_button(__('Maintenance CIP'), function() {
+							erpnext.work_order.make_cip_maintenance_document(frm);
+						});
+						maintenance_btn.addClass('btn-secondary');
 					}
 					
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
@@ -700,6 +717,25 @@ erpnext.work_order = {
 		} catch (error) {
 			console.error('Error making damage return stock entry:', error);
 			// Optionally handle error display or recovery
+		}
+	},
+
+	make_cip_maintenance_document: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_cip_maintenance_document',
+				args: {
+					'work_order': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				frappe.model.sync(r.message);
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making cip maintenance document:', error);
 		}
 	},
 
