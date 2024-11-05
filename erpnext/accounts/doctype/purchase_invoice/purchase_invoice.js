@@ -41,6 +41,8 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 
 		if(!doc.is_return && doc.docstatus == 1 && doc.outstanding_amount != 0){
 			if(doc.on_hold) {
+				$("[data-doctype='Payment Entry']").hide();
+				$("[data-doctype='Payment Request']").hide();
 				this.frm.add_custom_button(
 					__('Change Release Date'),
 					function() {me.change_release_date()},
