@@ -91,7 +91,7 @@ def get_flavour_and_pack_changes(maintenance_doc):
 
 
 def get_flavour_pack_change_setup(maintenance_doc):
-	flavour_pack_change_setups = frappe.db.sql(f"""SELECT `to_flavor`, `to_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change') AND (`from_flavor`='{maintenance_doc.change_flavour_from}' OR `from_pack`='{maintenance_doc.change_pack_from}')""", as_dict=True)
+	flavour_pack_change_setups = frappe.db.sql(f"""SELECT `to_flavor`, `to_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`from_flavor`='{maintenance_doc.change_flavour_from}' OR `from_pack`='{maintenance_doc.change_pack_from}')""", as_dict=True)
 
 	for flavour_pack_change_setup in flavour_pack_change_setups:
 		if flavour_pack_change_setup.get('to_flavor', None) == maintenance_doc.flavour_change_to and flavour_pack_change_setup.get('to_pack', None) == maintenance_doc.change_pack_to and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
@@ -113,7 +113,7 @@ def get_flavour_pack_change_setup(maintenance_doc):
 				maintenance_doc.standard_time = flavour_pack_change_setup.get('standard_time')
 
 	if not maintenance_doc.cip_steps or not maintenance_doc.standard_time:
-		flavour_pack_change_setups = frappe.db.sql(f"""SELECT `from_flavor`, `from_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change') AND (`to_flavor`='{maintenance_doc.flavour_change_to}' OR `to_pack`='{maintenance_doc.change_pack_to}')""", as_dict=True)
+		flavour_pack_change_setups = frappe.db.sql(f"""SELECT `from_flavor`, `from_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`to_flavor`='{maintenance_doc.flavour_change_to}' OR `to_pack`='{maintenance_doc.change_pack_to}')""", as_dict=True)
 		
 		for flavour_pack_change_setup in flavour_pack_change_setups:
 			if flavour_pack_change_setup.get('from_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('from_pack', None) == maintenance_doc.change_pack_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
@@ -138,9 +138,9 @@ def get_flavour_change_setup(maintenance_doc):
 	flavour_change_setups = frappe.db.sql("""
 		SELECT to_flavor, cip_steps, standard_time
 		FROM `tabCIP Standard Time`
-		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change')
+		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change' AND `cip_section`=%(cip_section)s)
 		AND from_flavor=%(from_flavor)s
-	""", {"from_flavor": maintenance_doc.change_flavour_from}, as_dict=True)
+	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True)
 
 	for setup in flavour_change_setups:
 		if setup.to_flavor == maintenance_doc.flavour_change_to:
@@ -155,9 +155,9 @@ def get_flavour_change_setup(maintenance_doc):
 		flavour_change_setups = frappe.db.sql("""
 			SELECT from_flavor, cip_steps, standard_time
 			FROM `tabCIP Standard Time`
-			WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change')
+			WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change' AND `cip_section`=%(cip_section)s)
 			AND to_flavor=%(to_flavor)s
-		""", {"to_flavor": maintenance_doc.flavour_change_to}, as_dict=True)
+		""", {"to_flavor": maintenance_doc.flavour_change_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in flavour_change_setups:
 			if setup.from_flavor == maintenance_doc.flavour_change_to:
@@ -174,9 +174,9 @@ def get_pack_change_setup(maintenance_doc):
 	pack_change_setups = frappe.db.sql("""
 		SELECT to_pack, cip_steps, standard_time
 		FROM `tabCIP Standard Time`
-		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Pack Change')
+		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Pack Change' AND `cip_section`=%(cip_section)s)
 		AND from_pack=%(from_pack)s
-	""", {"from_pack": maintenance_doc.change_pack_from}, as_dict=True)
+	""", {"from_pack": maintenance_doc.change_pack_from, "cip_section": maintenance_doc.section}, as_dict=True)
 
 	for setup in pack_change_setups:
 		if setup.to_pack == maintenance_doc.change_pack_to:
@@ -191,9 +191,9 @@ def get_pack_change_setup(maintenance_doc):
 		pack_change_setups = frappe.db.sql("""
 			SELECT from_pack, cip_steps, standard_time
 			FROM `tabCIP Standard Time`
-			WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Pack Change')
+			WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Pack Change' AND `cip_section`=%(cip_section)s)
 			AND to_pack=%(to_pack)s
-		""", {"to_pack": maintenance_doc.change_pack_to}, as_dict=True)
+		""", {"to_pack": maintenance_doc.change_pack_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in pack_change_setups:
 			if setup.from_pack == maintenance_doc.change_pack_to:
