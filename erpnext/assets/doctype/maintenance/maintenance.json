@@ -96,7 +96,8 @@
    "fieldname": "flavour_change_to",
    "fieldtype": "Select",
    "label": "Flavour Change to",
-   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater"
+   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
@@ -232,17 +233,19 @@
   {
    "fieldname": "change_pack_to",
    "fieldtype": "Data",
-   "label": "Change Pack to"
+   "label": "Change Pack to",
+   "read_only": 1
   },
   {
    "fieldname": "change_item_to",
    "fieldtype": "Link",
    "label": "Change Item To",
-   "options": "Item"
+   "options": "Item",
+   "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-06 17:03:56.371123",
+ "modified": "2024-11-06 17:16:24.447433",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
