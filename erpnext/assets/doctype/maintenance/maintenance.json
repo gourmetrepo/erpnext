@@ -12,6 +12,7 @@
   "section",
   "change_flavour_from",
   "change_pack_from",
+  "change_item_to",
   "flavour_change_to",
   "change_pack_to",
   "standard_time",
@@ -115,13 +116,15 @@
   },
   {
    "fieldname": "work_order_id",
-   "fieldtype": "Data",
-   "label": "Work Order ID"
+   "fieldtype": "Link",
+   "label": "Work Order ID",
+   "options": "Work Order"
   },
   {
    "fieldname": "work_order_item",
-   "fieldtype": "Data",
-   "label": "Work Order Item"
+   "fieldtype": "Link",
+   "label": "Work Order Item",
+   "options": "Item"
   },
   {
    "fieldname": "work_order_quantity",
@@ -144,8 +147,9 @@
   },
   {
    "fieldname": "company",
-   "fieldtype": "Data",
-   "label": "Company"
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   },
   {
    "fieldname": "location",
@@ -229,10 +233,16 @@
    "fieldname": "change_pack_to",
    "fieldtype": "Data",
    "label": "Change Pack to"
+  },
+  {
+   "fieldname": "change_item_to",
+   "fieldtype": "Link",
+   "label": "Change Item To",
+   "options": "Item"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-06 16:09:33.495433",
+ "modified": "2024-11-06 17:03:56.371123",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
