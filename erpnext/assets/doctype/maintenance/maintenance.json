@@ -11,7 +11,9 @@
   "maintenance_category",
   "section",
   "change_flavour_from",
+  "change_pack_from",
   "flavour_change_to",
+  "change_pack_to",
   "standard_time",
   "cip_steps",
   "column_break_8",
@@ -33,7 +35,8 @@
   "section_break_26",
   "bill_of_material_and_services",
   "maintenance_order_jobs_assignment",
-  "items_replacement_and_repair"
+  "items_replacement_and_repair",
+  "previous_workflow_state"
  ],
  "fields": [
   {
@@ -49,7 +52,7 @@
    "fieldname": "cip_type",
    "fieldtype": "Select",
    "label": "CIP Type",
-   "options": "Flavour Change\nPack Change\nGeneral"
+   "options": "Flavour Change\nPack Change\nFlavor & Pack Change\nGeneral"
   },
   {
    "depends_on": "eval:doc.task == \"CIP\"",
@@ -84,7 +87,8 @@
    "fieldname": "change_flavour_from",
    "fieldtype": "Select",
    "label": "Change Flavour From",
-   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater"
+   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
@@ -207,10 +211,28 @@
    "fieldtype": "Table",
    "label": "Items Replacement and Repair",
    "options": "Items Replacement and Repair"
+  },
+  {
+   "fieldname": "previous_workflow_state",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Previous Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "change_pack_from",
+   "fieldtype": "Data",
+   "label": "Change Pack From",
+   "read_only": 1
+  },
+  {
+   "fieldname": "change_pack_to",
+   "fieldtype": "Data",
+   "label": "Change Pack to"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-04 14:21:05.071470",
+ "modified": "2024-11-06 16:09:33.495433",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
