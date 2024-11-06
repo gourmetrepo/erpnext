@@ -115,7 +115,7 @@ def get_flavour_pack_change_setup(maintenance_doc):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
 				standard_time = flavour_pack_change_setup.get('standard_time')
 
-	if cip_steps or not standard_time:
+	if not cip_steps or not standard_time:
 		flavour_pack_change_setups = frappe.db.sql(f"""SELECT `from_flavor`, `from_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`to_flavor`='{maintenance_doc.flavour_change_to}' AND `to_pack`='{maintenance_doc.change_pack_to}')""", as_dict=True)
 		
 		for flavour_pack_change_setup in flavour_pack_change_setups:
