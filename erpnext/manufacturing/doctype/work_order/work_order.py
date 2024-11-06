@@ -889,29 +889,3 @@ def create_pick_list(source_name, target_doc=None, for_qty=None):
 	doc.set_item_locations()
 
 	return doc
-
-
-
-
-# Code by Moeiz to create cip maintenance document
-@frappe.whitelist()
-def create_cip_maintenance_document(work_order):
-    
-    if not frappe.has_permission("Work Order", "write"):
-        frappe.throw(_("Not permitted"), frappe.PermissionError)
-    
-    work_order_data = frappe.db.get_value('Work Order', work_order, ['production_item', 'qty', 'produced_qty', 'company'], as_dict=True)
-
-
-    cip_document = frappe.new_doc('Maintenance')
-    cip_document.task = "CIP"
-    cip_document.cip_category = "Unplanned CIP"
-    cip_document.company = work_order_data.get('company')
-    cip_document.work_order_id = work_order
-    cip_document.work_order_item = work_order_data.get('production_item')
-    cip_document.work_order_quantity = work_order_data.get('qty', 0)
-    cip_document.quantity_produced = work_order_data.get('produced_qty', 0)
-    cip_document.remaining_quantity = work_order_data.get('qty', 0) - work_order_data.get('produced_qty', 0)
-
-    return cip_document
-    

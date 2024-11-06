@@ -724,7 +724,7 @@ erpnext.work_order = {
 		try {
 			// Call the server-side function directly using frappe.call
 			const r = await frappe.call({
-				method: 'erpnext.manufacturing.doctype.work_order.work_order.create_cip_maintenance_document',
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_cip_maintenance_document',
 				args: {
 					'work_order': frm.doc.name
 				}
