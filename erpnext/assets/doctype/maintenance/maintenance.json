@@ -88,7 +88,7 @@
    "fieldname": "change_flavour_from",
    "fieldtype": "Select",
    "label": "Change Flavour From",
-   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
+   "options": "\nCola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
    "read_only": 1
   },
   {
@@ -96,7 +96,7 @@
    "fieldname": "flavour_change_to",
    "fieldtype": "Select",
    "label": "Flavour Change to",
-   "options": "Cola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
+   "options": "\nCola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
    "read_only": 1
   },
   {
@@ -245,7 +245,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-06 17:16:24.447433",
+ "modified": "2024-11-06 17:21:33.967216",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
