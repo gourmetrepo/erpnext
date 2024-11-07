@@ -3,7 +3,6 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-<<<<<<< Updated upstream
 		// frm.set_query("assign_to", "asset_maintenance_tasks", function(doc) {
 		// 	return {
 		// 		query: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members",
@@ -12,8 +11,6 @@ frappe.ui.form.on('Asset Maintenance', {
 		// 		}
 		// 	};
 		// });
-=======
->>>>>>> Stashed changes
 
 		frm.set_indicator_formatter('maintenance_status',
 			function(doc) {
@@ -115,56 +112,7 @@ frappe.ui.form.on('Asset Maintenance Task', {
 	},
 	end_date: (frm, cdt, cdn)  => {
 		get_next_due_date(frm, cdt, cdn);
-	},
-	maintenance_team: (frm, cdt, cdn) => {
-		let row = locals[cdt][cdn];
-		let maintenance_team_value = row.maintenance_team;  
-	
-		if (maintenance_team_value) {
-			frappe.call({
-				method: 'frappe.client.get_list',
-				args: {
-					doctype: 'Maintenance Team Member',
-					filters: {
-						parent: maintenance_team_value 
-					},
-					fields: ['team_member']
-				},
-				callback: function(r) {
-					if (r.message) {
-						let team_members = r.message.map(member => member.team_member);
-						console.log("Filtered team members: ", team_members);
-	
-						frm.set_query('assign_to', function() {
-							return {
-								filters: {
-									'name': ['in', team_members]
-								}
-							};
-						});
-					} else {
-						console.log("No team members found for the selected maintenance team.");
-						
-						frm.set_query('assign_to', function() {
-							return {};
-						});
-					}
-				},
-				error: function(err) {
-					console.log("Error in fetching team members: ", err);
-				}
-			});
-		} else {
-			console.log("No maintenance team selected.");
-	
-			frm.set_query('assign_to', function() {
-				return {};
-			});
-		}
-	
-		console.log(maintenance_team_value); 
 	}
-	
 });
 
 var get_next_due_date = function (frm, cdt, cdn) {
