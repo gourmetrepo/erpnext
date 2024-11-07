@@ -3,14 +3,14 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-		frm.set_query("assign_to", "asset_maintenance_tasks", function(doc) {
-			return {
-				query: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members",
-				filters: {
-					maintenance_team: doc.maintenance_team
-				}
-			};
-		});
+		// frm.set_query("assign_to", "asset_maintenance_tasks", function(doc) {
+		// 	return {
+		// 		query: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members",
+		// 		filters: {
+		// 			maintenance_team: doc.maintenance_team
+		// 		}
+		// 	};
+		// });
 
 		frm.set_indicator_formatter('maintenance_status',
 			function(doc) {
@@ -58,10 +58,49 @@ frappe.ui.form.on('Asset Maintenance', {
 				}
 			});
 		}
+	},
+
+	issue_material: (frm) => {
+		debugger;
+		if (!frm.doc.company){
+			frappe.throw("Select company first")
+		}
+		
+		frm.doc.bill_of_material_and_services.forEach(function(bill, index) {
+			if (!bill.item || !bill.demand_qty) {
+				frappe.throw(__(`Row ${index + 1}: Kindly provide item with demand quantity to issue material`));
+			}
+		});
+
+
+		frappe.call({
+			method: 'issue_mr_for_bill_of_material_and_services',
+			doc: frm.doc,
+			callback: (r) => {
+				debugger;
+				if (!r.message || !r.message.mr_reference) {
+					return;
+				}
+				
+				// Extract the MR reference from the response
+				const mr_reference = r.message.mr_reference;
+	
+				// Show a message with a clickable link to the Material Request
+				frappe.msgprint({
+					message: __('Material Request Created: <a href="#Form/Material Request/' + mr_reference + '" target="_blank">' + mr_reference + '</a>'),
+					title: __('Success'),
+					indicator: 'green'
+				});
+			}
+		});
 	}
+	
+	
+	
 });
 
 frappe.ui.form.on('Asset Maintenance Task', {
+
 	start_date: (frm, cdt, cdn)  => {
 		get_next_due_date(frm, cdt, cdn);
 	},
@@ -133,4 +172,5 @@ frappe.ui.form.on('Bill of Material and Services', {
         }
     }
 });
+
 
