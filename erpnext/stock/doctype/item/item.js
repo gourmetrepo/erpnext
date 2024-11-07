@@ -216,6 +216,23 @@ frappe.ui.form.on("Item", {
 
 	set_meta_tags(frm) {
 		frappe.utils.set_meta_tag(frm.doc.route);
+	},
+
+	inspection_required_before_purchase: function(frm) {
+		if (frm.doc.inspection_required_before_purchase || frm.doc.inspection_required_before_delivery){
+			frm.set_df_property('item_quality_inspection', 'reqd', 1);
+		}
+		else{
+			frm.set_df_property('item_quality_inspection', 'reqd', 0);
+		}
+	},
+	inspection_required_before_delivery: function(frm) {
+		if (frm.doc.inspection_required_before_purchase || frm.doc.inspection_required_before_delivery){
+			frm.set_df_property('item_quality_inspection', 'reqd', 1);
+		}
+		else{
+			frm.set_df_property('item_quality_inspection', 'reqd', 0);
+		}
 	}
 });
 
