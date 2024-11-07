@@ -97,7 +97,7 @@ frappe.ui.form.on('Maintenance', {
 						// Update previous workflow state to the current workflow_state
 						frm.set_value("previous_workflow_state", frm.doc.workflow_state);
 						frm.save();
-                        if (frm.doc.cip_type === "Flavour Change" || frm.doc.cip_type === "Pack Change" || frm.doc.cip_type === "Flavor and Pack Change") {
+                        if (frm.doc.cip_type === "Flavour Change" || frm.doc.cip_type === "Pack Change" || frm.doc.cip_type === "Flavor & Pack Change") {
                             frappe.call({
                                 method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
                                 args: {
