@@ -99,3 +99,38 @@ var get_next_due_date = function (frm, cdt, cdn) {
 		});
 	}
 };
+
+
+
+// Code by Moeiz
+frappe.ui.form.on('Bill of Material and Services', {
+    item: function(frm, cdt, cdn) {
+        // Get the current child row data
+        let row = locals[cdt][cdn];
+
+        if (frm.doc.company) {
+            // Run server-side code to get stock available for the selected item
+            frappe.call({
+                method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_available_stock_for_bill_and_services',
+                args: {
+                    'item_code': row.item,  // Verify the field name here
+                    'company': frm.doc.company
+                },
+				freeze: true, // Freeze the UI during the request
+                freeze_message: __("Calculating Stock for this Item"), // Display message
+                callback: function(response) {
+                    let total_qty = response.message ? response.message : 0;
+                    
+                    // Set the stock available in the child table's field
+                    frappe.model.set_value(cdt, cdn, 'stock_available', total_qty);
+                    
+                    // Refresh the field if necessary
+                    frm.refresh_field('bill_of_material_and_services');
+                }
+            });
+        } else {
+            frappe.throw("Please select Company first");
+        }
+    }
+});
+

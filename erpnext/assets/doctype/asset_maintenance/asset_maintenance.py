@@ -117,3 +117,23 @@ def get_maintenance_log(asset_name):
         from `tabAsset Maintenance Log`
         where asset_name=%s group by maintenance_status""",
         (asset_name), as_dict=1)
+
+
+
+
+# Code by Moeiz
+@frappe.whitelist()
+def get_available_stock_for_bill_and_services(item_code, company):
+    # Query to get the total stock for the specified item code and company
+    stock_data = frappe.db.sql("""
+        SELECT 
+            SUM(actual_qty) AS total_qty
+        FROM 
+            `tabStock Ledger Entry`
+        WHERE 
+            item_code = %s AND company = %s
+    """, (item_code, company), as_dict=True)
+    
+    # Return the total stock quantity, defaulting to 0 if no record is found
+    total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
+    return total_qty
