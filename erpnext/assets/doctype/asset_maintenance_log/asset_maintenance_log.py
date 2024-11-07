@@ -26,22 +26,42 @@ class AssetMaintenanceLog(Document):
 		self.update_maintenance_task()
 
 	def update_maintenance_task(self):
-		asset_maintenance_doc = frappe.get_doc('Asset Maintenance Task', self.task)
+		# asset_maintenance_doc = frappe.get_doc('Asset Maintenance Task', self.task)
 		if self.maintenance_status == "Completed":
-			if asset_maintenance_doc.last_completion_date != self.completion_date:
-				next_due_date = calculate_next_due_date(periodicity = self.periodicity, last_completion_date = self.completion_date)
-				asset_maintenance_doc.last_completion_date = self.completion_date
-				asset_maintenance_doc.next_due_date = next_due_date
-				asset_maintenance_doc.maintenance_status = "Planned"
-				asset_maintenance_doc.save()
+			# if asset_maintenance_doc.last_completion_date != self.completion_date:
+			# 	next_due_date = calculate_next_due_date(periodicity = self.periodicity, last_completion_date = self.completion_date)
+			# 	asset_maintenance_doc.last_completion_date = self.completion_date
+			# 	asset_maintenance_doc.next_due_date = next_due_date
+			# 	asset_maintenance_doc.maintenance_status = "Planned"
+			# 	asset_maintenance_doc.save()
+				
+			update_asset_maintenance_parent_document(self.task, "Completed")
+
 		if self.maintenance_status == "Cancelled":
-			asset_maintenance_doc.maintenance_status = "Cancelled"
-			asset_maintenance_doc.save()
-		asset_maintenance_doc = frappe.get_doc('Asset Maintenance', self.asset_maintenance)
-		asset_maintenance_doc.save()
+			# asset_maintenance_doc.maintenance_status = "Cancelled"
+			# asset_maintenance_doc.save()
+			update_asset_maintenance_parent_document(self.task, "Cancelled")
+		# asset_maintenance_doc = frappe.get_doc('Asset Maintenance', self.asset_maintenance)
+		# asset_maintenance_doc.save()
+
+	
+	def before_save(self):
+		# Status needs to be updated on save only if it goes overdue, completed or cancelled will be marked on submission
+		if self.maintenance_status == "Overdue":
+			update_asset_maintenance_parent_document(self.task, self.maintenance_status)
 
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_maintenance_tasks(doctype, txt, searchfield, start, page_len, filters):
 	asset_maintenance_tasks = frappe.db.get_values('Asset Maintenance Task', {'parent':filters.get("asset_maintenance")}, 'maintenance_task')
 	return asset_maintenance_tasks
+
+
+
+def update_asset_maintenance_parent_document(asset_maintenance_log_id, maintenance_status):
+
+	frappe.db.sql("""
+		UPDATE `tabAsset Maintenance Task`
+		SET `maintenance_status` = %s
+		WHERE `name` = %s
+	""", (maintenance_status, asset_maintenance_log_id))
