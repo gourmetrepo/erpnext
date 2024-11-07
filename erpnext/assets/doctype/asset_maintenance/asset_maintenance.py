@@ -36,6 +36,12 @@ class AssetMaintenance(Document):
 				maintenance_log = frappe.get_doc('Asset Maintenance Log', asset_maintenance_log.name)
 				maintenance_log.db_set('maintenance_status', 'Cancelled')
 
+	
+	def issue_mr_for_bill_of_material_and_services(self):
+		mr_reference = make_issue_material_request(self)
+		return {'mr_reference': mr_reference.name}
+
+
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
 	team_member = frappe.db.get_value('User', assign_to_member, "email")
@@ -117,3 +123,60 @@ def get_maintenance_log(asset_name):
         from `tabAsset Maintenance Log`
         where asset_name=%s group by maintenance_status""",
         (asset_name), as_dict=1)
+
+
+
+
+# Code by Moeiz
+@frappe.whitelist()
+def get_available_stock_for_bill_and_services(item_code, company):
+    # Query to get the total stock for the specified item code and company
+    stock_data = frappe.db.sql("""
+        SELECT 
+            SUM(actual_qty) AS total_qty
+        FROM 
+            `tabStock Ledger Entry`
+        WHERE 
+            item_code = %s AND company = %s
+    """, (item_code, company), as_dict=True)
+    
+    # Return the total stock quantity, defaulting to 0 if no record is found
+    total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
+    return total_qty
+
+
+def get_warehouse(item, company):
+    warehouse = frappe.db.get_list('Item Default',
+                                   filters={
+                                       'company': company,
+                                       'parent': item
+                                   },
+                                   fields=['company', 'default_warehouse'],
+                                   as_list=True)
+    if warehouse:
+        return warehouse[0]
+    else:
+        frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
+
+
+
+
+def make_issue_material_request(doc):  
+    mr = frappe.new_doc("Material Request")
+    mr.material_request_type = "Material Issue"
+    mr.company = doc.company
+    mr.title="Material Issue for Asset Maintenance"
+    mr.naming_series="MAT-MR-.YYYY.-"
+    for item in doc.bill_of_material_and_services:
+        warehouse=get_warehouse(item.item,doc.company)
+        i={}
+        i['item_code']= item.item
+        i["qty"]= item.demand_qty
+        i["uom"]= item.uom 
+        i["conversion_factor"]= 1
+        i["warehouse"]=warehouse[1]
+        mr.append("items", i)
+   
+    mr.insert(ignore_permissions=True)
+    # mr.submit()
+    return mr
