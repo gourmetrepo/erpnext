@@ -86,9 +86,7 @@ frappe.ui.form.on('Maintenance', {
 	
     refresh: function(frm) {
 
-        if (frm.doc.cip_type === "General") {
-            hide_fields_for_general_cip(frm);
-        }
+        hide_fields_for_general_cip(frm);
 
 
         // Check if the workflow_state has changed
@@ -131,23 +129,25 @@ frappe.ui.form.on('Maintenance', {
         }
     },
     onload: function(frm) {
-        if (frm.doc.cip_type === "General") {
-            hide_fields_for_general_cip(frm);
-        }
+        hide_fields_for_general_cip(frm);
     },
 
     cip_type: function (frm){
-        if (frm.doc.cip_type === "General") {
-            hide_fields_for_general_cip(frm);
-        }
-        
+        hide_fields_for_general_cip(frm);
     }
 });
 
 
 
 function hide_fields_for_general_cip(frm){
-    frm.set_df_property("change_item_to", "hidden", 1);
-    frm.set_df_property("flavour_change_to", "hidden", 1);
-    frm.set_df_property("change_pack_to", "hidden", 1);
+    if (frm.doc.cip_type === "General") {
+        frm.set_df_property("change_item_to", "hidden", 1);
+        frm.set_df_property("flavour_change_to", "hidden", 1);
+        frm.set_df_property("change_pack_to", "hidden", 1);
+    }else{
+        frm.set_df_property("change_item_to", "hidden", 0);
+        frm.set_df_property("flavour_change_to", "hidden", 0);
+        frm.set_df_property("change_pack_to", "hidden", 0);
+    }
+
 }
