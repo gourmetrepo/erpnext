@@ -74,20 +74,21 @@ class PurchaseInvoice(BuyingController):
         self.set_onload("supplier_tds", supplier_tds)
 
     def before_save(self):
-        # # Add customer loan deduction if exists
-        # if self.is_new():
-        #     pass
-        # else:
-        #     if len(self.customer_loan_deduction) > 0:
-        #         self.customer_loan_deduction[0].total_payable = self.rounded_total
-        #         if flt(self.customer_loan_deduction[0].total_recieveable) > flt(self.customer_loan_deduction[0].total_payable):
-        #             self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_payable
-        #         else:
-        #             self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_recieveable
+        # Add customer loan deduction if exists
+        if self.is_new():
+            pass
+        else:
+            if len(self.customer_loan_deduction) > 0:
+                if not self.customer_loan_deduction[0].total_payable:
+                    self.customer_loan_deduction[0].total_payable = self.rounded_total
+                    if flt(self.customer_loan_deduction[0].total_recieveable) > flt(self.customer_loan_deduction[0].total_payable):
+                        self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_payable
+                    else:
+                        self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_recieveable
 
-        #         self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
-        #         self.customer_loan_deduction[0].net_recieveable = flt(self.customer_loan_deduction[0].total_recieveable) - flt(self.customer_loan_deduction[0].allocated_amount)
-        #         self.customer_loan_deduction[0].allocation_percentage = flt((flt(self.customer_loan_deduction[0].allocated_amount) / flt(self.customer_loan_deduction[0].total_recieveable)) * 100)
+                    self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
+                    self.customer_loan_deduction[0].net_recieveable = flt(self.customer_loan_deduction[0].total_recieveable) - flt(self.customer_loan_deduction[0].allocated_amount)
+                    self.customer_loan_deduction[0].allocation_percentage = flt((flt(self.customer_loan_deduction[0].allocated_amount) / flt(self.customer_loan_deduction[0].total_recieveable)) * 100)
 
         if not self.on_hold:
             self.release_date = ""
