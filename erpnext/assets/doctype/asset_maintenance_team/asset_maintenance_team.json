@@ -57,7 +57,7 @@
    "reqd": 1
   }
  ],
- "modified": "2024-11-07 13:13:43.526925",
+ "modified": "2024-11-07 21:23:38.476409",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Team",
@@ -68,22 +68,11 @@
    "delete": 1,
    "email": 1,
    "export": 1,
+   "permlevel": 9,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "Manufacturing User",
-   "share": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
+   "role": "All",
    "share": 1,
    "write": 1
   }
