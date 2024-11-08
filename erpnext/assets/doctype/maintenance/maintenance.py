@@ -20,7 +20,7 @@ class Maintenance(Document):
 			elif self.cip_type == "Flavor & Pack Change":
 				get_flavour_pack_change_setup(self)
 			elif self.cip_type == "General":
-				get_general_setup()
+				get_general_setup(self)
 	
 	def mark_cip_inprogress(self):
 		# Stop the work order if CIP document goes in progress
@@ -67,7 +67,7 @@ def get_flavour_and_pack_changes(maintenance_doc):
 
 
 	# Get flavour to and pack to for selected item we move to for all cip types except general cip
-	if self.cip_type != "General":
+	if maintenance_doc.cip_type != "General":
 		to_item_flavour_pack = frappe.db.sql(f"""
 			SELECT 
 				parent_item.item_name as flavour, 
