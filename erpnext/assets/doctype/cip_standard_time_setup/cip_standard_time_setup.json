@@ -1,0 +1,68 @@
+{
+ "creation": "2024-11-04 15:28:24.333017",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "cip_type",
+  "cip_section",
+  "cip_standard_time",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "cip_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "CIP Type",
+   "options": "Flavour Change\nPack Change\nFlavour & Pack Change\nGeneral",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cip_section",
+   "fieldtype": "Select",
+   "label": "CIP Section",
+   "options": "Production Room\nSyrup Room\nSugar Room",
+   "reqd": 1
+  },
+  {
+   "fieldname": "cip_standard_time",
+   "fieldtype": "Table",
+   "label": "CIP Standard Time",
+   "options": "CIP Standard Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "CIP Standard Time Setup",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2024-11-08 11:12:06.074797",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "CIP Standard Time Setup",
+ "owner": "ali.ahsan@gourmetpakistan.com",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
