@@ -65,28 +65,30 @@ def get_flavour_and_pack_changes(maintenance_doc):
 	maintenance_doc.change_flavour_from = flavour_from
 	maintenance_doc.change_pack_from = pack_from
 
-	# Get flavour to and pack to for selected item we move to
-	to_item_flavour_pack = frappe.db.sql(f"""
-		SELECT 
-			parent_item.item_name as flavour, 
-			child_item.reporting_variant as pack 
-		FROM 
-			`tabItem` AS child_item
-		LEFT JOIN 
-			`tabItem` AS parent_item ON parent_item.name = child_item.variant_of
-		WHERE 
-			child_item.name = '{maintenance_doc.change_item_to}'
-	""", as_dict=True)
 
-	if to_item_flavour_pack:
-		flavour_to = to_item_flavour_pack[0].get('flavour')
-		pack_to = to_item_flavour_pack[0].get('pack')
-	else:
-		flavour_to = None
-		pack_to = None
-	
-	maintenance_doc.flavour_change_to = flavour_to
-	maintenance_doc.change_pack_to = pack_to
+	# Get flavour to and pack to for selected item we move to for all cip types except general cip
+	if self.cip_type != "General":
+		to_item_flavour_pack = frappe.db.sql(f"""
+			SELECT 
+				parent_item.item_name as flavour, 
+				child_item.reporting_variant as pack 
+			FROM 
+				`tabItem` AS child_item
+			LEFT JOIN 
+				`tabItem` AS parent_item ON parent_item.name = child_item.variant_of
+			WHERE 
+				child_item.name = '{maintenance_doc.change_item_to}'
+		""", as_dict=True)
+
+		if to_item_flavour_pack:
+			flavour_to = to_item_flavour_pack[0].get('flavour')
+			pack_to = to_item_flavour_pack[0].get('pack')
+		else:
+			flavour_to = None
+			pack_to = None
+		
+		maintenance_doc.flavour_change_to = flavour_to
+		maintenance_doc.change_pack_to = pack_to
 
 
 
@@ -229,4 +231,15 @@ def get_pack_change_setup(maintenance_doc):
 		frappe.throw("No such mapping exists for this combination of flavour and pack")
 
 def get_general_setup(maintenance_doc):
-	pass
+	general_change_setups = frappe.db.sql("""
+		SELECT cip_steps, standard_time
+		FROM `tabCIP Standard Time`
+		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='General' AND `cip_section`=%(cip_section)s)
+		LIMIT 1
+	""", {"cip_section": maintenance_doc.section}, as_dict=True)
+
+	if len(general_change_setups) > 0 and general_change_setups[0].get('cip_steps', None) and general_change_setups[0].get('standard_time', None):
+		maintenance_doc.cip_steps = general_change_setups[0].get('cip_steps', None)
+		maintenance_doc.standard_time = general_change_setups[0].get('standard_time', None)
+	else:
+		frappe.throw("No such mapping exists for general cip type")

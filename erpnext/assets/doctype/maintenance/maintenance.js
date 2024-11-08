@@ -85,6 +85,12 @@
 frappe.ui.form.on('Maintenance', {
 	
     refresh: function(frm) {
+
+        if (frm.doc.cip_type === "General") {
+            hide_fields_for_general_cip(frm);
+        }
+
+
         // Check if the workflow_state has changed
         if (frm.doc.workflow_state === "CIP Inprogress" && frm.doc.previous_workflow_state !== frm.doc.workflow_state) {
             // Run your first frappe.call
@@ -123,5 +129,25 @@ frappe.ui.form.on('Maintenance', {
 
 
         }
+    },
+    onload: function(frm) {
+        if (frm.doc.cip_type === "General") {
+            hide_fields_for_general_cip(frm);
+        }
+    },
+
+    cip_type: function (frm){
+        if (frm.doc.cip_type === "General") {
+            hide_fields_for_general_cip(frm);
+        }
+        
     }
 });
+
+
+
+function hide_fields_for_general_cip(frm){
+    frm.set_df_property("change_item_to", "hidden", 1);
+    frm.set_df_property("flavour_change_to", "hidden", 1);
+    frm.set_df_property("change_pack_to", "hidden", 1);
+}
