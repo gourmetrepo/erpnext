@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from erpnext.manufacturing.doctype.work_order.work_order import stop_unstop
+from frappe.utils import get_datetime
 
 class Maintenance(Document):
 
@@ -26,6 +27,7 @@ class Maintenance(Document):
 		# Stop the work order if CIP document goes in progress
 		if self.workflow_state == "CIP Inprogress" and self.work_order_id:
 			stop_unstop(self.work_order_id, "Stopped")
+			self.cip_start_time = get_datetime()
 		
 		return self.workflow_state
 
@@ -37,6 +39,8 @@ class Maintenance(Document):
 		# Resume the work order if CIP document is finished
 		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
 			stop_unstop(self.work_order_id, "Resumed")
+
+		self.cip_end_time = get_datetime()	
 
 
 
