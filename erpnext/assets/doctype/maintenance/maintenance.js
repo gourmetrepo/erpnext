@@ -8,6 +8,9 @@ frappe.ui.form.on('Maintenance', {
             // Set cip category to Planned CIP
             frm.doc.cip_category = "Unplanned CIP"
             frm.set_df_property("cip_category", "read_only", 1)
+            frm.set_df_property("work_order_id", "read_only", 1)
+            frm.set_df_property("work_order_item", "read_only", 1)
+            
             hide_fields_for_general_cip(frm);
         }else{
             planned_cip(frm);
