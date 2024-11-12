@@ -82,10 +82,10 @@ def get_stock_ledger_entries(filters):
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier
 		LEFT JOIN `tabPurchase Receipt Item` as pri on pri.parent = sle.voucher_no and pri.item_code = sle.item_code and pri.batch_no = sle.batch_no and sle.voucher_type='Purchase Receipt'
 		where sle.docstatus != 2  %s
-		group by sle.batch_no, sle.item_code, sle.warehouse 
+		group by sle.voucher_no,sle.batch_no, sle.item_code, sle.warehouse 
 					  ORDER BY 
     sle.item_code, 
-    sle.warehouse""" %
+    sle.warehouse,sle.posting_date""" %
 		conditions, as_dict=1,debug=True)
 
 def get_item_warehouse_batch_map(filters, float_precision):
