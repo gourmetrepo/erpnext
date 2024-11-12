@@ -4,17 +4,19 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "cip_configuration_section",
+  "company",
   "task",
   "cip_type",
+  "column_break_3",
   "cip_category",
   "maintenance_type",
   "maintenance_category",
   "section",
+  "section_break_8",
   "change_item_to",
   "flavour_change_to",
   "change_pack_to",
-  "standard_time",
-  "cip_steps",
   "column_break_8",
   "work_order_id",
   "work_order_item",
@@ -23,8 +25,10 @@
   "work_order_quantity",
   "quantity_produced",
   "remaining_quantity",
+  "cip_standard_time_setup_section",
+  "standard_time",
+  "cip_steps",
   "section_break_14",
-  "company",
   "location",
   "project",
   "notification_datetime",
@@ -120,30 +124,36 @@
    "fieldname": "work_order_id",
    "fieldtype": "Link",
    "label": "Work Order ID",
-   "options": "Work Order"
+   "options": "Work Order",
+   "read_only": 1
   },
   {
    "fieldname": "work_order_item",
    "fieldtype": "Link",
    "label": "Work Order Item",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "work_order_quantity",
    "fieldtype": "Data",
-   "label": "Work Order Quantity"
+   "label": "Work Order Quantity",
+   "read_only": 1
   },
   {
    "fieldname": "quantity_produced",
    "fieldtype": "Data",
-   "label": "Quantity Produced"
+   "label": "Quantity Produced",
+   "read_only": 1
   },
   {
    "fieldname": "remaining_quantity",
    "fieldtype": "Data",
-   "label": "Remaining Quantity"
+   "label": "Remaining Quantity",
+   "read_only": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_14",
    "fieldtype": "Section Break"
   },
@@ -197,24 +207,28 @@
    "read_only": 1
   },
   {
+   "collapsible": 1,
    "fieldname": "section_break_26",
    "fieldtype": "Section Break"
   },
   {
    "fieldname": "bill_of_material_and_services",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Bill of Material and Services",
    "options": "Bill of Material and Services"
   },
   {
    "fieldname": "maintenance_order_jobs_assignment",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Maintenance Order Jobs Assignment",
    "options": "Maintenance Order Jobs Assignment"
   },
   {
    "fieldname": "items_replacement_and_repair",
    "fieldtype": "Table",
+   "hidden": 1,
    "label": "Items Replacement and Repair",
    "options": "Items Replacement and Repair"
   },
@@ -242,10 +256,32 @@
    "fieldtype": "Link",
    "label": "Change Item To",
    "options": "Item"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "label": "Item Settings"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "cip_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "CIP Configuration"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "cip_standard_time_setup_section",
+   "fieldtype": "Section Break",
+   "label": "CIP Standard Time Setup"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-12 16:56:19.576842",
+ "modified": "2024-11-12 17:24:24.730281",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
