@@ -1,0 +1,99 @@
+{
+ "creation": "2024-11-12 10:50:46.788093",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "entry_type",
+  "posting_date",
+  "frequency",
+  "column_break_3",
+  "start_date",
+  "end_date",
+  "next_schedule_date",
+  "section_break_9",
+  "recurring_entry_table",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "entry_type",
+   "fieldtype": "Select",
+   "label": "Entry Type",
+   "options": "Auto Insurance Expense"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "recurring_entry_table",
+   "fieldtype": "Table",
+   "label": "Recurring Entry Table",
+   "options": "Recurring Entry Table",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Auto Recurring Payment",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Date",
+   "label": "Frequency",
+   "options": "Daily\nMonthly\nQuarterly\nHalf-yearly\nYearly"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "next_schedule_date",
+   "fieldtype": "Date",
+   "label": "Next Schedule Date"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2024-11-12 13:15:10.488870",
+ "modified_by": "ali.ahsan@gourmetpakistan.com",
+ "module": "Accounts",
+ "name": "Auto Recurring Payment",
+ "owner": "ali.ahsan@gourmetpakistan.com",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
