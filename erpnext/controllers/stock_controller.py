@@ -388,7 +388,11 @@ class StockController(AccountsController):
 			qa_required = False
 			if (inspection_required_fieldname and not d.quality_inspection and
 				frappe.db.get_value("Item", d.item_code, inspection_required_fieldname)):
-				qa_required = True
+				comps = frappe.db.get_list('Item Quality Inspection', {"parent": d.item_code}, 'company', as_list=1)
+				companies = [comp[0] for comp in comps]
+				
+				if self.company in companies:
+					qa_required = True
 			elif self.doctype == "Stock Entry" and not d.quality_inspection and d.t_warehouse:
 				qa_required = True
 			if self.docstatus == 1 and d.quality_inspection:

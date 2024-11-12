@@ -15,8 +15,15 @@ class QualityInspection(Document):
 
 	def get_item_specification_details(self):
 		if not self.quality_inspection_template:
-			self.quality_inspection_template = frappe.db.get_value('Item',
-				self.item_code, 'quality_inspection_template')
+			self.company = frappe.db.get_value(self.reference_type, self.reference_name, 'company')
+
+			purchase_check, delivery_check = frappe.db.get_value('Item', self.item_code, ['inspection_required_before_purchase', 'inspection_required_before_delivery'])
+
+			# Fetch company wise quality inspection template from Item master
+			if purchase_check or delivery_check:
+				self.quality_inspection_template = frappe.db.get_value('Item Quality Inspection', {'parent': self.item_code, 'company': self.company}, 'quality_inspection_template')
+			else:
+				self.quality_inspection_template = ""
 
 		if not self.quality_inspection_template: return
 

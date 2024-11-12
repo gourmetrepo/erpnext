@@ -112,8 +112,51 @@ frappe.ui.form.on('Asset Maintenance Task', {
 	},
 	end_date: (frm, cdt, cdn)  => {
 		get_next_due_date(frm, cdt, cdn);
+	},
+	maintenance_team: (frm, cdt, cdn) => {
+		let row = locals[cdt][cdn];
+		let maintenance_team_value = row.maintenance_team;  
+	
+		if (maintenance_team_value) {
+			frappe.call({
+				method: 'frappe.client.get_list',
+				args: {
+					doctype: 'Maintenance Team Member',
+					filters: {
+						"parent": maintenance_team_value 
+					},
+					fields: ['team_member']
+				},
+				callback: function(r) {
+					if (r.message) {
+						let team_members = r.message.map(member => member.team_member);
+						console.log("Filtered team members: ", team_members);
+	
+						frm.set_query('assign_to', function() {
+							return {
+								filters: {
+									'name': ['in', team_members]
+								}
+							};
+						});
+					} else {						
+						frm.set_query('assign_to', function() {
+							return {};
+						});
+					}
+				},
+				error: function(err) {
+					console.error("Permission error or other issue: ", err);
+					frappe.msgprint(__('You do not have permission to access this Maintenance Team Member record.'));
+				}
+			});
+		} else {	
+			frm.set_query('assign_to', function() {
+				return {};
+			});
+		}	
 	}
-});
+});	
 
 var get_next_due_date = function (frm, cdt, cdn) {
 	var d = locals[cdt][cdn];
