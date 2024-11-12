@@ -13,22 +13,39 @@ class Maintenance(Document):
 	def before_save(self):
 		get_flavour_and_pack_changes(self)
 
+		"""
+		Two categories of CIP:
+			1. Planned CIP (Scheduled CIP)
+			2. Unplanned CIP (Coming from work order)
+		"""
 		if self.task == "CIP":
-			if self.cip_type == "Flavour Change":
-				get_flavour_change_setup(self)
-			elif self.cip_type == "Pack Change":
-				get_pack_change_setup(self)
-			elif self.cip_type == "Flavor & Pack Change":
-				get_flavour_pack_change_setup(self)
-			elif self.cip_type == "General":
-				get_general_setup(self)
+			if self.cip_category == "Unplanned CIP":
+				self.setup_unplanned_cip()
+			elif self.cip_category == "Planned CIP":
+				self.setup_planned_cip()
+
+
+	def setup_unplanned_cip(self):
+		if self.cip_type == "Flavour Change":
+			get_flavour_change_setup(self)
+		elif self.cip_type == "Pack Change":
+			get_pack_change_setup(self)
+		elif self.cip_type == "Flavor & Pack Change":
+			get_flavour_pack_change_setup(self)
+		elif self.cip_type == "General":
+			get_general_setup(self)
+	
+	def setup_planned_cip(self):
+		if self.cip_type == "General":
+			get_general_setup(self)
 	
 	def mark_cip_inprogress(self):
-		# Stop the work order if CIP document goes in progress
-		if self.workflow_state == "CIP Inprogress" and self.work_order_id:
-			stop_unstop(self.work_order_id, "Stopped")
-			self.cip_start_time = get_datetime()
 		
+		# Stop the work order if CIP document goes in progress if Unplanned CIP
+		if self.cip_category == "Unplanned CIP" and self.workflow_state == "CIP Inprogress" and self.work_order_id:
+			stop_unstop(self.work_order_id, "Stopped")
+		
+		self.cip_start_time = get_datetime()
 		return self.workflow_state
 
 
@@ -36,8 +53,8 @@ class Maintenance(Document):
 		self.mark_cip_finished()
 
 	def mark_cip_finished(self):
-		# Resume the work order if CIP document is finished
-		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
+		# Resume the work order if CIP document is finished in case of Unplanned CIP
+		if self.cip_category == "Unplanned CIP" and self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
 			stop_unstop(self.work_order_id, "Resumed")
 
 		self.cip_end_time = get_datetime()	
@@ -246,4 +263,4 @@ def get_general_setup(maintenance_doc):
 		maintenance_doc.cip_steps = general_change_setups[0].get('cip_steps', None)
 		maintenance_doc.standard_time = general_change_setups[0].get('standard_time', None)
 	else:
-		frappe.throw("No such mapping exists for general cip type")
+		frappe.throw(f"No such mapping exists of general cip type for {maintenance_doc.section}")
