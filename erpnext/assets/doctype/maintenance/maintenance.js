@@ -13,6 +13,7 @@ frappe.ui.form.on('Maintenance', {
             
             hide_fields_for_general_cip(frm);
         }else{
+            // Planned cip is only scheduled from the cip schedule setup doctype
             planned_cip(frm);
         }
         
@@ -27,7 +28,6 @@ frappe.ui.form.on('Maintenance', {
                     if (r.message === "CIP Inprogress") {
                         
 						// Update previous workflow state to the current workflow_state
-						frm.set_value("previous_workflow_state", frm.doc.workflow_state);
 						frm.save();
 
                         // Only in case of planned cip
@@ -133,12 +133,7 @@ function unplanned_cip(frm){
 
 
 function planned_cip(frm){
-    // Set cip type to General and read only
-    frm.doc.cip_type = "General"
     frm.set_df_property("cip_type", "read_only", 1)
-
-    // Set cip category to Planned CIP
-    frm.doc.cip_category = "Planned CIP"
     frm.set_df_property("cip_category", "read_only", 1)
 
     frm.set_df_property("change_item_to", "hidden", 1);
@@ -148,10 +143,10 @@ function planned_cip(frm){
     frm.set_df_property("change_pack_from", "hidden", 1);
     frm.set_df_property("change_pack_to", "hidden", 1);
 
-    frm.set_df_property("work_order_id", "hidden", 1)
-    frm.set_df_property("work_order_item", "hidden", 1)
-    frm.set_df_property("work_order_quantity", "hidden", 1)
-    frm.set_df_property("quantity_produced", "hidden", 1)
-    frm.set_df_property("remaining_quantity", "hidden", 1)
+    // frm.set_df_property("work_order_id", "hidden", 1)
+    // frm.set_df_property("work_order_item", "hidden", 1)
+    // frm.set_df_property("work_order_quantity", "hidden", 1)
+    // frm.set_df_property("quantity_produced", "hidden", 1)
+    // frm.set_df_property("remaining_quantity", "hidden", 1)
 
 }
