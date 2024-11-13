@@ -11,8 +11,6 @@ from frappe.utils import get_datetime
 class Maintenance(Document):
 
 	def before_save(self):
-		get_flavour_and_pack_changes(self)
-
 		"""
 		Two categories of CIP:
 			1. Planned CIP (Scheduled CIP)
@@ -20,9 +18,10 @@ class Maintenance(Document):
 		"""
 		if self.task == "CIP":
 			if self.cip_category == "Unplanned CIP":
+				get_flavour_and_pack_changes(self)
 				self.setup_unplanned_cip()
-			elif self.cip_category == "Planned CIP":
-				self.setup_planned_cip()
+			# elif self.cip_category == "Planned CIP":
+			# 	self.setup_planned_cip()
 
 
 	def setup_unplanned_cip(self):
@@ -35,18 +34,33 @@ class Maintenance(Document):
 		elif self.cip_type == "General":
 			get_general_setup(self)
 	
-	def setup_planned_cip(self):
-		if self.cip_type == "General":
-			get_general_setup(self)
+	# def setup_planned_cip(self):
+	# 	if self.cip_type == "General":
+	# 		get_general_setup(self)
 	
 	def mark_cip_inprogress(self):
-		
-		# Stop the work order if CIP document goes in progress if Unplanned CIP
-		if self.cip_category == "Unplanned CIP" and self.workflow_state == "CIP Inprogress" and self.work_order_id:
-			stop_unstop(self.work_order_id, "Stopped")
-		
-		self.cip_start_time = get_datetime()
-		return self.workflow_state
+		try:
+			# Check if already for the same line and company, a cip is already in progress
+			check_if_inprocess_cip(self)
+
+			if self.cip_category == "Planned CIP":
+				check_if_work_order_in_process(self)
+			
+			# Stop the work order if CIP document goes in progress
+			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
+				stop_unstop(self.work_order_id, "Stopped")
+			
+			self.cip_start_time = get_datetime()
+			self.previous_workflow_state = self.workflow_state
+			return self.workflow_state
+
+		except Exception as e:
+			# Rollback workflow state to Not Initiated
+			frappe.db.sql(f"""UPDATE `tabMaintenance` SET workflow_state = 'Not Initiated' WHERE name = '{self.name}'""")
+			frappe.db.commit()
+			frappe.throw(str(e))
+			frappe.log_error(frappe.get_traceback(), "Mark CIP Inprogress")
+
 
 
 	def before_submit(self):
@@ -54,7 +68,7 @@ class Maintenance(Document):
 
 	def mark_cip_finished(self):
 		# Resume the work order if CIP document is finished in case of Unplanned CIP
-		if self.cip_category == "Unplanned CIP" and self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
+		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
 			stop_unstop(self.work_order_id, "Resumed")
 
 		self.cip_end_time = get_datetime()	
@@ -256,7 +270,6 @@ def get_general_setup(maintenance_doc):
 		SELECT cip_steps, standard_time
 		FROM `tabCIP Standard Time`
 		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='General' AND `cip_section`=%(cip_section)s)
-		LIMIT 1
 	""", {"cip_section": maintenance_doc.section}, as_dict=True)
 
 	if len(general_change_setups) > 0 and general_change_setups[0].get('cip_steps', None) and general_change_setups[0].get('standard_time', None):
@@ -264,3 +277,48 @@ def get_general_setup(maintenance_doc):
 		maintenance_doc.standard_time = general_change_setups[0].get('standard_time', None)
 	else:
 		frappe.throw(f"No such mapping exists of general cip type for {maintenance_doc.section}")
+
+
+
+def check_if_inprocess_cip(maintenance_doc):
+	inprocess_cip = frappe.db.sql(f"""
+		SELECT name
+		FROM `tabMaintenance`
+		WHERE `company` = %(company)s
+		AND `name` != %(name)s
+		AND `section` = %(section)s
+		AND `task` = 'CIP' 
+		AND `asset_id`=%(asset_id)s
+		AND workflow_state = 'CIP Inprogress'
+	""", {"company": maintenance_doc.company, "name": maintenance_doc.name,"section": maintenance_doc.section, "asset_id": maintenance_doc.asset_id})
+
+	if inprocess_cip and len(inprocess_cip[0]) > 0:
+		# Change workflow state of this document back to Not Initiated as workflow is first changed and then it comes to this document
+		frappe.db.sql(f"""UPDATE `tabMaintenance` SET workflow_state = 'Not Initiated' WHERE name = '{maintenance_doc.name}'""")
+		frappe.db.commit()
+		frappe.throw(f"""Maintenance for this {maintenance_doc.asset_id} is already in progress: {inprocess_cip[0][0]}""")
+
+
+
+
+def check_if_work_order_in_process(maintenance_doc):
+	# Check if work order is in process for the corresponding line and company
+	work_order_data = frappe.db.get_list(
+		'Work Order',
+		filters={
+			"company": maintenance_doc.company,
+			"production_line": maintenance_doc.asset_id,
+			"status": "In Process"
+		},
+		fields=['name', 'production_item', 'qty', 'produced_qty', 'company', 'item_name'],
+		order_by='creation desc',
+    	limit=1
+	)
+	if len(work_order_data) > 0 and work_order_data[0].get('name'):
+		maintenance_doc.company = work_order_data[0].get('company')
+		maintenance_doc.work_order_id = work_order_data[0].get('name')
+		maintenance_doc.work_order_item = work_order_data[0].get('production_item')
+		maintenance_doc.work_order_item_name = work_order_data[0].get('item_name')
+		maintenance_doc.work_order_quantity = work_order_data[0].get('qty', 0)
+		maintenance_doc.quantity_produced = work_order_data[0].get('produced_qty', 0)
+		maintenance_doc.remaining_quantity = work_order_data[0].get('qty', 0) - work_order_data[0].get('produced_qty', 0)
