@@ -1,5 +1,11 @@
 frappe.listview_settings['Additional Salary'] = {
     onload: function(listview) {
+        listview.page.add_inner_button(__('Download Template'), function() {
+            const filePath = "/assets/erpnext/csv/Additional_Salary_Template.csv";
+            const baseUrl = window.location.origin;
+            const fileUrl = baseUrl + filePath;
+            window.open(fileUrl, '_blank');
+        });
         listview.page.add_inner_button(__('Import Data'), function() {
             new frappe.ui.FileUploader({
                 allow_multiple: false,
