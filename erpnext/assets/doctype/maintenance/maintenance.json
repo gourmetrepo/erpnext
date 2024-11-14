@@ -1,4 +1,5 @@
 {
+ "autoname": "PM-MNT-.YYYY.-.######",
  "creation": "2024-11-01 12:07:33.395430",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -281,7 +282,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-12 17:24:24.730281",
+ "modified": "2024-11-13 15:56:48.605855",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
