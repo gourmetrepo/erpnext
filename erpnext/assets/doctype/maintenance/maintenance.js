@@ -64,6 +64,10 @@ frappe.ui.form.on('Maintenance', {
         hide_fields_for_general_cip(frm);
         frm.set_df_property('task', 'read_only', 1);
         frm.set_value('task', 'CIP');
+
+        if (frm.doc.work_order_item) {
+            populate_change_item_from(frm);
+        }
     },
 
     cip_type: function (frm){
@@ -174,8 +178,6 @@ function populate_change_item_to(frm) {
         callback: function(r) {
             frm.refresh_field("flavour_change_to");
             frm.refresh_field("change_pack_to");
-            frm.refresh_field("change_flavour_from");
-            frm.refresh_field("change_pack_from");
         }
     });
 }
@@ -187,8 +189,6 @@ function populate_change_item_from(frm) {
         freeze: true,
         freeze_message: __("Fetching data. Please wait."),
         callback: function(r) {
-            frm.refresh_field("flavour_change_to");
-            frm.refresh_field("change_pack_to");
             frm.refresh_field("change_flavour_from");
             frm.refresh_field("change_pack_from");
         }
