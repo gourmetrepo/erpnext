@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_copy": 1,
  "allow_import": 1,
  "creation": "2013-01-23 19:57:17",
@@ -118,15 +117,15 @@
    "default": "0",
    "fieldname": "disabled",
    "fieldtype": "Check",
-   "label": "Disabled"
+   "label": "Disabled",
+   "reqd": 1
   }
  ],
  "icon": "fa fa-money",
  "idx": 1,
  "is_tree": 1,
- "links": [],
- "modified": "2020-06-12 16:09:30.025214",
- "modified_by": "Administrator",
+ "modified": "2024-11-11 10:35:16.572007",
+ "modified_by": "muhammad.azeem@gourmetpakistan.com",
  "module": "Accounts",
  "name": "Cost Center",
  "nsm_parent_field": "parent_cost_center",

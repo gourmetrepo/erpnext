@@ -13492,3 +13492,879 @@ Traceback (most recent call last):
 redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
     raise ConnectionError(self._error_message(e))
 redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+19:24:01 RQ worker 'rq:worker:bdabdf99f10549068602e117d105eb45.grmtnext.20795.hr_secondary' started, version 0.12.0
+19:24:01 *** Listening on hr_secondary...
+19:24:01 Cleaning registries for queue: hr_secondary
+19:24:01 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04724', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (2396e075-fdae-4aa2-8a72-b448ff66e649)
+19:24:05 RQ worker 'rq:worker:3a2e43780c4b41ae973662a5aeabd848.grmtnext.20819.hr_secondary' started, version 0.12.0
+19:24:05 *** Listening on hr_secondary...
+19:24:05 Cleaning registries for queue: hr_secondary
+19:24:05 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04725', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (43ea1446-e056-4b4f-83fa-e4ab1e0b5b78)
+19:24:06 RQ worker 'rq:worker:747b2e4589e1494187da0f8223ad113a.grmtnext.20827.hr_secondary' started, version 0.12.0
+19:24:06 *** Listening on hr_secondary...
+19:24:06 Cleaning registries for queue: hr_secondary
+19:24:06 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04727', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (930d022b-ca33-4dbe-9083-b3054f8cef89)
+19:24:17 hr_secondary: Job OK (2396e075-fdae-4aa2-8a72-b448ff66e649)
+19:24:17 Result is kept for 500 seconds
+19:24:17 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04728', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (54ce6428-95a3-4879-8b79-fba4c7e72f3b)
+19:24:22 hr_secondary: Job OK (930d022b-ca33-4dbe-9083-b3054f8cef89)
+19:24:22 Result is kept for 500 seconds
+19:24:22 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04730', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (d174dd16-8601-4d25-891d-1af8ec8ea50b)
+19:24:31 hr_secondary: Job OK (54ce6428-95a3-4879-8b79-fba4c7e72f3b)
+19:24:31 Result is kept for 500 seconds
+19:24:31 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04731', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (e1661a41-8542-41a2-87d4-226f287ad234)
+19:24:36 hr_secondary: Job OK (43ea1446-e056-4b4f-83fa-e4ab1e0b5b78)
+19:24:36 Result is kept for 500 seconds
+19:24:36 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04732', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f9666c68-9cd9-42a3-a3be-446446198dda)
+19:24:37 hr_secondary: Job OK (d174dd16-8601-4d25-891d-1af8ec8ea50b)
+19:24:37 Result is kept for 500 seconds
+19:24:37 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04734', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f721aa55-bf14-450d-a42b-f9508f497f20)
+19:24:47 hr_secondary: Job OK (e1661a41-8542-41a2-87d4-226f287ad234)
+19:24:47 Result is kept for 500 seconds
+19:24:47 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04735', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (bd1ae651-dac6-4d10-bccc-467ff1eb370a)
+19:24:52 hr_secondary: Job OK (f721aa55-bf14-450d-a42b-f9508f497f20)
+19:24:52 Result is kept for 500 seconds
+19:24:52 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04736', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (81111851-4597-48dd-a3f8-96c4753a6ad2)
+19:25:02 hr_secondary: Job OK (bd1ae651-dac6-4d10-bccc-467ff1eb370a)
+19:25:02 Result is kept for 500 seconds
+19:25:02 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04737', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (46ee0cb9-eb24-4e40-aa23-32730e02085d)
+19:25:07 hr_secondary: Job OK (81111851-4597-48dd-a3f8-96c4753a6ad2)
+19:25:07 Result is kept for 500 seconds
+19:25:07 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04739', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (af5919c1-e128-42ee-8f04-4589146dcefd)
+19:25:17 hr_secondary: Job OK (46ee0cb9-eb24-4e40-aa23-32730e02085d)
+19:25:17 Result is kept for 500 seconds
+19:25:17 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04740', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c4d3b3c3-e18d-4151-8dce-ea62482275a2)
+19:25:21 hr_secondary: Job OK (f9666c68-9cd9-42a3-a3be-446446198dda)
+19:25:21 Result is kept for 500 seconds
+19:25:21 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04741', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (5a3254d9-f9a9-4f0f-9cee-333e58671826)
+19:25:23 hr_secondary: Job OK (af5919c1-e128-42ee-8f04-4589146dcefd)
+19:25:23 Result is kept for 500 seconds
+19:25:23 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04742', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (bc8f470c-84b6-4133-a577-1f7f040aadef)
+19:25:32 hr_secondary: Job OK (c4d3b3c3-e18d-4151-8dce-ea62482275a2)
+19:25:32 Result is kept for 500 seconds
+19:25:32 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04743', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (b9d867a4-6bc2-43a2-aa34-f74bbdb93fff)
+19:25:37 hr_secondary: Job OK (5a3254d9-f9a9-4f0f-9cee-333e58671826)
+19:25:37 Result is kept for 500 seconds
+19:25:37 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04744', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (88fa947c-2c82-4647-86df-72dfd21f8750)
+19:25:38 hr_secondary: Job OK (bc8f470c-84b6-4133-a577-1f7f040aadef)
+19:25:38 Result is kept for 500 seconds
+19:25:38 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04746', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9c9d0138-8b05-46e1-8e66-3d0aa1be242a)
+19:25:47 hr_secondary: Job OK (b9d867a4-6bc2-43a2-aa34-f74bbdb93fff)
+19:25:47 Result is kept for 500 seconds
+19:25:47 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04747', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9026fb22-6eae-482b-a4a3-b7b9eef30e5c)
+19:25:52 hr_secondary: Job OK (9c9d0138-8b05-46e1-8e66-3d0aa1be242a)
+19:25:52 Result is kept for 500 seconds
+19:25:52 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04748', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (d4044cc0-c58a-434c-b51a-7aebded6101e)
+19:26:02 hr_secondary: Job OK (9026fb22-6eae-482b-a4a3-b7b9eef30e5c)
+19:26:02 Result is kept for 500 seconds
+19:26:02 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04749', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (ba947c4f-bc85-4628-b396-a583bedcdbf2)
+19:26:08 hr_secondary: Job OK (d4044cc0-c58a-434c-b51a-7aebded6101e)
+19:26:08 Result is kept for 500 seconds
+19:26:08 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04751', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (020c64d2-cd1b-4db6-b7fb-10ef6ec6e631)
+19:26:18 hr_secondary: Job OK (ba947c4f-bc85-4628-b396-a583bedcdbf2)
+19:26:18 Result is kept for 500 seconds
+19:26:18 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04752', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (29b55ae7-f0a7-40d7-91a9-033939b1fa08)
+19:26:22 hr_secondary: Job OK (88fa947c-2c82-4647-86df-72dfd21f8750)
+19:26:22 Result is kept for 500 seconds
+19:26:22 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04753', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (2c50444d-d048-400d-8e62-2d94db99df95)
+19:26:23 hr_secondary: Job OK (020c64d2-cd1b-4db6-b7fb-10ef6ec6e631)
+19:26:23 Result is kept for 500 seconds
+19:26:23 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04754', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f96c3e8f-cbaa-4d4d-ac4b-defde393ab9f)
+19:26:33 hr_secondary: Job OK (29b55ae7-f0a7-40d7-91a9-033939b1fa08)
+19:26:33 Result is kept for 500 seconds
+19:26:33 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04755', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (53603eb5-5343-4bec-a16c-c43ca7832521)
+19:26:37 hr_secondary: Job OK (2c50444d-d048-400d-8e62-2d94db99df95)
+19:26:37 Result is kept for 500 seconds
+19:26:37 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04756', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9a538d11-da2f-4f93-9849-a0f8e8f1b7a2)
+19:26:38 hr_secondary: Job OK (f96c3e8f-cbaa-4d4d-ac4b-defde393ab9f)
+19:26:38 Result is kept for 500 seconds
+19:26:38 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04758', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (88ffd276-dfef-4f4e-a3ec-6ef7a68ff23e)
+19:26:48 hr_secondary: Job OK (53603eb5-5343-4bec-a16c-c43ca7832521)
+19:26:48 Result is kept for 500 seconds
+19:26:48 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04759', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c061943d-8377-4d3e-b15a-5c3973968452)
+19:26:54 hr_secondary: Job OK (88ffd276-dfef-4f4e-a3ec-6ef7a68ff23e)
+19:26:54 Result is kept for 500 seconds
+19:26:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04761', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (51210a0a-8d9e-4755-abfb-e217cdd2fb52)
+19:27:03 hr_secondary: Job OK (c061943d-8377-4d3e-b15a-5c3973968452)
+19:27:03 Result is kept for 500 seconds
+19:27:03 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04762', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (bf7d8307-193b-482c-b0ba-4fd2d78d9012)
+19:27:07 hr_secondary: Job OK (9a538d11-da2f-4f93-9849-a0f8e8f1b7a2)
+19:27:07 Result is kept for 500 seconds
+19:27:07 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04763', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (ac9ea34d-181c-49bb-a8e2-6b2979bacbfd)
+19:27:10 hr_secondary: Job OK (51210a0a-8d9e-4755-abfb-e217cdd2fb52)
+19:27:10 Result is kept for 500 seconds
+19:27:10 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04765', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (e5457021-8c47-4b88-a47e-6d5faa2b21a0)
+19:27:18 hr_secondary: Job OK (bf7d8307-193b-482c-b0ba-4fd2d78d9012)
+19:27:18 Result is kept for 500 seconds
+19:27:18 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04766', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (e864994b-23ca-4dc4-816b-06205381c012)
+19:27:23 hr_secondary: Job OK (ac9ea34d-181c-49bb-a8e2-6b2979bacbfd)
+19:27:23 Result is kept for 500 seconds
+19:27:23 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04767', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (52f3f94f-e965-4f78-aba8-52583f4221df)
+19:27:25 hr_secondary: Job OK (e5457021-8c47-4b88-a47e-6d5faa2b21a0)
+19:27:25 Result is kept for 500 seconds
+19:27:25 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04769', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (6b58c353-2bc6-49ec-8750-e13705800b0f)
+19:27:34 hr_secondary: Job OK (e864994b-23ca-4dc4-816b-06205381c012)
+19:27:34 Result is kept for 500 seconds
+19:27:34 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04770', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (7e1ea13b-7f8a-4694-814b-aa47c25e7bd6)
+19:27:38 hr_secondary: Job OK (52f3f94f-e965-4f78-aba8-52583f4221df)
+19:27:38 Result is kept for 500 seconds
+19:27:38 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04771', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (1a5cba2c-fab9-4b58-8699-f1191300fb74)
+19:27:41 hr_secondary: Job OK (6b58c353-2bc6-49ec-8750-e13705800b0f)
+19:27:41 Result is kept for 500 seconds
+19:27:41 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04773', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (fe6cfaac-685f-44a6-a89f-d5fece14c88c)
+19:27:49 hr_secondary: Job OK (7e1ea13b-7f8a-4694-814b-aa47c25e7bd6)
+19:27:49 Result is kept for 500 seconds
+19:27:49 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04774', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (186430a0-463a-4b1b-86b9-3fc4dc0ff5d5)
+19:27:53 hr_secondary: Job OK (1a5cba2c-fab9-4b58-8699-f1191300fb74)
+19:27:53 Result is kept for 500 seconds
+19:27:53 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04775', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (57ab1e1f-eefb-4eec-bacb-572ea19be348)
+19:27:57 hr_secondary: Job OK (fe6cfaac-685f-44a6-a89f-d5fece14c88c)
+19:27:57 Result is kept for 500 seconds
+19:27:57 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04777', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (b78846c7-57b1-4ed9-8a26-6c68700f12fa)
+19:28:04 hr_secondary: Job OK (186430a0-463a-4b1b-86b9-3fc4dc0ff5d5)
+19:28:04 Result is kept for 500 seconds
+19:28:04 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04778', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (013f618f-110d-4d8b-ab15-e637e2be3929)
+19:28:08 hr_secondary: Job OK (57ab1e1f-eefb-4eec-bacb-572ea19be348)
+19:28:08 Result is kept for 500 seconds
+19:28:08 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04779', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (8d554685-ebd2-425a-aa8e-86f0d6298b53)
+19:28:12 hr_secondary: Job OK (b78846c7-57b1-4ed9-8a26-6c68700f12fa)
+19:28:12 Result is kept for 500 seconds
+19:28:12 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04781', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (25d44883-af0c-4b44-855c-00ac53abc487)
+19:28:19 hr_secondary: Job OK (013f618f-110d-4d8b-ab15-e637e2be3929)
+19:28:19 Result is kept for 500 seconds
+19:28:19 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04782', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (b0b6b667-173a-4050-95ae-72058ae35ab6)
+19:28:24 hr_secondary: Job OK (8d554685-ebd2-425a-aa8e-86f0d6298b53)
+19:28:24 Result is kept for 500 seconds
+19:28:24 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04783', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (7150c5c1-6ac4-46fa-b594-828e399512f1)
+19:28:27 hr_secondary: Job OK (25d44883-af0c-4b44-855c-00ac53abc487)
+19:28:27 Result is kept for 500 seconds
+19:28:27 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (0d17c001-bca2-428b-a464-67c9718d919e)
+19:28:34 hr_secondary: Job OK (b0b6b667-173a-4050-95ae-72058ae35ab6)
+19:28:34 Result is kept for 500 seconds
+19:28:34 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04786', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (5e9b28ee-4652-4bd9-8d02-e28fa8bc3206)
+19:28:39 hr_secondary: Job OK (7150c5c1-6ac4-46fa-b594-828e399512f1)
+19:28:39 Result is kept for 500 seconds
+19:28:39 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04787', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c54a24a0-bc81-43dc-8574-a2fdd9c39d87)
+19:28:42 hr_secondary: Job OK (0d17c001-bca2-428b-a464-67c9718d919e)
+19:28:42 Result is kept for 500 seconds
+19:28:42 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04789', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (cc6b95d5-1a93-4756-996a-d4e2525d052c)
+19:28:50 hr_secondary: Job OK (5e9b28ee-4652-4bd9-8d02-e28fa8bc3206)
+19:28:50 Result is kept for 500 seconds
+19:28:50 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04790', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (bfca5b77-78e1-4ea4-9458-cbb44c7152d8)
+19:28:54 hr_secondary: Job OK (c54a24a0-bc81-43dc-8574-a2fdd9c39d87)
+19:28:54 Result is kept for 500 seconds
+19:28:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04791', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (132cf6a9-e11b-493e-a2d4-5bc7941921a7)
+19:28:58 hr_secondary: Job OK (cc6b95d5-1a93-4756-996a-d4e2525d052c)
+19:28:58 Result is kept for 500 seconds
+19:28:58 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04792', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f02d9f47-26f1-4726-8ac1-a4472770110d)
+19:29:05 hr_secondary: Job OK (bfca5b77-78e1-4ea4-9458-cbb44c7152d8)
+19:29:05 Result is kept for 500 seconds
+19:29:05 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04793', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c869b1df-79d8-4fcf-ab6a-67d7723092ea)
+19:29:10 hr_secondary: Job OK (132cf6a9-e11b-493e-a2d4-5bc7941921a7)
+19:29:10 Result is kept for 500 seconds
+19:29:10 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04794', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9bebea04-28d5-4de7-a182-15c79f3a761d)
+19:29:14 hr_secondary: Job OK (f02d9f47-26f1-4726-8ac1-a4472770110d)
+19:29:14 Result is kept for 500 seconds
+19:29:14 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04796', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (4447c63e-4b27-4168-8339-d75ebe5b2bf5)
+19:29:19 hr_secondary: Job OK (c869b1df-79d8-4fcf-ab6a-67d7723092ea)
+19:29:19 Result is kept for 500 seconds
+19:29:19 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04797', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (4ff02a7b-4677-4817-b23b-ba9bf82a2f3c)
+19:29:26 hr_secondary: Job OK (9bebea04-28d5-4de7-a182-15c79f3a761d)
+19:29:26 Result is kept for 500 seconds
+19:29:26 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04798', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (03e81841-e3c8-4f1d-afc8-7728f5148ae0)
+19:29:29 hr_secondary: Job OK (4447c63e-4b27-4168-8339-d75ebe5b2bf5)
+19:29:29 Result is kept for 500 seconds
+19:29:29 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04800', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (a7589e84-f64e-4b93-a7e0-9fbcf630aa36)
+19:29:34 hr_secondary: Job OK (4ff02a7b-4677-4817-b23b-ba9bf82a2f3c)
+19:29:34 Result is kept for 500 seconds
+19:29:34 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04801', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (a9023cd2-1972-42e6-9da2-9d117a1fd221)
+19:29:42 hr_secondary: Job OK (03e81841-e3c8-4f1d-afc8-7728f5148ae0)
+19:29:42 Result is kept for 500 seconds
+19:29:42 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04802', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (857e347a-a8a1-4cc3-9e40-98a18f23da7d)
+19:29:45 hr_secondary: Job OK (a7589e84-f64e-4b93-a7e0-9fbcf630aa36)
+19:29:45 Result is kept for 500 seconds
+19:29:45 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04804', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (697266c2-c61f-4b55-9a85-98c749bfc759)
+19:29:49 hr_secondary: Job OK (a9023cd2-1972-42e6-9da2-9d117a1fd221)
+19:29:49 Result is kept for 500 seconds
+19:29:49 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04805', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3c4cfc72-1516-43c7-8115-13e511d6d0c8)
+19:30:01 hr_secondary: Job OK (697266c2-c61f-4b55-9a85-98c749bfc759)
+19:30:01 Result is kept for 500 seconds
+19:30:01 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04807', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (aa413803-eecc-48fc-85ad-824b839227c8)
+19:30:04 hr_secondary: Job OK (3c4cfc72-1516-43c7-8115-13e511d6d0c8)
+19:30:04 Result is kept for 500 seconds
+19:30:04 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04808', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (789087dc-76be-4407-a98f-596ab3158f7c)
+19:30:14 hr_secondary: Job OK (857e347a-a8a1-4cc3-9e40-98a18f23da7d)
+19:30:14 Result is kept for 500 seconds
+19:30:14 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04809', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3602d056-e7ff-454b-b9ea-66c9431a77ba)
+19:30:16 hr_secondary: Job OK (aa413803-eecc-48fc-85ad-824b839227c8)
+19:30:16 Result is kept for 500 seconds
+19:30:16 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04811', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c34d200b-9ee7-4594-b735-ae4822fa3735)
+19:30:18 hr_secondary: Job OK (789087dc-76be-4407-a98f-596ab3158f7c)
+19:30:18 Result is kept for 500 seconds
+19:30:18 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04812', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (88d4d5bc-8502-4608-8cdb-48f85162a7df)
+19:30:29 hr_secondary: Job OK (3602d056-e7ff-454b-b9ea-66c9431a77ba)
+19:30:29 Result is kept for 500 seconds
+19:30:29 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04813', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3e9e47e8-1cb9-4473-b0ab-6a9e51448c21)
+19:30:32 hr_secondary: Job OK (c34d200b-9ee7-4594-b735-ae4822fa3735)
+19:30:32 Result is kept for 500 seconds
+19:30:32 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04815', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (e74c1759-4211-470c-9f9f-bd11cb2b1179)
+19:30:34 hr_secondary: Job OK (88d4d5bc-8502-4608-8cdb-48f85162a7df)
+19:30:34 Result is kept for 500 seconds
+19:30:34 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04816', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (a43870bd-99e2-4ced-9799-aab38f486b13)
+19:30:45 hr_secondary: Job OK (3e9e47e8-1cb9-4473-b0ab-6a9e51448c21)
+19:30:45 Result is kept for 500 seconds
+19:30:45 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04817', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (69213be8-186b-46c0-b9d8-0aa166e00178)
+19:30:48 hr_secondary: Job OK (e74c1759-4211-470c-9f9f-bd11cb2b1179)
+19:30:48 Result is kept for 500 seconds
+19:30:48 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04819', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (99307c4b-a26b-4201-9bd4-45eecb461060)
+19:30:49 hr_secondary: Job OK (a43870bd-99e2-4ced-9799-aab38f486b13)
+19:30:49 Result is kept for 500 seconds
+19:30:49 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04820', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (7f473ded-d640-4bc6-b16a-f388784bfd75)
+19:31:01 hr_secondary: Job OK (69213be8-186b-46c0-b9d8-0aa166e00178)
+19:31:01 Result is kept for 500 seconds
+19:31:01 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04821', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (0658e99f-2c7d-4015-a2e4-b72461a7ed77)
+19:31:04 hr_secondary: Job OK (99307c4b-a26b-4201-9bd4-45eecb461060)
+19:31:04 Result is kept for 500 seconds
+19:31:04 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04822', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (06000e2a-6c3a-4534-8ea4-1434bcf93023)
+19:31:04 hr_secondary: Job OK (7f473ded-d640-4bc6-b16a-f388784bfd75)
+19:31:04 Result is kept for 500 seconds
+19:31:04 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04823', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (cc3126c4-89d3-4285-bd5f-d04dff1f13d5)
+19:31:17 hr_secondary: Job OK (0658e99f-2c7d-4015-a2e4-b72461a7ed77)
+19:31:17 Result is kept for 500 seconds
+19:31:17 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04824', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (fde49e3f-493a-4fbb-8cca-3a91ab2d6258)
+19:31:20 hr_secondary: Job OK (cc3126c4-89d3-4285-bd5f-d04dff1f13d5)
+19:31:20 Result is kept for 500 seconds
+19:31:20 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04826', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9e26e231-4038-44be-89a4-e7c7633c654a)
+19:31:33 hr_secondary: Job OK (fde49e3f-493a-4fbb-8cca-3a91ab2d6258)
+19:31:33 Result is kept for 500 seconds
+19:31:33 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04827', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3520a7ed-2ba2-435a-80da-1ec905def9a8)
+19:31:35 hr_secondary: Job OK (06000e2a-6c3a-4534-8ea4-1434bcf93023)
+19:31:35 Result is kept for 500 seconds
+19:31:35 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04829', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (5eb6b9e3-c716-4dfe-aa50-e998d356256b)
+19:31:36 hr_secondary: Job OK (9e26e231-4038-44be-89a4-e7c7633c654a)
+19:31:36 Result is kept for 500 seconds
+19:31:36 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04830', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (97cca2dc-d009-49aa-8429-eacbda7d7d3c)
+19:31:49 hr_secondary: Job OK (3520a7ed-2ba2-435a-80da-1ec905def9a8)
+19:31:49 Result is kept for 500 seconds
+19:31:49 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04831', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f7250ff5-61d8-49b4-a4b5-b7a9f62d5dce)
+19:31:52 hr_secondary: Job OK (5eb6b9e3-c716-4dfe-aa50-e998d356256b)
+19:31:52 Result is kept for 500 seconds
+19:31:52 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04832', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (bb0b53f5-23ad-4fd6-a075-66d4900c8249)
+19:31:52 hr_secondary: Job OK (97cca2dc-d009-49aa-8429-eacbda7d7d3c)
+19:31:52 Result is kept for 500 seconds
+19:31:52 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04833', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (ad47b1cc-3901-4f06-9e17-c52a8a336d58)
+19:32:06 hr_secondary: Job OK (f7250ff5-61d8-49b4-a4b5-b7a9f62d5dce)
+19:32:06 Result is kept for 500 seconds
+19:32:06 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04834', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (fbddab22-fe77-4d59-bfc5-23cb3a7782cd)
+19:32:08 hr_secondary: Job OK (ad47b1cc-3901-4f06-9e17-c52a8a336d58)
+19:32:08 Result is kept for 500 seconds
+19:32:08 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04836', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3d19c161-634a-4f46-acfd-ae4a8dba98c2)
+19:32:22 hr_secondary: Job OK (fbddab22-fe77-4d59-bfc5-23cb3a7782cd)
+19:32:22 Result is kept for 500 seconds
+19:32:22 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04837', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (ac1c1e79-bec0-4a05-a0a6-753d3fdd97f1)
+19:32:23 hr_secondary: Job OK (bb0b53f5-23ad-4fd6-a075-66d4900c8249)
+19:32:23 Result is kept for 500 seconds
+19:32:23 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04839', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (38bc8f4d-262c-43bf-bd22-54ccb4cd639d)
+19:32:24 hr_secondary: Job OK (3d19c161-634a-4f46-acfd-ae4a8dba98c2)
+19:32:24 Result is kept for 500 seconds
+19:32:24 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04840', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (59b316ed-571c-4cd2-b57e-e7e3a08d777b)
+19:32:39 hr_secondary: Job OK (59b316ed-571c-4cd2-b57e-e7e3a08d777b)
+19:32:39 Result is kept for 500 seconds
+19:32:39 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04841', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (12db9c90-44db-4d5a-b012-bddc79a951dc)
+19:32:54 hr_secondary: Job OK (38bc8f4d-262c-43bf-bd22-54ccb4cd639d)
+19:32:54 Result is kept for 500 seconds
+19:32:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04842', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (1855f783-f1dd-46e7-810b-3633db9d528c)
+19:32:55 hr_secondary: Job OK (12db9c90-44db-4d5a-b012-bddc79a951dc)
+19:32:55 Result is kept for 500 seconds
+19:32:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04843', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (80cfb995-c1a2-434b-8a2e-3c868f881a65)
+19:33:10 hr_secondary: Job OK (80cfb995-c1a2-434b-8a2e-3c868f881a65)
+19:33:10 Result is kept for 500 seconds
+19:33:10 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04845', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (db627212-671e-410a-a112-0b8028a80e4d)
+19:33:25 hr_secondary: Job OK (ac1c1e79-bec0-4a05-a0a6-753d3fdd97f1)
+19:33:25 Result is kept for 500 seconds
+19:33:25 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04846', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (d0f70b9c-4845-42ff-8991-16b93eb43f43)
+19:33:26 hr_secondary: Job OK (1855f783-f1dd-46e7-810b-3633db9d528c)
+19:33:26 Result is kept for 500 seconds
+19:33:26 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04847', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c330c857-e3ae-4d8f-983e-67ffcd4d43d3)
+19:33:27 hr_secondary: Job OK (db627212-671e-410a-a112-0b8028a80e4d)
+19:33:27 Result is kept for 500 seconds
+19:33:27 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04848', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (1fb20c9c-e134-4fe8-8cb0-d33c33fbd5f8)
+19:33:42 hr_secondary: Job OK (1fb20c9c-e134-4fe8-8cb0-d33c33fbd5f8)
+19:33:42 Result is kept for 500 seconds
+19:33:42 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04850', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (b71b7346-4f54-4ff5-88e5-65696d81357b)
+19:33:57 hr_secondary: Job OK (c330c857-e3ae-4d8f-983e-67ffcd4d43d3)
+19:33:57 Result is kept for 500 seconds
+19:33:57 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04851', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (582c2113-e41c-4aa5-ad79-74245542a45e)
+19:33:58 hr_secondary: Job OK (b71b7346-4f54-4ff5-88e5-65696d81357b)
+19:33:58 Result is kept for 500 seconds
+19:33:58 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04852', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c2e2a993-68c6-4290-9267-6857a6de6b4a)
+19:34:12 hr_secondary: Job OK (d0f70b9c-4845-42ff-8991-16b93eb43f43)
+19:34:12 Result is kept for 500 seconds
+19:34:12 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04853', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (79282b51-c221-4d6f-ade4-af0515309028)
+19:34:14 hr_secondary: Job OK (c2e2a993-68c6-4290-9267-6857a6de6b4a)
+19:34:14 Result is kept for 500 seconds
+19:34:14 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04855', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (1e3bb594-91ab-4334-9729-6f664d0f6ae7)
+19:34:30 hr_secondary: Job OK (582c2113-e41c-4aa5-ad79-74245542a45e)
+19:34:30 Result is kept for 500 seconds
+19:34:30 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04857', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (cea5f8d0-0be8-46a1-a82c-01367436fe8c)
+19:34:30 hr_secondary: Job OK (1e3bb594-91ab-4334-9729-6f664d0f6ae7)
+19:34:30 Result is kept for 500 seconds
+19:34:30 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04858', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (a205433a-c166-4460-a643-0682606cb72c)
+19:34:44 hr_secondary: Job OK (79282b51-c221-4d6f-ade4-af0515309028)
+19:34:44 Result is kept for 500 seconds
+19:34:44 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04859', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3c6ae26c-e372-47f8-b556-ef86d6de6952)
+19:34:46 hr_secondary: Job OK (a205433a-c166-4460-a643-0682606cb72c)
+19:34:46 Result is kept for 500 seconds
+19:34:46 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04860', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (2599b856-47f2-49d4-abc5-576475882915)
+19:34:59 hr_secondary: Job OK (3c6ae26c-e372-47f8-b556-ef86d6de6952)
+19:34:59 Result is kept for 500 seconds
+19:34:59 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04861', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (b2d98bc5-5853-4378-9b3c-056dee579bbe)
+19:35:02 hr_secondary: Job OK (cea5f8d0-0be8-46a1-a82c-01367436fe8c)
+19:35:02 Result is kept for 500 seconds
+19:35:02 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04862', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (92459303-f938-4a4a-b8ed-0eee5bad8b8d)
+19:35:02 hr_secondary: Job OK (2599b856-47f2-49d4-abc5-576475882915)
+19:35:02 Result is kept for 500 seconds
+19:35:02 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04863', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (57b15eea-9ed3-4084-bd96-3b8ef14cddcd)
+19:35:15 hr_secondary: Job OK (b2d98bc5-5853-4378-9b3c-056dee579bbe)
+19:35:15 Result is kept for 500 seconds
+19:35:15 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04864', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (39250fb5-b2f2-4b4b-a453-6a755d66e9f0)
+19:35:18 hr_secondary: Job OK (57b15eea-9ed3-4084-bd96-3b8ef14cddcd)
+19:35:18 Result is kept for 500 seconds
+19:35:18 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04866', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (ee171fb7-41b9-4028-98c4-90e3cb787b14)
+19:35:31 hr_secondary: Job OK (39250fb5-b2f2-4b4b-a453-6a755d66e9f0)
+19:35:31 Result is kept for 500 seconds
+19:35:31 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04867', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (8c1d4bd0-4c52-4713-973e-cdae9ac9ef80)
+19:35:33 hr_secondary: Job OK (92459303-f938-4a4a-b8ed-0eee5bad8b8d)
+19:35:33 Result is kept for 500 seconds
+19:35:33 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04869', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (d94b8d39-7300-4bd5-8a24-fcc9a24575f5)
+19:35:34 hr_secondary: Job OK (ee171fb7-41b9-4028-98c4-90e3cb787b14)
+19:35:34 Result is kept for 500 seconds
+19:35:34 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04870', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (2ac24f96-acc0-43df-9e0c-622ec4286d86)
+19:35:46 hr_secondary: Job OK (8c1d4bd0-4c52-4713-973e-cdae9ac9ef80)
+19:35:46 Result is kept for 500 seconds
+19:35:46 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04871', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (0c4bc3e4-aa2c-416f-88d1-b1a25ec98cf6)
+19:35:49 hr_secondary: Job OK (2ac24f96-acc0-43df-9e0c-622ec4286d86)
+19:35:49 Result is kept for 500 seconds
+19:35:49 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04872', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (63af4eb7-ba2f-4521-92dc-d40fbfab3fcb)
+19:36:01 hr_secondary: Job OK (0c4bc3e4-aa2c-416f-88d1-b1a25ec98cf6)
+19:36:01 Result is kept for 500 seconds
+19:36:01 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04873', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (aaa62ef7-0953-4116-8962-d13a5a39ed19)
+19:36:04 hr_secondary: Job OK (d94b8d39-7300-4bd5-8a24-fcc9a24575f5)
+19:36:04 Result is kept for 500 seconds
+19:36:04 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04874', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (9bd43db5-fd0e-4776-8110-0c215063917b)
+19:36:05 hr_secondary: Job OK (63af4eb7-ba2f-4521-92dc-d40fbfab3fcb)
+19:36:05 Result is kept for 500 seconds
+19:36:05 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04875', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (3ecfe9f0-4ef6-44c4-84e9-15d841788eae)
+19:36:15 hr_secondary: Job OK (aaa62ef7-0953-4116-8962-d13a5a39ed19)
+19:36:15 Result is kept for 500 seconds
+19:36:15 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04876', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (f666ebf9-f3d4-44bc-a25e-df2027a9ce6a)
+19:36:20 hr_secondary: Job OK (9bd43db5-fd0e-4776-8110-0c215063917b)
+19:36:20 Result is kept for 500 seconds
+19:36:20 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04878', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (509d577c-b9ae-4b7f-b5c9-b7c42060800b)
+19:36:21 hr_secondary: Job OK (3ecfe9f0-4ef6-44c4-84e9-15d841788eae)
+19:36:21 Result is kept for 500 seconds
+19:36:21 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04879', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (40090b50-f288-4de0-80ae-30fe2df47305)
+19:36:30 hr_secondary: Job OK (f666ebf9-f3d4-44bc-a25e-df2027a9ce6a)
+19:36:30 Result is kept for 500 seconds
+19:36:30 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04880', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (c97fe7e9-5694-4594-b34b-ddef321d9a3a)
+19:36:36 hr_secondary: Job OK (509d577c-b9ae-4b7f-b5c9-b7c42060800b)
+19:36:36 Result is kept for 500 seconds
+19:36:36 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04881', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (0a4009d1-f6c6-47bf-9463-4059fcedd419)
+19:36:37 hr_secondary: Job OK (40090b50-f288-4de0-80ae-30fe2df47305)
+19:36:37 Result is kept for 500 seconds
+19:36:37 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04882', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (d6188217-28db-431c-b858-352ce43a19bd)
+19:36:46 hr_secondary: Job OK (c97fe7e9-5694-4594-b34b-ddef321d9a3a)
+19:36:46 Result is kept for 500 seconds
+19:36:46 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04883', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (6701c830-b454-46a1-b251-9eec0163ed83)
+19:36:52 hr_secondary: Job OK (0a4009d1-f6c6-47bf-9463-4059fcedd419)
+19:36:52 Result is kept for 500 seconds
+19:36:52 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04885', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hassan.k@gourmetpakistan.com') (0ad2457a-6def-43d2-ac8f-79666a2332a4)
+19:36:53 hr_secondary: Job OK (d6188217-28db-431c-b858-352ce43a19bd)
+19:36:53 Result is kept for 500 seconds
+19:36:53 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (410013ed-43dd-41f1-925f-1c2a656977ef)
+19:36:53 hr_secondary: Job OK (410013ed-43dd-41f1-925f-1c2a656977ef)
+19:36:53 Result is kept for 500 seconds
+19:36:53 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (e4cb1ff8-85dc-401c-8467-92522d4a6a2e)
+19:36:53 hr_secondary: Job OK (e4cb1ff8-85dc-401c-8467-92522d4a6a2e)
+19:36:53 Result is kept for 500 seconds
+19:36:53 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (862f9d2b-514a-4edb-affd-31fc0643c01e)
+19:36:54 hr_secondary: Job OK (862f9d2b-514a-4edb-affd-31fc0643c01e)
+19:36:54 Result is kept for 500 seconds
+19:36:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (3e9d0c2b-9875-4aea-a649-674fc31cf73a)
+19:36:54 hr_secondary: Job OK (3e9d0c2b-9875-4aea-a649-674fc31cf73a)
+19:36:54 Result is kept for 500 seconds
+19:36:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (4df4db69-d9e1-4a32-ab78-2abfb5251047)
+19:36:54 hr_secondary: Job OK (4df4db69-d9e1-4a32-ab78-2abfb5251047)
+19:36:54 Result is kept for 500 seconds
+19:36:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (bceb0998-0f79-427d-8988-0160e8e346ea)
+19:36:54 hr_secondary: Job OK (bceb0998-0f79-427d-8988-0160e8e346ea)
+19:36:54 Result is kept for 500 seconds
+19:36:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (6b293e59-3351-4556-a3b0-d60a2b363c8c)
+19:36:54 hr_secondary: Job OK (6b293e59-3351-4556-a3b0-d60a2b363c8c)
+19:36:54 Result is kept for 500 seconds
+19:36:54 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (065ed400-83df-40d8-9db5-c94d3b9818eb)
+19:36:55 hr_secondary: Job OK (065ed400-83df-40d8-9db5-c94d3b9818eb)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (6167ba86-002c-4fed-ad0e-9d387a813470)
+19:36:55 hr_secondary: Job OK (6167ba86-002c-4fed-ad0e-9d387a813470)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (a150bf2a-9b4c-46d0-b353-e3d9ca273c8e)
+19:36:55 hr_secondary: Job OK (a150bf2a-9b4c-46d0-b353-e3d9ca273c8e)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (10c21833-9067-48a6-85bb-78b2240c16d9)
+19:36:55 hr_secondary: Job OK (10c21833-9067-48a6-85bb-78b2240c16d9)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (27c57e96-9ca4-4c5a-813c-7b430146f0ab)
+19:36:55 hr_secondary: Job OK (27c57e96-9ca4-4c5a-813c-7b430146f0ab)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (f5f1c53b-f873-4855-afd4-24d403c6d7a7)
+19:36:55 hr_secondary: Job OK (f5f1c53b-f873-4855-afd4-24d403c6d7a7)
+19:36:55 Result is kept for 500 seconds
+19:36:55 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (55a34fb4-16a6-4d36-b24b-43c0c80f3582)
+19:36:56 hr_secondary: Job OK (55a34fb4-16a6-4d36-b24b-43c0c80f3582)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (b4bfca46-cda4-47c5-b3b4-8527212cc900)
+19:36:56 hr_secondary: Job OK (b4bfca46-cda4-47c5-b3b4-8527212cc900)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff304038da0>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (f1e939e3-b14b-4850-8c84-bce4a8f729ec)
+19:36:56 hr_secondary: Job OK (f1e939e3-b14b-4850-8c84-bce4a8f729ec)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff30532a470>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (903765da-be76-4534-b672-87039d6250d6)
+19:36:56 hr_secondary: Job OK (903765da-be76-4534-b672-87039d6250d6)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff304ec2630>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (fa10aa73-0005-4b6d-80ba-d6c20b8e962b)
+19:36:56 hr_secondary: Job OK (fa10aa73-0005-4b6d-80ba-d6c20b8e962b)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff305406668>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (c7c01a3c-bfc6-4499-ab02-e718689853ac)
+19:36:56 hr_secondary: Job OK (c7c01a3c-bfc6-4499-ab02-e718689853ac)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff0e009ef60>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (a79adda1-49ba-4a8f-a62f-6b973bb94b93)
+19:36:56 hr_secondary: Job OK (a79adda1-49ba-4a8f-a62f-6b973bb94b93)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff0e004b470>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (c0d86182-d382-43e2-ad68-793aed518e4e)
+19:36:56 hr_secondary: Job OK (c0d86182-d382-43e2-ad68-793aed518e4e)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff3045f9da0>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (881d88dd-0832-4cac-8999-9962754425e4)
+19:36:56 hr_secondary: Job OK (881d88dd-0832-4cac-8999-9962754425e4)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff306429a90>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (b92fddff-35c8-4582-86fc-93117eaacc0c)
+19:36:56 hr_secondary: Job OK (b92fddff-35c8-4582-86fc-93117eaacc0c)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff3052f2f28>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (113f8e2a-f946-42f4-a3da-320a0e016110)
+19:36:56 hr_secondary: Job OK (113f8e2a-f946-42f4-a3da-320a0e016110)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (61c922ce-dd6f-4aff-b585-7a00f87346a8)
+19:36:56 hr_secondary: Job OK (61c922ce-dd6f-4aff-b585-7a00f87346a8)
+19:36:56 Result is kept for 500 seconds
+19:36:56 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Leave Application', 'name': 'HR-LAP-2024-213785', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='fahim.td@gourmetpakistan.com') (4c1e9dc3-75a7-489e-b301-16262ac27e53)
+19:36:57 hr_secondary: Job OK (4c1e9dc3-75a7-489e-b301-16262ac27e53)
+19:36:57 Result is kept for 500 seconds
+19:36:57 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff0e0002b70>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (2f264bb6-065c-4357-ba6a-6452df268aa9)
+19:36:57 hr_secondary: Job OK (2f264bb6-065c-4357-ba6a-6452df268aa9)
+19:36:57 Result is kept for 500 seconds
+19:36:57 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff3057b7c50>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (e121b28b-1583-489e-b778-2a0b29023d10)
+19:36:57 hr_secondary: Job OK (e121b28b-1583-489e-b778-2a0b29023d10)
+19:36:57 Result is kept for 500 seconds
+19:36:57 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.utils.nestedset.update_nsm', kwargs={'doc': <erpnext.hr.doctype.employee.employee.Employee object at 0x7ff0e0328080>}, method='frappe.utils.nestedset.update_nsm', site='nrp.live', user='hamza.rafiq@gourmetpakistan.com') (d8265a1b-8b39-4296-9892-9e7bbdfe2cc6)
+19:36:57 hr_secondary: Job OK (d8265a1b-8b39-4296-9892-9e7bbdfe2cc6)
+19:36:57 Result is kept for 500 seconds
+19:37:01 hr_secondary: Job OK (6701c830-b454-46a1-b251-9eec0163ed83)
+19:37:01 Result is kept for 500 seconds
+19:37:07 hr_secondary: Job OK (0ad2457a-6def-43d2-ac8f-79666a2332a4)
+19:37:07 Result is kept for 500 seconds
+19:38:19 hr_secondary: frappe.utils.background_jobs.execute_job(event=None, is_async=True, job_name='frappe.model.document.execute_action', kwargs={'doctype': 'Shift Assignment', 'name': 'HR-SHA-24-10-04886', 'action': '_submit'}, method='frappe.model.document.execute_action', site='nrp.live', user='hamza.nasir@gourmetpakistan.com') (84a2bc85-cb31-463a-8a7e-ac20bbfcfa8a)
+19:38:34 hr_secondary: Job OK (84a2bc85-cb31-463a-8a7e-ac20bbfcfa8a)
+19:38:34 Result is kept for 500 seconds
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 177, in _read_from_socket
+    raise socket.error(SERVER_CLOSED_CONNECTION_ERROR)
+OSError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 668, in execute_command
+    return self.parse_response(connection, command_name, **options)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 680, in parse_response
+    response = connection.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 624, in read_response
+    response = self._parser.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 284, in read_response
+    response = self._buffer.readline()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 216, in readline
+    self._read_from_socket()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 191, in _read_from_socket
+    (e.args,))
+redis.exceptions.ConnectionError: Error while reading from socket: ('Connection closed by server.',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 486, in work
+    result = self.dequeue_job_and_maintain_ttl(timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 519, in dequeue_job_and_maintain_ttl
+    job_class=self.job_class)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 460, in dequeue_any
+    result = cls.lpop(queue_keys, timeout, connection=connection)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 410, in lpop
+    result = connection.blpop(queue_keys, timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 1269, in blpop
+    return self.execute_command('BLPOP', *keys)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2879, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 99, in <module>
+    main()
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 18, in main
+    click.Group(commands=commands)(prog_name='bench')
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 764, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 717, in main
+    rv = self.invoke(ctx)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 956, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 555, in invoke
+    return callback(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/commands/scheduler.py", line 167, in start_worker
+    start_worker(queue, quiet = quiet)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/background_jobs.py", line 177, in start_worker
+    Worker(queues, name=get_worker_name(queue)).work(logging_level = logging_level)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 502, in work
+    self.register_death()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 300, in register_death
+    p.execute()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2894, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 177, in _read_from_socket
+    raise socket.error(SERVER_CLOSED_CONNECTION_ERROR)
+OSError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 668, in execute_command
+    return self.parse_response(connection, command_name, **options)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 680, in parse_response
+    response = connection.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 624, in read_response
+    response = self._parser.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 284, in read_response
+    response = self._buffer.readline()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 216, in readline
+    self._read_from_socket()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 191, in _read_from_socket
+    (e.args,))
+redis.exceptions.ConnectionError: Error while reading from socket: ('Connection closed by server.',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 486, in work
+    result = self.dequeue_job_and_maintain_ttl(timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 519, in dequeue_job_and_maintain_ttl
+    job_class=self.job_class)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 460, in dequeue_any
+    result = cls.lpop(queue_keys, timeout, connection=connection)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 410, in lpop
+    result = connection.blpop(queue_keys, timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 1269, in blpop
+    return self.execute_command('BLPOP', *keys)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2879, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 99, in <module>
+    main()
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 18, in main
+    click.Group(commands=commands)(prog_name='bench')
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 764, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 717, in main
+    rv = self.invoke(ctx)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 956, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 555, in invoke
+    return callback(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/commands/scheduler.py", line 167, in start_worker
+    start_worker(queue, quiet = quiet)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/background_jobs.py", line 177, in start_worker
+    Worker(queues, name=get_worker_name(queue)).work(logging_level = logging_level)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 502, in work
+    self.register_death()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 300, in register_death
+    p.execute()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2894, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 177, in _read_from_socket
+    raise socket.error(SERVER_CLOSED_CONNECTION_ERROR)
+OSError: Connection closed by server.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 668, in execute_command
+    return self.parse_response(connection, command_name, **options)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 680, in parse_response
+    response = connection.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 624, in read_response
+    response = self._parser.read_response()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 284, in read_response
+    response = self._buffer.readline()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 216, in readline
+    self._read_from_socket()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 191, in _read_from_socket
+    (e.args,))
+redis.exceptions.ConnectionError: Error while reading from socket: ('Connection closed by server.',)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 486, in work
+    result = self.dequeue_job_and_maintain_ttl(timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 519, in dequeue_job_and_maintain_ttl
+    job_class=self.job_class)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 460, in dequeue_any
+    result = cls.lpop(queue_keys, timeout, connection=connection)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/queue.py", line 410, in lpop
+    result = connection.blpop(queue_keys, timeout)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 1269, in blpop
+    return self.execute_command('BLPOP', *keys)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 673, in execute_command
+    connection.send_command(*args)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 610, in send_command
+    self.send_packed_command(self.pack_command(*args))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2879, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 484, in connect
+    sock = self._connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 541, in _connect
+    raise err
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 529, in _connect
+    sock.connect(socket_address)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.6/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/usr/lib/python3.6/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 99, in <module>
+    main()
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/bench_helper.py", line 18, in main
+    click.Group(commands=commands)(prog_name='bench')
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 764, in __call__
+    return self.main(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 717, in main
+    rv = self.invoke(ctx)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 1137, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 956, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/click/core.py", line 555, in invoke
+    return callback(*args, **kwargs)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/commands/scheduler.py", line 167, in start_worker
+    start_worker(queue, quiet = quiet)
+  File "/home/frappeuser/frappe-bench/apps/frappe/frappe/utils/background_jobs.py", line 177, in start_worker
+    Worker(queues, name=get_worker_name(queue)).work(logging_level = logging_level)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 502, in work
+    self.register_death()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/rq/worker.py", line 300, in register_death
+    p.execute()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2894, in execute
+    return execute(conn, stack, raise_on_error)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/client.py", line 2749, in _execute_transaction
+    connection.send_packed_command(all_cmds)
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 585, in send_packed_command
+    self.connect()
+  File "/home/frappeuser/frappe-bench/env/lib/python3.6/site-packages/redis/connection.py", line 489, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error 111 connecting to localhost:11000. Connection refused.

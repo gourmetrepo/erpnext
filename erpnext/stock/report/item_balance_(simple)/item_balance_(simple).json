@@ -1,0 +1,21 @@
+{
+ "add_total_row": 0,
+ "creation": "2024-09-19 08:54:41.496707",
+ "disable_prepared_report": 0,
+ "disabled": 1,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2024-11-04 11:04:22.239220",
+ "modified_by": "Administrator",
+ "module": "Stock",
+ "name": "Item Balance (Simple)",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "select a.item_code as \"Item:Link/Item:120\",\n\t  a.item_name as \"Item Name::150\",\n\t  a.item_group as \"Item Group:Link/Item Group:120\",\n\t  a.brand as \"Brand:Link/Brand:120\",\n\t  a.description as \"Description::150\",\n\t  b.warehouse as \"Warehouse:Link/Warehouse:120\",\n\t  b.actual_qty as \"Balance Qty:Float:140\"\n from `tabItem` a left join `tabBin` b\n ON a.item_code = b.item_code",
+ "ref_doctype": "Bin",
+ "report_name": "Item Balance (Simple)",
+ "report_type": "Query Report",
+ "roles": []
+}

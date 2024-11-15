@@ -1,13 +1,13 @@
 {
  "add_total_row": 0,
- "creation": "2013-10-22 11:58:16",
+ "creation": "2024-09-19 08:54:46.100492",
  "disable_prepared_report": 0,
- "disabled": 0,
+ "disabled": 1,
  "docstatus": 0,
  "doctype": "Report",
- "idx": 3,
+ "idx": 0,
  "is_standard": "Yes",
- "modified": "2020-01-22 16:51:56.591110",
+ "modified": "2024-11-04 11:08:29.182806",
  "modified_by": "Administrator",
  "module": "CRM",
  "name": "Lead Details",
@@ -17,15 +17,5 @@
  "ref_doctype": "Lead",
  "report_name": "Lead Details",
  "report_type": "Query Report",
- "roles": [
-  {
-   "role": "Sales User"
-  },
-  {
-   "role": "Sales Manager"
-  },
-  {
-   "role": "System Manager"
-  }
- ]
+ "roles": []
 }
