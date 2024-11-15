@@ -1,0 +1,31 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Family Details",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2022-07-25 13:00:07.339735",
+   "default_value": null,
+   "doc_type": "Family Details",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "relation",
+   "idx": 0,
+   "modified": "2021-11-01 14:33:56.299708",
+   "modified_by": "Administrator",
+   "name": "Family Details-relation-options",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "options",
+   "property_type": "Text",
+   "value": "Father\nMother\nBrother\nSister\nSon\nDaughter\nNiece\nNephew\nUncle\nAunt\nGrandfather\nGrandmother\nHusband\nOther"
+  }
+ ],
+ "sync_on_migrate": 1
+}
