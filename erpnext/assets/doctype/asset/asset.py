@@ -36,7 +36,8 @@ class Asset(AccountsController):
 			self.make_gl_entries()
 	
 	def before_save(self):
-		verify_kanals(self)
+		pass
+		#verify_kanals(self)
 	
 	def before_cancel(self):
 		self.cancel_auto_gen_movement()
