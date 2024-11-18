@@ -443,7 +443,7 @@ class StockEntry(StockController):
 				args = self.get_args_for_incoming_rate(d)
 				d.basic_rate = get_incoming_rate(args)
 			elif d.allow_zero_valuation_rate and not d.s_warehouse:
-				d.basic_rate = 0.0
+				d.basic_rate = 0.001
 			elif d.t_warehouse and not d.basic_rate:
 				d.basic_rate = get_valuation_rate(d.item_code, d.t_warehouse,
 					self.doctype, self.name, d.allow_zero_valuation_rate,
