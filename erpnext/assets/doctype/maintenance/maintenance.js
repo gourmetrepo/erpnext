@@ -62,10 +62,28 @@ frappe.ui.form.on('Maintenance', {
     },
     onload: function(frm) {
         hide_fields_for_general_cip(frm);
+        frm.set_df_property('task', 'read_only', 1);
+        frm.set_value('task', 'CIP');
+
+        if (frm.doc.work_order_item) {
+            populate_change_item_from(frm);
+        }
     },
 
     cip_type: function (frm){
         hide_fields_for_general_cip(frm);
+    },
+
+    change_item_to: function (frm) {
+        if (frm.doc.change_item_to) {
+            populate_change_item_to(frm);
+        }
+    },
+
+    work_order_item: function (frm) {
+        if (frm.doc.work_order_item) {
+            populate_change_item_from(frm);
+        }
     }
 });
 
@@ -149,4 +167,30 @@ function planned_cip(frm){
     // frm.set_df_property("quantity_produced", "hidden", 1)
     // frm.set_df_property("remaining_quantity", "hidden", 1)
 
+}
+
+function populate_change_item_to(frm) {
+    frappe.call({
+        method: "get_flavour_and_pack_changes_for_change_to",
+        doc: frm.doc,
+        freeze: true,
+        freeze_message: __("Fetching data. Please wait."),
+        callback: function(r) {
+            frm.refresh_field("flavour_change_to");
+            frm.refresh_field("change_pack_to");
+        }
+    });
+}
+
+function populate_change_item_from(frm) {
+    frappe.call({
+        method: "get_flavour_and_pack_changes_for_change_from",
+        doc: frm.doc,
+        freeze: true,
+        freeze_message: __("Fetching data. Please wait."),
+        callback: function(r) {
+            frm.refresh_field("change_flavour_from");
+            frm.refresh_field("change_pack_from");
+        }
+    });
 }

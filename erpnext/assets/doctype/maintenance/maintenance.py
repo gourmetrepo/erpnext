@@ -18,7 +18,7 @@ class Maintenance(Document):
 		"""
 		if self.task == "CIP":
 			if self.cip_category == "Unplanned CIP":
-				get_flavour_and_pack_changes(self)
+				# get_flavour_and_pack_changes(self)
 				self.setup_unplanned_cip()
 			# elif self.cip_category == "Planned CIP":
 			# 	self.setup_planned_cip()
@@ -74,36 +74,9 @@ class Maintenance(Document):
 		self.cip_end_time = get_datetime()	
 
 
-
-def get_flavour_and_pack_changes(maintenance_doc):
-	
-	# Get flavour from and pack from for production item
-	production_item_flavour_pack = frappe.db.sql(f"""
-		SELECT 
-			parent_item.item_name as flavour, 
-			child_item.reporting_variant as pack 
-		FROM 
-			`tabItem` AS child_item
-		LEFT JOIN 
-			`tabItem` AS parent_item ON parent_item.name = child_item.variant_of
-		WHERE 
-			child_item.name = '{maintenance_doc.work_order_item}'
-	""", as_dict=True)
-
-	if production_item_flavour_pack:
-		flavour_from = production_item_flavour_pack[0].get('flavour')
-		pack_from = production_item_flavour_pack[0].get('pack')
-	else:
-		flavour_from = None
-		pack_from = None
-	
-	maintenance_doc.change_flavour_from = flavour_from
-	maintenance_doc.change_pack_from = pack_from
-
-
-	# Get flavour to and pack to for selected item we move to for all cip types except general cip
-	if maintenance_doc.cip_type != "General":
-		to_item_flavour_pack = frappe.db.sql(f"""
+	def get_flavour_and_pack_changes_for_change_from(self):
+		# Get flavour from and pack from for production item
+		production_item_flavour_pack = frappe.db.sql(f"""
 			SELECT 
 				parent_item.item_name as flavour, 
 				child_item.reporting_variant as pack 
@@ -112,19 +85,44 @@ def get_flavour_and_pack_changes(maintenance_doc):
 			LEFT JOIN 
 				`tabItem` AS parent_item ON parent_item.name = child_item.variant_of
 			WHERE 
-				child_item.name = '{maintenance_doc.change_item_to}'
+				child_item.name = '{self.work_order_item}'
 		""", as_dict=True)
 
-		if to_item_flavour_pack:
-			flavour_to = to_item_flavour_pack[0].get('flavour')
-			pack_to = to_item_flavour_pack[0].get('pack')
+		if production_item_flavour_pack:
+			flavour_from = production_item_flavour_pack[0].get('flavour')
+			pack_from = production_item_flavour_pack[0].get('pack')
 		else:
-			flavour_to = None
-			pack_to = None
+			flavour_from = None
+			pack_from = None
 		
-		maintenance_doc.flavour_change_to = flavour_to
-		maintenance_doc.change_pack_to = pack_to
+		self.change_flavour_from = flavour_from
+		self.change_pack_from = pack_from
 
+
+	def get_flavour_and_pack_changes_for_change_to(self):
+		# Get flavour to and pack to for selected item we move to for all cip types except general cip
+		if self.cip_type != "General":
+			to_item_flavour_pack = frappe.db.sql(f"""
+				SELECT 
+					parent_item.item_name as flavour, 
+					child_item.reporting_variant as pack 
+				FROM 
+					`tabItem` AS child_item
+				LEFT JOIN 
+					`tabItem` AS parent_item ON parent_item.name = child_item.variant_of
+				WHERE 
+					child_item.name = '{self.change_item_to}'
+			""", as_dict=True)
+
+			if to_item_flavour_pack:
+				flavour_to = to_item_flavour_pack[0].get('flavour')
+				pack_to = to_item_flavour_pack[0].get('pack')
+			else:
+				flavour_to = None
+				pack_to = None
+			
+			self.flavour_change_to = flavour_to
+			self.change_pack_to = pack_to
 
 
 def get_flavour_pack_change_setup(maintenance_doc):
