@@ -279,23 +279,25 @@ def get_general_setup(maintenance_doc):
 
 
 def check_if_inprocess_cip(maintenance_doc):
-	inprocess_cip = frappe.db.sql(f"""
-		SELECT name
-		FROM `tabMaintenance`
-		WHERE `company` = %(company)s
-		AND `name` != %(name)s
-		AND `section` = %(section)s
-		AND `task` = 'CIP' 
-		AND `asset_id`=%(asset_id)s
-		AND workflow_state = 'CIP Inprogress'
-	""", {"company": maintenance_doc.company, "name": maintenance_doc.name,"section": maintenance_doc.section, "asset_id": maintenance_doc.asset_id})
+	if maintenance_doc.cost_center:
+		inprocess_cip = frappe.db.sql(f"""
+			SELECT name
+			FROM `tabMaintenance`
+			WHERE `company` = %(company)s
+			AND `name` != %(name)s
+			AND `section` = %(section)s
+			AND `task` = 'CIP' 
+			AND `cost_center`=%(cost_center)s
+			AND workflow_state = 'CIP Inprogress'
+		""", {"company": maintenance_doc.company, "name": maintenance_doc.name,"section": maintenance_doc.section, "cost_center": maintenance_doc.cost_center})
 
-	if inprocess_cip and len(inprocess_cip[0]) > 0:
-		# Change workflow state of this document back to Not Initiated as workflow is first changed and then it comes to this document
-		frappe.db.sql(f"""UPDATE `tabMaintenance` SET workflow_state = 'Not Initiated' WHERE name = '{maintenance_doc.name}'""")
-		frappe.db.commit()
-		frappe.throw(f"""Maintenance for this {maintenance_doc.asset_id} is already in progress: {inprocess_cip[0][0]}""")
-
+		if inprocess_cip and len(inprocess_cip[0]) > 0:
+			# Change workflow state of this document back to Not Initiated as workflow is first changed and then it comes to this document
+			frappe.db.sql(f"""UPDATE `tabMaintenance` SET workflow_state = 'Not Initiated' WHERE name = '{maintenance_doc.name}'""")
+			frappe.db.commit()
+			frappe.throw(f"""Maintenance for this {maintenance_doc.cost_center} is already in progress: {inprocess_cip[0][0]}""")
+	else:
+		frappe.throw("Please select a cost center")
 
 
 
@@ -308,7 +310,7 @@ def check_if_work_order_in_process(maintenance_doc):
 			"production_line": maintenance_doc.asset_id,
 			"status": "In Process"
 		},
-		fields=['name', 'production_item', 'qty', 'produced_qty', 'company', 'item_name'],
+		fields=['name', 'production_item', 'qty', 'produced_qty', 'company', 'item_name', 'production_line', 'line_capacity_per_hour'],
 		order_by='creation desc',
     	limit=1
 	)
@@ -320,3 +322,5 @@ def check_if_work_order_in_process(maintenance_doc):
 		maintenance_doc.work_order_quantity = work_order_data[0].get('qty', 0)
 		maintenance_doc.quantity_produced = work_order_data[0].get('produced_qty', 0)
 		maintenance_doc.remaining_quantity = work_order_data[0].get('qty', 0) - work_order_data[0].get('produced_qty', 0)
+		maintenance_doc.line_capacity_per_hour = work_order_data[0].get('line_capacity_per_hour', 0)
+		maintenance_doc.cost_center = work_order_data[0].get('production_line')
