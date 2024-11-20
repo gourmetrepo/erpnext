@@ -110,5 +110,45 @@ def get_data():
 					"title":"Maintenance Asset Expenses"
 				},
 			]
-		}
+		},
+		{
+            "label": _("Plant and Maintenance"),
+            "items": [
+                 {
+                    "type": "doctype",
+                    "name": "Maintenance",
+                    "description": _("Maintenance and Downtime"),
+                    "label": _("Downtime"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Asset Maintenance",
+                    "description": _("Asset Maintenance"),
+                    "label": _("Asset Maintenance"),
+                    "onboard": 1
+                },
+				                {
+                    "type": "doctype",
+                    "name": "Asset Maintenance Log",
+                    "description": _("Asset Maintenance Log"),
+                    "label": _("Asset Maintenance Log"),
+                    "onboard": 1
+                },
+				                {
+                    "type": "doctype",
+                    "name": "Work Order",
+                    "description": _("Work Order"),
+                    "label": _("Work Order"),
+                    "onboard": 1
+                },
+				                {
+                    "type": "doctype",
+                    "name": "Cost Center",
+                    "description": _("Cost Center"),
+                    "label": _("Cost Center"),
+                    "onboard": 1
+                }
+            ]
+        }
 	]

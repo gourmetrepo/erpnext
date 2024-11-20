@@ -307,10 +307,10 @@ def check_if_work_order_in_process(maintenance_doc):
 		'Work Order',
 		filters={
 			"company": maintenance_doc.company,
-			"production_line": maintenance_doc.asset_id,
+			"production_line": maintenance_doc.cost_center,
 			"status": "In Process"
 		},
-		fields=['name', 'production_item', 'qty', 'produced_qty', 'company', 'item_name', 'production_line', 'line_capacity_per_hour'],
+		fields=['name', 'production_item', 'qty', 'produced_qty', 'company', 'item_name', 'production_line'],
 		order_by='creation desc',
     	limit=1
 	)
@@ -322,5 +322,4 @@ def check_if_work_order_in_process(maintenance_doc):
 		maintenance_doc.work_order_quantity = work_order_data[0].get('qty', 0)
 		maintenance_doc.quantity_produced = work_order_data[0].get('produced_qty', 0)
 		maintenance_doc.remaining_quantity = work_order_data[0].get('qty', 0) - work_order_data[0].get('produced_qty', 0)
-		maintenance_doc.line_capacity_per_hour = work_order_data[0].get('line_capacity_per_hour', 0)
 		maintenance_doc.cost_center = work_order_data[0].get('production_line')
