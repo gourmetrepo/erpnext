@@ -10,6 +10,7 @@ frappe.ui.form.on('Maintenance', {
             frm.set_df_property("cip_category", "read_only", 1)
             frm.set_df_property("work_order_id", "read_only", 1)
             frm.set_df_property("work_order_item", "read_only", 1)
+            frm.set_df_property("company", "read_only", 1)
             
             hide_fields_for_general_cip(frm);
         }else if(frm.doc.cip_category === "Planned CIP"){
@@ -28,6 +29,8 @@ frappe.ui.form.on('Maintenance', {
             frappe.call({
                 method: "mark_cip_inprogress",
                 doc: frm.doc,
+                freeze: true,
+                freeze_message: __("Marking CIP in Progress. Please wait."),
                 callback: function(r) {
                     if (r.message === "CIP Inprogress") {
                         
@@ -42,6 +45,8 @@ frappe.ui.form.on('Maintenance', {
                                     work_order: frm.doc.work_order_id,
                                     status: "Closed"
                                 },
+                                freeze: true,
+                                freeze_message: __("Marking CIP Complete. Please wait."),
                                 callback: function(r) {
                                     if (r.message) {
                                         let stock_entry = r.message;
@@ -119,6 +124,8 @@ function unplanned_cip(frm){
             frappe.call({
                 method: "mark_cip_inprogress",
                 doc: frm.doc,
+                freeze: true,
+                freeze_message: __("Marking CIP in Progress. Please wait."),
                 callback: function(r) {
                     if (r.message === "CIP Inprogress") {
                         
@@ -132,6 +139,8 @@ function unplanned_cip(frm){
                                     work_order: frm.doc.work_order_id,
                                     status: "Closed"
                                 },
+                                freeze: true,
+                                freeze_message: __("Marking CIP Complete. Please wait."),
                                 callback: function(r) {
                                     if (r.message) {
                                         let stock_entry = r.message;
@@ -164,6 +173,7 @@ function planned_cip(frm){
     frm.set_df_property("change_flavour_from", "hidden", 1);
     frm.set_df_property("change_pack_from", "hidden", 1);
     frm.set_df_property("change_pack_to", "hidden", 1);
+    frm.set_df_property('company', 'read_only', 1)
 
     // frm.set_df_property("work_order_id", "hidden", 1)
     // frm.set_df_property("work_order_item", "hidden", 1)
@@ -208,5 +218,21 @@ function create_cip_configuration(frm){
     frm.set_value('cip_type', 'General');
     frm.set_df_property('cip_type', 'read_only', 1)
 
+    frm.set_df_property('company', 'reqd', 1)
+
+    frm.set_df_property('cost_center', 'reqd', 1)
+    frm.set_df_property('cost_center', 'read_only', 0)
+    frm.set_df_property('cost_center', 'hidden', 0)
+
+
+    // Show only parent asset marked cost centers for selected company
+	frm.set_query('cost_center', function(doc) {
+		return {
+			filters: {
+				"is_parent_asset": 1,
+				"company": doc.company
+			}
+		};
+	});
 
 }
