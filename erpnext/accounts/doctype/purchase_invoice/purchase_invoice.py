@@ -96,10 +96,10 @@ class PurchaseInvoice(BuyingController):
                                     GROUP BY party '''.format(customer,party_type,company),as_dict=True)
 
                     if len(total_receivable) > 0:
-                        total_receivable = total_receivable[0]['total_receivable']
-                        self.customer_loan_deduction[0].total_recieveable = total_receivable[0]['total_receivable']
+                        total_receivable = flt(total_receivable[0]['total_receivable'])
+                        self.customer_loan_deduction[0].total_recieveable = flt(total_receivable[0]['total_receivable'])
                     else:
-                        total_receivable = self.customer_loan_deduction[0].total_recieveable
+                        total_receivable = flt(self.customer_loan_deduction[0].total_recieveable)
 
                 if not self.customer_loan_deduction[0].total_payable:
                     self.customer_loan_deduction[0].total_payable = self.rounded_total
