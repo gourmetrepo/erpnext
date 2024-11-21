@@ -112,7 +112,7 @@ def get_data():
 			]
 		},
 		{
-            "label": _("Plant and Maintenance"),
+            "label": _("Plant Maintenance"),
             "items": [
                  {
                     "type": "doctype",
@@ -123,26 +123,33 @@ def get_data():
                 },
 				{
                     "type": "doctype",
+                    "name": "CIP Standard Time Setup",
+                    "description": _("CIP Standard Time Setup"),
+                    "label": _("CIP Standard Time Setup"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
                     "name": "Asset Maintenance",
                     "description": _("Asset Maintenance"),
                     "label": _("Asset Maintenance"),
                     "onboard": 1
                 },
-				                {
+				{
                     "type": "doctype",
                     "name": "Asset Maintenance Log",
                     "description": _("Asset Maintenance Log"),
                     "label": _("Asset Maintenance Log"),
                     "onboard": 1
                 },
-				                {
+				{
                     "type": "doctype",
                     "name": "Work Order",
                     "description": _("Work Order"),
                     "label": _("Work Order"),
                     "onboard": 1
                 },
-				                {
+				{
                     "type": "doctype",
                     "name": "Cost Center",
                     "description": _("Cost Center"),
