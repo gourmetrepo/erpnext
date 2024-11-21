@@ -79,6 +79,25 @@ class PurchaseInvoice(BuyingController):
             pass
         else:
             if len(self.customer_loan_deduction) > 0:
+                customer = frappe.db.get_value('Customer Supplier Relationship',{'supplier':self.supplier},['customer'])
+                company = "Rasool Nawaz Sugar Mill (Pvt.) Ltd."
+                party_type = 'Customer'
+
+                if customer:
+                    total_receivable = frappe.db.sql('''SELECT (SUM(debit) - SUM(credit)) AS total_receivable
+                                    FROM `tabGL Entry` 
+                                    WHERE party_type='{1}' 
+                                    AND party='{0}' 
+                                    AND ACCOUNT IN (SELECT ACCOUNT 
+                                                    FROM `tabParty Account` 
+                                                    WHERE parenttype='{1}' 
+                                                    AND parent='{0}' 
+                                                    AND company='{2}')
+                                    GROUP BY party '''.format(customer,party_type,company),as_dict=True)
+
+                    if len(total_receivable) > 0:
+                        self.customer_loan_deduction[0].total_recieveable = total_receivable[0]['total_receivable']
+            
                 if not self.customer_loan_deduction[0].total_payable:
                     self.customer_loan_deduction[0].total_payable = self.rounded_total
                     if flt(self.customer_loan_deduction[0].total_recieveable) > flt(self.customer_loan_deduction[0].total_payable):
