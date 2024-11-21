@@ -108,9 +108,9 @@ class PurchaseInvoice(BuyingController):
                     else:
                         self.customer_loan_deduction[0].allocated_amount = total_receivable_value
 
-                    self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
-                    self.customer_loan_deduction[0].net_recieveable = flt(total_receivable_value) - flt(self.customer_loan_deduction[0].allocated_amount)
-                    self.customer_loan_deduction[0].allocation_percentage = flt((flt(self.customer_loan_deduction[0].allocated_amount) / flt(total_receivable_value)) * 100)
+                self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
+                self.customer_loan_deduction[0].net_recieveable = flt(total_receivable_value) - flt(self.customer_loan_deduction[0].allocated_amount)
+                self.customer_loan_deduction[0].allocation_percentage = flt((flt(self.customer_loan_deduction[0].allocated_amount) / flt(total_receivable_value)) * 100)
 
         if not self.on_hold:
             self.release_date = ""
