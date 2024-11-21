@@ -107,6 +107,15 @@ def get_data():
 			"type": "module",
 			"description": "Quality goals, procedures, reviews and action."
 		},
+  	 	{
+			"module_name": "Plant Maintenance",
+			"category": "Modules",
+			"label": _("Plant Maintenance"),
+			"color": "#1abc9c",
+			"icon": "fa fa-file",
+			"type": "module",
+			"description": "Plant Maintenance of the Unit"
+		},
 		
 
 		# Category: "Domains"
