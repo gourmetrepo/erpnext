@@ -1327,8 +1327,8 @@ class StockEntry(StockController):
 			#samad comment cost_center
 			_cost_center = None
 			if self.work_order !=None:
-				_cost_center = frappe.db.sql(f"""SELECT cost_center FROM `tabSection Warehouse` AS sw
-												INNER JOIN `tabWork Order` AS wo ON wo.item_section =sw.`parent` AND wo.`name`='{self.work_order}' and sw.company='{self.company}'""",as_dict=True)
+				_cost_center = frappe.db.sql(f"""SELECT sw.`cost_center` FROM `tabSection Warehouse` AS sw
+												INNER JOIN `tabWork Order` AS wo ON wo.item_section =sw.`parent` AND wo.`name`='{self.work_order}' and sw.company='{self.company}'""",as_dict=True, debug=True)
 			
    			
 			stock_uom = item_dict[d].get("stock_uom") or frappe.db.get_value("Item", d, "stock_uom")
