@@ -12,9 +12,13 @@ frappe.ui.form.on('Maintenance', {
             frm.set_df_property("work_order_item", "read_only", 1)
             
             hide_fields_for_general_cip(frm);
-        }else{
+        }else if(frm.doc.cip_category === "Planned CIP"){
             // Planned cip is only scheduled from the cip schedule setup doctype
             planned_cip(frm);
+        }else{
+            // Creating document from new button
+            create_cip_configuration(frm)
+            hide_fields_for_general_cip(frm)
         }
         
         // Worflow setup
@@ -193,4 +197,16 @@ function populate_change_item_from(frm) {
             frm.refresh_field("change_pack_from");
         }
     });
+}
+
+
+function create_cip_configuration(frm){
+
+    frm.set_value('cip_category', 'Unplanned CIP');
+    frm.set_df_property('cip_category', 'read_only', 1)
+
+    frm.set_value('cip_type', 'General');
+    frm.set_df_property('cip_type', 'read_only', 1)
+
+
 }
