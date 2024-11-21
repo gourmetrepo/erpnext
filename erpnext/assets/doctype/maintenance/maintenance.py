@@ -43,7 +43,7 @@ class Maintenance(Document):
 			# Check if already for the same line and company, a cip is already in progress
 			check_if_inprocess_cip(self)
 
-			if self.cip_category == "Planned CIP":
+			if not self.work_order_id:
 				check_if_work_order_in_process(self)
 			
 			# Stop the work order if CIP document goes in progress
