@@ -103,10 +103,11 @@ class PurchaseInvoice(BuyingController):
 
                 if not self.customer_loan_deduction[0].total_payable:
                     self.customer_loan_deduction[0].total_payable = self.rounded_total
-                    if flt(total_receivable_value) > flt(self.customer_loan_deduction[0].total_payable):
-                        self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_payable
-                    else:
-                        self.customer_loan_deduction[0].allocated_amount = total_receivable_value
+                    
+                if flt(total_receivable_value) > flt(self.customer_loan_deduction[0].total_payable):
+                    self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_payable
+                else:
+                    self.customer_loan_deduction[0].allocated_amount = total_receivable_value
 
                 self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
                 self.customer_loan_deduction[0].net_recieveable = flt(total_receivable_value) - flt(self.customer_loan_deduction[0].allocated_amount)
