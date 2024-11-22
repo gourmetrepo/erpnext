@@ -2,8 +2,9 @@ frappe.ui.form.on("Maintenance", {
   refresh: function (frm) {
     // Unplanned CIP if coming from work order
     if (frm.doc.work_order_id) {
-      // Set cip category to Planned CIP
+      if (!frm.doc.cip_category){
       frm.doc.cip_category = "Unplanned CIP";
+      }
       frm.set_df_property("cip_category", "read_only", 1);
       frm.set_df_property("work_order_id", "read_only", 1);
       frm.set_df_property("work_order_item", "read_only", 1);
