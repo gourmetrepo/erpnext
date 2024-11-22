@@ -1,13 +1,13 @@
 {
  "add_total_row": 0,
- "creation": "2018-10-16 12:28:43.651915",
+ "creation": "2024-09-19 08:54:42.344226",
  "disable_prepared_report": 0,
- "disabled": 0,
+ "disabled": 1,
  "docstatus": 0,
  "doctype": "Report",
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2020-02-01 11:04:47.299453",
+ "modified": "2024-11-04 11:08:55.726810",
  "modified_by": "Administrator",
  "module": "Quality Management",
  "name": "Review",
@@ -17,12 +17,5 @@
  "ref_doctype": "Quality Action",
  "report_name": "Review",
  "report_type": "Query Report",
- "roles": [
-  {
-   "role": "System Manager"
-  },
-  {
-   "role": "Quality Manager"
-  }
- ]
+ "roles": []
 }

@@ -1,13 +1,13 @@
 {
  "add_total_row": 1,
- "creation": "2023-11-07 10:17:20.132804",
+ "creation": "2024-09-19 08:54:41.313738",
  "disable_prepared_report": 0,
  "disabled": 1,
  "docstatus": 0,
  "doctype": "Report",
  "idx": 0,
  "is_standard": "Yes",
- "modified": "2024-02-09 14:48:00.404374",
+ "modified": "2024-11-04 11:12:43.259425",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Ordered Items To Be Delivered",
@@ -17,18 +17,5 @@
  "ref_doctype": "Delivery Note",
  "report_name": "Ordered Items To Be Delivered",
  "report_type": "Query Report",
- "roles": [
-  {
-   "role": "Stock User"
-  },
-  {
-   "role": "Stock Manager"
-  },
-  {
-   "role": "Sales User"
-  },
-  {
-   "role": "Accounts User"
-  }
- ]
+ "roles": []
 }
