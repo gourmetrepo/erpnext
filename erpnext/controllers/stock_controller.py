@@ -403,8 +403,9 @@ class StockController(AccountsController):
 
 				qa_failed = any([r.status=="Rejected" for r in qa_doc.readings])
 				if qa_failed:
-					frappe.throw(_("Row {0}: Quality Inspection rejected for item {1}")
-						.format(d.idx, d.item_code), QualityInspectionRejectedError)
+					if not d.rejected_qty > 0 or not self.rejected_warehouse:
+						frappe.throw(_("Row {0}: Quality Inspection rejected for item {1} and rejected qty or rejected warehouse is not defined.")
+							.format(d.idx, d.item_code), QualityInspectionRejectedError)
 			elif qa_required :
 				action = frappe.get_doc('Stock Settings').action_if_quality_inspection_is_not_submitted
 				if self.docstatus==1 and action == 'Stop':
