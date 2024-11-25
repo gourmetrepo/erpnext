@@ -24,41 +24,41 @@ def execute(filters=None):
         if unit==filters.company:
             data = frappe.db.sql(f"""SELECT  party as customer,c.customer_name,account,SUM(shop_value) as shop_value,GROUP_CONCAT(ref_doc) AS ref_doc  FROM
 (
-SELECT   party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
+SELECT party,account,SUM(credit)-SUM(debit) AS shop_value GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
                     FROM `tabGL Entry` 
                     WHERE account IN ({unit_accounts.get('accounts')})
                     AND DATE(posting_date) ='{yesterday}'  AND company='{unit}' AND Voucher_type='Sales Invoice' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
                     
                     UNION ALL
-                    SELECT  GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc ,account, party , SUM(credit)-SUM(debit) AS shop_value 
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
                     FROM `tabGL Entry` 
                     WHERE account IN ({unit_accounts.get('accounts')})
                     AND DATE(posting_date) ='{today}'  AND company='{unit}' AND name NOT LIKE "%ACC-SVJV%" AND Voucher_type='Journal Entry' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
                 
                     UNION ALL
-                    SELECT  GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc ,account, party , SUM(credit)-SUM(debit) AS shop_value 
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
                     FROM `tabGL Entry` 
                     WHERE account IN ({unit_accounts.get('accounts')})
                     AND DATE(posting_date) ='{today}'  AND company='{unit}' AND Voucher_type='Payment Entry' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
                 
                     UNION ALL
-                    SELECT  GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc ,account, party , SUM(credit)-SUM(debit) AS shop_value 
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
                     FROM `tabGL Entry` 
                     WHERE account IN ({unit_accounts.get('ng_accounts')})
                     AND DATE(posting_date) ='{today}' AND company='{unit}' AND Voucher_type='Payment Entry' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
                 
                     UNION ALL
-                    SELECT  GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc ,account, party , SUM(credit)-SUM(debit) AS shop_value 
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
                     FROM `tabGL Entry` 
                     WHERE account IN ({unit_accounts.get('ng_accounts')})
                     AND DATE(posting_date) ='{today}' AND company='{unit}' AND Voucher_type='Sales Invoice' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
                     ) AS a
-                    INNER JOIN `tabCustomer` AS c ON a.party = c.`name`  
+					INNER JOIN `tabCustomer` AS c ON a.party = c.`name`  
                     GROUP BY party, account""",as_dict=True,debug=True)
 
 
@@ -66,10 +66,11 @@ SELECT   party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT
     return columns, data
 
 
-def get_columns(filters):
-    """return columns based on filters"""
 
-    columns = [_("Customer") + ":Link/Customer:100"]  + [_("Customer Name") + "::150"] + [_("Account") + "::150"] + \
-                 [_("Shop Value") + ":Float:120"] + [_("Ref Doc") + "::420"] 
-    
-    return columns
+def get_columns(filters):
+	"""return columns based on filters"""
+
+	columns = [_("Customer") + ":Link/Customer:100"]  + [_("Customer Name") + "::150"] + [_("Account") + "::150"] + \
+ 				[_("Shop Value") + ":Float:120"] + [_("Ref Doc") + "::420"] 
+	
+	return columns
