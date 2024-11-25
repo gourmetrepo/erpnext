@@ -18,6 +18,14 @@ frappe.ui.form.on("Project", {
 		};
 	},
 	onload: function (frm) {
+		frm.set_query('bank_account',function(){
+			return {
+				filters: {
+					"bank" : frm.doc.bank,
+					"company": frm.doc.company
+				}
+			}
+		});
 		var so = frappe.meta.get_docfield("Project", "sales_order");
 		so.get_route_options_for_new_doc = function (field) {
 			if (frm.is_new()) return;
