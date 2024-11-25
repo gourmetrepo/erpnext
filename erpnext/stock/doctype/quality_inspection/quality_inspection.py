@@ -13,40 +13,39 @@ class QualityInspection(Document):
 		if not self.readings and self.item_code:
 			self.get_item_specification_details()
 
-		if not self.quality_inspection_template:
-			parameters = get_template_details(self.quality_inspection_template)
-			for reading in self.readings:
-				matching_parameter = next((d for d in parameters if d["specification"] == reading.specification), None)
+		parameters = get_template_details(self.quality_inspection_template)
+		for reading in self.readings:
+			matching_parameter = next((d for d in parameters if d["specification"] == reading.specification), None)
 
-				if not matching_parameter:
-					frappe.throw(f"Specification {reading.specification} not found in the template parameters.")
+			if not matching_parameter:
+				frappe.throw(f"Specification {reading.specification} not found in the template parameters.")
 
-				expected_type = matching_parameter["type"]
-				actual_type = type(reading.reading_1).__name__.capitalize()
-				if expected_type == "String":
-					if actual_type == "Str":
-						actual_type = "String"
+			expected_type = matching_parameter["type"]
+			actual_type = type(reading.reading_1).__name__.capitalize()
+			if expected_type == "String":
+				if actual_type == "Str":
+					actual_type = "String"
 
-					if expected_type != actual_type:
-						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+				if expected_type != actual_type:
+					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 
-				if expected_type in ["Int", "Float"]:
-					min_value = matching_parameter.get("min_value")
-					max_value = matching_parameter.get("max_value")
+			if expected_type in ["Int", "Float"]:
+				min_value = matching_parameter.get("min_value")
+				max_value = matching_parameter.get("max_value")
 
 
-					if min_value is not None:
-						min_value = float(min_value) if expected_type == "Float" else int(min_value)
-					if max_value is not None:
-						max_value = float(max_value) if expected_type == "Float" else int(max_value)
-						
-					if expected_type != type(min_value).__name__.capitalize() or expected_type != type(max_value).__name__.capitalize():
-						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+				if min_value is not None:
+					min_value = float(min_value) if expected_type == "Float" else int(min_value)
+				if max_value is not None:
+					max_value = float(max_value) if expected_type == "Float" else int(max_value)
+					
+				if expected_type != type(min_value).__name__.capitalize() or expected_type != type(max_value).__name__.capitalize():
+					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 
-					if min_value is not None and max_value is not None:
-						reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
-						if not (min_value <= reading.reading_1 <= max_value):
-							frappe.throw(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
+				if min_value is not None and max_value is not None:
+					reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
+					if not (min_value <= reading.reading_1 <= max_value):
+						frappe.throw(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
 
 	def get_item_specification_details(self):
 		if not self.quality_inspection_template:
