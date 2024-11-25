@@ -108,9 +108,9 @@ def get_columns(filters):
     columns = (
         [_("Customer") + ":Link/Customer:100"]
         + [_("Customer Name") + "::150"]
-        + [_("Account") + "::150"]
+        + [_("Account") + "::350"]
         + [_("Shop Value") + ":Float:120"]
-        + [_("Ref Doc") + "::420"]
+        + [_("Ref Doc") + "::520"]
     )
 
     return columns
