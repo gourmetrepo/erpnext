@@ -106,8 +106,8 @@ def get_columns(filters):
     """return columns based on filters"""
 
     columns = (
-        [_("Customer") + ":Link/Customer:100"]
-        + [_("Customer Name") + "::150"]
+        [_("Customer") + ":Link/Customer:200"]
+        + [_("Customer Name") + "::350"]
         + [_("Account") + "::350"]
         + [_("Shop Value") + ":Float:120"]
         + [_("Ref Doc") + "::520"]
