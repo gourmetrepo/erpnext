@@ -225,6 +225,9 @@ def get_flavour_change_setup(maintenance_doc):
 			
 
 def get_pack_change_setup(maintenance_doc):
+	cip_steps = None
+	standard_time = None
+	
 	pack_change_setups = frappe.db.sql("""
 		SELECT to_pack, cip_steps, standard_time
 		FROM `tabCIP Standard Time`
