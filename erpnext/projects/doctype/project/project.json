@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "project_name",
+  "company",
   "status",
   "project_type",
   "is_active",
@@ -38,7 +39,6 @@
   "total_costing_amount",
   "total_expense_claim",
   "total_purchase_cost",
-  "company",
   "column_break_28",
   "total_sales_amount",
   "total_billable_amount",
@@ -172,7 +172,6 @@
   {
    "fieldname": "customer",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "label": "Customer",
    "oldfieldname": "customer",
    "oldfieldtype": "Link",
@@ -295,7 +294,8 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company",
-   "remember_last_selected_value": 1
+   "remember_last_selected_value": 1,
+   "reqd": 1
   },
   {
    "fieldname": "column_break_28",
@@ -444,7 +444,7 @@
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
  "max_attachments": 4,
- "modified": "2020-04-09 14:17:15.524529",
+ "modified": "2024-11-25 15:01:21.224670",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",
