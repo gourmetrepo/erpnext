@@ -43,7 +43,15 @@ class QualityInspection(Document):
 					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 
 				if min_value is not None and max_value is not None:
-					reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
+					if expected_type == "Int":
+						try:
+							reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
+						except ValueError:
+							frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} cannot be interpreted as an integer.")
+
+					if expected_type != type(reading.reading_1).__name__.capitalize():
+						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+     
 					if not (min_value <= reading.reading_1 <= max_value):
 						frappe.throw(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
 
