@@ -70,6 +70,17 @@ class PurchaseReceipt(BuyingController):
 			})
 
 	def validate(self):
+
+		if self.import_costing_sheet is None and self.docstatus == 1:
+			po_number = ''
+			for pri in self.items:
+				po_number = pri.purchase_order
+				break
+			if po_number != '':
+				purchase_order_type = frappe.get_value('Purchase Order',po_number,'purchase_order_type')
+				if purchase_order_type == 'Import' and self.import_costing_sheet is None and self.docstatus == 1:
+					frappe.throw('You cannot submit Purchase Receipt of Type "Import" without Import Costing Sheet.')
+
 		self.validate_posting_time()
 		super(PurchaseReceipt, self).validate()
 
