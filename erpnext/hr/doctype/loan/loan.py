@@ -112,8 +112,8 @@ class Loan(AccountsController):
 	def set_status(self, from_validate=False):
 		disbursement = self.get_disbursement_entry()
 		disbursement_date = None
-
-		self.status = "Draft"
+		if self.status != "Disbursed":
+			self.status = "Draft"
 
 		if (not disbursement or disbursement.disbursed_amount == 0) and self.docstatus == 1:
 			self.status = "Sanctioned"
