@@ -17,6 +17,15 @@ frappe.ui.form.on("Task", {
 				frm: frm
 			})
 		}
+
+		frm.set_query("parent_task", function() {
+			return {
+				filters: {
+					"is_group": 1,
+					"project": frm.doc.project
+				}
+			}
+		});
 	},
 
 	onload: function (frm) {
@@ -29,10 +38,6 @@ frappe.ui.form.on("Task", {
 				filters: filters
 			};
 		})
-	},
-
-	refresh: function (frm) {
-		frm.set_query("parent_task", { "is_group": 1, "project": frm.doc.project });
 	},
 
 	is_group: function (frm) {
