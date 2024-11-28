@@ -1,4 +1,5 @@
 {
+ "autoname": "format: {cip_type}",
  "creation": "2024-11-04 15:28:24.333017",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -42,7 +43,7 @@
    "read_only": 1
   }
  ],
- "modified": "2024-11-08 11:32:51.373659",
+ "modified": "2024-11-20 19:50:54.903953",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "CIP Standard Time Setup",

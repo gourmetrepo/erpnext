@@ -41,7 +41,8 @@
   "bill_of_material_and_services",
   "maintenance_order_jobs_assignment",
   "items_replacement_and_repair",
-  "previous_workflow_state"
+  "previous_workflow_state",
+  "frequency"
  ],
  "fields": [
   {
@@ -60,6 +61,7 @@
    "options": "Flavour Change\nPack Change\nFlavor & Pack Change\nGeneral"
   },
   {
+   "default": "Unplanned CIP",
    "depends_on": "eval:doc.task == \"CIP\"",
    "fieldname": "cip_category",
    "fieldtype": "Select",
@@ -93,7 +95,6 @@
    "fieldname": "change_flavour_from",
    "fieldtype": "Select",
    "label": "Change Flavour From",
-   "options": "\nCola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
    "read_only": 1
   },
   {
@@ -101,7 +102,6 @@
    "fieldname": "flavour_change_to",
    "fieldtype": "Select",
    "label": "Flavour Change to",
-   "options": "\nCola\nLemon\nMalta\nTwister\nSoda Ice\nApple\nRed Anar\nLychee\nDiet Cola\nDiet Lemon\nWater",
    "read_only": 1
   },
   {
@@ -155,7 +155,6 @@
    "read_only": 1
   },
   {
-   "collapsible": 1,
    "fieldname": "section_break_14",
    "fieldtype": "Section Break"
   },
@@ -256,19 +255,16 @@
    "fieldtype": "Column Break"
   },
   {
-   "collapsible": 1,
    "fieldname": "section_break_8",
    "fieldtype": "Section Break",
    "label": "Item Settings"
   },
   {
-   "collapsible": 1,
    "fieldname": "cip_configuration_section",
    "fieldtype": "Section Break",
    "label": "CIP Configuration"
   },
   {
-   "collapsible": 1,
    "fieldname": "cip_standard_time_setup_section",
    "fieldtype": "Section Break",
    "label": "CIP Standard Time Setup"
@@ -279,10 +275,16 @@
    "label": "Cost Center",
    "options": "Cost Center",
    "read_only": 1
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Frequency"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-20 17:17:10.242722",
+ "modified": "2024-11-25 17:51:40.174176",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
