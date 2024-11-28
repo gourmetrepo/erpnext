@@ -32,7 +32,7 @@ frappe.ui.form.on("Task", {
 	},
 
 	refresh: function (frm) {
-		frm.set_query("parent_task", { "is_group": 1 });
+		frm.set_query("parent_task", { "is_group": 1, "project": frm.doc.project });
 	},
 
 	is_group: function (frm) {
