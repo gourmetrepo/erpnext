@@ -38,6 +38,27 @@ frappe.ui.form.on("Task", {
 				filters: filters
 			};
 		})
+
+		frappe.call({
+			method: "frappe.client.get_value",
+			args: {
+				doctype: "Employee",
+				filters: { user_id: frappe.session.user_email },
+				fieldname: "company"
+			},
+			callback: function(r) {
+				if (r.message) {
+					debugger;
+					frm.set_query("project", function () {
+						return {
+							filters: {
+								company: r.message.company
+							}
+						};
+					})
+				}
+			}
+		});
 	},
 
 	is_group: function (frm) {
