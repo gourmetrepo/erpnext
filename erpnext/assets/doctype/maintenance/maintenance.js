@@ -128,7 +128,8 @@ function hide_fields_for_general_cip(frm) {
     frm.set_query("change_item_to", function (doc) {
       return {
         filters: {
-          item_section: "FG CSD"
+          item_section: "FG CSD",
+          name: ["!=", doc.work_order_item] // Use an array for "!="
         },
       };
     });

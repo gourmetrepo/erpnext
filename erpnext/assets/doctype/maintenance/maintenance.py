@@ -78,7 +78,7 @@ class Maintenance(Document):
 		# Get flavour from and pack from for production item
 		production_item_flavour_pack = frappe.db.sql(f"""
 			SELECT 
-				parent_item.item_name as flavour, 
+				COALESCE(parent_item.item_name, child_item.reporting_flavor) as flavour, 
 				child_item.reporting_variant as pack 
 			FROM 
 				`tabItem` AS child_item
@@ -104,7 +104,7 @@ class Maintenance(Document):
 		if self.cip_type != "General":
 			to_item_flavour_pack = frappe.db.sql(f"""
 				SELECT 
-					parent_item.item_name as flavour, 
+					COALESCE(parent_item.item_name, child_item.reporting_flavor) as flavour, 
 					child_item.reporting_variant as pack 
 				FROM 
 					`tabItem` AS child_item
