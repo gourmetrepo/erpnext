@@ -34,14 +34,14 @@ class Maintenance(Document):
 		elif self.cip_type == "General":
 			get_general_setup(self)
 	
-	# def setup_planned_cip(self):
-	# 	if self.cip_type == "General":
-	# 		get_general_setup(self)
-	
+
 	def mark_cip_inprogress(self):
 		try:
 			# Check if already for the same line and company, a cip is already in progress
-			check_if_inprocess_cip(self)
+			inprocess_status = check_if_inprocess_cip(self)
+
+			if inprocess_status:
+				return "Already in progress"
 
 			if not self.work_order_id:
 				check_if_work_order_in_process(self)
@@ -298,7 +298,8 @@ def check_if_inprocess_cip(maintenance_doc):
 			# Change workflow state of this document back to Not Initiated as workflow is first changed and then it comes to this document
 			frappe.db.sql(f"""UPDATE `tabMaintenance` SET workflow_state = 'Not Initiated' WHERE name = '{maintenance_doc.name}'""")
 			frappe.db.commit()
-			frappe.throw(f"""Maintenance for this {maintenance_doc.cost_center} is already in progress: {inprocess_cip[0][0]}""")
+			frappe.msgprint(f"""Maintenance for this {maintenance_doc.cost_center} is already in progress: {inprocess_cip[0][0]}""")
+			return True
 	else:
 		frappe.throw("Please select a cost center")
 
