@@ -61,7 +61,6 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	issue_material: (frm) => {
-		debugger;
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
 		}
@@ -77,7 +76,6 @@ frappe.ui.form.on('Asset Maintenance', {
 			method: 'issue_mr_for_bill_of_material_and_services',
 			doc: frm.doc,
 			callback: (r) => {
-				debugger;
 				if (!r.message || !r.message.mr_reference) {
 					return;
 				}
