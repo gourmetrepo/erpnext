@@ -1,5 +1,6 @@
 frappe.ui.form.on("Maintenance", {
   refresh: function (frm) {
+    
     // Unplanned CIP if coming from work order
     if (frm.doc.work_order_id) {
       if (!frm.doc.cip_category){
@@ -34,9 +35,7 @@ frappe.ui.form.on("Maintenance", {
         freeze_message: __("Marking CIP in Progress. Please wait."),
         callback: function (r) {
           if (r.message === "CIP Inprogress") {
-            // Update previous workflow state to the current workflow_state
             frm.save();
-
             // Only in case of planned cip
             if (
               frm.doc.cip_category === "Unplanned CIP" &&
@@ -70,6 +69,9 @@ frappe.ui.form.on("Maintenance", {
                 },
               });
             }
+          }else if(r.message === "Already in progress"){
+            frm.set_value('workflow_state', "Not Initiated")
+            frm.save();
           }
         },
       });
