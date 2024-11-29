@@ -35,40 +35,39 @@ frappe.ui.form.on("Maintenance", {
         freeze_message: __("Marking CIP in Progress. Please wait."),
         callback: function (r) {
           if (r.message === "CIP Inprogress") {
-            frm.save();
-            // Only in case of planned cip
-            if (
-              frm.doc.cip_category === "Unplanned CIP" &&
-              (frm.doc.cip_type === "Flavour Change" ||
-                frm.doc.cip_type === "Pack Change" ||
-                frm.doc.cip_type === "Flavor & Pack Change")
-            ) {
-              frappe.call({
-                method:
-                  "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
-                args: {
-                  work_order: frm.doc.work_order_id,
-                  status: "Closed",
-                },
-                freeze: true,
-                freeze_message: __("Marking CIP Complete. Please wait."),
-                callback: function (r) {
-                  if (r.message) {
-                    let stock_entry = r.message;
-                    if (isEmpty(stock_entry)) {
-                      location.reload();
-                    } else {
-                      frappe.model.sync(stock_entry);
-                      frappe.set_route(
-                        "Form",
-                        stock_entry.doctype,
-                        stock_entry.name
-                      );
+            frm.save().then(() => {
+              // Only in case of unplanned CIP and specific CIP types
+              if (
+                frm.doc.cip_category === "Unplanned CIP" &&
+                (frm.doc.cip_type === "Flavour Change" ||
+                  frm.doc.cip_type === "Pack Change" ||
+                  frm.doc.cip_type === "Flavor & Pack Change")
+              ) {
+                // Close work order after saving
+                frappe.call({
+                  method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
+                  args: {
+                    work_order: frm.doc.work_order_id,
+                    status: "Closed",
+                  },
+                  freeze: true,
+                  freeze_message: __("Marking CIP Complete. Please wait."),
+                  callback: function (r) {
+                    if (r.message) {
+                      let stock_entry = r.message;
+                      if (isEmpty(stock_entry)) {
+                        location.reload();
+                      } else {
+                        frappe.model.sync(stock_entry);
+                        frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+                      }
                     }
-                  }
-                },
-              });
-            }
+                  },
+                });
+              }
+            }).catch((err) => {
+              frappe.msgprint(__('Failed to save the document.'));
+            });
           }else if(r.message === "Already in progress"){
             frm.set_value('workflow_state', "Not Initiated")
             frm.save();
