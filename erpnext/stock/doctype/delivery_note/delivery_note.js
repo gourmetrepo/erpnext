@@ -125,7 +125,7 @@ frappe.ui.form.on("Delivery Note", {
 	},
 	customer_type:function(frm) {
 		if (frm.doc.customer_type === 'Employee'){
-			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Gourmet Ice Cream'){
+			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC'){
 				frm.set_df_property('vehicle_no', 'hidden', true);		
 				frm.set_df_property('vehicle', 'hidden', false);
 				frm.set_df_property('vehicle', 'read_only', 0);
@@ -152,7 +152,7 @@ frappe.ui.form.on("Delivery Note", {
 			frm.set_df_property('driver', 'reqd', 1);
 			frm.set_df_property('transporter', 'reqd', 0);
 		}else if(frm.doc.customer_type === 'Supplier'){
-			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Gourmet Ice Cream') {
+			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC') {
 				frm.set_df_property('vehicle_no', 'hidden', true);		
 				frm.set_df_property('vehicle', 'hidden', false);
 				frm.set_df_property('vehicle', 'read_only', 0);
@@ -172,7 +172,7 @@ frappe.ui.form.on("Delivery Note", {
 		}
 	},
 	vehicle: function(frm) {
-		if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Gourmet Ice Cream'){
+		if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC'){
 				frm.set_df_property('vehicle_no', 'hidden', false);		
 				frm.set_value("vehicle_no", frm.doc.vehicle);
 				frm.set_df_property('vehicle_no', 'read_only', 1);
