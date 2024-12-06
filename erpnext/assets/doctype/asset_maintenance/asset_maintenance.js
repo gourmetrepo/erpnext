@@ -24,6 +24,14 @@ frappe.ui.form.on('Asset Maintenance', {
 				return indicator;
 			}
 		);
+
+		frm.set_query('project', function() {
+            return {
+                filters: {
+                    status: 'Open'
+                }
+            };
+        });
 	},
 
 	refresh: (frm) => {
@@ -91,9 +99,24 @@ frappe.ui.form.on('Asset Maintenance', {
 				});
 			}
 		});
+	},
+	
+	work_order_id: (frm) => {
+		if (!frm.doc.work_order_id) {
+            frm.set_value("order_item", null)
+			frm.set_df_property('order_item', 'hidden', 1);
+            frm.set_value("total_quantity", null)
+            frm.set_df_property('total_quantity', 'hidden', 1);
+            frm.set_value("quantity_produced", null)
+            frm.set_df_property('quantity_produced', 'hidden', 1);
+            frm.set_value("remaining_quantity", null)
+            frm.set_df_property('remaining_quantity', 'hidden', 1);
+        }
+
+		if (frm.doc.total_quantity !== undefined && frm.doc.total_quantity !== undefined){
+			frm.set_value("remaining_quantity", (frm.doc.total_quantity - frm.doc.quantity_produced));
+		}
 	}
-	
-	
 	
 });
 
@@ -211,6 +234,17 @@ frappe.ui.form.on('Bill of Material and Services', {
         } else {
             frappe.throw("Please select Company first");
         }
+
+		// if (frm.doc.bill_of_material_and_services) {
+		// 	let items_list = frm.doc.bill_of_material_and_services.map(row => row.item);
+		// 	 frm.fields_dict['asset_maintenance_tasks'].grid.get_field('item_used').get_query = function () {
+		// 		return {
+		// 			"filters": {
+		// 				"item_used": ['in', items_list]
+		// 			},
+		// 		};
+		// 	};
+		// }
     }
 });
 

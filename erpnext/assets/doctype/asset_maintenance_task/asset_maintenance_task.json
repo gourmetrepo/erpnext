@@ -17,6 +17,8 @@
   "end_date",
   "certificate_required",
   "section_break_9",
+  "item_used",
+  "section_break_14",
   "assign_to",
   "column_break_10",
   "assign_to_name",
@@ -145,10 +147,20 @@
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Estimated Time"
+  },
+  {
+   "fieldname": "item_used",
+   "fieldtype": "Link",
+   "label": "Item Used",
+   "options": "Item"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
   }
  ],
  "istable": 1,
- "modified": "2024-11-07 19:40:51.295160",
+ "modified": "2024-12-02 16:30:44.476420",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
