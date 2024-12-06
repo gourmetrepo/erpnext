@@ -48,14 +48,29 @@ frappe.ui.form.on("Task", {
 			},
 			callback: function(r) {
 				if (r.message) {
-					debugger;
-					frm.set_query("project", function () {
-						return {
-							filters: {
-								company: r.message.company
-							}
-						};
-					})
+					if (r.message.designation) {
+						const designation = r.message.designation;
+						const allowedDesignations = ['Plant Engineer', 'Maintenance Engineer', 
+											'Machine Supervisor', 'Manager Production', 
+											'Manager Engineering', 'Asst. Manager Engineering'];
+						if (allowedDesignations.includes(designation) && (frm.doc.progress == 100)) {
+							frm.add_custom_button("Reopen", function() {
+								frm.set_value("status", "Open");
+								frm.set_value("progress", 0);
+								frm.save();
+							})
+						}
+					}
+
+					if (r.message.company) {
+						frm.set_query("project", function () {
+							return {
+								filters: {
+									company: r.message.company
+								}
+							};
+						})
+					}
 				}
 			}
 		});
