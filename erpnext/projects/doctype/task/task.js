@@ -48,17 +48,6 @@ frappe.ui.form.on("Task", {
 			},
 			callback: function(r) {
 				if (r.message) {
-					if (r.message.company) {
-						frm.set_query("project", function () {
-							return {
-								filters: {
-									company: r.message.company
-								}
-							};
-						})
-					}
-
-
 					if (r.message.designation) {
 						const designation = r.message.designation;
 						const allowedDesignations = ['Plant Engineer', 'Maintenance Engineer', 
@@ -71,6 +60,16 @@ frappe.ui.form.on("Task", {
 								frm.save();
 							})
 						}
+					}
+
+					if (r.message.company) {
+						frm.set_query("project", function () {
+							return {
+								filters: {
+									company: r.message.company
+								}
+							};
+						})
 					}
 				}
 			}
