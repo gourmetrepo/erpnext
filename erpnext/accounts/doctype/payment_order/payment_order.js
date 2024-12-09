@@ -3,13 +3,13 @@
 
 frappe.ui.form.on('Payment Order', {
 	setup: function(frm) {
-		frm.set_query("company_bank_account", function() {
-			return {
-				filters: {
-					"is_company_account":1
-				}
-			}
-		});
+		// frm.set_query("company_bank_account", function() {
+		// 	return {
+		// 		filters: {
+		// 		//	"is_company_account":1
+		// 		}
+		// 	}
+		// });
 	},
 	refresh: function(frm) {
 		if (frm.doc.docstatus == 0) {
