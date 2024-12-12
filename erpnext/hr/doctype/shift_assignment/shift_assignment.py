@@ -16,8 +16,8 @@ class OverlapError(frappe.ValidationError): pass
 class ShiftAssignment(Document):
 	def validate(self):
 		self.validate_overlapping_dates()
-	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
+	# def submit(self):
+	# 	self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
 	def validate_overlapping_dates(self):
 			if not self.name:
 				self.name = "New Shift Assignment"
