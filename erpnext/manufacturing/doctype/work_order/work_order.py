@@ -771,6 +771,24 @@ def stop_unstop(work_order, status):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
 
 	pro_order = frappe.get_doc("Work Order", work_order)
+
+	# Code by Moeiz
+	csd_companies = ["Unit 5", "Unit 8", "Unit 11"]
+	if pro_order.company in csd_companies and status == "Resumed":
+		in_process_cips = frappe.db.sql(
+			f"""
+			SELECT `name` FROM `tabMaintenance`
+			WHERE `work_order_id`='{self.work_order_id}'
+			AND `workflow_state`="CIP Inprogress";
+			""", as_dict=True)
+
+		if in_process_cips and len(in_process_cips) > 0:
+			in_process_cip_links = ", ".join([
+				f"<a href='{frappe.utils.get_url_to_form('Maintenance', cip.get('name'))}' target='_blank'>{cip.get('name')}</a>"
+				for cip in in_process_cips
+			])
+			frappe.throw(f"Cannot resume work order. CIP is in progress: {in_process_cip_links}")
+	
 	pro_order.update_status(status)
 	pro_order.update_planned_qty()
 	frappe.msgprint(_("Work Order has been {0}").format(status))
