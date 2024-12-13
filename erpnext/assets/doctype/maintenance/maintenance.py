@@ -104,7 +104,11 @@ class Maintenance(Document):
 	def mark_cip_finished(self):
 		# Resume the work order if CIP document is finished in case of Unplanned CIP
 		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
-			stop_unstop(self.work_order_id, "Resumed")
+			work_order_status = frappe.db.get_value('Work Order', {'name': self.work_order_id}, 'status')
+			if work_order_status == "Stopped":
+				stop_unstop(self.work_order_id, "Resumed")
+			elif work_order_status != "Closed":
+				frappe.throw("Please contact support. The referenced work order has to be stopped or closed to finish CIP")
 
 		self.cip_end_time = get_datetime()	
 
