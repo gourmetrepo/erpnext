@@ -106,7 +106,7 @@ class Maintenance(Document):
 		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
 			work_order_status = frappe.db.get_value('Work Order', {'name': self.work_order_id}, 'status')
 			if work_order_status == "Stopped":
-				stop_unstop(self.work_order_id, "Resumed")
+				stop_unstop(self.work_order_id, "Resumed", self.name)
 			elif work_order_status != "Closed":
 				frappe.throw("Please contact support. The referenced work order has to be stopped or closed to finish CIP")
 

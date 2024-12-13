@@ -764,7 +764,7 @@ def get_default_warehouse():
 	return {"wip_warehouse": wip_warehouse, "fg_warehouse": fg_warehouse}
 
 @frappe.whitelist()
-def stop_unstop(work_order, status):
+def stop_unstop(work_order, status, cip_name):
 	""" Called from client side on Stop/Unstop event"""
 
 	if not frappe.has_permission("Work Order", "write"):
@@ -779,7 +779,8 @@ def stop_unstop(work_order, status):
 			f"""
 			SELECT `name` FROM `tabMaintenance`
 			WHERE `work_order_id`='{work_order}'
-			AND `workflow_state`="CIP Inprogress";
+			AND `workflow_state`="CIP Inprogress"
+			AND `name` != '{cip_name}';	
 			""", as_dict=True)
 
 		if in_process_cips and len(in_process_cips) > 0:
