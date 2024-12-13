@@ -3,10 +3,11 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import math
 import frappe
 from frappe.model.document import Document
 from erpnext.manufacturing.doctype.work_order.work_order import stop_unstop
-from frappe.utils import get_datetime
+from frappe.utils import get_datetime, time_diff
 
 class Maintenance(Document):
 
@@ -61,9 +62,43 @@ class Maintenance(Document):
 			frappe.throw(str(e))
 			frappe.log_error(frappe.get_traceback(), "Mark CIP Inprogress")
 
+	def convert_minutes_to_hhmm(self, minutes):
+		hours = minutes // 60
+		remaining_minutes = minutes % 60
+
+		formatted_hours = str(hours).zfill(2)
+		formatted_minutes = str(remaining_minutes).zfill(2)
+
+		return f"{formatted_hours}:{formatted_minutes}"
+
+	def check_delay_before_submit(self):
+		standard_time = self.standard_time
+		standard_time_parts = standard_time.split(":")
+		standard_time_total_minutes = (int(standard_time_parts[0]) * 60) + int(standard_time_parts[1])
+
+		# Get the current time and CIP start time
+		current_time = get_datetime()
+		cip_start_time = self.cip_start_time
+
+		# Calculate actual time elapsed
+		actual_time_minutes = math.floor(time_diff(current_time, cip_start_time).total_seconds() / 60)
+		delay_time_minutes = actual_time_minutes - standard_time_total_minutes
+		
+		if delay_time_minutes > 0:
+			return True, actual_time_minutes, delay_time_minutes
+		else:
+			return False, actual_time_minutes, delay_time_minutes
 
 
 	def before_submit(self):
+		is_delayed, actual_time_minutes, delay_time_minutes = self.check_delay_before_submit()
+		if is_delayed:
+			if not self.delay_reason:
+				frappe.throw("Please fill delay reason before marking CIP as finished")
+		
+			self.actual_time = self.convert_minutes_to_hhmm(actual_time_minutes)
+			self.delay_time = self.convert_minutes_to_hhmm(delay_time_minutes)
+			
 		self.mark_cip_finished()
 
 	def mark_cip_finished(self):

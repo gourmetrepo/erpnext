@@ -84,6 +84,8 @@ frappe.ui.form.on("Maintenance", {
     }
   },
   onload: function (frm) {
+    check_and_populate_delay(frm);
+
     hide_fields_for_general_cip(frm);
     frm.set_df_property("task", "read_only", 1);
     frm.set_value("task", "CIP");
@@ -109,6 +111,55 @@ frappe.ui.form.on("Maintenance", {
     }
   },
 });
+
+function check_and_populate_delay(frm) {
+  const standardTime = frm.doc.standard_time;
+  const standardTimeParts = standardTime.split(":");
+  const standardTimeTotalMins = (parseInt(standardTimeParts[0]) * 60) + 
+                                parseInt(standardTimeParts[1])
+  
+  const currentTime = frappe.datetime.now_datetime();
+  const cipStartTime = frm.doc.cip_start_time;
+
+  function convertMinutesToHHMM(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.floor(minutes % 60);
+
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = remainingMinutes.toString().padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}`;
+  }
+
+  let actualTime = moment(currentTime).diff(cipStartTime, 'minutes', true);
+  const delay = actualTime - standardTimeTotalMins;
+
+  actualTime = convertMinutesToHHMM(actualTime);
+  let delayTime = '00:00';
+  if (delay > 0) {
+    delayTime = convertMinutesToHHMM(delay);
+
+    if (frm.doc.workflow_state !== "CIP Finished") {
+      frm.set_df_property("actual_time", "hidden", 0);
+      frm.set_df_property("delay_time", "hidden", 0);
+      frm.set_df_property("delay_reason", "hidden", 0);
+
+      frm.set_value("actual_time", actualTime);
+      frm.set_value("delay_time", delayTime);
+
+      frm.refresh_field("actual_time");
+      frm.refresh_field("delay_time");
+      frm.refresh_field("delay_reason");
+    }
+  }
+
+  if (frm.doc.workflow_state == "CIP Finished") {
+    frm.set_df_property("delay_reason", "read_only", 1);
+    frm.refresh_field("delay_reason");
+  }
+
+  frm.save();
+}
 
 function hide_fields_for_general_cip(frm) {
   if (frm.doc.cip_type === "General") {
