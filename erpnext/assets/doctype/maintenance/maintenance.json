@@ -42,7 +42,13 @@
   "maintenance_order_jobs_assignment",
   "items_replacement_and_repair",
   "previous_workflow_state",
-  "frequency"
+  "frequency",
+  "section_break_39",
+  "actual_time",
+  "column_break_41",
+  "delay_time",
+  "section_break_43",
+  "delay_reason"
  ],
  "fields": [
   {
@@ -281,10 +287,42 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Frequency"
+  },
+  {
+   "fieldname": "section_break_39",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "actual_time",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Actual Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_41",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delay_time",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Delay Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "delay_reason",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "Delay Reason"
+  },
+  {
+   "fieldname": "section_break_43",
+   "fieldtype": "Section Break"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-11-25 17:51:40.174176",
+ "modified": "2024-12-13 11:35:25.664186",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
