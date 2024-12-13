@@ -558,7 +558,7 @@ erpnext.work_order = {
 						}
 					
 					// Code by Moeiz to allow maintenance CIP button for Unit 5 only
-					let maintenance_allowed_companies = ['Unit 5']
+					let maintenance_allowed_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
 					if (maintenance_allowed_companies.includes(company)){
 						var maintenance_btn = frm.add_custom_button(__('Downtime'), function() {
 							erpnext.work_order.make_cip_maintenance_document(frm);
