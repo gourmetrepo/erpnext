@@ -778,7 +778,7 @@ def stop_unstop(work_order, status):
 		in_process_cips = frappe.db.sql(
 			f"""
 			SELECT `name` FROM `tabMaintenance`
-			WHERE `work_order_id`='{self.work_order_id}'
+			WHERE `work_order_id`='{work_order}'
 			AND `workflow_state`="CIP Inprogress";
 			""", as_dict=True)
 
