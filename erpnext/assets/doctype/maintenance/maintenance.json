@@ -94,7 +94,8 @@
    "fieldname": "section",
    "fieldtype": "Select",
    "label": "Section",
-   "options": "Production Room\nSugar Room\nSyrup Room"
+   "options": "Production Room\nSugar Room\nSyrup Room",
+   "set_only_once": 1
   },
   {
    "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
@@ -322,7 +323,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-13 11:35:25.664186",
+ "modified": "2024-12-13 16:10:01.355888",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
