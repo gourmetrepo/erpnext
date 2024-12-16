@@ -564,12 +564,15 @@ erpnext.work_order = {
 								},
 								callback: function(r) {
 									if (r.message && r.message.length > 0) {
-										frappe.throw(__(`Can not start a Work Order on line ${self.production_line} as CIP is in progress`));
-									} 
+										frappe.throw(__(`Can not start a Work Order on line ${frm.doc.production_line} as CIP is in progress`));
+									} else {
+										erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
+									}
 								}
 							});
+						} else {
+							erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
 						}
-						erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
 					});
 					start_btn.addClass('btn-primary');
 				}
