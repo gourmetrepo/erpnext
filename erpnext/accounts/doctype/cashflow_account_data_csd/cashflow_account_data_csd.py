@@ -17,9 +17,9 @@ class Cashflowaccountdatacsd(Document):
 def insertDataQueue(from_date=None,to_date=None,companies=None):
 	try:
 		if not from_date:
-			from_date = datetime.now().strftime('%Y-%m-%d')
+			from_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 		if not to_date:
-			to_date = datetime.now().strftime('%Y-%m-%d')
+			to_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
 		cashflow_config = get_config_by_name('CASH_FLOW_DATA_CONFIG_CSD')
 
