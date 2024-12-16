@@ -59,7 +59,7 @@ def insertDataQueue(from_date=None,to_date=None,companies=None):
 					to_date=start_date.strftime('%Y-%m-%d'), 
 					company=company, 
 					cashflow_config=cashflow_config,
-					queue="long",
+					queue="sync",
 					timeout=13000
 				)
 				frappe.db.commit()
@@ -154,5 +154,5 @@ def updateCashBankData():
 # Cron job for daily update of cashflow data
 @frappe.whitelist()
 def csd_cashflow_data_job():
-	frappe.enqueue("erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertDataQueue", queue="long")
+	frappe.enqueue("erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertDataQueue", queue="sync")
 	frappe.db.commit()
