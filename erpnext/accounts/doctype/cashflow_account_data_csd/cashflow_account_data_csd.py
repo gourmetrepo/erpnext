@@ -50,6 +50,7 @@ def insertDataQueue(from_date=None,to_date=None,companies=None):
 		for company in companies_tuple:
 			while from_date <= to_date:
 				# insertData(from_date=from_date.strftime('%Y-%m-%d'), to_date=from_date.strftime('%Y-%m-%d'), company=company, cashflow_config=cashflow_config)
+				frappe.db.commit()
 				frappe.enqueue(
 					"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
 					from_date=from_date.strftime('%Y-%m-%d'), 
