@@ -514,6 +514,23 @@ erpnext.work_order = {
 						erpnext.work_order.create_pick_list(frm);
 					});
 					var start_btn = frm.add_custom_button(__('Start'), function() {
+						frappe.call({
+							method: 'frappe.client.get_list',
+							args: {
+								doctype: 'Maintenance',
+								fieldname: ['name'],
+								filters: {
+									workflow_state: 'CIP Inprogress',
+									cost_center: self.production_line
+								}
+							},
+							callback: function(r) {
+								if (r.message && r.message.length > 0) {
+									frappe.throw(__(`Can not start a Work Order on line ${self.production_line} as CIP is in progress`));
+								} 
+							}
+						});
+
 						erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
 					});
 					start_btn.addClass('btn-primary');
