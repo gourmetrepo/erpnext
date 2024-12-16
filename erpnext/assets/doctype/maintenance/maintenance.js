@@ -144,8 +144,8 @@ function check_and_populate_delay(frm) {
       frm.set_df_property("delay_time", "hidden", 0);
       frm.set_df_property("delay_reason", "hidden", 0);
 
-      frm.set_value("actual_time", actualTime);
-      frm.set_value("delay_time", delayTime);
+      frappe.db.set_value("Maintenance", "actual_time", actualTime);
+      frappe.db.set_value("Maintenance", "delay_time", delayTime);
 
       frm.refresh_field("actual_time");
       frm.refresh_field("delay_time");
@@ -157,8 +157,6 @@ function check_and_populate_delay(frm) {
     frm.set_df_property("delay_reason", "read_only", 1);
     frm.refresh_field("delay_reason");
   }
-
-  frm.save();
 }
 
 function hide_fields_for_general_cip(frm) {
