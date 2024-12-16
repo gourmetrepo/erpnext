@@ -48,20 +48,22 @@ def insertDataQueue(from_date=None,to_date=None,companies=None):
 
 	
 		for company in companies_tuple:
-			while from_date <= to_date:
-				# insertData(from_date=from_date.strftime('%Y-%m-%d'), to_date=from_date.strftime('%Y-%m-%d'), company=company, cashflow_config=cashflow_config)
+			start_date = from_date
+			end_date = to_date
+			while start_date <= end_date:
+				# insertData(from_date=start_date.strftime('%Y-%m-%d'), to_date=start_date.strftime('%Y-%m-%d'), company=company, cashflow_config=cashflow_config)
 				frappe.db.commit()
 				frappe.enqueue(
 					"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertData",
-					from_date=from_date.strftime('%Y-%m-%d'), 
-					to_date=from_date.strftime('%Y-%m-%d'), 
+					from_date=start_date.strftime('%Y-%m-%d'), 
+					to_date=start_date.strftime('%Y-%m-%d'), 
 					company=company, 
 					cashflow_config=cashflow_config,
 					queue="long",
 					timeout=13000
 				)
 				frappe.db.commit()
-				from_date += timedelta(days=1)
+				start_date += timedelta(days=1)
 	except Exception as e:
 		title = "CSD Cash Flow Data"
 		traceback = frappe.get_traceback()
