@@ -408,6 +408,42 @@ frappe.ui.form.on("Work Order", {
 		frm.fields_dict.operations.grid.toggle_reqd("workstation", frm.doc.operations);
 	},
 
+	company: function(frm) {
+		// CIP QA Sheet - Point 23
+		const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+		if (csd_companies.includes(frm.doc.company)) {
+			if (frm.doc.company) {
+				frappe.call({
+					method: "frappe.client.get_list",
+					args: {
+						doctype: "Cost Center",
+						filters: {
+							is_parent_asset: 1,
+							company: frm.doc.company
+						},
+						fields: ["name"]
+					},
+					callback: function(r) {
+						if (r.message) {
+							let options = r.message.map(row => row.name);
+							frm.set_df_property("production_line", "options", options.join("\n"));
+						}
+					}
+				});
+			}
+		}
+	},
+
+	before_save: function(frm) {
+		// CIP QA Sheet - Point 23
+		const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+		if (csd_companies.includes(frm.doc.company)) {
+			if (!frm.doc.production_line || frm.doc.production_line.length < 1) {
+				frappe.throw(__("Production Line is Mandatory"))
+			}
+		}
+	},
+
 	set_sales_order: function(frm) {
 		if(frm.doc.production_item) {
 			frappe.call({
@@ -514,23 +550,25 @@ erpnext.work_order = {
 						erpnext.work_order.create_pick_list(frm);
 					});
 					var start_btn = frm.add_custom_button(__('Start'), function() {
-						frappe.call({
-							method: 'frappe.client.get_list',
-							args: {
-								doctype: 'Maintenance',
-								fieldname: ['name'],
-								filters: {
-									workflow_state: 'CIP Inprogress',
-									cost_center: self.production_line
+						const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+						if (csd_companies.includes(frm.doc.company)) {
+							frappe.call({
+								method: 'frappe.client.get_list',
+								args: {
+									doctype: 'Maintenance',
+									fieldname: ['name'],
+									filters: {
+										workflow_state: 'CIP Inprogress',
+										cost_center: self.production_line
+									}
+								},
+								callback: function(r) {
+									if (r.message && r.message.length > 0) {
+										frappe.throw(__(`Can not start a Work Order on line ${self.production_line} as CIP is in progress`));
+									} 
 								}
-							},
-							callback: function(r) {
-								if (r.message && r.message.length > 0) {
-									frappe.throw(__(`Can not start a Work Order on line ${self.production_line} as CIP is in progress`));
-								} 
-							}
-						});
-
+							});
+						}
 						erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
 					});
 					start_btn.addClass('btn-primary');
