@@ -19,7 +19,7 @@ class AssetMaintenance(Document):
 			if not task.assign_to and self.docstatus == 0:
 				throw(_("Row #{}: Please asign task to a member.").format(task.idx))
 
-	def on_save(self):
+	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
 
 		for task in asset_maintenance_tasks:
