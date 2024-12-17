@@ -3,10 +3,11 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import math
 import frappe
 from frappe.model.document import Document
 from erpnext.manufacturing.doctype.work_order.work_order import stop_unstop
-from frappe.utils import get_datetime
+from frappe.utils import get_datetime, time_diff
 
 class Maintenance(Document):
 
@@ -48,7 +49,7 @@ class Maintenance(Document):
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
-				stop_unstop(self.work_order_id, "Stopped")
+				stop_unstop(self.work_order_id, "Stopped", self.name)
 			
 			self.cip_start_time = get_datetime()
 			self.previous_workflow_state = self.workflow_state
@@ -61,15 +62,53 @@ class Maintenance(Document):
 			frappe.throw(str(e))
 			frappe.log_error(frappe.get_traceback(), "Mark CIP Inprogress")
 
+	def convert_minutes_to_hhmm(self, minutes):
+		hours = minutes // 60
+		remaining_minutes = minutes % 60
+
+		formatted_hours = str(hours).zfill(2)
+		formatted_minutes = str(remaining_minutes).zfill(2)
+
+		return f"{formatted_hours}:{formatted_minutes}"
+
+	def check_delay_before_submit(self):
+		standard_time = self.standard_time
+		standard_time_parts = standard_time.split(":")
+		standard_time_total_minutes = (int(standard_time_parts[0]) * 60) + int(standard_time_parts[1])
+
+		# Get the current time and CIP start time
+		current_time = get_datetime()
+		cip_start_time = self.cip_start_time
+
+		# Calculate actual time elapsed
+		actual_time_minutes = math.floor(time_diff(current_time, cip_start_time).total_seconds() / 60)
+		delay_time_minutes = actual_time_minutes - standard_time_total_minutes
+		
+		if delay_time_minutes > 0:
+			return True, actual_time_minutes, delay_time_minutes
+		else:
+			return False, actual_time_minutes, delay_time_minutes
 
 
 	def before_submit(self):
+		is_delayed, actual_time_minutes, delay_time_minutes = self.check_delay_before_submit()
+		if is_delayed:
+			if not self.delay_reason:
+				frappe.throw("Please fill delay reason before marking CIP as finished")
+		
+			self.actual_time = self.convert_minutes_to_hhmm(actual_time_minutes)
+			self.delay_time = self.convert_minutes_to_hhmm(delay_time_minutes)
+			
 		self.mark_cip_finished()
 
 	def mark_cip_finished(self):
 		# Resume the work order if CIP document is finished in case of Unplanned CIP
 		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
-			stop_unstop(self.work_order_id, "Resumed")
+			work_order_status = frappe.db.get_value('Work Order', {'name': self.work_order_id}, 'status')
+			if work_order_status == "Stopped":
+				stop_unstop(self.work_order_id, "Resumed", self.name)
+			elif work_order_status != "Closed":
+				frappe.throw("Please contact support. The referenced work order has to be stopped or closed to finish CIP")
 
 		self.cip_end_time = get_datetime()	
 
@@ -187,7 +226,7 @@ def get_flavour_change_setup(maintenance_doc):
 		FROM `tabCIP Standard Time`
 		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change' AND `cip_section`=%(cip_section)s)
 		AND from_flavor=%(from_flavor)s
-	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True)
+	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True, debug=True)
 
 	for setup in flavour_change_setups:
 		if setup.to_flavor == maintenance_doc.flavour_change_to:

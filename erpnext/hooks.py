@@ -330,6 +330,9 @@ scheduler_events = {
         "erpnext.manufacturing.doctype.bom_update_tool.bom_update_tool.update_latest_price_in_all_boms",
     	"erpnext.controllers.accounts_controller.update_invoice_status"
 
+	 ],
+	 "0 2 * * *": [
+		"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.csd_cashflow_data_job"
 	 ]
      }
 }

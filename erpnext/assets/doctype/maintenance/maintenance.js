@@ -82,7 +82,9 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("change_item_to", "read_only", 1);
       frm.set_df_property("section", "read_only", 1);
     }
+    check_and_populate_delay(frm);
   },
+
   onload: function (frm) {
     hide_fields_for_general_cip(frm);
     frm.set_df_property("task", "read_only", 1);
@@ -90,6 +92,13 @@ frappe.ui.form.on("Maintenance", {
 
     if (frm.doc.work_order_item) {
       populate_change_item_from(frm);
+    }
+  },
+
+
+  before_save: function(frm){
+    if(frm.doc.cip_category === "Planned CIP" && frm.is_new()){
+      frappe.throw("You cannot create planned CIP from here")
     }
   },
 
@@ -109,6 +118,57 @@ frappe.ui.form.on("Maintenance", {
     }
   },
 });
+
+function check_and_populate_delay(frm) {
+  const standardTime = frm.doc.standard_time;
+  if (!standardTime) {
+    return;
+  }
+
+  const standardTimeParts = standardTime.split(":");
+  const standardTimeTotalMins = (parseInt(standardTimeParts[0]) * 60) + 
+                                parseInt(standardTimeParts[1])
+  
+  const currentTime = frappe.datetime.now_datetime();
+  const cipStartTime = frm.doc.cip_start_time;
+
+  function convertMinutesToHHMM(minutes) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.floor(minutes % 60);
+
+    const formattedHours = hours.toString().padStart(2, '0');
+    const formattedMinutes = remainingMinutes.toString().padStart(2, '0');
+
+    return `${formattedHours}:${formattedMinutes}`;
+  }
+
+  let actualTime = moment(currentTime).diff(cipStartTime, 'minutes', true);
+  const delay = actualTime - standardTimeTotalMins;
+
+  actualTime = convertMinutesToHHMM(actualTime);
+  let delayTime = '00:00';
+  if (delay > 0) {
+    delayTime = convertMinutesToHHMM(delay);
+
+    if (frm.doc.workflow_state !== "CIP Finished") {
+      frm.set_df_property("actual_time", "hidden", 0);
+      frm.set_df_property("delay_time", "hidden", 0);
+      frm.set_df_property("delay_reason", "hidden", 0);
+
+      frappe.db.set_value("Maintenance", "actual_time", actualTime);
+      frappe.db.set_value("Maintenance", "delay_time", delayTime);
+
+      frm.refresh_field("actual_time");
+      frm.refresh_field("delay_time");
+      frm.refresh_field("delay_reason");
+    }
+  }
+
+  if (frm.doc.workflow_state == "CIP Finished") {
+    frm.set_df_property("delay_reason", "read_only", 1);
+    frm.refresh_field("delay_reason");
+  }
+}
 
 function hide_fields_for_general_cip(frm) {
   if (frm.doc.cip_type === "General") {
@@ -222,6 +282,7 @@ function populate_change_item_to(frm) {
 }
 
 function populate_change_item_from(frm) {
+  debugger;
   frappe.call({
     method: "get_flavour_and_pack_changes_for_change_from",
     doc: frm.doc,
