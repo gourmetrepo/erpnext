@@ -84,6 +84,7 @@ frappe.ui.form.on("Maintenance", {
     }
   },
   onload: function (frm) {
+
     check_and_populate_delay(frm);
 
     hide_fields_for_general_cip(frm);
@@ -92,6 +93,13 @@ frappe.ui.form.on("Maintenance", {
 
     if (frm.doc.work_order_item) {
       populate_change_item_from(frm);
+    }
+  },
+
+
+  before_save: function(frm){
+    if(frm.doc.cip_category === "Planned CIP" && frm.is_new()){
+      frappe.throw("You cannot create planned CIP from here")
     }
   },
 
@@ -271,6 +279,7 @@ function populate_change_item_to(frm) {
 }
 
 function populate_change_item_from(frm) {
+  debugger;
   frappe.call({
     method: "get_flavour_and_pack_changes_for_change_from",
     doc: frm.doc,
