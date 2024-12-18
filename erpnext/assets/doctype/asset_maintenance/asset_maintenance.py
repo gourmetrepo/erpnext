@@ -190,3 +190,15 @@ def make_issue_material_request(doc):
     mr.insert(ignore_permissions=True)
     # mr.submit()
     return mr
+
+@frappe.whitelist()
+def get_team_members(maintenance_teams):
+    if isinstance(maintenance_teams, str):
+        maintenance_teams = frappe.parse_json(maintenance_teams)
+    
+    team_members = frappe.get_all(
+        'Maintenance Team Member',
+        filters={'parent': ['in', maintenance_teams]},
+        fields=['team_member']
+    )
+    return [member.team_member for member in team_members]

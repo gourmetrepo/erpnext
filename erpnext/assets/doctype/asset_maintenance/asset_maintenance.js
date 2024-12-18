@@ -133,6 +133,47 @@ frappe.ui.form.on('Asset Maintenance', {
 			}
 		});
 	},
+	maintenance_team: (frm, cdt, cdn) => {
+		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
+			const maintenanceTeamNames = frm.doc.maintenance_team.map(team => team.maintenance_team_name);
+			console.log("Maintenance Team Names:", maintenanceTeamNames);
+	
+			if (maintenanceTeamNames.length > 0) {
+				frappe.call({
+					method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members',
+					args: {
+						maintenance_teams: maintenanceTeamNames
+					},
+					callback: function(response) {
+						if (response.message) {
+							const teamMembers = response.message;
+	
+							frm.fields_dict['asset_maintenance_tasks'].grid.get_field('assign_to').get_query = function(doc, cdt, cdn) {
+								return {
+									filters: {
+										name: ['in', teamMembers]
+									}
+								};
+							};
+						} else {
+							frappe.msgprint(__('No team members found for the selected maintenance teams.'));
+						}
+					},
+					error: function(error) {
+						console.error("Error fetching team members:", error);
+						frappe.msgprint(__('There was an error fetching the team members.'));
+					}
+				});
+			} else {
+				frappe.msgprint(__('No maintenance team names found.'));
+			}
+		} else {
+			frappe.msgprint(__('No maintenance teams selected.'));
+		}
+	},	
+	bill_of_material_and_services: function(frm, cdt, cdn) {
+        console.log("bill_of_material_and_services_add");
+    },
 	
 	work_order_id: (frm) => {
 		if (!frm.doc.work_order_id) {
@@ -259,6 +300,7 @@ frappe.ui.form.on('Bill of Material and Services', {
                     
                     // Set the stock available in the child table's field
                     frappe.model.set_value(cdt, cdn, 'stock_available', total_qty);
+					collect_items_and_update_field(frm)
                     
                     // Refresh the field if necessary
                     frm.refresh_field('bill_of_material_and_services');
@@ -278,7 +320,25 @@ frappe.ui.form.on('Bill of Material and Services', {
 		// 		};
 		// 	};
 		// }
-    }
+		function collect_items_and_update_field(frm) {
+			let item_list = [];
+		
+			frm.doc.bill_of_material_and_services.forEach(row => {
+				if (row.item) {
+					item_list.push(row.item);
+				}
+			});
+
+			frm.fields_dict['asset_maintenance_tasks'].grid.get_field('item_used').get_query = function(doc, cdt, cdn) {
+				return {
+					filters: {
+						name: ['in', item_list]
+					}
+				};
+			};
+		
+			frm.refresh_field('item_used');
+		}
+    },
+	
 });
-
-
