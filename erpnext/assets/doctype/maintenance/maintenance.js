@@ -82,11 +82,10 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("change_item_to", "read_only", 1);
       frm.set_df_property("section", "read_only", 1);
     }
-  },
-  onload: function (frm) {
-
     check_and_populate_delay(frm);
+  },
 
+  onload: function (frm) {
     hide_fields_for_general_cip(frm);
     frm.set_df_property("task", "read_only", 1);
     frm.set_value("task", "CIP");
@@ -122,6 +121,10 @@ frappe.ui.form.on("Maintenance", {
 
 function check_and_populate_delay(frm) {
   const standardTime = frm.doc.standard_time;
+  if (!standardTime) {
+    return;
+  }
+
   const standardTimeParts = standardTime.split(":");
   const standardTimeTotalMins = (parseInt(standardTimeParts[0]) * 60) + 
                                 parseInt(standardTimeParts[1])

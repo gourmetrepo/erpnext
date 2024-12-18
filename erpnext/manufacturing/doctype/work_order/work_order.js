@@ -556,10 +556,10 @@ erpnext.work_order = {
 								method: 'frappe.client.get_list',
 								args: {
 									doctype: 'Maintenance',
-									fieldname: ['name'],
+									field: ['name'],
 									filters: {
 										workflow_state: 'CIP Inprogress',
-										cost_center: self.production_line
+										cost_center: frm.doc.production_line
 									}
 								},
 								callback: function(r) {

@@ -52,11 +52,13 @@
  ],
  "fields": [
   {
+   "default": "CIP",
    "fieldname": "task",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Task",
-   "options": "CIP\nMachine Breakdown\nMaintenance",
+   "options": "CIP",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -94,7 +96,8 @@
    "fieldname": "section",
    "fieldtype": "Select",
    "label": "Section",
-   "options": "Production Room\nSugar Room\nSyrup Room",
+   "options": "Production Room",
+   "read_only": 1,
    "set_only_once": 1
   },
   {
@@ -323,8 +326,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-13 16:10:01.355888",
- "modified_by": "Administrator",
+ "modified": "2024-12-17 17:32:07.408553",
+ "modified_by": "ali.ahsan@gourmetpakistan.com",
  "module": "Assets",
  "name": "Maintenance",
  "owner": "ali.ahsan@gourmetpakistan.com",

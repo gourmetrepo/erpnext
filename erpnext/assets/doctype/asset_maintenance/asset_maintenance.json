@@ -1,5 +1,5 @@
 {
- "autoname": "field:asset_name",
+ "autoname": "PM-AST-.YYYY.-.#####",
  "creation": "2017-10-19 16:50:22.879545",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -13,7 +13,8 @@
   "section_break_6",
   "column_break_9",
   "section_break_8",
-  "asset_maintenance_tasks"
+  "asset_maintenance_tasks",
+  "amended_from"
  ],
  "fields": [
   {
@@ -69,9 +70,19 @@
    "label": "Maintenance Tasks",
    "options": "Asset Maintenance Task",
    "reqd": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Asset Maintenance",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
- "modified": "2024-11-07 15:55:52.602517",
+ "is_submittable": 1,
+ "modified": "2024-12-17 21:00:43.726027",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance",

@@ -25,6 +25,15 @@ class AssetMaintenanceLog(Document):
 			frappe.throw(_("Maintenance Status has to be Cancelled or Completed to Submit"))
 		self.update_maintenance_task()
 
+	def update_task_status_on_submit(self):
+		task = self.task_name
+		if task:
+			task_doc = frappe.get_doc('Task', task)
+			if task_doc.status not in ['Completed', 'Cancelled', 'Overdue']:
+				task_doc.status = "Completed"
+				task_doc.save()
+				frappe.db.commit()
+
 	def update_maintenance_task(self):
 		# asset_maintenance_doc = frappe.get_doc('Asset Maintenance Task', self.task)
 		if self.maintenance_status == "Completed":
@@ -34,7 +43,7 @@ class AssetMaintenanceLog(Document):
 			# 	asset_maintenance_doc.next_due_date = next_due_date
 			# 	asset_maintenance_doc.maintenance_status = "Planned"
 			# 	asset_maintenance_doc.save()
-				
+			self.update_task_status_on_submit()
 			update_asset_maintenance_parent_document(self.task, "Completed")
 
 		if self.maintenance_status == "Cancelled":
@@ -44,7 +53,6 @@ class AssetMaintenanceLog(Document):
 		# asset_maintenance_doc = frappe.get_doc('Asset Maintenance', self.asset_maintenance)
 		# asset_maintenance_doc.save()
 
-	
 	def before_save(self):
 		# Status needs to be updated on save only if it goes overdue, completed or cancelled will be marked on submission
 		if self.maintenance_status == "Overdue":

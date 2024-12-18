@@ -19,6 +19,16 @@ class AssetMaintenance(Document):
 			if not task.assign_to and self.docstatus == 0:
 				throw(_("Row #{}: Please asign task to a member.").format(task.idx))
 
+	def before_submit(self):
+		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
+
+		for task in asset_maintenance_tasks:
+			if task.maintenance_task:
+				task_doc = frappe.get_doc('Task', task.maintenance_task)
+				task_doc.asset_maintenance = self.name
+				task_doc.save()
+				frappe.db.commit()
+
 	def on_update(self):
 		for task in self.get('asset_maintenance_tasks'):
 			assign_tasks(self.name, task.assign_to, task.maintenance_task, task.next_due_date)

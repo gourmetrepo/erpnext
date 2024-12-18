@@ -39,6 +39,39 @@ frappe.ui.form.on('Asset Maintenance', {
 			frm.trigger('make_dashboard');
 		}
 	},
+	project: function(frm) {
+        if (frm.doc.project) {
+
+            frappe.call({
+                method: 'frappe.client.get_list',
+                args: {
+                    doctype: 'Task',
+                    filters: {
+                        project: frm.doc.project,
+                        status: 'Open'
+                    },
+                    fields: "*"
+                },
+                callback: function(response) {
+                    if (response.message) {
+                        const tasks = response.message;
+
+                        tasks.forEach(task => {
+							const child = frm.add_child('asset_maintenance_tasks');
+                            if (child) {
+                                child.maintenance_task = task.name || "";
+								child.assign_to = task.completed_by
+                            }
+                        });
+
+                        frm.refresh_field('asset_maintenance_tasks');
+                    } else {
+                        console.error("No tasks found for project:", frm.doc.project);
+                    }
+                }
+            });
+        }
+    },
 	make_dashboard: (frm) => {
 		if(!frm.is_new()) {
 			frappe.call({
