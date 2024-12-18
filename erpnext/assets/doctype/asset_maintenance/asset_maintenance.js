@@ -55,7 +55,7 @@ frappe.ui.form.on('Asset Maintenance', {
                 callback: function(response) {
                     if (response.message) {
                         const tasks = response.message;
-
+						frm.clear_table('asset_maintenance_tasks');
                         tasks.forEach(task => {
 							const child = frm.add_child('asset_maintenance_tasks');
                             if (child) {
