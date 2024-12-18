@@ -94,11 +94,14 @@ class Maintenance(Document):
 	def before_submit(self):
 		is_delayed, actual_time_minutes, delay_time_minutes = self.check_delay_before_submit()
 		if is_delayed:
-			if not self.delay_reason:
-				frappe.throw("Please fill delay reason before marking CIP as finished")
+			formatted_actual_time = self.convert_minutes_to_hhmm(math.floor(actual_time_minutes))
+			formatted_delay_time = self.convert_minutes_to_hhmm(math.floor(delay_time_minutes))
+			
+			self.actual_time = formatted_actual_time
+			self.delay_time = formatted_delay_time
 		
-			self.actual_time = self.convert_minutes_to_hhmm(actual_time_minutes)
-			self.delay_time = self.convert_minutes_to_hhmm(delay_time_minutes)
+			if not self.delay_reason or not len(self.delay_reason) > 0:
+				frappe.throw(f"Please fill delay reason before marking CIP as finished. Delay Time is {formatted_delay_time} and Actual Time is {formatted_actual_time}.")
 			
 		self.mark_cip_finished()
 

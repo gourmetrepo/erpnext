@@ -299,7 +299,6 @@
   {
    "fieldname": "actual_time",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Actual Time",
    "read_only": 1
   },
@@ -310,14 +309,12 @@
   {
    "fieldname": "delay_time",
    "fieldtype": "Data",
-   "hidden": 1,
    "label": "Delay Time",
    "read_only": 1
   },
   {
    "fieldname": "delay_reason",
    "fieldtype": "Text",
-   "hidden": 1,
    "label": "Delay Reason"
   },
   {
@@ -326,8 +323,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-17 17:32:07.408553",
- "modified_by": "ali.ahsan@gourmetpakistan.com",
+ "modified": "2024-12-18 17:38:56.211992",
+ "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
  "owner": "ali.ahsan@gourmetpakistan.com",
