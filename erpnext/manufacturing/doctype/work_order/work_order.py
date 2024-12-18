@@ -771,11 +771,11 @@ def stop_unstop(work_order, status, cip_name=''):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
 
 	pro_order = frappe.get_doc("Work Order", work_order)
-	cip_name_query = f"AND `name` != '{cip_name}'" if len(cip_name) > 0 else ''
-
+	
 	# Code by Moeiz
 	csd_companies = ["Unit 5", "Unit 8", "Unit 11"]
 	if pro_order.company in csd_companies and status == "Resumed":
+		cip_name_query = f"AND `name` != '{cip_name}'" if len(cip_name) > 0 else ''
 		in_process_cips = frappe.db.sql(
 			f"""
 			SELECT `name` FROM `tabMaintenance`

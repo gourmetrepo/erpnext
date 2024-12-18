@@ -49,8 +49,9 @@ class Maintenance(Document):
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
-				stop_unstop(self.work_order_id, "Stopped", self.name)
-			
+				# stop_unstop(self.work_order_id, "Stopped", self.name)
+				stop_unstop(self.work_order_id, "Stopped")
+				
 			self.cip_start_time = get_datetime()
 			self.previous_workflow_state = self.workflow_state
 			return self.workflow_state
