@@ -45,7 +45,8 @@ frappe.ui.form.on('Asset', {
 			args: {
 				doctype: "Asset Maintenance",
 				filters: {
-					asset_name: frm.doc.asset_name
+					asset_name: frm.doc.name,
+					docstatus: 1
 				},
 				fields: ["name"],
 			},
@@ -54,7 +55,8 @@ frappe.ui.form.on('Asset', {
 				if (r.message) {
 					const recordCount = r.message.length;
 					if (recordCount)
-						frm.doc.set_value("repair_count", recordCount)
+						frm.set_value("repair_count", recordCount)
+						frm.refresh_field("repair_count")
 				}
 			}
 		});
