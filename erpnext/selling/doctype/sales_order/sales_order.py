@@ -189,7 +189,7 @@ class SalesOrder(SellingController):
 			existing_sales_inv_against_customer = frappe.db.sql("""SELECT  NAME FROM  `tabSales Invoice` WHERE customer= %s AND STATUS='Overdue'""", (self.customer), as_dict=True, debug=True)
 			if existing_sales_inv_against_customer:
 				existing_sales_inv_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_sales_inv_against_customer]
-				frappe.throw(_("Cannot create Sales Order. Kindly Paid the following sale Invoices first: {0}").format(", ".join(existing_sales_inv_links)))
+				frappe.throw(_("Cannot create Sales Order. Kindly Paid the following Sales Invoice first: {0}").format(", ".join(existing_sales_inv_links)))
 
 
 	def before_save(self):
