@@ -194,7 +194,7 @@ class DeliveryNote(SellingController):
 		if(self.is_return==1):
 			self.queue_action('submit',queue_name="return")
 		elif(self.company=='Unit 6'):
-			if self.section and self.section in ("FG Mithae"):
+			if self.section and self.section in ("FG Mithae","FG Seasonal Halwa"):
 				self.queue_action('submit',queue_name="fg_mithae")
 			elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
 				self.queue_action('submit',queue_name="return")
