@@ -175,18 +175,18 @@ def get_flavour_pack_change_setup(maintenance_doc):
 	flavour_pack_change_setups = frappe.db.sql(f"""SELECT `to_flavor`, `to_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`from_flavor`='{maintenance_doc.change_flavour_from}' AND `from_pack`='{maintenance_doc.change_pack_from}')""", as_dict=True)
 
 	for flavour_pack_change_setup in flavour_pack_change_setups:
-		if flavour_pack_change_setup.get('to_flavor', None) == maintenance_doc.flavour_change_to and flavour_pack_change_setup.get('to_pack', None) == maintenance_doc.change_pack_to and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+		if flavour_pack_change_setup.get('to_flavor', None).lower() == maintenance_doc.flavour_change_to.lower() and flavour_pack_change_setup.get('to_pack', None).lower() == maintenance_doc.change_pack_to.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 			cip_steps = flavour_pack_change_setup.get('cip_steps')
 			standard_time = flavour_pack_change_setup.get('standard_time')
 		elif flavour_pack_change_setup.get('to_flavor', None) == "Any":
-			if flavour_pack_change_setup.get('to_pack', None) == maintenance_doc.change_pack_to and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('to_pack', None).lower() == maintenance_doc.change_pack_to.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
 				standard_time = flavour_pack_change_setup.get('standard_time')
 			elif flavour_pack_change_setup.get('to_pack', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
 				standard_time = flavour_pack_change_setup.get('standard_time')
 		elif flavour_pack_change_setup.get('to_pack', None) == "Any":
-			if flavour_pack_change_setup.get('to_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('to_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
 				standard_time = flavour_pack_change_setup.get('standard_time')
 			elif flavour_pack_change_setup.get('to_flavor', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
@@ -197,18 +197,18 @@ def get_flavour_pack_change_setup(maintenance_doc):
 		flavour_pack_change_setups = frappe.db.sql(f"""SELECT `from_flavor`, `from_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`to_flavor`='{maintenance_doc.flavour_change_to}' AND `to_pack`='{maintenance_doc.change_pack_to}')""", as_dict=True)
 		
 		for flavour_pack_change_setup in flavour_pack_change_setups:
-			if flavour_pack_change_setup.get('from_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('from_pack', None) == maintenance_doc.change_pack_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('from_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('from_pack', None).lower() == maintenance_doc.change_pack_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
 				standard_time = flavour_pack_change_setup.get('standard_time')
 			elif flavour_pack_change_setup.get('from_flavor', None) == "Any":
-				if flavour_pack_change_setup.get('from_pack', None) == maintenance_doc.change_pack_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+				if flavour_pack_change_setup.get('from_pack', None).lower() == maintenance_doc.change_pack_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
 					standard_time = flavour_pack_change_setup.get('standard_time')
 				elif flavour_pack_change_setup.get('from_pack', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
 					standard_time = flavour_pack_change_setup.get('standard_time')
 			elif flavour_pack_change_setup.get('from_pack', None) == "Any":
-				if flavour_pack_change_setup.get('from_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+				if flavour_pack_change_setup.get('from_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
 					standard_time = flavour_pack_change_setup.get('standard_time')
 				elif flavour_pack_change_setup.get('from_flavor', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
@@ -233,7 +233,7 @@ def get_flavour_change_setup(maintenance_doc):
 	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True, debug=True)
 
 	for setup in flavour_change_setups:
-		if setup.to_flavor == maintenance_doc.flavour_change_to:
+		if setup.to_flavor.lower() == maintenance_doc.flavour_change_to.lower():
 			cip_steps = setup.cip_steps
 			standard_time = setup.standard_time
 		elif setup.to_flavor == "Any":
@@ -250,7 +250,7 @@ def get_flavour_change_setup(maintenance_doc):
 		""", {"to_flavor": maintenance_doc.flavour_change_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in flavour_change_setups:
-			if setup.from_flavor == maintenance_doc.flavour_change_to:
+			if setup.from_flavor.lower() == maintenance_doc.flavour_change_to.lower():
 				cip_steps = setup.cip_steps
 				standard_time = setup.standard_time
 			elif setup.from_flavor == "Any":
@@ -279,7 +279,7 @@ def get_pack_change_setup(maintenance_doc):
 	""", {"from_pack": maintenance_doc.change_pack_from, "cip_section": maintenance_doc.section}, as_dict=True)
 
 	for setup in pack_change_setups:
-		if setup.to_pack == maintenance_doc.change_pack_to:
+		if setup.to_pack.lower() == maintenance_doc.change_pack_to.lower():
 			cip_steps = setup.cip_steps
 			standard_time = setup.standard_time
 		elif setup.to_pack == "Any":
@@ -296,7 +296,7 @@ def get_pack_change_setup(maintenance_doc):
 		""", {"to_pack": maintenance_doc.change_pack_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in pack_change_setups:
-			if setup.from_pack == maintenance_doc.change_pack_to:
+			if setup.from_pack.lower() == maintenance_doc.change_pack_to.lower():
 				cip_steps = setup.cip_steps
 				standard_time = setup.standard_time
 			elif setup.from_pack == "Any":
