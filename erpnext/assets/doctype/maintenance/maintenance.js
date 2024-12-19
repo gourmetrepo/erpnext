@@ -82,6 +82,8 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("change_item_to", "read_only", 1);
       frm.set_df_property("section", "read_only", 1);
     }
+
+    frm.page.menu.find('[data-label="Menu"],[data-label="Duplicate"]').parent().parent().remove();
   },
 
   onload: function (frm) {

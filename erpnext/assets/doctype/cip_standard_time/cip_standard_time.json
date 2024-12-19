@@ -1,0 +1,74 @@
+{
+ "creation": "2024-11-04 15:29:25.180758",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "from_flavor",
+  "from_pack",
+  "to_flavor",
+  "to_pack",
+  "cip_steps",
+  "standard_time"
+ ],
+ "fields": [
+  {
+   "default": "Any",
+   "fieldname": "from_flavor",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "From Flavor",
+   "options": "Any\nAmrood\nAnar\nApple\nButter Scotch\nChoco Butter\nChocolate Eclair\nChuran Chatny\nCola\nCool Drops\nDiet\nGuava\nIce Cream Soda\nImlee\nKhopra\nLemon up\nLychee\nMalta\nMango\nMauj Mango\nMilk\nMint\nMix Fruit\nMojito\nOrange Phalpy\nPan Shan\nRed Anar\nSpark\nStinger\nStrawberry\nTwister\nRed Malta\nPan Maza",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_pack",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "From Pack",
+   "options": "Any\n250 ML\n300 ml\n400 ML\n500 ML\n600 ML\n1000 ML\n1500 ML\n2250 ML"
+  },
+  {
+   "default": "Any",
+   "fieldname": "to_flavor",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "To Flavor",
+   "options": "Any\nAmrood\nAnar\nApple\nButter Scotch\nChoco Butter\nChocolate Eclair\nChuran Chatny\nCola\nCool Drops\nDiet\nGuava\nIce Cream Soda\nImlee\nKhopra\nLemon up\nLychee\nMalta\nMango\nMauj Mango\nMilk\nMint\nMix Fruit\nMojito\nOrange Phalpy\nPan Shan\nRed Anar\nSpark\nStinger\nStrawberry\nTwister\nRed Malta\nPan Maza",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_pack",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "To Pack",
+   "options": "Any\n250 ML\n300 ml\n400 ML\n500 ML\n600 ML\n1000 ML\n1500 ML\n2250 ML"
+  },
+  {
+   "fieldname": "cip_steps",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "CIP Steps",
+   "options": "3 Steps\n5 Steps",
+   "reqd": 1
+  },
+  {
+   "fieldname": "standard_time",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Standard Time (hh:mm)",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2024-12-19 16:43:27.422819",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "CIP Standard Time",
+ "owner": "ali.ahsan@gourmetpakistan.com",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
