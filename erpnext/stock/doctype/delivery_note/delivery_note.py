@@ -375,6 +375,50 @@ class DeliveryNote(SellingController):
 				else:
 					self.set("returnable_items", [])
 		
+		from erpnext.stock.get_item_details import get_item_tax_map
+		from nrp_manufacturing.modules.gourmet.sales_order.sales_order import add_taxes_from_tax_template
+		from nrp_manufacturing.modules.gourmet.sales_order.sales_order import get_itemised_tax_breakup_html
+
+		for item in self.items:
+			item_tax_template = frappe.db.sql("""SELECT 
+					d.item_tax_template
+				FROM
+					`tabCustomer Margin Mapping` m
+						INNER JOIN
+					`tabItem Margin Details` d ON m.name = d.parent
+				WHERE
+					m.customer = '{customer}'
+						AND d.item_code = '{item_code}'
+						AND d.warehouse = '{warehouse}'
+						AND m.docstatus = 1
+						AND m.key_account=0
+						AND d.start_date <= DATE(NOW())
+						AND d.end_date >= DATE(NOW())
+						ORDER BY m.creation DESC
+				LIMIT 1;""".format(customer=self.customer, item_code=item.item_code,warehouse=item.warehouse), as_dict=True)
+
+			if not item_tax_template:
+				item_tax_template = frappe.db.sql("""SELECT 
+								d.item_tax_template
+							FROM
+								`tabCustomer Margin Mapping` m
+									INNER JOIN
+								`tabCustomer Margin Mapping Details` d ON m.name = d.parent
+							WHERE
+								m.customer = '{customer}'
+									AND d.item_group = '{item_group}'
+									AND m.docstatus = 1
+									AND m.key_account=0
+									AND d.start_date <= DATE(NOW())
+									AND d.end_date >= DATE(NOW())
+									ORDER BY m.creation DESC
+							LIMIT 1;""".format(customer=self.customer, item_group=item.item_group), as_dict=True)
+			if(item_tax_template):
+				item.item_tax_template = item_tax_template[0].item_tax_template
+				item.item_tax_rate = get_item_tax_map( self.company, item.item_tax_template, as_json=True)
+				add_taxes_from_tax_template(item, self)
+
+
 		
 
 		
