@@ -392,10 +392,10 @@ class DeliveryNote(SellingController):
 						AND d.warehouse = '{warehouse}'
 						AND m.docstatus = 1
 						AND m.key_account=0
-						AND d.start_date <= DATE(NOW())
-						AND d.end_date >= DATE(NOW())
+						AND d.start_date <= '{current_date}'
+						AND d.end_date >= '{current_date}'
 						ORDER BY m.creation DESC
-				LIMIT 1;""".format(customer=self.customer, item_code=item.item_code,warehouse=item.warehouse), as_dict=True)
+				LIMIT 1;""".format(customer=self.customer, item_code=item.item_code,warehouse=item.warehouse, current_date=frappe.utils.nowdate()), as_dict=True,debug=True)
 
 			if not item_tax_template:
 				item_tax_template = frappe.db.sql("""SELECT 
@@ -409,10 +409,10 @@ class DeliveryNote(SellingController):
 									AND d.item_group = '{item_group}'
 									AND m.docstatus = 1
 									AND m.key_account=0
-									AND d.start_date <= DATE(NOW())
-									AND d.end_date >= DATE(NOW())
+									AND d.start_date <='{current_date}'
+									AND d.end_date >= '{current_date}'
 									ORDER BY m.creation DESC
-							LIMIT 1;""".format(customer=self.customer, item_group=item.item_group), as_dict=True)
+							LIMIT 1;""".format(customer=self.customer, item_group=item.item_group, current_date=frappe.utils.nowdate()), as_dict=True, debug=True)
 			if(item_tax_template):
 				item.item_tax_template = item_tax_template[0].item_tax_template
 				item.item_tax_rate = get_item_tax_map( self.company, item.item_tax_template, as_json=True)
