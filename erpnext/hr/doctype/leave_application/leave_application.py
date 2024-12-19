@@ -865,7 +865,7 @@ def push_leave_application_to_rms(docname):
 			"ref_doctype": "Leave Application",
 			"doctype": "Nrp Integration",
 			"request": str(data),
-			"title": "Sync Leave Application to RMS"
+			"title": "Sync Leave Application to EXE"
 		}
 
 		nrp_logs = frappe.get_doc(nrp_integration)
@@ -876,11 +876,11 @@ def push_leave_application_to_rms(docname):
 		response = requests.post(url, headers=headers, data=data)
 		
 		if response.status_code == 200:
-			frappe.log("Successfully sent leave application to RMS.")
+			frappe.log("Successfully sent leave application to EXE.")
 			response_data = response.json()
 		else:
 			frappe.log_error(message=response.text, title="RMS Response Error")
-			raise Exception(f"Failed to send data to RMS. Status Code: {response.status_code}")
+			raise Exception(f"Failed to send data to EXE. Status Code: {response.status_code}")
 
 		frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', response.text)
 
