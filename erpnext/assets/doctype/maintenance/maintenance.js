@@ -84,6 +84,11 @@ frappe.ui.form.on("Maintenance", {
     }
 
     frm.page.menu.find('[data-label="Menu"],[data-label="Duplicate"]').parent().parent().remove();
+
+    if (!frm.is_new()) {
+      frm.set_df_property("company", "read_only", 1);
+      frm.set_df_property("cost_center", "read_only", 1);
+    }
   },
 
   onload: function (frm) {
