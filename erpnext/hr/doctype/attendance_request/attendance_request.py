@@ -18,7 +18,7 @@ class AttendanceRequest(Document):
 				frappe.throw(_("Half day date should be in between from date and to date"))
 
 	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary")
+		self.queue_action('submit',queue="hr_secondary")
 
 	def on_submit(self):
 		self.create_attendance()
