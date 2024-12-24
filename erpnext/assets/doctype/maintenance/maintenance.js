@@ -27,8 +27,6 @@ frappe.ui.form.on("Maintenance", {
       frm.doc.workflow_state === "CIP Inprogress" &&
       frm.doc.previous_workflow_state !== frm.doc.workflow_state
     ) {
-      check_cost_center_against_company(frm);
-
       // Run your first frappe.call
       frappe.call({
         method: "mark_cip_inprogress",
@@ -93,6 +91,10 @@ frappe.ui.form.on("Maintenance", {
     }
 
     show_delay_reason(frm);
+  },
+
+  validate: (frm) => {
+      check_cost_center_against_company(frm);
   },
 
   onload: function (frm) {
