@@ -102,7 +102,16 @@ frappe.ui.form.on("Project", {
 			}
 		}
 	},
-
+	import_type: function(frm){
+		if (frm.doc.import_type == 'Letter of Credit'){
+			frm.set_df_property('import_sub_type', 'options', '\nAt Sight\nUsance/DA\nHybrid Payment\nAdvance Payment');
+		}else if(frm.doc.import_type == 'Bank Contract'){
+			frm.set_df_property('import_sub_type', 'options', '\nAt Sight\nUsance/DA\nHybrid Payment');
+		}else{
+			frm.set_df_property('import_sub_type', 'options', '');
+		}
+		frm.refresh_field('import_sub_type');
+	},
 	create_duplicate: function(frm) {
 		return new Promise(resolve => {
 			frappe.prompt('Project Name', (data) => {
