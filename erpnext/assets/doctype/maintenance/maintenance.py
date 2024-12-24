@@ -8,8 +8,16 @@ import frappe
 from frappe.model.document import Document
 from erpnext.manufacturing.doctype.work_order.work_order import stop_unstop
 from frappe.utils import get_datetime, time_diff
+from frappe import _
 
 class Maintenance(Document):
+	def validate(self):
+		# Check cost center against company before marking CIP in progress - CIP QA Sheet 53
+		company = frappe.db.get_value('Cost Center', {'name': self.cost_center}, 'company', as_dict=True)
+		if company and company.get("company"):
+			if self.company != company["company"]:
+				frappe.throw(_("Company for the Cost Center does not match. Company for {0} is {1}.")
+							.format(self.cost_center, company["company"]))
 
 	def before_save(self):
 		"""

@@ -93,10 +93,6 @@ frappe.ui.form.on("Maintenance", {
     show_delay_reason(frm);
   },
 
-  validate: (frm) => {
-      check_cost_center_against_company(frm);
-  },
-
   onload: function (frm) {
     hide_fields_for_general_cip(frm);
     frm.set_df_property("task", "read_only", 1);
@@ -277,18 +273,6 @@ function create_cip_configuration(frm) {
       },
     };
   });
-}
-
-// Check cost center against company before marking CIP inprogress - CIP QA Sheet 53
-function check_cost_center_against_company(frm) {
-  frappe.db.get_value('Cost Center', { name: frm.doc.cost_center }, 'company')
-    .then(response => {
-      if (response && response.message) {
-        if (frm.doc.company !== response.message.company) {
-          frappe.throw(__(`Company for the Cost Center does not match. Company for ${frm.doc.cost_center} is ${response.message.company}.`));
-        }
-      }
-    });
 }
 
 function show_delay_reason(frm) {
