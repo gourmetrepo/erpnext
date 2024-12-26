@@ -186,6 +186,7 @@ frappe.ui.form.on("Work Order", {
 		// Close button code in Custom Script moved here. Stop showing Close button in Work Order if CIP is in progress on the Cost Center/ Production Line
 		if((cur_frm.doc.status == 'Completed' || cur_frm.doc.status == 'Stopped') && cur_frm.doc.closed != 1 ){
 			const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+			let remove_close_button_due_to_cip = false;
 			if (csd_companies.includes(frm.doc.company)) {
 				frappe.call({
 					method: 'frappe.client.get_list',
@@ -199,31 +200,34 @@ frappe.ui.form.on("Work Order", {
 					},
 					callback: function(r) {
 						if (r.message) {
-							if (r.message.length < 1) {
-								cur_frm.add_custom_button(__("Close"), function() {
-									frappe.call({
-										method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
-										args: {
-											work_order: cur_frm.doc.name,
-											status : cur_frm.doc.status
-										},
-										callback: function(r) {
-											if(r.message) {
-												let stock_entry = r.message;
-												if(isEmpty(stock_entry)){
-												location.reload()
-												}else{
-													frappe.model.sync(stock_entry);
-													frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
-												}
-											}
-										}
-									});
-								}).addClass("btn-primary");
+							if (r.message.length > 1) {
+								remove_close_button_due_to_cip = true;
 							}
 						}
 					}
 				});
+			}
+			if (!remove_close_due_to_cip) {
+				cur_frm.add_custom_button(__("Close"), function() {
+					frappe.call({
+						method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
+						args: {
+							work_order: cur_frm.doc.name,
+							status : cur_frm.doc.status
+						},
+						callback: function(r) {
+							if(r.message) {
+								let stock_entry = r.message;
+								if(isEmpty(stock_entry)){
+								location.reload()
+								}else{
+									frappe.model.sync(stock_entry);
+									frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+								}
+							}
+						}
+					});
+				}).addClass("btn-primary");
 			}
         }
 	},
