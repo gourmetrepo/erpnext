@@ -134,7 +134,7 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 			}
 			if(doc.status != "Closed") {
 				if (doc.status != "On Hold") {
-					if(flt(doc.per_received) < 100 && allow_receipt) {
+					if(flt(doc.per_received) < 100 && allow_receipt && doc.status != "Expired") {
 						cur_frm.add_custom_button(__('Receipt'), this.make_purchase_receipt, __('Create'));
 						if(doc.is_subcontracted==="Yes" && me.has_unsupplied_items()) {
 							cur_frm.add_custom_button(__('Material to Supplier'),

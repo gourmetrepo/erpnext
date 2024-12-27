@@ -8,7 +8,11 @@ frappe.listview_settings['Purchase Order'] = {
 			return [__("On Hold"), "orange", "status,=,On Hold"];
 		} else if (doc.status === "Delivered") {
 			return [__("Delivered"), "green", "status,=,Closed"];
-		} else if (flt(doc.per_received, 2) < 100 && doc.status !== "Closed") {
+		} 
+		else if (doc.status === "Expired") {
+			return [__("Expired"), "red", "status,=,Expired"];
+		}
+		else if (flt(doc.per_received, 2) < 100 && doc.status !== "Closed") {
 			if (flt(doc.per_billed, 2) < 100) {
 				return [__("To Receive and Bill"), "orange",
 					"per_received,<,100|per_billed,<,100|status,!=,Closed"];
@@ -29,8 +33,8 @@ frappe.listview_settings['Purchase Order'] = {
 			listview.call_for_selected_items(method, { "status": "Closed" });
 		});
 
-		listview.page.add_menu_item(__("Re-open"), function () {
-			listview.call_for_selected_items(method, { "status": "Submitted" });
-		});
+		// listview.page.add_menu_item(__("Re-open"), function () {
+		// 	listview.call_for_selected_items(method, { "status": "Submitted" });
+		// });
 	}
 };
