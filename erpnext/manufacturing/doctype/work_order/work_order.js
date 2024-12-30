@@ -201,7 +201,7 @@ frappe.ui.form.on("Work Order", {
 						const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
 						let remove_close_button_due_to_cip = false;
 
-						if (r.message.length > 1 && csd_companies.includes(frm.doc.company)) {
+						if (r.message.length > 0 && csd_companies.includes(frm.doc.company)) {
 							remove_close_button_due_to_cip = true;
 						}
 
