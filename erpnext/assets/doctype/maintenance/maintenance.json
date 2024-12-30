@@ -1,0 +1,323 @@
+{
+ "autoname": "PM.-.CIP.-.YY.-.######",
+ "creation": "2024-12-30 11:57:10.389864",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "cip_configuration_section",
+  "company",
+  "task",
+  "cip_type",
+  "column_break_3",
+  "cip_category",
+  "maintenance_type",
+  "maintenance_category",
+  "section",
+  "section_break_8",
+  "change_item_to",
+  "flavour_change_to",
+  "change_pack_to",
+  "column_break_8",
+  "work_order_id",
+  "work_order_item",
+  "change_flavour_from",
+  "change_pack_from",
+  "work_order_quantity",
+  "quantity_produced",
+  "remaining_quantity",
+  "cip_standard_time_setup_section",
+  "standard_time",
+  "cip_steps",
+  "section_break_14",
+  "location",
+  "project",
+  "notification_datetime",
+  "section_break_21",
+  "cost_center",
+  "capacity",
+  "amended_from",
+  "section_break_26",
+  "previous_workflow_state",
+  "frequency",
+  "section_break_39",
+  "actual_time",
+  "column_break_41",
+  "delay_time",
+  "section_break_43",
+  "delay_reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "cip_configuration_section",
+   "fieldtype": "Section Break",
+   "label": "CIP Configuration"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "CIP",
+   "fieldname": "task",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Task",
+   "options": "CIP",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:doc.task == \"CIP\"",
+   "fieldname": "cip_type",
+   "fieldtype": "Select",
+   "label": "CIP Type",
+   "options": "Flavour Change\nPack Change\nFlavor & Pack Change\nGeneral"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Unplanned CIP",
+   "depends_on": "eval:doc.task == \"CIP\"",
+   "fieldname": "cip_category",
+   "fieldtype": "Select",
+   "label": "CIP Category",
+   "options": "Planned CIP\nUnplanned CIP"
+  },
+  {
+   "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
+   "fieldname": "maintenance_type",
+   "fieldtype": "Select",
+   "label": "Maintenance Type",
+   "options": "Corrective Maintenance\nPreventive Maintenance"
+  },
+  {
+   "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
+   "fieldname": "maintenance_category",
+   "fieldtype": "Select",
+   "label": "Maintenance Category",
+   "options": "Planned Maintenance\nUnplanned Maintenance"
+  },
+  {
+   "default": "Production Room",
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "section",
+   "fieldtype": "Select",
+   "label": "Section",
+   "options": "Production Room",
+   "read_only": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break",
+   "label": "Item Settings"
+  },
+  {
+   "fieldname": "change_item_to",
+   "fieldtype": "Link",
+   "label": "Change Item To",
+   "options": "Item"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "flavour_change_to",
+   "fieldtype": "Select",
+   "label": "Flavour Change to",
+   "read_only": 1
+  },
+  {
+   "fieldname": "change_pack_to",
+   "fieldtype": "Data",
+   "label": "Change Pack to",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "work_order_id",
+   "fieldtype": "Link",
+   "label": "Work Order ID",
+   "options": "Work Order",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_order_item",
+   "fieldtype": "Link",
+   "label": "Work Order Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "change_flavour_from",
+   "fieldtype": "Select",
+   "label": "Change Flavour From",
+   "read_only": 1
+  },
+  {
+   "fieldname": "change_pack_from",
+   "fieldtype": "Data",
+   "label": "Change Pack From",
+   "read_only": 1
+  },
+  {
+   "fieldname": "work_order_quantity",
+   "fieldtype": "Data",
+   "label": "Work Order Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "quantity_produced",
+   "fieldtype": "Data",
+   "label": "Quantity Produced",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remaining_quantity",
+   "fieldtype": "Data",
+   "label": "Remaining Quantity",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cip_standard_time_setup_section",
+   "fieldtype": "Section Break",
+   "label": "CIP Standard Time Setup"
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "standard_time",
+   "fieldtype": "Data",
+   "label": "Standard Time",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
+   "fieldname": "cip_steps",
+   "fieldtype": "Data",
+   "label": "CIP Steps",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Data",
+   "label": "Project"
+  },
+  {
+   "fieldname": "notification_datetime",
+   "fieldtype": "Data",
+   "label": "Notification Date/Time"
+  },
+  {
+   "fieldname": "section_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "cost_center.production_capacity_per_hour",
+   "fieldname": "capacity",
+   "fieldtype": "Data",
+   "label": "Line Capacity Per Hour",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_26",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Maintenance",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "previous_workflow_state",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Previous Workflow State",
+   "read_only": 1
+  },
+  {
+   "fieldname": "frequency",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Frequency"
+  },
+  {
+   "fieldname": "section_break_39",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "actual_time",
+   "fieldtype": "Data",
+   "label": "Actual Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_41",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "delay_time",
+   "fieldtype": "Data",
+   "label": "Delay Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_43",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "delay_reason",
+   "fieldtype": "Text",
+   "label": "Delay Reason"
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2024-12-30 12:03:36.588075",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Maintenance",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
