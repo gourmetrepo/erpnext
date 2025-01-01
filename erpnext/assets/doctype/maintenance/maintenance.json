@@ -38,6 +38,9 @@
   "capacity",
   "amended_from",
   "section_break_26",
+  "bill_of_material_and_services",
+  "maintenance_order_jobs_assignment",
+  "items_replacement_and_repair",
   "previous_workflow_state",
   "frequency",
   "section_break_39",
@@ -295,10 +298,31 @@
    "fieldname": "delay_reason",
    "fieldtype": "Text",
    "label": "Delay Reason"
+  },
+  {
+   "fieldname": "bill_of_material_and_services",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Bill of Material and Services",
+   "options": "Bill of Material and Services"
+  },
+  {
+   "fieldname": "maintenance_order_jobs_assignment",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Maintenance Order Jobs Assignment",
+   "options": "Maintenance Order Jobs Assignment"
+  },
+  {
+   "fieldname": "items_replacement_and_repair",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Items Replacement and Repair",
+   "options": "Items Replacement and Repair"
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-30 12:03:36.588075",
+ "modified": "2025-01-01 15:09:35.869042",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
