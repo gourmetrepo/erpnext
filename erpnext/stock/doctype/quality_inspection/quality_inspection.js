@@ -89,3 +89,13 @@ cur_frm.set_query("batch_no", function(doc) {
 cur_frm.add_fetch('item_code', 'item_name', 'item_name');
 cur_frm.add_fetch('item_code', 'description', 'description');
 
+frappe.ui.form.on('Quality Inspection Reading', {
+	status: function(frm, cdt, cdn) {
+		var d = locals[cdt][cdn];
+		console.log(frm);
+		if (d.status == "Conditionally Accepted") {
+			frm.set_value("conditionaly_accepted", 1)
+
+		}
+	}
+})
