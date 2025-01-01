@@ -97,5 +97,9 @@ frappe.ui.form.on('Quality Inspection Reading', {
 			frm.set_value("conditionaly_accepted", 1)
 
 		}
+		else {
+			frm.set_value("conditionaly_accepted", 0)
+		}
+
 	}
 })
