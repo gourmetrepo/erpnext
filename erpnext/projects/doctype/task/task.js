@@ -93,6 +93,8 @@ frappe.ui.form.on("Task", {
 						});
 					}
 				});
+				change_timeline_dialogue.set_value('expected_start_date_dialogue', frm.doc.exp_start_date);
+				change_timeline_dialogue.set_value('expected_end_date_dialogue', frm.doc.exp_end_date);
 				change_timeline_dialogue.show();
 			});
 		}
