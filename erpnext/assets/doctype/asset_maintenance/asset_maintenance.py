@@ -172,24 +172,51 @@ def get_warehouse(item, company):
 
 
 def make_issue_material_request(doc):  
-    mr = frappe.new_doc("Material Request")
-    mr.material_request_type = "Material Issue"
-    mr.company = doc.company
-    mr.title="Material Issue for Asset Maintenance"
-    mr.naming_series="MAT-MR-.YYYY.-"
-    for item in doc.bill_of_material_and_services:
-        warehouse=get_warehouse(item.item,doc.company)
-        i={}
-        i['item_code']= item.item
-        i["qty"]= item.demand_qty
-        i["uom"]= item.uom 
-        i["conversion_factor"]= 1
-        i["warehouse"]=warehouse[1]
-        mr.append("items", i)
-   
-    mr.insert(ignore_permissions=True)
-    # mr.submit()
-    return mr
+	mr = frappe.new_doc("Material Request")
+	mr.material_request_type = "Material Issue"
+	mr.company = doc.company
+	mr.title="Material Issue for Asset Maintenance"
+	mr.naming_series="MAT-MR-.YYYY.-"
+	for item in doc.bill_of_material_and_services:
+		if not item.mr_reference:
+			warehouse=get_warehouse(item.item,doc.company)
+			i={}
+			i['item_code']= item.item
+			i["qty"]= item.demand_qty
+			i["uom"]= item.uom 
+			i["conversion_factor"]= 1
+			i["warehouse"]=warehouse[1]
+			mr.append("items", i)
+		else:
+			continue
+	
+	mr.insert(ignore_permissions=True)
+	# mr.submit()
+	return mr
+
+
+@frappe.whitelist()
+def get_received_qty_from_material_request(mr_references):
+	if isinstance(mr_references, str):
+		import json
+		mr_references = json.loads(mr_references)
+
+	if not frappe.has_permission('Material Request Item', 'read'):
+		frappe.throw(_("You do not have permission to access Material Request Items."))
+
+	items = frappe.get_all(
+		'Material Request Item',
+		filters={
+            'parent': ['in', mr_references],
+            # 'parentfield': 'items',
+            # 'parenttype': 'Material Request',
+            # 'parent__docstatus': 1
+        },
+		fields=['parent', 'item_code', 'qty']
+	)
+	
+	return items
+
 
 @frappe.whitelist()
 def get_team_members(maintenance_teams):
