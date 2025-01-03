@@ -39,6 +39,7 @@ frappe.ui.form.on('Asset Maintenance', {
 			frm.trigger('make_dashboard');
 		}
 	},
+
 	project: function(frm) {
         if (frm.doc.project) {
 
@@ -72,6 +73,7 @@ frappe.ui.form.on('Asset Maintenance', {
             });
         }
     },
+
 	make_dashboard: (frm) => {
 		if(!frm.is_new()) {
 			frappe.call({
@@ -99,6 +101,24 @@ frappe.ui.form.on('Asset Maintenance', {
 				}
 			});
 		}
+	},
+
+	company: (frm) => {
+		frm.set_query('cost_center', function() {
+            return {
+                filters: {
+                    company: frm.doc.company
+                }
+            };
+        });
+
+		frm.set_query('asset_name', function() {
+            return {
+                filters: {
+                    company: frm.doc.company
+                }
+            };
+        });
 	},
 
 	after_save: (frm) => {
