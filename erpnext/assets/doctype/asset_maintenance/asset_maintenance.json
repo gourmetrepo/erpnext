@@ -23,8 +23,7 @@
    "in_list_view": 1,
    "label": "Asset Name",
    "options": "Asset",
-   "reqd": 1,
-   "unique": 1
+   "reqd": 1
   },
   {
    "fetch_from": "asset_name.asset_category",
@@ -82,7 +81,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-17 21:00:43.726027",
+ "modified": "2025-01-03 10:26:28.341096",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance",
