@@ -28,6 +28,78 @@ frappe.ui.form.on("Task", {
 		});
 	},
 
+	refresh: function (frm) {
+		if (!frm.is_new()) {
+			frm.set_df_property("exp_start_date", "read_only", 1);
+			frm.set_df_property("exp_end_date", "read_only", 1);
+
+			frm.add_custom_button(__('Change Timeline'), () => {
+				let change_timeline_dialogue = new frappe.ui.Dialog({
+					title: 'Change Timeline',
+					fields: [
+						{
+							label: 'Expected Start Date',
+							fieldname: 'expected_start_date_dialogue',
+							fieldtype: 'Date'
+						},
+						{
+							label: 'Expected End Date',
+							fieldname: 'expected_end_date_dialogue',
+							fieldtype: 'Date'
+						},
+						{
+							label: 'Reason for Timeline Change',
+							fieldname: 'reason_timeline_change',
+							fieldtype: 'Text'
+						}
+					],
+					size: 'large', 
+					primary_action_label: 'Submit',
+					primary_action(values) {
+						if (!values.reason_timeline_change) {
+							frappe.msgprint(__("Please provide a reason for timeline change"), "Error");
+							return;
+						}
+						if (!values.expected_start_date_dialogue && !values.expected_end_date_dialogue) {
+							frappe.msgprint(__("No change in Dates"), "Error");
+							return;
+						}
+
+						let comment_text = "<div>";
+						if (values.expected_start_date_dialogue) {
+							frm.doc.exp_start_date = values.expected_start_date_dialogue;
+							comment_text += "<p>Expected Start Date changed to " + values.expected_start_date_dialogue + "</p>"
+						}
+						if (values.expected_end_date_dialogue) {
+							frm.doc.exp_end_date = values.expected_end_date_dialogue;
+							comment_text += "<p>Expected End Date changed to " + values.expected_end_date_dialogue + "</p>"
+						}
+						comment_text += "<p>Reason: " + values.reason_timeline_change + "</p></div>"
+
+						frappe.call({
+							method: "frappe.desk.form.utils.add_comment",
+							args: {
+								reference_doctype: frm.doc.doctype,
+								reference_name: frm.doc.name,
+								content: comment_text,
+								comment_email: frappe.session.user
+							},
+							callback: function(r) {
+								if(!r.exc) {
+									frm.save();
+									change_timeline_dialogue.hide();
+								}
+							}
+						});
+					}
+				});
+				change_timeline_dialogue.set_value('expected_start_date_dialogue', frm.doc.exp_start_date);
+				change_timeline_dialogue.set_value('expected_end_date_dialogue', frm.doc.exp_end_date);
+				change_timeline_dialogue.show();
+			});
+		}
+	},
+
 	onload: function (frm) {
 		frm.set_query("task", "depends_on", function () {
 			let filters = {

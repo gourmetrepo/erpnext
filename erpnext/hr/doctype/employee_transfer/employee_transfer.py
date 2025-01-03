@@ -13,6 +13,9 @@ class EmployeeTransfer(Document):
 	def validate(self):
 		if frappe.get_value("Employee", self.employee, "status") == "Left":
 			frappe.throw(_("Cannot transfer Employee with status Left"))
+		
+		# Code by Moeiz to enforce user to enter reporting to field to ensure that lft, rgt tree at Employee Master Data remains integrated
+		validate_reporting_to(self)
 
 	def before_submit(self):
 		if getdate(self.transfer_date) > getdate():
@@ -68,3 +71,15 @@ class EmployeeTransfer(Document):
 			if item.fieldname == "user_id" and item.new != item.current:
 				return True
 		return False
+
+
+
+def validate_reporting_to(doc):
+	reporting_to_flag = False
+	for transfer_detail in doc.transfer_details:
+		if transfer_detail.property == "Reports to" and transfer_detail.new:
+			reporting_to_flag = True
+			break
+	
+	if not reporting_to_flag:
+		frappe.throw(_("Please add a reporting to employee in transfer details to proceed"))

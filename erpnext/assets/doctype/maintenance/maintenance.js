@@ -82,6 +82,15 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("change_item_to", "read_only", 1);
       frm.set_df_property("section", "read_only", 1);
     }
+
+    frm.page.menu.find('[data-label="Menu"],[data-label="Duplicate"]').parent().parent().remove();
+
+    if (!frm.is_new()) {
+      frm.set_df_property("company", "read_only", 1);
+      frm.set_df_property("cost_center", "read_only", 1);
+    }
+
+    show_delay_reason(frm);
   },
 
   onload: function (frm) {
@@ -264,4 +273,30 @@ function create_cip_configuration(frm) {
       },
     };
   });
+}
+
+function show_delay_reason(frm) {
+  if (frm.doc.workflow_state == "CIP Inprogress") {
+    const standardTimeParts = frm.doc.standard_time.split(':');
+    const hours = parseInt(standardTimeParts[0])
+    const minutes = parseInt(standardTimeParts[1])
+    const standardTimeMinutes = hours * 60 + minutes;
+
+    const currentTime = new Date();
+    const cipStartTime = new Date(frm.doc.cip_start_time);
+
+    // Calculate actual time elapsed in minutes
+    const timeDifferenceInMillis = currentTime - cipStartTime;
+    const actualTimeMinutes = Math.floor(timeDifferenceInMillis / 60_000);
+
+    // Calculate delay time (in minutes)
+    const delayTimeMinutes = actualTimeMinutes - standardTimeMinutes;
+
+    if (delayTimeMinutes > 0 || !frm.is_new()) {
+      frm.set_df_property("delay_reason", "hidden", 0);
+    } else {
+      frm.set_df_property("delay_reason", "hidden", 1);
+    }
+    frm.refresh_field("delay_reason")
+  }
 }
