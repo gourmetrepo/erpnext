@@ -272,23 +272,58 @@ frappe.ui.form.on("Purchase Receipt", "is_subcontracted", function(frm) {
 });
 
 frappe.ui.form.on('Purchase Receipt Item', {
-	item_code: function(frm, cdt, cdn) {
-		var d = locals[cdt][cdn];
+    item_code: function(frm, cdt, cdn) {
+        var d = locals[cdt][cdn];
 		frappe.db.get_value('Item', {name: d.item_code}, 'sample_quantity', (r) => {
-			frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
-			validate_sample_quantity(frm, cdt, cdn);
-		});
-	},
-	qty: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
-	sample_quantity: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
-	batch_no: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
+            frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
+            validate_sample_quantity(frm, cdt, cdn);
+        });
+    },
+    qty: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+    sample_quantity: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+    batch_no: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+
+    returned_quantity: function(frm, cdt, cdn) {
+        console.log('Returned Quantity Updated:', frm);
+        console.log('Item Data:', locals[cdt][cdn]);
+
+		var item = locals[cdt][cdn];
+		frappe.model.round_floats_in(item, ["returned_quantity"]);
+
+		if (!frm.doc.is_return && validate_negative_quantity(cdt, cdn, item, ["returned_quantity"])) {
+			return;
+		}
+		var calculated_qty = flt(item.received_qty - item.returned_quantity, precision("qty", item));
+		console.log('Calculated Quantity:', calculated_qty);
+		console.log("cdt:", cdt, "cdn:", cdn);
+		item.qty = calculated_qty;
+		frm.refresh_field("items"); 
+		}
 });
+
+
+function validate_negative_quantity(cdt, cdn, item, fieldnames) {
+    if (!item || !fieldnames) {
+        return false;
+    }
+
+    var is_negative_qty = false;
+    for (var i = 0; i < fieldnames.length; i++) {
+        if (item[fieldnames[i]] < 0) {
+            frappe.msgprint(__("Row #{0}: {1} cannot be negative for item {2}",
+                [item.idx, __(frappe.meta.get_label(cdt, fieldnames[i], cdn)), item.item_code]));
+            is_negative_qty = true;
+            break;
+        }
+    }
+    return is_negative_qty;
+}
 
 cur_frm.cscript['Make Stock Entry'] = function() {
 	frappe.model.open_mapped_doc({
