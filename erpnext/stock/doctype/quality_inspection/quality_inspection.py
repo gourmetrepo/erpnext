@@ -28,6 +28,9 @@ class QualityInspection(Document):
 
 				if expected_type != actual_type:
 					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+				else:
+					if reading.reading_1 != "Yes" and reading.reading_1 != "No":
+						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be Yes or No.")
 
 			if expected_type in ["Int", "Float"]:
 				min_value = matching_parameter.get("min_value")
@@ -53,7 +56,7 @@ class QualityInspection(Document):
 						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
      
 					if not (min_value <= reading.reading_1 <= max_value):
-						frappe.throw(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
+						frappe.msgprint(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
       
 	def before_save(self):
 		if self.received_quantity is None or self.received_quantity == 0  and self.accepted_quantity is None or self.accepted_quantity == 0:
