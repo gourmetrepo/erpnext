@@ -29,8 +29,10 @@ class QualityInspection(Document):
 				if expected_type != actual_type:
 					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 				else:
-					if reading.reading_1 != "Yes" and reading.reading_1 != "No":
-						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be Yes or No.")
+					min_value = matching_parameter.get("min_value")
+					max_value = matching_parameter.get("max_value")
+					if reading.reading_1 not in [min_value, max_value]:
+						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
 
 			if expected_type in ["Int", "Float"]:
 				min_value = matching_parameter.get("min_value")
