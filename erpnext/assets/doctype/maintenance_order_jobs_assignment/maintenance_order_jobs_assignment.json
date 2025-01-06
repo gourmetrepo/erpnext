@@ -1,0 +1,64 @@
+{
+ "creation": "2025-01-01 14:25:22.198050",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "work",
+  "description",
+  "assigned_to",
+  "item",
+  "estimated_time",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "work",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Work"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Description"
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Assigned To"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item"
+  },
+  {
+   "fieldname": "estimated_time",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Estimated Time"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Not Started\nIn Progress\nCompleted\nFault"
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-01-01 14:26:47.460762",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Maintenance Order Jobs Assignment",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
