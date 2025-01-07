@@ -8,6 +8,11 @@ cur_frm.email_field = "email_id";
 
 frappe.ui.form.on("Job Applicant", {
 	refresh: function(frm) {
+		frappe.require("assets/nerp/js/jquery.maskedinput.min.js", () => {
+            $.mask.definitions['3'] = null;
+            $('input[data-fieldname="personal_cell_number"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
+        });
+
 		if (!frm.doc.__islocal) {
 			if (frm.doc.__onload && frm.doc.__onload.job_offer) {
 				frm.add_custom_button(__("Job Offer"), function() {
