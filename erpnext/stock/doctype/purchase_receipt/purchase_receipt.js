@@ -290,8 +290,6 @@ frappe.ui.form.on('Purchase Receipt Item', {
     },
 
     returned_quantity: function(frm, cdt, cdn) {
-        console.log('Returned Quantity Updated:', frm);
-        console.log('Item Data:', locals[cdt][cdn]);
 
 		var item = locals[cdt][cdn];
 		frappe.model.round_floats_in(item, ["returned_quantity"]);
@@ -299,9 +297,7 @@ frappe.ui.form.on('Purchase Receipt Item', {
 		if (!frm.doc.is_return && validate_negative_quantity(cdt, cdn, item, ["returned_quantity"])) {
 			return;
 		}
-		var calculated_qty = flt(item.received_qty - item.returned_quantity, precision("qty", item));
-		console.log('Calculated Quantity:', calculated_qty);
-		console.log("cdt:", cdt, "cdn:", cdn);
+		var calculated_qty = flt(item.qty - item.returned_quantity, precision("qty", item));
 		item.qty = calculated_qty;
 		frm.refresh_field("items"); 
 		}
