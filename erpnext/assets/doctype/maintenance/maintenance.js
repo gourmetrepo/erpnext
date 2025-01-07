@@ -300,3 +300,10 @@ function show_delay_reason(frm) {
     frm.refresh_field("delay_reason")
   }
 }
+
+
+
+// Utility function to check if an object is empty
+function isEmpty(obj) {
+	return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+}

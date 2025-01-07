@@ -890,3 +890,9 @@ erpnext.work_order = {
 		});
 	}
 };
+
+
+// Utility function to check if an object is empty
+function isEmpty(obj) {
+	return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+}
