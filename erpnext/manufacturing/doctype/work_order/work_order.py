@@ -715,6 +715,41 @@ def make_stock_entry(work_order_id, purpose, qty=None):
 	stock_entry.get_items()
 	return stock_entry.as_dict()
 
+# @frappe.whitelist()
+# def make_damage_return_stock_entry(work_order_id, purpose):
+# 	work_order = frappe.get_doc("Work Order", work_order_id)
+# 	if not frappe.db.get_value("Warehouse", work_order.wip_warehouse, "is_group") \
+# 			and not work_order.skip_transfer:
+# 		wip_warehouse = work_order.wip_warehouse
+# 	else:
+# 		wip_warehouse = None
+
+# 	stock_entry = frappe.new_doc("Stock Entry")
+# 	stock_entry.purpose = purpose
+# 	stock_entry.work_order = work_order_id
+# 	stock_entry.company = work_order.company
+# 	stock_entry.from_bom = 1
+# 	stock_entry.bom_no = work_order.bom_no
+# 	stock_entry.use_multi_level_bom = work_order.use_multi_level_bom
+# 	if work_order.bom_no:
+# 		stock_entry.inspection_required = frappe.db.get_value('BOM',
+# 			work_order.bom_no, 'inspection_required')
+
+# 	if purpose=="Return WIP Damage":
+# 		damage_warehouse = frappe.db.sql("""
+#                                     SELECT damage_warehouse FROM `tabSection Warehouse` 
+# 								   WHERE parent = '{section}' 
+# 								   AND company = '{company}';
+#                                     """.format( section = work_order.item_section, company = work_order.company), as_dict=1)
+# 		stock_entry.to_warehouse = damage_warehouse[0]['damage_warehouse']
+# 		stock_entry.from_warehouse = wip_warehouse
+
+# 	stock_entry.set_stock_entry_type()
+# 	stock_entry.get_items()
+# 	return stock_entry.as_dict()
+
+
+
 @frappe.whitelist()
 def get_default_warehouse():
 	wip_warehouse = frappe.db.get_single_value("Manufacturing Settings",
@@ -724,13 +759,33 @@ def get_default_warehouse():
 	return {"wip_warehouse": wip_warehouse, "fg_warehouse": fg_warehouse}
 
 @frappe.whitelist()
-def stop_unstop(work_order, status):
+def stop_unstop(work_order, status, cip_name=''):
 	""" Called from client side on Stop/Unstop event"""
 
 	if not frappe.has_permission("Work Order", "write"):
 		frappe.throw(_("Not permitted"), frappe.PermissionError)
 
 	pro_order = frappe.get_doc("Work Order", work_order)
+	
+	# Code by Moeiz
+	csd_companies = ["Unit 5", "Unit 8", "Unit 11"]
+	if pro_order.company in csd_companies and status == "Resumed":
+		cip_name_query = f"AND `name` != '{cip_name}'" if len(cip_name) > 0 else ''
+		in_process_cips = frappe.db.sql(
+			f"""
+			SELECT `name` FROM `tabMaintenance`
+			WHERE `work_order_id`='{work_order}'
+			AND `workflow_state`='CIP Inprogress'
+			{cip_name_query};	
+			""", as_dict=True)
+
+		if in_process_cips and len(in_process_cips) > 0:
+			in_process_cip_links = ", ".join([
+				f"<a href='{frappe.utils.get_url_to_form('Maintenance', cip.get('name'))}' target='_blank'>{cip.get('name')}</a>"
+				for cip in in_process_cips
+			])
+			frappe.throw(f"Cannot resume work order. CIP is in progress: {in_process_cip_links}")
+	
 	pro_order.update_status(status)
 	pro_order.update_planned_qty()
 	frappe.msgprint(_("Work Order has been {0}").format(status))

@@ -182,6 +182,55 @@ frappe.ui.form.on("Work Order", {
 				frm.trigger("make_bom");
 			});
 		}
+
+		// Close button code in Custom Script moved here. Stop showing Close button in Work Order if CIP is in progress on the Cost Center/ Production Line
+		if((frm.doc.status == 'Completed' || frm.doc.status == 'Stopped') && frm.doc.closed != 1 ){
+			frappe.call({
+				method: 'frappe.client.get_list',
+				args: {
+					doctype: 'Maintenance',
+					field: ['name'],
+					filters: {
+						workflow_state: 'CIP Inprogress',
+						cost_center: frm.doc.production_line,
+						company: frm.doc.company
+					}
+				},
+				callback: function(r) {
+					if (r.message) {
+						const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+						let remove_close_button_due_to_cip = false;
+
+						if (r.message.length > 0 && csd_companies.includes(frm.doc.company)) {
+							remove_close_button_due_to_cip = true;
+						}
+
+						if (!remove_close_button_due_to_cip) {
+							cur_frm.add_custom_button(__("Close"), function() {
+								frappe.call({
+									method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
+									args: {
+										work_order: cur_frm.doc.name,
+										status : cur_frm.doc.status
+									},
+									callback: function(r) {
+										if(r.message) {
+											let stock_entry = r.message;
+											if(isEmpty(stock_entry)){
+											location.reload()
+											}else{
+												frappe.model.sync(stock_entry);
+												frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+											}
+										}
+									}
+								});
+							}).addClass("btn-primary");
+						}
+					}
+				}
+			});
+        }
 	},
 
 	make_job_card: function(frm) {
@@ -408,6 +457,42 @@ frappe.ui.form.on("Work Order", {
 		frm.fields_dict.operations.grid.toggle_reqd("workstation", frm.doc.operations);
 	},
 
+	company: function(frm) {
+		// CIP QA Sheet - Point 23
+		const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+		if (csd_companies.includes(frm.doc.company)) {
+			if (frm.doc.company) {
+				frappe.call({
+					method: "frappe.client.get_list",
+					args: {
+						doctype: "Cost Center",
+						filters: {
+							is_parent_asset: 1,
+							company: frm.doc.company
+						},
+						fields: ["name"]
+					},
+					callback: function(r) {
+						if (r.message) {
+							let options = r.message.map(row => row.name);
+							frm.set_df_property("production_line", "options", options.join("\n"));
+						}
+					}
+				});
+			}
+		}
+	},
+
+	before_save: function(frm) {
+		// CIP QA Sheet - Point 23
+		const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+		if (csd_companies.includes(frm.doc.company)) {
+			if (!frm.doc.production_line || frm.doc.production_line.length < 1) {
+				frappe.throw(__("Production Line is Mandatory"))
+			}
+		}
+	},
+
 	set_sales_order: function(frm) {
 		if(frm.doc.production_item) {
 			frappe.call({
@@ -514,7 +599,29 @@ erpnext.work_order = {
 						erpnext.work_order.create_pick_list(frm);
 					});
 					var start_btn = frm.add_custom_button(__('Start'), function() {
-						erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
+						const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+						if (csd_companies.includes(frm.doc.company)) {
+							frappe.call({
+								method: 'frappe.client.get_list',
+								args: {
+									doctype: 'Maintenance',
+									field: ['name'],
+									filters: {
+										workflow_state: 'CIP Inprogress',
+										cost_center: frm.doc.production_line
+									}
+								},
+								callback: function(r) {
+									if (r.message && r.message.length > 0) {
+										frappe.throw(__(`Can not start a Work Order on line ${frm.doc.production_line} as CIP is in progress`));
+									} else {
+										erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
+									}
+								}
+							});
+						} else {
+							erpnext.work_order.make_se(frm, 'Material Transfer for Manufacture');
+						}
 					});
 					start_btn.addClass('btn-primary');
 				}
@@ -555,6 +662,16 @@ erpnext.work_order = {
 							});
 							damage_return_btn.addClass('btn-secondary');	
 						}
+					
+					// Code by Moeiz to allow maintenance CIP button for CSD
+					let maintenance_allowed_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+					if (maintenance_allowed_companies.includes(company)){
+						var maintenance_btn = frm.add_custom_button(__('Downtime'), function() {
+							erpnext.work_order.make_cip_maintenance_document(frm);
+						});
+						maintenance_btn.addClass('btn-secondary');
+					}
+
 
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
 						erpnext.work_order.make_se(frm, 'Manufacture');
@@ -575,6 +692,15 @@ erpnext.work_order = {
 							erpnext.work_order.make_damage_return_se(frm);
 						});
 						damage_return_btn.addClass('btn-secondary');	
+					}
+
+					// Code by Moeiz to allow maintenance CIP button for CSD
+					let maintenance_allowed_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+					if (maintenance_allowed_companies.includes(company)){
+						var maintenance_btn = frm.add_custom_button(__('Downtime'), function() {
+							erpnext.work_order.make_cip_maintenance_document(frm);
+						});
+						maintenance_btn.addClass('btn-secondary');
 					}
 					
 					var finish_btn = frm.add_custom_button(__('Finish'), function() {
@@ -689,6 +815,25 @@ erpnext.work_order = {
 		} catch (error) {
 			console.error('Error making damage return stock entry:', error);
 			// Optionally handle error display or recovery
+		}
+	},
+
+	make_cip_maintenance_document: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'nrp_manufacturing.modules.gourmet.work_order.work_order.create_cip_maintenance_document',
+				args: {
+					'work_order': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				frappe.model.sync(r.message);
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making cip maintenance document:', error);
 		}
 	},
 
