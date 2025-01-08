@@ -1,0 +1,31 @@
+{
+ "custom_fields": [],
+ "custom_perms": [],
+ "doctype": "Allowed To Transact With",
+ "property_setters": [
+  {
+   "_assign": null,
+   "_comments": null,
+   "_liked_by": null,
+   "_user_tags": null,
+   "creation": "2023-04-11 17:24:43.043772",
+   "default_value": null,
+   "doc_type": "Allowed To Transact With",
+   "docstatus": 0,
+   "doctype_or_field": "DocField",
+   "field_name": "company",
+   "idx": 0,
+   "modified": "2021-05-31 19:51:15.677211",
+   "modified_by": "Administrator",
+   "name": "Allowed To Transact With-company-ignore_user_permissions",
+   "owner": "Administrator",
+   "parent": null,
+   "parentfield": null,
+   "parenttype": null,
+   "property": "ignore_user_permissions",
+   "property_type": "Check",
+   "value": "1"
+  }
+ ],
+ "sync_on_migrate": 1
+}
