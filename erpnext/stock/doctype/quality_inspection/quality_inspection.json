@@ -72,12 +72,13 @@
    "fieldname": "reference_type",
    "fieldtype": "Select",
    "label": "Reference Type",
-   "options": "\nPurchase Receipt\nPurchase Invoice\nDelivery Note\nSales Invoice\nStock Entry\nWork Order",
+   "options": "\nPurchase Receipt\nPurchase Invoice\nDelivery Note\nSales Invoice\nStock Entry",
    "reqd": 1
   },
   {
    "fieldname": "reference_name",
    "fieldtype": "Dynamic Link",
+   "in_global_search": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Reference Name",
@@ -93,6 +94,7 @@
   {
    "fieldname": "item_code",
    "fieldtype": "Link",
+   "in_global_search": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Item Code",
@@ -135,6 +137,7 @@
   {
    "fieldname": "item_name",
    "fieldtype": "Data",
+   "in_global_search": 1,
    "label": "Item Name",
    "read_only": 1
   },
@@ -219,19 +222,19 @@
    "options": "Quality Inspection Reading"
   },
   {
-   "default": "Accepted",
+   "default": "Pass",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "\nAccepted\nRejected",
+   "options": "\nPass\nFail",
    "reqd": 1
   }
  ],
  "icon": "fa fa-search",
  "idx": 1,
  "is_submittable": 1,
- "modified": "2024-09-18 13:19:49.088687",
- "modified_by": "abdul.samad@gourmetpakistan.com",
+ "modified": "2025-01-01 19:12:28.163306",
+ "modified_by": "Administrator",
  "module": "Stock",
  "name": "Quality Inspection",
  "owner": "Administrator",
