@@ -14,6 +14,15 @@ frappe.ui.form.on('Cost Center', {
 					is_group: 1
 				}
 			}
+		}),
+		
+		frm.set_query("chart_of_account", function() {
+			return {
+				filters: {
+					company: frm.doc.company,
+					is_group: 0
+				}
+			}
 		})
 	},
 	refresh: function(frm) {
