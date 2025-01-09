@@ -31,6 +31,8 @@ class Project(Document):
 
 
 	def validate(self):
+		if self.project_name.find('/') != -1:
+			frappe.throw('/ is not allowed in a project name')
 		if not self.is_new():
 			self.copy_from_template()
 		self.send_welcome_email()
