@@ -23,7 +23,9 @@ class CompensatoryLeaveRequest(Document):
 		self.validate_holidays()
 		self.validate_attendance()
 		if not self.leave_type:
-			frappe.throw(_("Leave Type is madatory"))
+			frappe.throw(_("Leave Type is mandatory"))
+		
+		validate_last_date_of_year(from_date=self.work_from_date, to_date=self.work_end_date)
 
 	def validate_attendance(self):
 		attendance = frappe.get_all('Attendance',
@@ -125,3 +127,16 @@ class CompensatoryLeaveRequest(Document):
 		allocation.insert(ignore_permissions=True)
 		allocation.submit()
 		return allocation
+
+
+
+# Code by Moeiz
+# To make sure user adds compensation leave separately for December 25 to avoid any conflicts
+def validate_last_date_of_year(from_date, to_date):
+	from datetime import datetime
+	from_date = getdate(from_date)
+	to_date = getdate(to_date)
+	
+	if (from_date.month == 12 and from_date.day == 25) or (to_date.month == 12 and to_date.day == 25):
+		if from_date != to_date:
+			frappe.throw(f"Please add compensatory leave for December 25 separately. Current request is for {from_date} to {to_date}")
