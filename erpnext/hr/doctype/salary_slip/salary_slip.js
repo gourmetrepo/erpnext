@@ -79,6 +79,10 @@ frappe.ui.form.on("Salary Slip", {
 	refresh: function(frm) {
 		frm.trigger("toggle_fields")
 
+		if(!frm.is_new()){
+		    frm.disable_save();
+		}
+
 		var salary_detail_fields = ["formula", "abbr", "statistical_component", "variable_based_on_taxable_salary"];
 		cur_frm.fields_dict['earnings'].grid.set_column_disp(salary_detail_fields,false);
 		cur_frm.fields_dict['deductions'].grid.set_column_disp(salary_detail_fields,false);
