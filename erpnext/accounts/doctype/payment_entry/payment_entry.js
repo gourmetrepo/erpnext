@@ -345,6 +345,26 @@ frappe.ui.form.on('Payment Entry', {
 			frm.set_value("contact_email", "");
 			frm.set_value("contact_person", "");
 		}
+
+		if (frm.doc.party_type == 'Customer'){
+	        frm.set_value("territory", null)
+	        frappe.call({
+    			method: "frappe.client.get_value",
+    			args: {
+    				doctype: "Customer",
+    				filters: {"name": frm.doc.party},
+    				fieldname: "territory"
+    			},
+    			callback: function(r){
+    				if(r.message){
+    					frm.set_value("territory", r.message.territory)
+    				}
+    				refresh_field("territory");
+    			}
+			
+	    	});
+	    }
+		
 		if(frm.doc.payment_type && frm.doc.party_type && frm.doc.party && frm.doc.company) {
 			if(!frm.doc.posting_date) {
 				frappe.msgprint(__("Please select Posting Date before selecting Party"))
