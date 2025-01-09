@@ -204,16 +204,11 @@ def get_received_qty_from_material_request(mr_references):
 	if not frappe.has_permission('Material Request Item', 'read'):
 		frappe.throw(_("You do not have permission to access Material Request Items."))
 
-	items = frappe.get_all(
-		'Material Request Item',
-		filters={
-            'parent': ['in', mr_references],
-            # 'parentfield': 'items',
-            # 'parenttype': 'Material Request',
-            # 'parent__docstatus': 1
-        },
-		fields=['parent', 'item_code', 'qty']
-	)
+	mr_ref_query = "'" + "','".join(mr_references) + "'"
+	items = frappe.db.sql(f"""
+			SELECT tmri.parent, tmri.item_code, tmri.qty FROM `tabMaterial Request` AS tmr
+			LEFT JOIN `tabMaterial Request Item` AS tmri ON tmr.name = tmri.parent
+			WHERE tmr.docstatus = 1 AND tmri.parent in ({mr_ref_query});""", as_dict=True, debug=True)
 	
 	return items
 

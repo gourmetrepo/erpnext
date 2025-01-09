@@ -38,6 +38,62 @@ frappe.ui.form.on('Asset Maintenance', {
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
+		make_bill_of_material_cdt_read_only(frm);
+	},
+
+	onload: (frm) => {
+		// Hide Bill of Material child tables when loading the Asset Maintenance document
+		frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
+		frm.set_df_property('consumed_items', 'hidden', 1);
+		frm.set_df_property('return_items', 'hidden', 1);
+		frm.set_df_property('issue_material', 'hidden', 1);
+		frm.set_df_property('charge_consumption', 'hidden', 1);
+		frm.set_df_property('return_item', 'hidden', 1);
+
+		// Collect unique MR references from the child table
+        const mr_references = Array.from(new Set(
+            frm.doc.bill_of_material_and_services
+                .filter(row => row.mr_reference)
+                .map(row => row.mr_reference)
+        ));
+
+        if (mr_references.length === 0) return;
+
+		// Fetch all relevant Material Request Item records in a single API call
+		frappe.call({
+			method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_received_qty_from_material_request',
+			freeze: true,
+			freeze_message: __("Retrieving Received Qty from Material Request"),
+			args: {
+				mr_references: JSON.stringify(mr_references)
+			},
+			callback: function(response) {
+				if (response.message) {
+					const mr_items = response.message;
+
+					// Create a mapping of (MR name -> Item Code -> Qty)
+					const mr_items_map = {};
+					mr_items.forEach(item => {
+						if (!mr_items_map[item.parent]) {
+							mr_items_map[item.parent] = {};
+						}
+						mr_items_map[item.parent][item.item_code] = item.qty;
+					});
+
+					// Populate received_qty for each row in the child table if value is 0
+					frm.doc.bill_of_material_and_services.forEach(row => {
+						if (row.received_qty === 0 || row.received_qty === undefined) {
+							if (row.mr_reference && mr_items_map[row.mr_reference]) {
+								// Update received_qty
+								row.received_qty = mr_items_map[row.mr_reference][row.item]; 
+							}
+						} 
+					});
+
+					frm.refresh_field('bill_of_material_and_services');
+				}
+			}
+		});
 	},
 
 	project: function(frm) {
@@ -121,53 +177,6 @@ frappe.ui.form.on('Asset Maintenance', {
         });
 	},
 
-	after_save: (frm) => {
-		// Collect unique MR references from the child table
-        const mr_references = Array.from(new Set(
-            frm.doc.bill_of_material_and_services
-                .filter(row => row.mr_reference)
-                .map(row => row.mr_reference)
-        ));
-
-        if (mr_references.length === 0) return;
-
-        // Fetch all relevant Material Request Item records in a single API call
-        frappe.call({
-            method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_received_qty_from_material_request',
-			freeze: true,
-			freeze_message: __("Retrieving Received Qty from Material Request"),
-            args: {
-                mr_references: JSON.stringify(mr_references)
-            },
-            callback: function(response) {
-                if (response.message) {
-                    const mr_items = response.message;
-
-                    // Create a mapping of (MR name -> Item Code -> Qty)
-					const mr_items_map = {};
-					mr_items.forEach(item => {
-						if (!mr_items_map[item.parent]) {
-							mr_items_map[item.parent] = {};
-						}
-						mr_items_map[item.parent][item.item_code] = item.qty;
-					});
-
-					// Populate received_qty for each row in the child table
-					frm.doc.bill_of_material_and_services.forEach(row => {
-						if (row.mr_reference && mr_items_map[row.mr_reference]) {
-							const item_qty = mr_items_map[row.mr_reference][row.item];
-							if (item_qty !== undefined) {
-								row.received_qty = item_qty; // Update received_qty
-							}
-						}
-					});
-
-					frm.refresh_field('bill_of_material_and_services');
-                }
-            }
-        });
-	},
-
 	issue_material: (frm) => {
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
@@ -200,15 +209,6 @@ frappe.ui.form.on('Asset Maintenance', {
 						if (!row.mr_reference) { // Check if mr_reference is not set
 							row.mr_reference = mr_reference; // Update the cell
 							frappe.model.set_value(row.doctype, row.name, 'mr_reference', row.mr_reference);
-
-							// TODO: make row read only after MR has been attached
-							// // Mark the row as read-only
-							// const grid_row = frm.fields_dict['bill_of_material_and_services'].grid.grid_rows_by_docname[row.name];
-							// if (grid_row) {
-							// 	grid_row.docfields.forEach(field => {
-							// 		field.read_only = 1;
-							// 	});
-							// }
 						}
 					});
 
@@ -217,6 +217,8 @@ frappe.ui.form.on('Asset Maintenance', {
 				}
 
 				frm.save(); // populate received_qty in after_save
+
+				make_bill_of_material_cdt_read_only(frm);
 	
 				// Show a message with a clickable link to the Material Request
 				frappe.msgprint({
@@ -227,6 +229,25 @@ frappe.ui.form.on('Asset Maintenance', {
 			}
 		});
 	},
+
+	bill_of_material: function(frm) {
+        const fields_to_toggle = [
+            'bill_of_material_and_services',
+            'consumed_items',
+            'return_items',
+            'issue_material',
+            'charge_consumption',
+            'return_item'
+        ];
+
+        fields_to_toggle.forEach(field => {
+            let current_visibility = frm.fields_dict[field].df.hidden;
+            frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
+        });
+
+		frm.refresh();
+    },
+
 	maintenance_team: (frm, cdt, cdn) => {
 		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
 			const maintenanceTeamNames = frm.doc.maintenance_team.map(team => team.maintenance_team_name);
@@ -371,7 +392,21 @@ var get_next_due_date = function (frm, cdt, cdn) {
 	}
 };
 
-
+var make_bill_of_material_cdt_read_only = function (frm) {
+	if (frm.fields_dict['bill_of_material_and_services'].df.hidden === 0) {
+		frm.doc.bill_of_material_and_services.forEach(row => {
+			if (row.mr_reference) {
+				const grid_row = frm.fields_dict['bill_of_material_and_services'].grid.grid_rows_by_docname[row.name];
+				if (grid_row) {
+					grid_row.docfields.forEach(field => {
+						field.read_only = 1;
+					});
+				}
+			}
+		});
+	};
+	frm.refresh_field('bill_of_material_and_services');
+}
 
 // Code by Moeiz
 frappe.ui.form.on('Bill of Material and Services', {
