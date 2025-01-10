@@ -192,13 +192,13 @@ erpnext.buying.BuyingController = erpnext.TransactionController.extend({
 		this._super(doc, cdt, cdn);
 	},
 
-	received_qty: function(doc, cdt, cdn) {
-		this.calculate_accepted_qty(doc, cdt, cdn)
-	},
+	// received_qty: function(doc, cdt, cdn) {
+	// 	this.calculate_accepted_qty(doc, cdt, cdn)
+	// },
 
-	rejected_qty: function(doc, cdt, cdn) {
-		this.calculate_accepted_qty(doc, cdt, cdn)
-	},
+	// rejected_qty: function(doc, cdt, cdn) {
+	// 	this.calculate_accepted_qty(doc, cdt, cdn)
+	// },
 
 	calculate_accepted_qty: function(doc, cdt, cdn){
 		var item = frappe.get_doc(cdt, cdn);

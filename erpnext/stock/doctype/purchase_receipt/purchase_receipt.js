@@ -56,6 +56,27 @@ frappe.ui.form.on("Purchase Receipt", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+
+		frm.set_query('gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1
+    				}
+    			};
+			    
+			}
+		});
 	},
 
 	company: function(frm) {
@@ -289,37 +310,13 @@ frappe.ui.form.on('Purchase Receipt Item', {
         validate_sample_quantity(frm, cdt, cdn);
     },
 
-    returned_quantity: function(frm, cdt, cdn) {
-
-		var item = locals[cdt][cdn];
-		frappe.model.round_floats_in(item, ["returned_quantity"]);
-
-		if (!frm.doc.is_return && validate_negative_quantity(cdt, cdn, item, ["returned_quantity"])) {
-			return;
-		}
-		var calculated_qty = flt(item.qty - item.returned_quantity, precision("qty", item));
-		item.qty = calculated_qty;
-		frm.refresh_field("items"); 
-		}
 });
-
-
-function validate_negative_quantity(cdt, cdn, item, fieldnames) {
-    if (!item || !fieldnames) {
-        return false;
+frappe.ui.form.on('Purchase Receipt Item', {
+    qty: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+        frappe.model.set_value(cdt, cdn, "received_qty", row.qty);
     }
-
-    var is_negative_qty = false;
-    for (var i = 0; i < fieldnames.length; i++) {
-        if (item[fieldnames[i]] < 0) {
-            frappe.msgprint(__("Row #{0}: {1} cannot be negative for item {2}",
-                [item.idx, __(frappe.meta.get_label(cdt, fieldnames[i], cdn)), item.item_code]));
-            is_negative_qty = true;
-            break;
-        }
-    }
-    return is_negative_qty;
-}
+});
 
 cur_frm.cscript['Make Stock Entry'] = function() {
 	frappe.model.open_mapped_doc({
