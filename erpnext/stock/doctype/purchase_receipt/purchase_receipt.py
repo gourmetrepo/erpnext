@@ -200,8 +200,9 @@ class PurchaseReceipt(BuyingController):
 					for it in self.get('items'):
 						data.append({
 							"ProductId": it.item_code,
-							"SupplierId": self.supplier,
-							"Qty": it.qty
+							"SupplierId": self.supplier if self.supplier else '',
+							"Qty": it.qty,
+							"nrpInvoiceNo": self.name if self.name else ''
 							})
 					
 					payload = {
