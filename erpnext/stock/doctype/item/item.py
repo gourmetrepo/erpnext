@@ -91,39 +91,40 @@ class Item(WebsiteGenerator):
 		try:
 			from datetime import datetime
 			baseurl = get_config_by_name("THIRD_PARTY_SUPPLIER_APP")
-			url = baseurl + 'PostProducts'
+			if baseurl:
+				url = baseurl + 'PostProducts'
 
-			payload = [{
-							"productCode": self.item_code if self.item_code else '',
-							"productName": self.item_name if self.item_name else '',
-							"supplierCode": "",
-							"description": self.description if self.description else '',
-							"stockQty": 0.0,
-							"variantOf": self.variant_of if self.variant_of else '',
-							"stockUom": self.stock_uom if self.stock_uom else '',
-							"productCategory": self.item_category if self.item_category else '',
-							"purchaseUom": self.purchase_uom if self.purchase_uom else ''
-						}]
+				payload = [{
+								"productCode": self.item_code if self.item_code else '',
+								"productName": self.item_name if self.item_name else '',
+								"supplierCode": "",
+								"description": self.description if self.description else '',
+								"stockQty": 0.0,
+								"variantOf": self.variant_of if self.variant_of else '',
+								"stockUom": self.stock_uom if self.stock_uom else '',
+								"productCategory": self.item_category if self.item_category else '',
+								"purchaseUom": self.purchase_uom if self.purchase_uom else ''
+							}]
 
-			# Maintain logs
-			nrp_integeration = {
-				"ref_doctype": "Item",
-				"doctype": "Nrp Integration",
-				"request": str(payload)
-			}
+				# Maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Item",
+					"doctype": "Nrp Integration",
+					"request": str(payload)
+				}
 
-			nrp_integeration["title"] = "Item Sync with GSSM " + str(datetime.now())
-			nrp_logs = frappe.get_doc(nrp_integeration)
-			nrp_logs.save(ignore_permissions=True)
-			response_gssm = []
+				nrp_integeration["title"] = "Item Sync with GSSM " + str(datetime.now())
+				nrp_logs = frappe.get_doc(nrp_integeration)
+				nrp_logs.save(ignore_permissions=True)
+				response_gssm = []
 
-			data = json.dumps(payload, default=str)
-			headers = {'Content-Type': 'application/json'}
-			response = requests.request("POST", url , headers=headers, data=data)
-			response_gssm.append(response.text)
-			
-			# Maintain logs
-			frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+				data = json.dumps(payload, default=str)
+				headers = {'Content-Type': 'application/json'}
+				response = requests.request("POST", url , headers=headers, data=data)
+				response_gssm.append(response.text)
+				
+				# Maintain logs
+				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
 		except ValidationError as error:
 			return json_error_response(str(error))
 		except frappe.PermissionError as error:

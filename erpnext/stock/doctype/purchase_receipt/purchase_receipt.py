@@ -8,6 +8,8 @@ from frappe.utils import flt, cint, nowdate
 
 from frappe import throw, _
 import frappe.defaults
+import json
+import requests
 from frappe.utils import getdate
 from erpnext.controllers.buying_controller import BuyingController
 from erpnext.accounts.utils import get_account_currency
@@ -16,6 +18,9 @@ from frappe.model.mapper import get_mapped_doc
 from erpnext.buying.utils import check_on_hold_or_closed_status
 from erpnext.assets.doctype.asset.asset import get_asset_account, is_cwip_accounting_enabled
 from erpnext.assets.doctype.asset_category.asset_category import get_asset_category_account
+from nrp_manufacturing.utils import get_config_by_name, json_error_response
+from nrp_manufacturing.constants.globals import PERMISSION_ERROR_MSG, ERROR_MSG
+from frappe.exceptions import ValidationError
 from six import iteritems
 
 form_grid_templates = {
@@ -173,6 +178,52 @@ class PurchaseReceipt(BuyingController):
 			traceback = frappe.get_traceback()
 			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
 			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+
+		try:
+			from datetime import datetime
+			baseurl = get_config_by_name("THIRD_PARTY_SUPPLIER_APP")
+			if baseurl:
+				if frappe.db.get_value('Supplier', self.supplier, 'third_party_warehouse'):
+					url = baseurl + 'PostNrpData'
+					data = []
+					for it in self.get('items'):
+						data.append({
+							"ProductId": it.item_code,
+							"SupplierId": self.supplier,
+							"Qty": it.qty
+							})
+					
+					payload = {
+						"data": data
+					}
+
+				# Maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Purchase Receipt",
+					"doctype": "Nrp Integration",
+					"request": str(payload)
+				}
+
+				nrp_integeration["title"] = "Purchase Receipt Sync with GSSM " + str(datetime.now())
+				nrp_logs = frappe.get_doc(nrp_integeration)
+				nrp_logs.save(ignore_permissions=True)
+				response_gssm = []
+
+				data = json.dumps(payload, default=str)
+				headers = {'Content-Type': 'application/json'}
+				response = requests.request("POST", url , headers=headers, data=data)
+				response_gssm.append(response.text)
+				
+				# Maintain logs
+				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+		except ValidationError as error:
+			return json_error_response(str(error))
+		except frappe.PermissionError as error:
+			return json_error_response(PERMISSION_ERROR_MSG)
+		except Exception as error:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback, title="Error While Purchase Receipt Sync with GSSM.")
+			return json_error_response(ERROR_MSG)
 	
 	def check_next_docstatus(self):
 		submit_rv = frappe.db.sql("""select t1.name

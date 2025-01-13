@@ -36,51 +36,52 @@ class Supplier(TransactionBase):
 		try:
 			from datetime import datetime
 			baseurl = get_config_by_name("THIRD_PARTY_SUPPLIER_APP")
-			url = baseurl + 'PostSuppliers'
+			if baseurl:
+				url = baseurl + 'PostSuppliers'
 
-			address_data = frappe.db.sql(f"""SELECT address_line1, phone, city FROM `tabAddress` WHERE address_title='{self.name}';""", as_dict=True)
-			address=""
-			phone=""
-			city=""
+				address_data = frappe.db.sql(f"""SELECT address_line1, phone, city FROM `tabAddress` WHERE address_title='{self.name}';""", as_dict=True)
+				address=""
+				phone=""
+				city=""
 
-			if len(address_data) > 0:
-				if address_data[0].address_line1:
-					address=address_data[0].address_line1
-				if address_data[0].phone:
-					phone=address_data[0].phone
-				if address_data[0].city:
-					city=address_data[0].city
+				if len(address_data) > 0:
+					if address_data[0].address_line1:
+						address=address_data[0].address_line1
+					if address_data[0].phone:
+						phone=address_data[0].phone
+					if address_data[0].city:
+						city=address_data[0].city
 
-			payload = [{
-					"supplierName": self.supplier_name if self.supplier_name else '',
-					"supplierCode": self.name if self.name else '',
-					"address": address,
-					"phone": phone,
-					"city": city,
-					"company": "",
-					"supplierGroup": self.supplier_group if self.supplier_group else '',
-					"supplierType": self.supplier_type if self.supplier_type else ''
-				}]
+				payload = [{
+						"supplierName": self.supplier_name if self.supplier_name else '',
+						"supplierCode": self.name if self.name else '',
+						"address": address,
+						"phone": phone,
+						"city": city,
+						"company": "",
+						"supplierGroup": self.supplier_group if self.supplier_group else '',
+						"supplierType": self.supplier_type if self.supplier_type else ''
+					}]
 
-			# Maintain logs
-			nrp_integeration = {
-				"ref_doctype": "Supplier",
-				"doctype": "Nrp Integration",
-				"request": str(payload)
-			}
+				# Maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Supplier",
+					"doctype": "Nrp Integration",
+					"request": str(payload)
+				}
 
-			nrp_integeration["title"] = "Supplier Sync with GSSM " + str(datetime.now())
-			nrp_logs = frappe.get_doc(nrp_integeration)
-			nrp_logs.save(ignore_permissions=True)
-			response_gssm = []
+				nrp_integeration["title"] = "Supplier Sync with GSSM " + str(datetime.now())
+				nrp_logs = frappe.get_doc(nrp_integeration)
+				nrp_logs.save(ignore_permissions=True)
+				response_gssm = []
 
-			data = json.dumps(payload, default=str)
-			headers = {'Content-Type': 'application/json'}
-			response = requests.request("POST", url , headers=headers, data=data)
-			response_gssm.append(response.text)
-			
-			# Maintain logs
-			frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+				data = json.dumps(payload, default=str)
+				headers = {'Content-Type': 'application/json'}
+				response = requests.request("POST", url , headers=headers, data=data)
+				response_gssm.append(response.text)
+				
+				# Maintain logs
+				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
 		except ValidationError as error:
 			return json_error_response(str(error))
 		except frappe.PermissionError as error:
