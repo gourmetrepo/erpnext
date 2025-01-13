@@ -255,8 +255,8 @@ function create_cip_configuration(frm) {
   frm.set_value("cip_category", "Unplanned CIP");
   frm.set_df_property("cip_category", "read_only", 1);
 
-  frm.set_value("cip_type", "General");
-  frm.set_df_property("cip_type", "read_only", 1);
+  // frm.set_value("cip_type", "General");
+  // frm.set_df_property("cip_type", "read_only", 1);
 
   frm.set_df_property("company", "reqd", 1);
 
