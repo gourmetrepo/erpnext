@@ -56,6 +56,10 @@ class PurchaseInvoice(BuyingController):
 		if not self.on_hold:
 			self.release_date = ''
 
+		# Code by Moeiz
+		# FS_Advanced_Payment_Update _v1.0
+		if self.purchase_order_type and self.purchase_order_type == "Import":
+			self.set_advances()		
 
 	def invoice_is_blocked(self):
 		return self.on_hold and (not self.release_date or self.release_date > getdate(nowdate()))
@@ -1143,3 +1147,4 @@ def validate_company_cost_center_and_accounts(purchase_invoice):
 				frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
 			if tax.cost_center and tax.cost_center not in cost_centers:
 				frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
+
