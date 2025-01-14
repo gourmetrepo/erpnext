@@ -33,6 +33,12 @@ class QualityInspection(Document):
 					max_value = matching_parameter.get("max_value")
 					if reading.reading_1 not in [min_value, max_value]:
 						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+			if expected_type == "Char":
+				min_value = matching_parameter.get("min_value")
+				max_value = matching_parameter.get("max_value")
+				if reading.reading_1 not in [min_value, max_value]:
+					frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+
 
 			if expected_type in ["Int", "Float"]:
 				min_value = matching_parameter.get("min_value")
