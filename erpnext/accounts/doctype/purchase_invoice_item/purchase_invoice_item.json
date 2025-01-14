@@ -93,6 +93,7 @@
   "pr_detail",
   "accounting_dimensions_section",
   "project",
+  "import_costing_sheet",
   "dimension_col_break",
   "cost_center",
   "section_break_82",
@@ -121,7 +122,6 @@
    "fetch_if_empty": 1,
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Name",
    "oldfieldname": "item_name",
    "oldfieldtype": "Data",
@@ -774,11 +774,18 @@
    "no_copy": 1,
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "import_costing_sheet",
+   "fieldtype": "Link",
+   "label": "Import Costing Sheet",
+   "options": "Import Costing Sheet",
+   "read_only": 1
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-06-30 16:48:01.398356",
+ "modified": "2024-11-28 17:44:50.018385",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Purchase Invoice Item",

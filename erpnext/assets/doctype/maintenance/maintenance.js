@@ -35,40 +35,39 @@ frappe.ui.form.on("Maintenance", {
         freeze_message: __("Marking CIP in Progress. Please wait."),
         callback: function (r) {
           if (r.message === "CIP Inprogress") {
-            frm.save();
-            // Only in case of planned cip
-            if (
-              frm.doc.cip_category === "Unplanned CIP" &&
-              (frm.doc.cip_type === "Flavour Change" ||
-                frm.doc.cip_type === "Pack Change" ||
-                frm.doc.cip_type === "Flavor & Pack Change")
-            ) {
-              frappe.call({
-                method:
-                  "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
-                args: {
-                  work_order: frm.doc.work_order_id,
-                  status: "Closed",
-                },
-                freeze: true,
-                freeze_message: __("Marking CIP Complete. Please wait."),
-                callback: function (r) {
-                  if (r.message) {
-                    let stock_entry = r.message;
-                    if (isEmpty(stock_entry)) {
-                      location.reload();
-                    } else {
-                      frappe.model.sync(stock_entry);
-                      frappe.set_route(
-                        "Form",
-                        stock_entry.doctype,
-                        stock_entry.name
-                      );
+            frm.save().then(() => {
+              // Only in case of unplanned CIP and specific CIP types
+              if (
+                frm.doc.cip_category === "Unplanned CIP" &&
+                (frm.doc.cip_type === "Flavour Change" ||
+                  frm.doc.cip_type === "Pack Change" ||
+                  frm.doc.cip_type === "Flavor & Pack Change")
+              ) {
+                // Close work order after saving
+                frappe.call({
+                  method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
+                  args: {
+                    work_order: frm.doc.work_order_id,
+                    status: "Closed",
+                  },
+                  freeze: true,
+                  freeze_message: __("Marking CIP Complete. Please wait."),
+                  callback: function (r) {
+                    if (r.message) {
+                      let stock_entry = r.message;
+                      if (isEmpty(stock_entry)) {
+                        location.reload();
+                      } else {
+                        frappe.model.sync(stock_entry);
+                        frappe.set_route("Form", stock_entry.doctype, stock_entry.name);
+                      }
                     }
-                  }
-                },
-              });
-            }
+                  },
+                });
+              }
+            }).catch((err) => {
+              frappe.msgprint(__('Failed to save the document.'));
+            });
           }else if(r.message === "Already in progress"){
             frm.set_value('workflow_state', "Not Initiated")
             frm.save();
@@ -83,7 +82,17 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("change_item_to", "read_only", 1);
       frm.set_df_property("section", "read_only", 1);
     }
+
+    frm.page.menu.find('[data-label="Menu"],[data-label="Duplicate"]').parent().parent().remove();
+
+    if (!frm.is_new()) {
+      frm.set_df_property("company", "read_only", 1);
+      frm.set_df_property("cost_center", "read_only", 1);
+    }
+
+    show_delay_reason(frm);
   },
+
   onload: function (frm) {
     hide_fields_for_general_cip(frm);
     frm.set_df_property("task", "read_only", 1);
@@ -91,6 +100,13 @@ frappe.ui.form.on("Maintenance", {
 
     if (frm.doc.work_order_item) {
       populate_change_item_from(frm);
+    }
+  },
+
+
+  before_save: function(frm){
+    if(frm.doc.cip_category === "Planned CIP" && frm.is_new()){
+      frappe.throw("You cannot create planned CIP from here")
     }
   },
 
@@ -128,7 +144,8 @@ function hide_fields_for_general_cip(frm) {
     frm.set_query("change_item_to", function (doc) {
       return {
         filters: {
-          item_section: "FG CSD"
+          item_section: "FG CSD",
+          name: ["!=", doc.work_order_item] // Use an array for "!="
         },
       };
     });
@@ -238,8 +255,8 @@ function create_cip_configuration(frm) {
   frm.set_value("cip_category", "Unplanned CIP");
   frm.set_df_property("cip_category", "read_only", 1);
 
-  frm.set_value("cip_type", "General");
-  frm.set_df_property("cip_type", "read_only", 1);
+  // frm.set_value("cip_type", "General");
+  // frm.set_df_property("cip_type", "read_only", 1);
 
   frm.set_df_property("company", "reqd", 1);
 
@@ -256,4 +273,30 @@ function create_cip_configuration(frm) {
       },
     };
   });
+}
+
+function show_delay_reason(frm) {
+  if (frm.doc.workflow_state == "CIP Inprogress") {
+    const standardTimeParts = frm.doc.standard_time.split(':');
+    const hours = parseInt(standardTimeParts[0])
+    const minutes = parseInt(standardTimeParts[1])
+    const standardTimeMinutes = hours * 60 + minutes;
+
+    const currentTime = new Date();
+    const cipStartTime = new Date(frm.doc.cip_start_time);
+
+    // Calculate actual time elapsed in minutes
+    const timeDifferenceInMillis = currentTime - cipStartTime;
+    const actualTimeMinutes = Math.floor(timeDifferenceInMillis / 60_000);
+
+    // Calculate delay time (in minutes)
+    const delayTimeMinutes = actualTimeMinutes - standardTimeMinutes;
+
+    if (delayTimeMinutes > 0 || !frm.is_new()) {
+      frm.set_df_property("delay_reason", "hidden", 0);
+    } else {
+      frm.set_df_property("delay_reason", "hidden", 1);
+    }
+    frm.refresh_field("delay_reason")
+  }
 }

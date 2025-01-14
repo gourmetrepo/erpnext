@@ -471,6 +471,7 @@ def get_mapped_purchase_invoice(source_name, target_doc=None, ignore_permissions
 			"field_map": {
 				"name": "po_detail",
 				"parent": "purchase_order",
+				"import_costing_sheet" : "import_costing_sheet"
 			},
 			"postprocess": update_item,
 			"condition": lambda doc: (doc.base_amount==0 or abs(doc.billed_amt) < abs(doc.amount))

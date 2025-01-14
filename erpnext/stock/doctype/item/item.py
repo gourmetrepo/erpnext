@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import itertools
 import json
+import requests
 import erpnext
 import frappe
 import copy
@@ -20,7 +21,9 @@ from frappe.website.doctype.website_slideshow.website_slideshow import \
 
 from frappe.website.render import clear_cache
 from frappe.website.website_generator import WebsiteGenerator
-
+from nrp_manufacturing.utils import get_config_by_name, json_error_response
+from nrp_manufacturing.constants.globals import PERMISSION_ERROR_MSG, ERROR_MSG
+from frappe.exceptions import ValidationError
 from six import iteritems
 
 
@@ -82,6 +85,54 @@ class Item(WebsiteGenerator):
 			next_pos_item_id = frappe.db.sql("SELECT max(pos_item_id) + 1 AS id FROM `tabItem`")
 			if next_pos_item_id:
 				self.pos_item_id = next_pos_item_id[0][0]
+	
+	def before_save(self):
+		# Item Sync with third party API
+		try:
+			from datetime import datetime
+			baseurl = get_config_by_name("THIRD_PARTY_SUPPLIER_APP")
+			if baseurl:
+				url = baseurl + 'PostProducts'
+
+				payload = [{
+								"productCode": self.item_code if self.item_code else '',
+								"productName": self.item_name if self.item_name else '',
+								"supplierCode": "",
+								"description": self.description if self.description else '',
+								"stockQty": 0.0,
+								"variantOf": self.variant_of if self.variant_of else '',
+								"stockUom": self.stock_uom if self.stock_uom else '',
+								"productCategory": self.item_category if self.item_category else '',
+								"purchaseUom": self.purchase_uom if self.purchase_uom else ''
+							}]
+
+				# Maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Item",
+					"doctype": "Nrp Integration",
+					"request": str(payload)
+				}
+
+				nrp_integeration["title"] = "Item Sync with GSSM " + str(datetime.now())
+				nrp_logs = frappe.get_doc(nrp_integeration)
+				nrp_logs.save(ignore_permissions=True)
+				response_gssm = []
+
+				data = json.dumps(payload, default=str)
+				headers = {'Content-Type': 'application/json'}
+				response = requests.request("POST", url , headers=headers, data=data)
+				response_gssm.append(response.text)
+				
+				# Maintain logs
+				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+		except ValidationError as error:
+			return json_error_response(str(error))
+		except frappe.PermissionError as error:
+			return json_error_response(PERMISSION_ERROR_MSG)
+		except Exception as error:
+			traceback = frappe.get_traceback()
+			frappe.log_error(message=traceback, title="Error While Item Sync with GSSM.")
+			return json_error_response(ERROR_MSG)
 
 	def after_insert(self):
 		'''set opening stock and item price'''

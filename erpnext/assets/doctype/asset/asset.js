@@ -39,6 +39,28 @@ frappe.ui.form.on('Asset', {
 				}
 			};
 		});
+
+		frappe.call({
+			method: "frappe.client.get_list",
+			args: {
+				doctype: "Asset Maintenance",
+				filters: {
+					asset_name: frm.doc.name,
+					docstatus: 1
+				},
+				fields: ["name"],
+			},
+			callback: function(r) {
+				debugger;
+				if (r.message) {
+					const recordCount = r.message.length;
+					if (recordCount)
+						frm.set_value("repair_count", recordCount)
+						frm.refresh_field("repair_count")
+				}
+			}
+		});
+
 	},
 
 	setup: function(frm) {

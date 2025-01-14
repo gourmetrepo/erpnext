@@ -534,7 +534,6 @@ if (frm.doc.docstatus === 0) {
 
 		frm.trigger("setup_quality_inspection");
 
-		debugger;
 
 		// Code by Moeiz for WIP Damage Return to disable fields
 		if(frm.doc.stock_entry_type == "Return WIP Damage") {

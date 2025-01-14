@@ -7,6 +7,7 @@
  "document_type": "Setup",
  "engine": "InnoDB",
  "field_order": [
+  "expected_start_date",
   "project_name",
   "company",
   "status",
@@ -15,9 +16,8 @@
   "percent_complete_method",
   "percent_complete",
   "column_break_5",
-  "project_template",
-  "expected_start_date",
   "expected_end_date",
+  "project_template",
   "priority",
   "department",
   "customer_details",
@@ -444,7 +444,7 @@
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
  "max_attachments": 4,
- "modified": "2024-11-25 15:01:21.224670",
+ "modified": "2024-12-27 16:53:01.356977",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",
@@ -486,5 +486,6 @@
  "sort_field": "modified",
  "sort_order": "DESC",
  "timeline_field": "customer",
+ "track_changes": 1,
  "track_seen": 1
 }

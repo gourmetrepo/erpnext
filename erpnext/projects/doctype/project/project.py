@@ -31,6 +31,8 @@ class Project(Document):
 
 
 	def validate(self):
+		if self.project_name.find('/') != -1:
+			frappe.throw('/ is not allowed in a project name')
 		if not self.is_new():
 			self.copy_from_template()
 		self.send_welcome_email()
@@ -470,7 +472,7 @@ def create_kanban_board_if_not_exists(project):
 	from frappe.desk.doctype.kanban_board.kanban_board import quick_kanban_board
 
 	if not frappe.db.exists('Kanban Board', project):
-		quick_kanban_board('Task', project, 'status')
+		quick_kanban_board('Task', project, 'status', project)
 
 	return True
 

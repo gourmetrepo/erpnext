@@ -7,6 +7,7 @@
  "field_order": [
   "maintenance_task",
   "maintenance_type",
+  "description",
   "column_break_2",
   "maintenance_status",
   "section_break_2",
@@ -17,6 +18,8 @@
   "end_date",
   "certificate_required",
   "section_break_9",
+  "item_used",
+  "section_break_14",
   "assign_to",
   "column_break_10",
   "assign_to_name",
@@ -24,24 +27,24 @@
   "next_due_date",
   "column_break_14",
   "last_completion_date",
-  "section_break_7",
-  "description"
+  "section_break_7"
  ],
  "fields": [
   {
    "fieldname": "maintenance_task",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_filter": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Maintenance Task",
+   "label": "Task",
+   "options": "Task",
    "reqd": 1
   },
   {
    "fieldname": "maintenance_type",
    "fieldtype": "Select",
    "label": "Maintenance Type",
-   "options": "Preventive Maintenance\nCalibration"
+   "options": "Preventive Maintenance\nCorrective Maintenance"
   },
   {
    "fieldname": "column_break_2",
@@ -86,6 +89,7 @@
    "default": "0",
    "fieldname": "certificate_required",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Certificate Required",
    "search_index": 1,
    "set_only_once": 1
@@ -99,14 +103,14 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Assign To",
-   "options": "User"
+   "options": "Employee"
   },
   {
    "fieldname": "column_break_10",
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "assign_to.full_name",
+   "fetch_from": "assign_to.employee_name",
    "fieldname": "assign_to_name",
    "fieldtype": "Read Only",
    "label": "Assign to Name"
@@ -136,19 +140,31 @@
    "fieldtype": "Section Break"
   },
   {
+   "fetch_from": "maintenance_task.description",
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description"
   },
   {
    "fieldname": "estimated_time",
-   "fieldtype": "Datetime",
+   "fieldtype": "Time",
    "in_list_view": 1,
    "label": "Estimated Time"
+  },
+  {
+   "fieldname": "item_used",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item Used",
+   "options": "Item"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
   }
  ],
  "istable": 1,
- "modified": "2024-11-07 19:40:51.295160",
+ "modified": "2025-01-09 16:42:34.098497",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",

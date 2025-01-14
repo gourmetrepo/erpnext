@@ -56,6 +56,27 @@ frappe.ui.form.on("Purchase Receipt", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+
+		frm.set_query('gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1
+    				}
+    			};
+			    
+			}
+		});
 	},
 
 	company: function(frm) {
@@ -272,22 +293,29 @@ frappe.ui.form.on("Purchase Receipt", "is_subcontracted", function(frm) {
 });
 
 frappe.ui.form.on('Purchase Receipt Item', {
-	item_code: function(frm, cdt, cdn) {
-		var d = locals[cdt][cdn];
+    item_code: function(frm, cdt, cdn) {
+        var d = locals[cdt][cdn];
 		frappe.db.get_value('Item', {name: d.item_code}, 'sample_quantity', (r) => {
-			frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
-			validate_sample_quantity(frm, cdt, cdn);
-		});
-	},
-	qty: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
-	sample_quantity: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
-	batch_no: function(frm, cdt, cdn) {
-		validate_sample_quantity(frm, cdt, cdn);
-	},
+            frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
+            validate_sample_quantity(frm, cdt, cdn);
+        });
+    },
+    qty: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+    sample_quantity: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+    batch_no: function(frm, cdt, cdn) {
+        validate_sample_quantity(frm, cdt, cdn);
+    },
+
+});
+frappe.ui.form.on('Purchase Receipt Item', {
+    qty: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+        frappe.model.set_value(cdt, cdn, "received_qty", row.qty);
+    }
 });
 
 cur_frm.cscript['Make Stock Entry'] = function() {

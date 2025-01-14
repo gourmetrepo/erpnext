@@ -19,6 +19,16 @@ class AssetMaintenance(Document):
 			if not task.assign_to and self.docstatus == 0:
 				throw(_("Row #{}: Please asign task to a member.").format(task.idx))
 
+	def before_submit(self):
+		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
+
+		for task in asset_maintenance_tasks:
+			if task.maintenance_task:
+				task_doc = frappe.get_doc('Task', task.maintenance_task)
+				task_doc.asset_maintenance = self.name
+				task_doc.save()
+				frappe.db.commit()
+
 	def on_update(self):
 		for task in self.get('asset_maintenance_tasks'):
 			assign_tasks(self.name, task.assign_to, task.maintenance_task, task.next_due_date)
@@ -162,21 +172,55 @@ def get_warehouse(item, company):
 
 
 def make_issue_material_request(doc):  
-    mr = frappe.new_doc("Material Request")
-    mr.material_request_type = "Material Issue"
-    mr.company = doc.company
-    mr.title="Material Issue for Asset Maintenance"
-    mr.naming_series="MAT-MR-.YYYY.-"
-    for item in doc.bill_of_material_and_services:
-        warehouse=get_warehouse(item.item,doc.company)
-        i={}
-        i['item_code']= item.item
-        i["qty"]= item.demand_qty
-        i["uom"]= item.uom 
-        i["conversion_factor"]= 1
-        i["warehouse"]=warehouse[1]
-        mr.append("items", i)
-   
-    mr.insert(ignore_permissions=True)
-    # mr.submit()
-    return mr
+	mr = frappe.new_doc("Material Request")
+	mr.material_request_type = "Material Issue"
+	mr.company = doc.company
+	mr.title="Material Issue for Asset Maintenance"
+	mr.naming_series="MAT-MR-.YYYY.-"
+	for item in doc.bill_of_material_and_services:
+		if not item.mr_reference:
+			warehouse=get_warehouse(item.item,doc.company)
+			i={}
+			i['item_code']= item.item
+			i["qty"]= item.demand_qty
+			i["uom"]= item.uom 
+			i["conversion_factor"]= 1
+			i["warehouse"]=warehouse[1]
+			mr.append("items", i)
+		else:
+			continue
+	
+	mr.insert(ignore_permissions=True)
+	# mr.submit()
+	return mr
+
+
+@frappe.whitelist()
+def get_received_qty_from_material_request(mr_references):
+	if isinstance(mr_references, str):
+		import json
+		mr_references = json.loads(mr_references)
+
+	if not frappe.has_permission('Material Request Item', 'read'):
+		frappe.throw(_("You do not have permission to access Material Request Items."))
+
+	mr_ref_query = "'" + "','".join(mr_references) + "'"
+	items = frappe.db.sql(f"""
+			SELECT tmri.parent, tmri.item_code, tmri.qty FROM `tabMaterial Request` AS tmr
+			LEFT JOIN `tabMaterial Request Item` AS tmri ON tmr.name = tmri.parent
+			WHERE tmr.docstatus = 1 AND tmri.parent in ({mr_ref_query});""", as_dict=True, debug=True)
+	
+	return items
+
+
+@frappe.whitelist()
+def get_team_members(maintenance_teams):
+    if isinstance(maintenance_teams, str):
+        maintenance_teams = frappe.parse_json(maintenance_teams)
+    
+    team_members = frappe.get_all(
+        'Maintenance Team Member',
+        filters={'parent': ['in', maintenance_teams]},
+        fields=['team_member']
+    )
+    return [member.team_member for member in team_members]

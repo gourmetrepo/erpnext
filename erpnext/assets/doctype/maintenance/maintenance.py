@@ -3,12 +3,21 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import math
 import frappe
 from frappe.model.document import Document
 from erpnext.manufacturing.doctype.work_order.work_order import stop_unstop
-from frappe.utils import get_datetime
+from frappe.utils import get_datetime, time_diff
+from frappe import _
 
 class Maintenance(Document):
+	def validate(self):
+		# Check cost center against company before marking CIP in progress - CIP QA Sheet 53
+		company = frappe.db.get_value('Cost Center', {'name': self.cost_center}, 'company', as_dict=True)
+		if company and company.get("company"):
+			if self.company != company["company"]:
+				frappe.throw(_("Company for the Cost Center does not match. Company for {0} is {1}.")
+							.format(self.cost_center, company["company"]))
 
 	def before_save(self):
 		"""
@@ -48,8 +57,9 @@ class Maintenance(Document):
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
+				# stop_unstop(self.work_order_id, "Stopped", self.name)
 				stop_unstop(self.work_order_id, "Stopped")
-			
+				
 			self.cip_start_time = get_datetime()
 			self.previous_workflow_state = self.workflow_state
 			return self.workflow_state
@@ -61,15 +71,57 @@ class Maintenance(Document):
 			frappe.throw(str(e))
 			frappe.log_error(frappe.get_traceback(), "Mark CIP Inprogress")
 
+	def convert_minutes_to_hhmm(self, minutes):
+		hours = minutes // 60
+		remaining_minutes = minutes % 60
+
+		formatted_hours = str(hours).zfill(2)
+		formatted_minutes = str(remaining_minutes).zfill(2)
+
+		return f"{formatted_hours}:{formatted_minutes}"
+
+	def check_delay_before_submit(self):
+		standard_time = self.standard_time
+		standard_time_parts = standard_time.split(":")
+		standard_time_total_minutes = (int(standard_time_parts[0]) * 60) + int(standard_time_parts[1])
+
+		# Get the current time and CIP start time
+		current_time = get_datetime()
+		cip_start_time = self.cip_start_time
+
+		# Calculate actual time elapsed
+		actual_time_minutes = math.floor(time_diff(current_time, cip_start_time).total_seconds() / 60)
+		delay_time_minutes = actual_time_minutes - standard_time_total_minutes
+		
+		if delay_time_minutes > 0:
+			return True, actual_time_minutes, delay_time_minutes
+		else:
+			return False, actual_time_minutes, delay_time_minutes
 
 
 	def before_submit(self):
+		is_delayed, actual_time_minutes, delay_time_minutes = self.check_delay_before_submit()
+		if is_delayed:
+			formatted_actual_time = self.convert_minutes_to_hhmm(math.floor(actual_time_minutes))
+			formatted_delay_time = self.convert_minutes_to_hhmm(math.floor(delay_time_minutes))
+			
+			self.actual_time = formatted_actual_time
+			self.delay_time = formatted_delay_time
+		
+			if not self.delay_reason or not len(self.delay_reason) > 0:
+				frappe.throw(f"Please fill delay reason before marking CIP as finished. Delay Time is {formatted_delay_time} and Actual Time is {formatted_actual_time}.")
+			
 		self.mark_cip_finished()
 
 	def mark_cip_finished(self):
 		# Resume the work order if CIP document is finished in case of Unplanned CIP
 		if self.work_order_id and self.workflow_state == "CIP Finished" and self.cip_type == "General":
-			stop_unstop(self.work_order_id, "Resumed")
+			work_order = frappe.db.get_value('Work Order', {'name': self.work_order_id}, ['status', 'closed'], as_dict=1)
+			if not work_order.closed:
+				if work_order.status == "Stopped":
+					stop_unstop(self.work_order_id, "Resumed", self.name)
+				elif work_order.status != "Closed":
+					frappe.throw("Please contact support. The referenced work order has to be stopped or closed to finish CIP")
 
 		self.cip_end_time = get_datetime()	
 
@@ -78,7 +130,7 @@ class Maintenance(Document):
 		# Get flavour from and pack from for production item
 		production_item_flavour_pack = frappe.db.sql(f"""
 			SELECT 
-				parent_item.item_name as flavour, 
+				COALESCE(parent_item.item_name, child_item.reporting_flavor) as flavour, 
 				child_item.reporting_variant as pack 
 			FROM 
 				`tabItem` AS child_item
@@ -104,7 +156,7 @@ class Maintenance(Document):
 		if self.cip_type != "General":
 			to_item_flavour_pack = frappe.db.sql(f"""
 				SELECT 
-					parent_item.item_name as flavour, 
+					COALESCE(parent_item.item_name, child_item.reporting_flavor) as flavour, 
 					child_item.reporting_variant as pack 
 				FROM 
 					`tabItem` AS child_item
@@ -132,45 +184,45 @@ def get_flavour_pack_change_setup(maintenance_doc):
 	flavour_pack_change_setups = frappe.db.sql(f"""SELECT `to_flavor`, `to_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`from_flavor`='{maintenance_doc.change_flavour_from}' AND `from_pack`='{maintenance_doc.change_pack_from}')""", as_dict=True)
 
 	for flavour_pack_change_setup in flavour_pack_change_setups:
-		if flavour_pack_change_setup.get('to_flavor', None) == maintenance_doc.flavour_change_to and flavour_pack_change_setup.get('to_pack', None) == maintenance_doc.change_pack_to and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+		if flavour_pack_change_setup.get('to_flavor', None).lower() == maintenance_doc.flavour_change_to.lower() and flavour_pack_change_setup.get('to_pack', None).lower() == maintenance_doc.change_pack_to.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 			cip_steps = flavour_pack_change_setup.get('cip_steps')
-			standard_time = flavour_pack_change_setup.get('standard_time')
+			standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 		elif flavour_pack_change_setup.get('to_flavor', None) == "Any":
-			if flavour_pack_change_setup.get('to_pack', None) == maintenance_doc.change_pack_to and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('to_pack', None).lower() == maintenance_doc.change_pack_to.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
-				standard_time = flavour_pack_change_setup.get('standard_time')
+				standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 			elif flavour_pack_change_setup.get('to_pack', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
-				standard_time = flavour_pack_change_setup.get('standard_time')
+				standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 		elif flavour_pack_change_setup.get('to_pack', None) == "Any":
-			if flavour_pack_change_setup.get('to_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('to_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
-				standard_time = flavour_pack_change_setup.get('standard_time')
+				standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 			elif flavour_pack_change_setup.get('to_flavor', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
-				standard_time = flavour_pack_change_setup.get('standard_time')
+				standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 
 	if not cip_steps or not standard_time:
 		flavour_pack_change_setups = frappe.db.sql(f"""SELECT `from_flavor`, `from_pack`,`cip_steps`, `standard_time` FROM `tabCIP Standard Time` WHERE parent in (SELECT `name` FROM `tabCIP Standard Time Setup` WHERE `cip_type`='Flavour & Pack Change' AND `cip_section`='{maintenance_doc.section}') AND (`to_flavor`='{maintenance_doc.flavour_change_to}' AND `to_pack`='{maintenance_doc.change_pack_to}')""", as_dict=True)
 		
 		for flavour_pack_change_setup in flavour_pack_change_setups:
-			if flavour_pack_change_setup.get('from_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('from_pack', None) == maintenance_doc.change_pack_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+			if flavour_pack_change_setup.get('from_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('from_pack', None).lower() == maintenance_doc.change_pack_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 				cip_steps = flavour_pack_change_setup.get('cip_steps')
-				standard_time = flavour_pack_change_setup.get('standard_time')
+				standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 			elif flavour_pack_change_setup.get('from_flavor', None) == "Any":
-				if flavour_pack_change_setup.get('from_pack', None) == maintenance_doc.change_pack_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+				if flavour_pack_change_setup.get('from_pack', None).lower() == maintenance_doc.change_pack_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
-					standard_time = flavour_pack_change_setup.get('standard_time')
+					standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 				elif flavour_pack_change_setup.get('from_pack', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
-					standard_time = flavour_pack_change_setup.get('standard_time')
+					standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 			elif flavour_pack_change_setup.get('from_pack', None) == "Any":
-				if flavour_pack_change_setup.get('from_flavor', None) == maintenance_doc.change_flavour_from and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
+				if flavour_pack_change_setup.get('from_flavor', None).lower() == maintenance_doc.change_flavour_from.lower() and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
-					standard_time = flavour_pack_change_setup.get('standard_time')
+					standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 				elif flavour_pack_change_setup.get('from_flavor', None) == "Any" and flavour_pack_change_setup.get('cip_steps', None) and flavour_pack_change_setup.get('standard_time', None):
 					cip_steps = flavour_pack_change_setup.get('cip_steps')
-					standard_time = flavour_pack_change_setup.get('standard_time')
+					standard_time = convert_time_to_hhmm(flavour_pack_change_setup.get('standard_time'))
 	
 	if cip_steps and standard_time:
 		maintenance_doc.cip_steps = cip_steps
@@ -187,15 +239,15 @@ def get_flavour_change_setup(maintenance_doc):
 		FROM `tabCIP Standard Time`
 		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change' AND `cip_section`=%(cip_section)s)
 		AND from_flavor=%(from_flavor)s
-	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True)
+	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True, debug=True)
 
 	for setup in flavour_change_setups:
-		if setup.to_flavor == maintenance_doc.flavour_change_to:
+		if setup.to_flavor.lower() == maintenance_doc.flavour_change_to.lower():
 			cip_steps = setup.cip_steps
-			standard_time = setup.standard_time
+			standard_time = convert_time_to_hhmm(setup.standard_time)
 		elif setup.to_flavor == "Any":
 			cip_steps = setup.cip_steps
-			standard_time = setup.standard_time
+			standard_time = convert_time_to_hhmm(setup.standard_time)
 	
 	
 	if not cip_steps or not standard_time:
@@ -207,12 +259,12 @@ def get_flavour_change_setup(maintenance_doc):
 		""", {"to_flavor": maintenance_doc.flavour_change_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in flavour_change_setups:
-			if setup.from_flavor == maintenance_doc.flavour_change_to:
+			if setup.from_flavor.lower() == maintenance_doc.flavour_change_to.lower():
 				cip_steps = setup.cip_steps
-				standard_time = setup.standard_time
+				standard_time = convert_time_to_hhmm(setup.standard_time)
 			elif setup.from_flavor == "Any":
 				cip_steps = setup.cip_steps
-				standard_time = setup.standard_time
+				standard_time = convert_time_to_hhmm(setup.standard_time)
 
 	
 	if cip_steps and standard_time:
@@ -236,12 +288,12 @@ def get_pack_change_setup(maintenance_doc):
 	""", {"from_pack": maintenance_doc.change_pack_from, "cip_section": maintenance_doc.section}, as_dict=True)
 
 	for setup in pack_change_setups:
-		if setup.to_pack == maintenance_doc.change_pack_to:
+		if setup.to_pack.lower() == maintenance_doc.change_pack_to.lower():
 			cip_steps = setup.cip_steps
-			standard_time = setup.standard_time
+			standard_time = convert_time_to_hhmm(setup.standard_time)
 		elif setup.to_pack == "Any":
 			cip_steps = setup.cip_steps
-			standard_time = setup.standard_time
+			standard_time = convert_time_to_hhmm(setup.standard_time)
 	
 
 	if not cip_steps or not standard_time:
@@ -253,12 +305,12 @@ def get_pack_change_setup(maintenance_doc):
 		""", {"to_pack": maintenance_doc.change_pack_to, "cip_section": maintenance_doc.section}, as_dict=True)
 
 		for setup in pack_change_setups:
-			if setup.from_pack == maintenance_doc.change_pack_to:
+			if setup.from_pack.lower() == maintenance_doc.change_pack_to.lower():
 				cip_steps = setup.cip_steps
-				standard_time = setup.standard_time
+				standard_time = convert_time_to_hhmm(setup.standard_time)
 			elif setup.from_pack == "Any":
 				cip_steps = setup.cip_steps
-				standard_time = setup.standard_time
+				standard_time = convert_time_to_hhmm(setup.standard_time)
 	
 	if cip_steps and standard_time:
 		maintenance_doc.cip_steps = cip_steps
@@ -275,7 +327,7 @@ def get_general_setup(maintenance_doc):
 
 	if len(general_change_setups) > 0 and general_change_setups[0].get('cip_steps', None) and general_change_setups[0].get('standard_time', None):
 		maintenance_doc.cip_steps = general_change_setups[0].get('cip_steps', None)
-		maintenance_doc.standard_time = general_change_setups[0].get('standard_time', None)
+		maintenance_doc.standard_time = convert_time_to_hhmm(general_change_setups[0].get('standard_time', None))
 	else:
 		frappe.throw(f"No such mapping exists of general cip type for {maintenance_doc.section}")
 
@@ -327,3 +379,10 @@ def check_if_work_order_in_process(maintenance_doc):
 		maintenance_doc.quantity_produced = work_order_data[0].get('produced_qty', 0)
 		maintenance_doc.remaining_quantity = work_order_data[0].get('qty', 0) - work_order_data[0].get('produced_qty', 0)
 		maintenance_doc.cost_center = work_order_data[0].get('production_line')
+
+
+def convert_time_to_hhmm(time_delta):
+    total_minutes = time_delta.total_seconds() // 60
+    hours = int(total_minutes // 60)
+    minutes = int(total_minutes % 60)
+    return f"{hours:02}:{minutes:02}"
