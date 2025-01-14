@@ -4,7 +4,7 @@ frappe.ui.form.on("Maintenance", {
     // Unplanned CIP if coming from work order
     if (frm.doc.work_order_id) {
       if (!frm.doc.cip_category){
-      frm.doc.cip_category = "Unplanned CIP";
+      frm.doc.cip_category = "Without Work Order";
       }
       frm.set_df_property("cip_category", "read_only", 1);
       frm.set_df_property("work_order_id", "read_only", 1);
@@ -38,8 +38,7 @@ frappe.ui.form.on("Maintenance", {
             frm.save().then(() => {
               // Only in case of unplanned CIP and specific CIP types
               if (
-                frm.doc.cip_category === "Unplanned CIP" &&
-                (frm.doc.cip_type === "Flavour Change" ||
+                frm.doc.cip_category === "Unplanned CIP" &&   (frm.doc.cip_type === "Flavour Change" ||
                   frm.doc.cip_type === "Pack Change" ||
                   frm.doc.cip_type === "Flavor & Pack Change")
               ) {
@@ -252,7 +251,7 @@ function populate_change_item_from(frm) {
 }
 
 function create_cip_configuration(frm) {
-  frm.set_value("cip_category", "Unplanned CIP");
+  frm.set_value("cip_category", "Without Work Order");
   frm.set_df_property("cip_category", "read_only", 1);
 
   // frm.set_value("cip_type", "General");
