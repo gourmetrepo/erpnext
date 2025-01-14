@@ -82,4 +82,5 @@ frappe.ui.form.on('Salary Structure Assignment', {
 	bank_salary: function(frm){
 	    frm.trigger("calculate_base_salary");
 	}
+
 });
