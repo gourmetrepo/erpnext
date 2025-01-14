@@ -20,6 +20,22 @@ frappe.ui.form.on('Leave Encashment', {
 	employee: function(frm) {
 		frm.trigger("get_leave_details_for_encashment");
 	},
+	company: function(frm) {
+        frm.set_query("leave_period", function() {
+            return {
+                "filters": {
+                    "company": frm.doc.company
+                }
+            };
+        });
+        frm.set_query("employee", function() {
+            return {
+                "filters": {
+                    "company": frm.doc.company
+                }
+            };
+        });
+    },
 	leave_type: function(frm) {
 		frm.trigger("get_leave_details_for_encashment");
 	},
