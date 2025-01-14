@@ -339,6 +339,17 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		} else if(doc.docstatus===0) {
 			cur_frm.cscript.add_from_mappers();
 		}
+
+		// Code by Moeiz
+		// FS_Advanced_Payment_Update _v1.0 
+		if (this.frm.doc.purchase_order_type == "Import" && this.frm.doc.docstatus == 1){
+			// Only buttons to keep are "Payment Request" and "Receipt"
+			const buttons_to_remove = ['Subscription', 'Invoice', 'Payment']
+			for (var i = 0; i < buttons_to_remove.length; i++) {
+				this.frm.remove_custom_button(buttons_to_remove[i], __('Create'));
+			}
+		}
+
 	},
 
 

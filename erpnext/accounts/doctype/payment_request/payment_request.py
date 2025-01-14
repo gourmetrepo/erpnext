@@ -289,6 +289,27 @@ def make_payment_request(**args):
 		frappe.db.set_value("Sales Order", args.dn, "loyalty_points", int(args.loyalty_points), update_modified=False)
 		frappe.db.set_value("Sales Order", args.dn, "loyalty_amount", loyalty_amount, update_modified=False)
 		grand_total = grand_total - loyalty_amount
+	
+
+	# Code by Moeiz
+	# FS_Advanced_Payment_Update _v1.0
+	if args.dt == "Purchase Order" and ref_doc.get("purchase_order_type") == "Import":
+		result = frappe.db.sql(
+			f"""
+			SELECT SUM(grand_total) AS total_payment_request_amount
+			FROM `tabPayment Request`
+			WHERE (reference_name IN (
+			SELECT DISTINCT(`parent`)
+			FROM `tabPurchase Invoice Item`
+			WHERE `purchase_order` = '{args.dn}') OR reference_name='{args.dn}') AND `status`!="Cancelled";
+			""",
+			as_dict=True
+		)
+
+		if len(result)>0 and result[0].get('total_payment_request_amount'):
+			if ref_doc.get("grand_total", 0) <= result[0].get('total_payment_request_amount'):
+				frappe.throw("The total of payment requests created against this Purchase Order is equal to the total amount of the Purchase Order. You cannot proceed further to create a Payment Request")
+			
 
 	gateway_account = get_gateway_details(args) or frappe._dict()
 
