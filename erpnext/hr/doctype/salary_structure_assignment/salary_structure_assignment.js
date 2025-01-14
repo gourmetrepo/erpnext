@@ -31,6 +31,19 @@ frappe.ui.form.on('Salary Structure Assignment', {
 			}
 		});
 	},
+	refresh(frm) {
+		frm.trigger("calculate_base_salary");
+		frm.set_query("last_salary", function() {
+            let filters = {
+                "docstatus": 1
+            }
+            if(frm.doc.employee)
+                filters.employee = frm.doc.employee;
+            return {
+                "filters": filters 
+            };
+        });
+	},
 	employee: function(frm) {
 		if(frm.doc.employee){
 			frappe.call({
@@ -52,5 +65,22 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		else{
 			frm.set_value("company", null);
 		}
+	},
+	calculate_base_salary:function(frm){
+	    if(frm.doc.docstatus != 1){
+	        // make calculation on the fields
+    		frm.set_value("base",((frm.doc.cash_salary)?parseFloat(frm.doc.cash_salary):0) + ((frm.doc.bank_salary)?parseFloat(frm.doc.bank_salary):0));
+    		frm.refresh_field("base");
+	    }
+	},
+	cash_salary: function(frm){
+	  frm.trigger("calculate_base_salary");  
+	},
+	bank_salary: function(frm){
+	    frm.trigger("calculate_base_salary");
+	},
+	employee: function(frm){
+	    frm.set_value("last_salary","");
+		frm.refresh_field("last_salary");
 	}
 });
