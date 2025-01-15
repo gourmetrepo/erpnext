@@ -9,9 +9,6 @@ frappe.ui.form.on("Journal Entry", {
 	setup: function(frm) {
 		frm.add_fetch("bank_account", "account", "account");
 	},
-	onload(frm){
-        frm.set_df_property("generated", "read_only", 1);
-    },
 
 	refresh: function(frm) {
 		erpnext.toggle_naming_series();
@@ -52,9 +49,6 @@ frappe.ui.form.on("Journal Entry", {
 					frm.trigger("make_inter_company_journal_entry");
 				}, __('Make'));
 		}
-		if (frm.is_new() && (frm.get_field('user_remark').value === undefined || frm.get_field('user_remark').value.length === 0)) {
-            frm.set_value('generated','Manual Generated');
-        }
 	},
 
 	make_inter_company_journal_entry: function(frm) {
