@@ -59,6 +59,8 @@ class Maintenance(Document):
 
 			if not self.work_order_id:
 				check_if_work_order_in_process(self)
+			elif self.cip_category == "Without Work Order":
+				check_if_work_order_in_process(self)
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
@@ -233,7 +235,7 @@ def get_flavour_pack_change_setup(maintenance_doc):
 		maintenance_doc.cip_steps = cip_steps
 		maintenance_doc.standard_time = standard_time
 	else:
-		frappe.throw("No such mapping exists for this combination of flavour and pack")
+		frappe.throw("No such mapping exists for this combination of flavour and pack.Please contact to Support team for further assistance")
 
 def get_flavour_change_setup(maintenance_doc):
 	cip_steps = None
