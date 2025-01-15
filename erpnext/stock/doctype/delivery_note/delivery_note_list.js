@@ -53,5 +53,13 @@ frappe.listview_settings['Delivery Note'] = {
 		};
 
 		doclist.page.add_actions_menu_item(__('Create Delivery Trip'), action, false);
+	
+			if (Object.values(frappe.route_options).length == 0){
+				frappe.route_options = {
+					"company": frappe.get_cookie('company') ,
+					"creation":["Between",[frappe.datetime.add_days(frappe.datetime.get_today(), -15),frappe.datetime.get_today()]]
+				};
+			}
+		
 	}
 };
