@@ -32,7 +32,7 @@ class Maintenance(Document):
 			elif self.cip_category == "Without Work Order":
 				# get_flavour_and_pack_changes(self)
 				self.setup_unplanned_cip()
-
+				check_if_work_order_in_process(self)
 			# elif self.cip_category == "Planned CIP":
 			# 	self.setup_planned_cip()
 				
@@ -59,8 +59,7 @@ class Maintenance(Document):
 
 			if not self.work_order_id:
 				check_if_work_order_in_process(self)
-			elif self.cip_category == "Without Work Order":
-				check_if_work_order_in_process(self)
+				
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
@@ -379,7 +378,8 @@ def check_if_work_order_in_process(maintenance_doc):
 	)
 	if len(work_order_data) > 0 and work_order_data[0].get('name'):
 		maintenance_doc.company = work_order_data[0].get('company')
-		maintenance_doc.work_order_id = work_order_data[0].get('name')
+		if maintenance_doc.cip_category != "Without Work Order":
+			maintenance_doc.work_order_id = work_order_data[0].get('name')
 		maintenance_doc.work_order_item = work_order_data[0].get('production_item')
 		maintenance_doc.work_order_item_name = work_order_data[0].get('item_name')
 		maintenance_doc.work_order_quantity = work_order_data[0].get('qty', 0)
