@@ -56,6 +56,28 @@ frappe.ui.form.on("Purchase Receipt", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+
+		frm.set_query('gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1,
+    					"gate_pass_type": "Against Purchase Order"
+    				}
+    			};
+			    
+			}
+		});
 	},
 
 	company: function(frm) {

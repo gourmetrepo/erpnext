@@ -6,12 +6,14 @@ frappe.ui.form.on('Payment Order', {
 		frm.set_query("company_bank_account", function() {
 			return {
 				filters: {
-					"is_company_account":1
+					"is_company_account":1,
+					"company": frm.doc.company
 				}
 			}
 		});
 	},
 	refresh: function(frm) {
+		frm.remove_custom_button("Payment Request", "Get Payments from");
 		if (frm.doc.docstatus == 0) {
 			frm.add_custom_button(__('Payment Request'), function() {
 				frm.trigger("get_from_payment_request");
@@ -25,8 +27,6 @@ frappe.ui.form.on('Payment Order', {
             // Function to open the blank pop-up
 			frm.trigger("openSupplierPaymentHistory");
        			 });
-			
-
 
 			frm.trigger('remove_button');
 		}
@@ -65,14 +65,28 @@ frappe.ui.form.on('Payment Order', {
 				})
 			},('Create'));
 		}
-		console.log(frm.doc)
-			if ( frm.doc.__unsaved){
-				console.log("Unsaved Document")
-			}else{
-			if (frm.doc.docstatus == 0 && frm.doc.docstatus != 1 ){
-			setTimeout(function() {
-				frm.trigger("balances_dashboard");
-			}, 100);}}
+		if ( frm.doc.__unsaved){
+			console.log("Unsaved Document")
+		}else{
+		if (frm.doc.docstatus == 0 && frm.doc.docstatus != 1 ){
+		setTimeout(function() {
+			frm.trigger("balances_dashboard");
+		}, 100);}}
+
+		frm.set_query("item_code", "items", function() {
+			if (frm.doc.is_subcontracted == "Yes") {
+				return{
+					query: "erpnext.controllers.queries.item_query",
+					filters:{ 'is_sub_contracted_item': 1 }
+				}
+			}
+			else {
+				return{
+					query: "erpnext.controllers.queries.item_query",
+					filters: {'is_purchase_item': 1, 'is_stock_item': 0}
+				}
+			}
+		});
 	},
 
 	remove_row_if_empty: function(frm) {
@@ -118,22 +132,28 @@ frappe.ui.form.on('Payment Order', {
 	},
 
 	get_from_payment_request: function(frm) {
+        if (!frm.doc.company_bank_account) {
+            frappe.throw("Please select Company's default bank");
+        }
 		frm.trigger("remove_row_if_empty");
 		erpnext.utils.map_current_doc({
-			method: "erpnext.accounts.doctype.payment_request.payment_request.make_payment_order",
+			method: "nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_order",
 			source_doctype: "Payment Request",
 			target: frm,
 			setters: {
-				party: frm.doc.supplier || ""
+				party: frm.doc.supplier || "",
 			},
 			get_query_filters: {
-				bank: frm.doc.bank,
 				docstatus: 1,
 				status: ["=", "Initiated"],
+				company: frm.doc.company,
 			}
 		});
 	},
-
+	company: function(frm) {
+        frm.set_value("company_bank_account", null);
+        frm.set_value("references", null);
+    },
 	make_payment_records: function(frm){
 		var dialog = new frappe.ui.Dialog({
 			title: __("For Supplier"),
@@ -146,15 +166,6 @@ frappe.ui.form.on('Payment Order', {
 						}
 					}, "reqd": 1
 				},
-
-				{"fieldtype": "Link", "label": __("Mode of Payment"), "fieldname": "mode_of_payment", "options":"Mode of Payment",
-					"get_query": function () {
-						return {
-							query:"erpnext.accounts.doctype.payment_order.payment_order.get_mop_query",
-							filters: {'parent': frm.doc.name}
-						}
-					}
-				}
 			]
 		});
 
@@ -167,7 +178,6 @@ frappe.ui.form.on('Payment Order', {
 				args: {
 					"name": me.frm.doc.name,
 					"supplier": args.supplier,
-					"mode_of_payment": me.mode_of_payment
 				},
 				freeze: true,
 				callback: function(r) {

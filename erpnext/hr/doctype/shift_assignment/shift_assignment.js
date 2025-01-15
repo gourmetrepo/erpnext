@@ -10,7 +10,6 @@ frappe.ui.form.on('Shift Assignment', {
 			if(data.length > 0){
 				var departments = frappe.utils.get_config_by_name("SHIFT_ASSIGNMENT_RESTRICTED_DEPARTMENTS", []);
 				var allowed_shifts = frappe.utils.get_config_by_name("ALLOWED_SHIFT_ASSIGNMENT_FOR_RESTRICTED_DEPARTMENTS", []);
-				console.log("allowed shift", allowed_shifts);
 				if( departments.indexOf(data[0].department) > -1 ) {
 					frm.set_query("shift_type", function() {
 						return {
