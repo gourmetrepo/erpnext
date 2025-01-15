@@ -65,6 +65,7 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		else{
 			frm.set_value("company", null);
 		}
+
 		frm.set_value("last_salary","");
 		frm.refresh_field("last_salary");
 	},
@@ -81,5 +82,6 @@ frappe.ui.form.on('Salary Structure Assignment', {
 	},
 	bank_salary: function(frm){
 	    frm.trigger("calculate_base_salary");
-	},
+	}
+
 });
