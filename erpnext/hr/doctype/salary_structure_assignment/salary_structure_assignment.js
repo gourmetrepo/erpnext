@@ -84,4 +84,5 @@ frappe.ui.form.on('Salary Structure Assignment', {
 	    frm.set_value("last_salary","");
 		frm.refresh_field("last_salary");
 	}
+
 });
