@@ -38,17 +38,6 @@ frappe.ui.form.on("Stock Reconciliation", {
 		if(frm.doc.company) {
 			frm.trigger("toggle_display_account_head");
 		}
-
-		frm.set_query('batch_no', 'items', function(doc, cdt, cdn) {
-			            var d  = locals[cdt][cdn];
-						return {
-							filters: {
-								item_code: d.item_code,
-								warehouse: d.warehouse
-							},
-							query: 'erpnext.controllers.queries.get_batch_no'
-						};
-			        });
 	},
 
 	get_items: function(frm) {
