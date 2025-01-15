@@ -1,11 +1,6 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.handlers["Job Opening"]["designation"] = [];
-
-delete cur_frm.events["designation"];
-delete cur_frm.cscript["designation"];
-
 frappe.ui.form.on('Job Opening', {
 	onload: function(frm) {
 		frm.set_query("department", function() {
@@ -39,14 +34,17 @@ frappe.ui.form.on('Job Opening', {
             };
         });
 	},
-	designation: function(frm) {
-		if(frm.doc.designation && frm.doc.company){
+	designation: function(frm){
+	    if(frm.doc.designation && frm.doc.company && frm.doc.department && frm.doc.branch && frm.doc.sub_branch){
 			frappe.call({
 				"method": "erpnext.hr.doctype.staffing_plan.staffing_plan.get_active_staffing_plan_details",
 				args: {
 					company: frm.doc.company,
 					designation: frm.doc.designation,
-					date: frappe.datetime.now_date() // ToDo - Date in Job Opening?
+					date: frappe.datetime.now_date(), // ToDo - Date in Job Opening?
+					department: frm.doc.department,
+					branch: frm.doc.branch,
+					sub_branch: frm.doc.sub_branch
 				},
 				callback: function (data) {
 					if(data.message){
