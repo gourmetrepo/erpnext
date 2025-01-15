@@ -68,12 +68,13 @@ frappe.ui.form.on('Salary Structure Assignment', {
 		frm.set_value("last_salary","");
 		frm.refresh_field("last_salary");
 	},
-	calculate_base_salary:function(frm){
-	    if(frm.doc.docstatus != 1){
-	        // make calculation on the fields
-    		frm.set_value("base",((frm.doc.cash_salary)?parseFloat(frm.doc.cash_salary):0) + ((frm.doc.bank_salary)?parseFloat(frm.doc.bank_salary):0));
-    		frm.refresh_field("base");
-	    }
+	calculate_base_salary(frm) {
+		if (frm.doc.docstatus != 1) {
+			const cashSalary = frm.doc.cash_salary ? parseFloat(frm.doc.cash_salary) : 0;
+			const bankSalary = frm.doc.bank_salary ? parseFloat(frm.doc.bank_salary) : 0;
+			frm.set_value("base", cashSalary + bankSalary);
+			frm.refresh_field("base");
+		}
 	},
 	cash_salary: function(frm){
 	  frm.trigger("calculate_base_salary");  
