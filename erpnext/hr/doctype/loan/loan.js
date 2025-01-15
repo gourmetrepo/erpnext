@@ -204,14 +204,118 @@ frappe.ui.form.on('Loan', {
             });
         }
 	},
+	posting_date: function(frm){
+		frm.trigger("calculate_salary_fields");
+        frm.trigger("toggle_fields");
+	},
+
+	applicant: function(frm){
+        frm.trigger("calculate_salary_fields");
+        frm.trigger("toggle_fields");
+        if (frm.doc.applicant) {
+			frappe.model.with_doc(frm.doc.applicant_type, frm.doc.applicant, function() {
+				var applicant = frappe.model.get_doc(frm.doc.applicant_type, frm.doc.applicant);
+				frm.set_value("company",applicant.company);
+			});
+		}
+		else {
+			frm.set_value("company", null);
+		}
+		frm.trigger("loan_type");
+    },
+	loan_type: function(frm){
+		frm.trigger("calculate_salary_fields");
+		frm.trigger("validate_loan_amount");
+        frm.trigger("toggle_fields");
+        frm.set_value("loan_account", "");
+        frm.set_value("interest_income_account", "");
+		if(frm.doc.loan_type){
+		    frappe.call({
+                method: "nerp.modules.gourmet.loan.loan.get_loan_type",
+                args:
+                    {   
+                        'company':      frm.doc.company,
+                        'loan_type':    frm.doc.loan_type
+                    },
+                callback: function(r){
+                    if(r.message){
+                        var data = r.message;
+                        
+                        if(data){
+        					frm.set_query("loan_account", function () {
+        						return {
+        							"filters": {
+        								"name": data.loan_account,
+        								"company": frm.doc.company
+        							}
+        						};
+        					});
+        					frm.set_query("interest_income_account", function () {
+        						return {
+        							"filters": {
+        								"name": data.interest_account,
+        								"company": frm.doc.company
+        							}
+        						};
+        					});
+        					
+        					if(data.loan_account){
+        					    frm.set_value("loan_account", data.loan_account);
+        					    }
+        					
+        					if(data.interest_account){
+        					    frm.set_value("interest_income_account", data.interest_account);
+        					    }
+				        }
+                    }
+                }
+		    });
+
+		}
+		frm.refresh_field('loan_account');
+		frm.refresh_field('interest_income_account');
+    },
 
 	repayment_method: function (frm) {
 		frm.trigger("toggle_fields")
 	},
 
 	toggle_fields: function (frm) {
-		frm.toggle_enable("monthly_repayment_amount", frm.doc.repayment_method == "Repay Fixed Amount per Period")
-		frm.toggle_enable("repayment_periods", frm.doc.repayment_method == "Repay Over Number of Periods")
+		frm.toggle_enable("monthly_repayment_amount", frm.doc.repayment_method == "Repay Fixed Amount per Period");
+		frm.toggle_enable("repayment_periods", frm.doc.repayment_method == "Repay Over Number of Periods");
+		frm.set_df_property('repayment_start_date', 'read_only', frm.doc.loan_type==frappe.utils.get_config_by_name('ADVANCE_SALARY_LOAN_TYPE', 'Advance Against Salary'));
+		frm.set_df_property('repayment_periods', 'read_only', frm.doc.loan_type==frappe.utils.get_config_by_name('ADVANCE_SALARY_LOAN_TYPE', 'Advance Against Salary'));
+		frm.set_df_property('repayment_method', 'read_only', frm.doc.loan_type==frappe.utils.get_config_by_name('ADVANCE_SALARY_LOAN_TYPE', 'Advance Against Salary'));
+	
+	},
+	loan_amount: function(frm){
+	    frm.trigger("validate_loan_amount");
+	},
+	calculate_salary_fields: function(frm){
+		frappe.call({
+			method: 'nerp.modules.gourmet.loan.loan.get_emp_salary_and_work_details',
+			args: {
+                loan: cur_frm.doc,
+            },
+			callback: function(r) {
+			    frm.set_value('present_days', r.message.loan.present_days);
+			    frm.set_value('current_salary', r.message.loan.current_salary);
+			    frm.set_value('earned_salary', r.message.loan.earned_salary);
+			    frm.set_value('repayment_periods', r.message.loan.repayment_periods);
+			    frm.set_value('repayment_start_date', r.message.loan.repayment_start_date);
+				frm.refresh();
+			}
+		});
+	},
+	validate_loan_amount: function(frm){
+	    var max_percentage = frappe.utils.get_config_by_name('MAX_PERCENTAGE_FOR_ADV_SALARY_LOAN', 60);
+	    if(frm.doc.loan_type == frappe.utils.get_config_by_name('ADVANCE_SALARY_LOAN_TYPE', 'Advance Against Salary')) {
+	        var max_loan_amount = frm.doc.earned_salary * (max_percentage/100);
+	        max_loan_amount = max_loan_amount.toFixed(2)
+	        if(frm.doc.loan_amount > max_loan_amount){
+	            frappe.msgprint(`Advance Against Salary Loan Amount cannot be more than ${max_percentage}% of Employee Earned Salary. Please enter (${max_loan_amount}) or less.`);
+	        }
+	    }
 	}
 });
 
