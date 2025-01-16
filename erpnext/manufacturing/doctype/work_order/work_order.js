@@ -486,8 +486,9 @@ frappe.ui.form.on("Work Order", {
 	before_save: function(frm) {
 		// CIP QA Sheet - Point 23
 		const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+		const item_sections = ["FG CSD","FG Juices","FG RGB","FG Water", "FG Bulk Water", "SF Juices", "SF Syrup","FG Husky"];
 		if (csd_companies.includes(frm.doc.company)) {
-			if (!frm.doc.production_line || frm.doc.production_line.length < 1) {
+			if ((!frm.doc.production_line || frm.doc.production_line.length < 1 ) && item_sections.includes(frm.doc.item_section)) {
 				frappe.throw(__("Production Line is Mandatory"))
 			}
 		}
