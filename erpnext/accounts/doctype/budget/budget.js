@@ -20,13 +20,13 @@ frappe.ui.form.on('Budget', {
 		})
 		
 		frm.set_query("account", "accounts", function() {
-			return {
-				filters: {
-					company: frm.doc.company,
-					report_type: "Profit and Loss",
-					is_group: 0
-				}
-			}
+			// return {
+			// 	filters: {
+			// 		company: frm.doc.company,
+			// 		report_type: "Profit and Loss",
+			// 		is_group: 0
+			// 	}
+			// }
 		})
 		
 		frm.set_query("monthly_distribution", function() {
