@@ -22,6 +22,20 @@ frappe.ui.form.on("Item", {
 		if (frm.doc.is_fixed_asset) {
 			frm.trigger("set_asset_naming_series");
 		}
+
+		frappe.call({
+			method: 'nrp_manufacturing.apis.item.get_item_atr_value',
+			callback: function(res) { // receive the response from the server
+				// var options = [];
+				// (res.message || []).forEach(function(row) {
+				//     options.push({
+				//         "ng_brand": row.abbr
+				//     }) // just one entry for now...
+				// })
+				frm.set_df_property('ng_brand', 'options',res.message);
+				frm.refresh_field('ng_brand');
+			}
+		});
 	},
 
 	refresh: function(frm) {

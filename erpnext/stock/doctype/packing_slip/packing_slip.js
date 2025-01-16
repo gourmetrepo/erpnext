@@ -27,9 +27,10 @@ cur_frm.cscript.onload_post_render = function(doc, cdt, cdn) {
 
 cur_frm.cscript.get_items = function(doc, cdt, cdn) {
 	return this.frm.call({
-		doc: this.frm.doc,
-		method: "get_items",
+		args: {doc: this.frm.doc},
+		method: "nrp_manufacturing.modules.gourmet.packing_slip.packing_slip.get_items",
 		callback: function(r) {
+		    console.log(r)
 			if(!r.exc) cur_frm.refresh();
 		}
 	});
@@ -71,22 +72,23 @@ cur_frm.cscript.validate_calculate_item_details = function(doc) {
 
 // Do not allow duplicate items i.e. items with same item_code
 // Also check for 0 qty
-cur_frm.cscript.validate_duplicate_items = function(doc, ps_detail) {
-	for(var i=0; i<ps_detail.length; i++) {
-		for(var j=0; j<ps_detail.length; j++) {
-			if(i!=j && ps_detail[i].item_code && ps_detail[i].item_code==ps_detail[j].item_code) {
-				frappe.msgprint(__("You have entered duplicate items. Please rectify and try again."));
-				frappe.validated = false;
-				return;
-			}
-		}
-		if(flt(ps_detail[i].qty)<=0) {
-			frappe.msgprint(__("Invalid quantity specified for item {0}. Quantity should be greater than 0.", [ps_detail[i].item_code]));
-			frappe.validated = false;
-		}
-	}
-}
 
+// cur_frm.cscript.validate_duplicate_items = function(doc, ps_detail) {
+// 	for(var i=0; i<ps_detail.length; i++) {
+// 		for(var j=0; j<ps_detail.length; j++) {
+// 			if(i!=j && ps_detail[i].item_code && ps_detail[i].item_code==ps_detail[j].item_code) {
+// 				frappe.msgprint(__("You have entered duplicate items. Please rectify and try again."));
+// 				frappe.validated = false;
+// 				return;
+// 			}
+// 		}
+// 		if(flt(ps_detail[i].qty)<=0) {
+// 			frappe.msgprint(__("Invalid quantity specified for item {0}. Quantity should be greater than 0.", [ps_detail[i].item_code]));
+// 			frappe.validated = false;
+// 		}
+// 	}
+// }
+cur_frm.cscript.validate_duplicate_items = function(doc, ps_detail) {}
 
 // Calculate Net Weight of Package
 cur_frm.cscript.calc_net_total_pkg = function(doc, ps_detail) {
