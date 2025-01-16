@@ -32,18 +32,22 @@ class QualityInspection(Document):
 					min_value = matching_parameter.get("min_value")
 					max_value = matching_parameter.get("max_value")
 					if reading.reading_1 not in [min_value, max_value]:
-						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+						if reading.status == "Conditionally Accepted":
+							frappe.msgprint(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+						else:
+							frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
 			if expected_type == "Char":
 				min_value = matching_parameter.get("min_value")
 				max_value = matching_parameter.get("max_value")
 				if reading.reading_1 not in [min_value, max_value]:
-					frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
-
+					if reading.status == "Conditionally Accepted":
+						frappe.msgprint(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+					else:
+						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
 
 			if expected_type in ["Int", "Float"]:
 				min_value = matching_parameter.get("min_value")
 				max_value = matching_parameter.get("max_value")
-
 
 				if min_value is not None:
 					min_value = float(min_value) if expected_type == "Float" else int(min_value)
@@ -58,7 +62,10 @@ class QualityInspection(Document):
 						try:
 							reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
 						except ValueError:
-							frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} cannot be interpreted as an integer.")
+							if reading.status == "Conditionally Accepted":
+								frappe.msgprint(f"Invalid value for {reading.specification}: {reading.reading_1} cannot be interpreted as an integer.")
+							else:
+								frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} cannot be interpreted as an integer.")
 
 					if expected_type != type(reading.reading_1).__name__.capitalize():
 						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
