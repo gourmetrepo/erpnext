@@ -31,7 +31,7 @@ class Maintenance(Document):
 				self.setup_unplanned_cip()
 			elif self.cip_category == "Without Work Order":
 				# get_flavour_and_pack_changes(self)
-				check_if_work_order_in_process(self)
+				#check_if_work_order_in_process(self)
 				self.setup_unplanned_cip()
 				
 			# elif self.cip_category == "Planned CIP":
