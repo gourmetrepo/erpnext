@@ -10,7 +10,11 @@ frappe.ui.form.on("Maintenance", {
       frm.set_df_property("work_order_id", "read_only", 1);
       frm.set_df_property("work_order_item", "read_only", 1);
       frm.set_df_property("company", "read_only", 1);
+      if  (frm.doc.cip_category == "Without Work Order")
+      {
+        frm.set_df_property("work_order_item", "read_only", 0);
 
+      }
       hide_fields_for_general_cip(frm);
     } else if (frm.doc.cip_category === "Planned CIP") {
       // Planned cip is only scheduled from the cip schedule setup doctype
@@ -100,6 +104,11 @@ frappe.ui.form.on("Maintenance", {
     if (frm.doc.work_order_item) {
       populate_change_item_from(frm);
     }
+    if  (frm.doc.cip_category == "Without Work Order")
+      {
+        frm.set_df_property("work_order_item", "read_only", 0);
+        
+      }
   },
 
 
