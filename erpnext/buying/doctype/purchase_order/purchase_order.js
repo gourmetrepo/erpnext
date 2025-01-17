@@ -344,10 +344,28 @@ erpnext.buying.PurchaseOrderController = erpnext.buying.BuyingController.extend(
 		// FS_Advanced_Payment_Update _v1.0 
 		if (this.frm.doc.purchase_order_type == "Import" && this.frm.doc.docstatus == 1){
 			// Only buttons to keep are "Payment Request" and "Receipt"
-			const buttons_to_remove = ['Subscription', 'Invoice', 'Payment']
+			const buttons_to_remove = ['Subscription', 'Invoice', 'Payment', 'Inter Company Order']
 			for (var i = 0; i < buttons_to_remove.length; i++) {
 				this.frm.remove_custom_button(buttons_to_remove[i], __('Create'));
 			}
+
+			let doc_form = this.frm
+
+			// Check for total of Payment Requests to hide "Payment Request" button
+			frappe.call({
+				method: "erpnext.accounts.doctype.payment_request.payment_request.validate_total_payment_request_against_po",
+				args: {
+					"purchase_order_name": this.frm.doc.name,
+					"doctype": "Purchase Order",
+					"purchase_order_type": this.frm.doc.purchase_order_type,
+					"grand_total": this.frm.doc.grand_total
+				},
+				callback: function(r) {
+					if (r.message) {
+						doc_form.remove_custom_button("Payment Request", __('Create'));
+					}
+				}
+				})
 		}
 
 	},
