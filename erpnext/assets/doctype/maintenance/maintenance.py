@@ -29,8 +29,13 @@ class Maintenance(Document):
 			if self.cip_category == "Unplanned CIP":
 				# get_flavour_and_pack_changes(self)
 				self.setup_unplanned_cip()
+			elif self.cip_category == "Without Work Order":
+				# get_flavour_and_pack_changes(self)
+				self.setup_unplanned_cip()
+				check_if_work_order_in_process(self)
 			# elif self.cip_category == "Planned CIP":
 			# 	self.setup_planned_cip()
+				
 
 
 	def setup_unplanned_cip(self):
@@ -54,6 +59,7 @@ class Maintenance(Document):
 
 			if not self.work_order_id:
 				check_if_work_order_in_process(self)
+				
 			
 			# Stop the work order if CIP document goes in progress
 			if  self.workflow_state == "CIP Inprogress" and self.work_order_id:
@@ -228,7 +234,7 @@ def get_flavour_pack_change_setup(maintenance_doc):
 		maintenance_doc.cip_steps = cip_steps
 		maintenance_doc.standard_time = standard_time
 	else:
-		frappe.throw("No such mapping exists for this combination of flavour and pack")
+		frappe.throw("No such mapping exists for this combination of flavour and pack.Please contact to Support team for further assistance")
 
 def get_flavour_change_setup(maintenance_doc):
 	cip_steps = None
@@ -372,7 +378,8 @@ def check_if_work_order_in_process(maintenance_doc):
 	)
 	if len(work_order_data) > 0 and work_order_data[0].get('name'):
 		maintenance_doc.company = work_order_data[0].get('company')
-		maintenance_doc.work_order_id = work_order_data[0].get('name')
+		if maintenance_doc.cip_category != "Without Work Order":
+			maintenance_doc.work_order_id = work_order_data[0].get('name')
 		maintenance_doc.work_order_item = work_order_data[0].get('production_item')
 		maintenance_doc.work_order_item_name = work_order_data[0].get('item_name')
 		maintenance_doc.work_order_quantity = work_order_data[0].get('qty', 0)

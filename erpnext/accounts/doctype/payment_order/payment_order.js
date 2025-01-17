@@ -12,6 +12,7 @@ frappe.ui.form.on('Payment Order', {
 		});
 	},
 	refresh: function(frm) {
+		apply_company_bank_account_filter(frm);
 		if (frm.doc.docstatus == 0) {
 			frm.add_custom_button(__('Payment Request'), function() {
 				frm.trigger("get_from_payment_request");
@@ -82,6 +83,13 @@ frappe.ui.form.on('Payment Order', {
 		}
 	},
 
+	company: function(frm) {
+        console.log('Company field changed.');
+        frm.set_value("company_bank_account", null);
+		frm.set_value("references", null);
+        apply_company_bank_account_filter(frm);
+    },
+
 	remove_button: function(frm) {
 		// remove custom button of order type that is not imported
 
@@ -118,18 +126,21 @@ frappe.ui.form.on('Payment Order', {
 	},
 
 	get_from_payment_request: function(frm) {
+        if (!frm.doc.company_bank_account) {
+            frappe.throw("Please select Company's default bank");
+        }
 		frm.trigger("remove_row_if_empty");
 		erpnext.utils.map_current_doc({
-			method: "erpnext.accounts.doctype.payment_request.payment_request.make_payment_order",
+			method: "nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_order",
 			source_doctype: "Payment Request",
 			target: frm,
 			setters: {
-				party: frm.doc.supplier || ""
+				party: frm.doc.supplier || "",
 			},
 			get_query_filters: {
-				bank: frm.doc.bank,
 				docstatus: 1,
 				status: ["=", "Initiated"],
+				company: frm.doc.company,
 			}
 		});
 	},
@@ -146,15 +157,6 @@ frappe.ui.form.on('Payment Order', {
 						}
 					}, "reqd": 1
 				},
-
-				{"fieldtype": "Link", "label": __("Mode of Payment"), "fieldname": "mode_of_payment", "options":"Mode of Payment",
-					"get_query": function () {
-						return {
-							query:"erpnext.accounts.doctype.payment_order.payment_order.get_mop_query",
-							filters: {'parent': frm.doc.name}
-						}
-					}
-				}
 			]
 		});
 
@@ -167,7 +169,6 @@ frappe.ui.form.on('Payment Order', {
 				args: {
 					"name": me.frm.doc.name,
 					"supplier": args.supplier,
-					"mode_of_payment": me.mode_of_payment
 				},
 				freeze: true,
 				callback: function(r) {
@@ -179,7 +180,6 @@ frappe.ui.form.on('Payment Order', {
 
 		dialog.show();
 	},
-
 
 	balances_dashboard: function(frm) {
 		console.log("pmo triggered")
@@ -357,3 +357,18 @@ frappe.ui.form.on('Payment Order', {
 		}
 	}
 });
+
+function apply_company_bank_account_filter(frm) {
+    if (!frm.doc.company) {
+        return;
+    }
+
+    frm.set_query("company_bank_account", function() {
+        return {
+            filters: {
+                "is_company_account": 1,
+                "company": frm.doc.company
+            }
+        };
+    });
+}

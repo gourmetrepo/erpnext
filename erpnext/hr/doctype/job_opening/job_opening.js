@@ -1,6 +1,11 @@
 // Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
 // For license information, please see license.txt
 
+frappe.ui.form.handlers["Job Opening"]["designation"] = [];
+
+delete cur_frm.events["designation"];
+delete cur_frm.cscript["designation"];
+
 frappe.ui.form.on('Job Opening', {
 	onload: function(frm) {
 		frm.set_query("department", function() {
@@ -10,6 +15,29 @@ frappe.ui.form.on('Job Opening', {
 				}
 			};
 		});
+
+		frm.set_query("branch", function() {
+            if(!frm.doc.department){
+                frappe.msgprint("Please select Department first");
+            }
+            return {
+                "filters": {
+                    "department": frm.doc.department,
+                    "parent":["<","0"]
+                }
+            };
+        });
+        
+        frm.set_query("sub_branch", function() {
+            if(!frm.doc.branch){
+                frappe.msgprint("Please select Branch first");
+            }
+            return {
+                "filters": {
+                    "branch": frm.doc.branch
+                }
+            };
+        });
 	},
 	designation: function(frm) {
 		if(frm.doc.designation && frm.doc.company){
