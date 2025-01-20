@@ -69,12 +69,12 @@
    "options": "Flavour Change\nPack Change\nFlavor & Pack Change\nGeneral"
   },
   {
-   "default": "Unplanned CIP",
+   "default": "Without Work Order",
    "depends_on": "eval:doc.task == \"CIP\"",
    "fieldname": "cip_category",
    "fieldtype": "Select",
    "label": "CIP Category",
-   "options": "Planned CIP\nUnplanned CIP"
+   "options": "Planned CIP\nUnplanned CIP\nWithout Work Order"
   },
   {
    "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
@@ -323,7 +323,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2024-12-18 17:38:56.211992",
+ "modified": "2025-01-14 19:47:07.220491",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
