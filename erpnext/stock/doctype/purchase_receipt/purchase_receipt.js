@@ -43,6 +43,13 @@ frappe.ui.form.on("Purchase Receipt", {
 	},
 
 	refresh: function(frm) {
+		if (frm.doc.import_costing_sheet != undefined && frm.doc.import_costing_sheet != ""){
+			frm.set_df_property("items", "read_only", 1);
+			refresh_field("items");
+			frm.set_df_property("taxes", "read_only", 1);
+			refresh_field("taxes");
+		}
+
 		if(frm.doc.company) {
 			frm.trigger("toggle_display_account_head");
 		}
@@ -96,6 +103,15 @@ frappe.ui.form.on("Purchase Receipt", {
 	toggle_display_account_head: function(frm) {
 		var enabled = erpnext.is_perpetual_inventory_enabled(frm.doc.company)
 		frm.fields_dict["items"].grid.set_column_disp(["cost_center"], enabled);
+	},
+	shipment_no: function(frm){
+		var shipment_no = frm.doc.shipment_no;
+		frappe.confirm(__("Are you sure to change all item shipment no to "+shipment_no), function() {
+			frm.doc.items.forEach(d => {
+				d.shipment_no = shipment_no;
+			});
+			refresh_field('items');
+		});
 	}
 });
 
