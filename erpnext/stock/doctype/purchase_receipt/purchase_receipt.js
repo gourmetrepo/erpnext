@@ -296,33 +296,61 @@ frappe.ui.form.on('Purchase Receipt Item', {
     item_code: function(frm, cdt, cdn) {
         var d = locals[cdt][cdn];
 		frappe.db.get_value('Item', {name: d.item_code}, 'sample_quantity', (r) => {
-            frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
-            validate_sample_quantity(frm, cdt, cdn);
-        });
-    },
-    qty: function(frm, cdt, cdn) {
-        validate_sample_quantity(frm, cdt, cdn);
-    },
-    sample_quantity: function(frm, cdt, cdn) {
-        validate_sample_quantity(frm, cdt, cdn);
-    },
-    batch_no: function(frm, cdt, cdn) {
-        validate_sample_quantity(frm, cdt, cdn);
-    },
+			frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
+			validate_sample_quantity(frm, cdt, cdn);
+		});
+	},
+	qty: function(frm, cdt, cdn) {
+		validate_sample_quantity(frm, cdt, cdn);
+	},
+	sample_quantity: function(frm, cdt, cdn) {
+		validate_sample_quantity(frm, cdt, cdn);
+	},
+	batch_no: function(frm, cdt, cdn) {
+		validate_sample_quantity(frm, cdt, cdn);
+	},
 
-});
-frappe.ui.form.on('Purchase Receipt Item', {
-    qty: function(frm, cdt, cdn) {
-        let row = frappe.get_doc(cdt, cdn);
-        frappe.model.set_value(cdt, cdn, "received_qty", row.qty);
+	received_qty: function(frm, cdt, cdn) {
+        update_accepted_qty(frm, cdt, cdn);
+    },
+    rejected_qty: function(frm, cdt, cdn) {
+        update_accepted_qty(frm, cdt, cdn, "rejected_qty");
+    },
+    returned_quantity: function(frm, cdt, cdn) {
+        update_accepted_qty(frm, cdt, cdn, "returned_quantity");
     }
 });
 
-cur_frm.cscript['Make Stock Entry'] = function() {
-	frappe.model.open_mapped_doc({
-		method: "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_stock_entry",
-		frm: cur_frm,
-	})
+function update_accepted_qty(frm, cdt, cdn, field) {
+    let row = frappe.get_doc(cdt, cdn);
+
+    if (!row._original_qty) {
+        row._original_qty = row.qty || 0;
+    }
+    row._prev_rejected_qty = row._prev_rejected_qty || 0;
+    row._prev_returned_qty = row._prev_returned_qty || 0;
+
+    let original_qty = row._original_qty;
+
+    let delta = 0;
+    if (field === 'rejected_qty') {
+        delta = (row.rejected_qty || 0) - row._prev_rejected_qty;
+        row._prev_rejected_qty = row.rejected_qty || 0;
+    } else if (field === 'returned_quantity') {
+        delta = (row.returned_quantity || 0) - row._prev_returned_qty;
+        row._prev_returned_qty = row.returned_quantity || 0;
+    }
+
+    let accepted_qty =
+        original_qty - (row.rejected_qty || 0) - (row.returned_quantity || 0);
+
+    if (accepted_qty < 0) {
+        frappe.msgprint(__('Accepted quantity cannot be negative.'));
+        accepted_qty = 0;
+    }
+
+    frappe.model.set_value(cdt, cdn, 'qty', accepted_qty);
+    frm.refresh_field('items');
 }
 
 var validate_sample_quantity = function(frm, cdt, cdn) {
