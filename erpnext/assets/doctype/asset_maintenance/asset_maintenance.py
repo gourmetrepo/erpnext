@@ -262,7 +262,3 @@ def get_team_members(maintenance_teams):
         fields=['team_member']
     )
     return [member.team_member for member in team_members]
-
-
-
-
