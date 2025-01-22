@@ -149,9 +149,12 @@ class StockEntry(StockController):
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
 		
-	# Changes by Moeiz for Return WIP Damage for CSD to create new stock entry once wip damage return stock entry has been submitted
+		# Changes by Moeiz for Return WIP Damage for CSD to create new stock entry once wip damage return stock entry has been submitted
 		if self.purpose == "Return WIP Damage":
 			create_compensation_stock_entry_for_wip_damage(self)
+		
+
+
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
@@ -161,6 +164,10 @@ class StockEntry(StockController):
 		# #enqueue(StockEntry.make_gl_entries, self=self, queue='short')
 		# self.make_gl_entries()
 		frappe.db.sql("UPDATE `tabStock Entry` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
+
+		# Changes by Moeiz for FS-Plant Maintenance 2.0
+		if self.purpose == "Material Transfer":
+			update_plant_asset_maintenance_document(self)
 
 
 	def on_cancel(self):
@@ -1831,3 +1838,19 @@ def validate_company_cost_center_and_accounts(stock_entry):
 			
 			if item.cost_center and item.cost_center not in cost_centers:
 				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
+
+
+
+def update_plant_asset_maintenance_document(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		if asset_maintenance_doc.status == "Draft" or asset_maintenance_doc.status == "MR Generated":
+			asset_maintenance_doc.status = "Not Started"
+			asset_maintenance_doc.save()
+			frappe.db.commit()
