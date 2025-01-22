@@ -205,7 +205,7 @@ def make_issue_material_request(doc):
 			i["warehouse"]=warehouse[1]
 			i["asset_maintenance"] = doc.name
 			i["warehouse"] = doc.wip_warehouse
-			
+			i["source_warehouse"] = doc.source_warehouse
 			if doc.project_based == "Yes" and \
 				(doc.project is not None and doc.project != ""):
 				i["project"] = doc.project
