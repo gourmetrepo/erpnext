@@ -48,8 +48,14 @@ class AssetMaintenance(Document):
 
 	
 	def issue_mr_for_bill_of_material_and_services(self):
-		mr_reference = make_issue_material_request(self)
-		return {'mr_reference': mr_reference.name}
+		try:
+			mr_reference = make_issue_material_request(self)
+			if self.status == "Draft":
+				self.status = "MR Generated"
+			return {'mr_reference': mr_reference.name}
+		except Exception as e:
+			frappe.log_error(e, "Plant Maintenance Issue Material Request Failed")
+			frappe.throw("Issue Material Request Failed")
 
 
 @frappe.whitelist()
@@ -177,6 +183,7 @@ def make_issue_material_request(doc):
 	mr.company = doc.company
 	mr.title="Material Issue for Asset Maintenance"
 	mr.naming_series="MAT-MR-.YYYY.-"
+	mr_items_list = []
 	for item in doc.bill_of_material_and_services:
 		if not item.mr_reference:
 			warehouse=get_warehouse(item.item,doc.company)
@@ -186,13 +193,23 @@ def make_issue_material_request(doc):
 			i["uom"]= item.uom 
 			i["conversion_factor"]= 1
 			i["warehouse"]=warehouse[1]
-			mr.append("items", i)
+			i["asset_maintenance"] = doc.name
+			
+			if doc.project_based == "Yes" and \
+				(doc.project is not None and doc.project != ""):
+				i["project"] = doc.project
+
+			mr_items_list.append(i)
 		else:
 			continue
 	
-	mr.insert(ignore_permissions=True)
-	# mr.submit()
-	return mr
+	if mr_items_list:
+		mr.extend("items", mr_items_list)
+		mr.insert(ignore_permissions=True)
+		mr.submit()
+		return mr
+	else:
+		frappe.throw("Please add new items to BOM to create material request for issue")
 
 
 @frappe.whitelist()
