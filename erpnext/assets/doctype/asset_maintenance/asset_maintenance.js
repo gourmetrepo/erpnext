@@ -3,7 +3,7 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-		debugger
+		
 		frm.set_indicator_formatter('status',
 			function(doc) {
 				let indicator = 'red'
@@ -22,8 +22,6 @@ frappe.ui.form.on('Asset Maintenance', {
                 }
             };
         });
-
-		manage_workflow_buttons(frm);
 	},
 
 	refresh: (frm) => {
@@ -32,12 +30,13 @@ frappe.ui.form.on('Asset Maintenance', {
 		}
 		make_bill_of_material_cdt_read_only(frm);
 		manage_workflow_buttons(frm);
-		set_indicator(frm);
+		project_frm_configuration(frm);
 	},
 
 	onload: (frm) => {
 		manage_workflow_buttons(frm);
-		set_indicator(frm);
+		project_frm_configuration(frm);
+		
 		// Hide Bill of Material child tables when loading the Asset Maintenance document
 		frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
 		frm.set_df_property('consumed_items', 'hidden', 1);
@@ -92,6 +91,9 @@ frappe.ui.form.on('Asset Maintenance', {
 		});
 	},
 
+	project_based: function(frm){
+		project_frm_configuration(frm)
+	},
 	project: function(frm) {
         if (frm.doc.project) {
 
@@ -119,12 +121,14 @@ frappe.ui.form.on('Asset Maintenance', {
 
                         frm.refresh_field('asset_maintenance_tasks');
                     } else {
-                        console.error("No tasks found for project:", frm.doc.project);
+                        frappe.throw(`"No tasks found for project: ${frm.doc.project}`);
                     }
                 }
             });
         }
     },
+
+
 
 	make_dashboard: (frm) => {
 		if(!frm.is_new()) {
@@ -277,6 +281,7 @@ frappe.ui.form.on('Bill of Material and Services', {
 
 
 function manage_workflow_buttons(frm){
+	
 	let status = frm.doc.status
 	if (status == "MR Generated"){
 		frm.add_custom_button(__('Not Started'), function() {
@@ -285,3 +290,13 @@ function manage_workflow_buttons(frm){
 	}
 }
 
+
+
+function project_frm_configuration(frm){
+	
+	if (frm.doc.project_based == "Yes"){
+		frm.set_df_property('project', 'reqd', 1)
+	}else{
+		frm.set_df_property('project', 'reqd', 0)
+	}
+}
