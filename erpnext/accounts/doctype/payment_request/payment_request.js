@@ -9,7 +9,29 @@ frappe.ui.form.on("Payment Request", {
 				query: "erpnext.setup.doctype.party_type.party_type.get_party_type",
 			};
 		});
+	},
+
+	mode_of_payment: function(frm) {
+		if (frm.doc.mode_of_payment=='Cash') {
+			 frm.toggle_reqd("cash_account", 1);
+			 frm.toggle_reqd("bank_account", 0);
+		}
+		 else {
+			 frm.toggle_reqd("bank_account", 1);
+			 frm.toggle_reqd("cash_account", 0);
+		 }
+	},
+
+	party: function(frm) {
+	    if (frm.doc.party_type == "Supplier"){
+	        frappe.db.get_value(frm.doc.party_type, {"name": frm.doc.party}, "supplier_name", 
+	            (r) => {
+				frm.set_value("party_name", r.supplier_name);
+				frm.refresh_field("party_name");
+			});
+	    }
 	}
+
 })
 
 frappe.ui.form.on("Payment Request", "onload", function(frm, dt, dn){
@@ -21,6 +43,20 @@ frappe.ui.form.on("Payment Request", "onload", function(frm, dt, dn){
 				set_field_options("print_format", r.message["print_format"])
 			}
 		})
+	}
+
+	frm.set_query("cash_account", function() {
+		return {
+			filters: {
+				company: frm.doc.company,
+				account_type: 'Cash',
+				is_group: 0,
+			}
+		}
+	})
+	if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		frm.set_value('naming_series', 'PRQSM-.YY.-');
+		refresh_field('naming_series')
 	}
 })
 

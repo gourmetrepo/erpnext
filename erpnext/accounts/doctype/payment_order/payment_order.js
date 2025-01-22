@@ -3,38 +3,32 @@
 
 frappe.ui.form.on('Payment Order', {
 	setup: function(frm) {
-		// frm.set_query("company_bank_account", function() {
-		// 	return {
-		// 		filters: {
-		// 		//	"is_company_account":1
-		// 		}
-		// 	}
-		// });
+		frm.set_query("company_bank_account", function() {
+			return {
+				filters: {
+				//	"is_company_account":1,
+					"company": frm.doc.company
+				}
+			}
+		});
 	},
 	refresh: function(frm) {
+		frm.remove_custom_button("Payment Request", "Get Payments from");
 		if (frm.doc.docstatus == 0) {
 			frm.add_custom_button(__('Payment Request'), function() {
 				frm.trigger("get_from_payment_request");
 			}, __("Get Payments from"));
-
-			frm.add_custom_button(__('Payment Entry'), function() {
-				frm.trigger("get_from_payment_entry");
-			}, __("Get Payments from"));
-
-			frm.trigger('remove_button');
-			frm.add_custom_button(__('Get Supplier Payment History'), function () {
-				// Function to open the blank pop-up
-				frm.trigger("openSupplierPaymentHistory");
-			});
-		}
-
-		// payment Entry
-		if (frm.doc.docstatus===1 && frm.doc.payment_order_type==='Payment Request') {
-			frm.add_custom_button(__('Create Payment Entries'), function() {
-				frm.trigger("make_payment_records");
-			});
 		}
 	},
+
+	onload: function(frm) {
+        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		    frm.set_value('naming_series', 'PMOSM-.YY.-');
+		    refresh_field('naming_series')
+		    frm.refresh_field('vendor_details');
+		    console.log('check');
+		    }
+   },
 
 	remove_row_if_empty: function(frm) {
 		// remove if first row is empty
@@ -79,22 +73,30 @@ frappe.ui.form.on('Payment Order', {
 	},
 
 	get_from_payment_request: function(frm) {
+        if (!frm.doc.company_bank_account) {
+            frappe.throw("Please select Company's default bank");
+        }
 		frm.trigger("remove_row_if_empty");
 		erpnext.utils.map_current_doc({
-			method: "erpnext.accounts.doctype.payment_request.payment_request.make_payment_order",
+			method: "nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_order",
 			source_doctype: "Payment Request",
 			target: frm,
 			setters: {
-				party: frm.doc.supplier || ""
+				party: frm.doc.supplier || "",
 			},
 			get_query_filters: {
-				bank: frm.doc.bank,
 				docstatus: 1,
 				status: ["=", "Initiated"],
+				company: frm.doc.company,
 			}
 		});
+		
 	},
 
+	company: function(frm) {
+        frm.set_value("company_bank_account", null);
+        frm.set_value("references", null);
+    },
 	make_payment_records: function(frm){
 		var dialog = new frappe.ui.Dialog({
 			title: __("For Supplier"),
@@ -107,15 +109,6 @@ frappe.ui.form.on('Payment Order', {
 						}
 					}, "reqd": 1
 				},
-
-				{"fieldtype": "Link", "label": __("Mode of Payment"), "fieldname": "mode_of_payment", "options":"Mode of Payment",
-					"get_query": function () {
-						return {
-							query:"erpnext.accounts.doctype.payment_order.payment_order.get_mop_query",
-							filters: {'parent': frm.doc.name}
-						}
-					}
-				}
 			]
 		});
 
@@ -128,7 +121,6 @@ frappe.ui.form.on('Payment Order', {
 				args: {
 					"name": me.frm.doc.name,
 					"supplier": args.supplier,
-					"mode_of_payment": args.mode_of_payment
 				},
 				freeze: true,
 				callback: function(r) {
