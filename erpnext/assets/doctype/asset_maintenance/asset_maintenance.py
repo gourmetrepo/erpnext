@@ -36,6 +36,18 @@ class AssetMaintenance(Document):
 				maintenance_log = frappe.get_doc('Asset Maintenance Log', asset_maintenance_log.name)
 				maintenance_log.db_set('maintenance_status', 'Cancelled')
 
+	
+	def issue_mr_for_bill_of_material_and_services(self):
+		try:
+			mr_reference = make_issue_material_request(self)
+			if self.status == "Draft":
+				self.status = "MR Generated"
+			return {'mr_reference': mr_reference.name}
+		except Exception as e:
+			frappe.log_error(e, "Plant Maintenance Issue Material Request Failed")
+			frappe.throw("Issue Material Request Failed")
+
+
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
 	team_member = frappe.db.get_value('User', assign_to_member, "email")
@@ -117,3 +129,105 @@ def get_maintenance_log(asset_name):
         from `tabAsset Maintenance Log`
         where asset_name=%s group by maintenance_status""",
         (asset_name), as_dict=1)
+
+
+
+
+# Code by Moeiz
+@frappe.whitelist()
+def get_available_stock_for_bill_and_services(item_code, company):
+    # Query to get the total stock for the specified item code and company
+    stock_data = frappe.db.sql("""
+        SELECT 
+            SUM(actual_qty) AS total_qty
+        FROM 
+            `tabStock Ledger Entry`
+        WHERE 
+            item_code = %s AND company = %s
+    """, (item_code, company), as_dict=True)
+    
+    # Return the total stock quantity, defaulting to 0 if no record is found
+    total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
+    return total_qty
+
+
+def get_warehouse(item, company):
+    warehouse = frappe.db.get_list('Item Default',
+                                   filters={
+                                       'company': company,
+                                       'parent': item
+                                   },
+                                   fields=['company', 'default_warehouse'],
+                                   as_list=True)
+    if warehouse:
+        return warehouse[0]
+    else:
+        frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
+
+
+
+
+def make_issue_material_request(doc):  
+	mr = frappe.new_doc("Material Request")
+	mr.material_request_type = "Material Issue"
+	mr.company = doc.company
+	mr.title="Material Issue for Asset Maintenance"
+	mr.naming_series="MAT-MR-.YYYY.-"
+	mr_items_list = []
+	for item in doc.bill_of_material_and_services:
+		if not item.mr_reference:
+			warehouse=get_warehouse(item.item,doc.company)
+			i={}
+			i['item_code']= item.item
+			i["qty"]= item.demand_qty
+			i["uom"]= item.uom 
+			i["conversion_factor"]= 1
+			i["warehouse"]=warehouse[1]
+			i["asset_maintenance"] = doc.name
+			
+			if doc.project_based == "Yes" and \
+				(doc.project is not None and doc.project != ""):
+				i["project"] = doc.project
+
+			mr_items_list.append(i)
+		else:
+			continue
+	
+	if mr_items_list:
+		mr.extend("items", mr_items_list)
+		mr.insert(ignore_permissions=True)
+		mr.submit()
+		return mr
+	else:
+		frappe.throw("Please add new items to BOM to create material request for issue")
+
+
+@frappe.whitelist()
+def get_received_qty_from_material_request(mr_references):
+	if isinstance(mr_references, str):
+		import json
+		mr_references = json.loads(mr_references)
+
+	if not frappe.has_permission('Material Request Item', 'read'):
+		frappe.throw(_("You do not have permission to access Material Request Items."))
+
+	mr_ref_query = "'" + "','".join(mr_references) + "'"
+	items = frappe.db.sql(f"""
+			SELECT tmri.parent, tmri.item_code, tmri.qty FROM `tabMaterial Request` AS tmr
+			LEFT JOIN `tabMaterial Request Item` AS tmri ON tmr.name = tmri.parent
+			WHERE tmr.docstatus = 1 AND tmri.parent in ({mr_ref_query});""", as_dict=True, debug=True)
+	
+	return items
+
+
+@frappe.whitelist()
+def get_team_members(maintenance_teams):
+    if isinstance(maintenance_teams, str):
+        maintenance_teams = frappe.parse_json(maintenance_teams)
+    
+    team_members = frappe.get_all(
+        'Maintenance Team Member',
+        filters={'parent': ['in', maintenance_teams]},
+        fields=['team_member']
+    )
+    return [member.team_member for member in team_members]
