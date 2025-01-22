@@ -345,6 +345,7 @@ def make_payment_request(**args):
 			"message": gateway_account.get("message") or get_dummy_message(ref_doc),
 			"reference_doctype": args.dt,
 			"reference_name": args.dn,
+			"company": ref_doc.company,
 			"party_type": args.get("party_type") or "Customer",
 			"party": args.get("party") or ref_doc.get("customer"),
 			"bank_account": bank_account
@@ -526,3 +527,33 @@ def validate_company_cost_center_and_accounts(payment_request):
 
 	if payment_request.cash_account and payment_request.cash_account not in accounts:
 		frappe.throw(_("Cash Account {0} does not belong to company {1}").format(payment_request.cash_account, company))
+
+
+
+
+# Code by Moeiz
+# FS_Advanced_Payment_Update _v1.0
+# Validate total payment request against purchase order total to hide the create payment request button at Purchase Order
+@frappe.whitelist()
+def validate_total_payment_request_against_po(purchase_order_name, doctype, purchase_order_type, grand_total):
+	# Code by Moeiz
+	# FS_Advanced_Payment_Update _v1.0
+	if doctype == "Purchase Order" and purchase_order_type == "Import":
+		result = frappe.db.sql(
+			f"""
+			SELECT SUM(grand_total) AS total_payment_request_amount
+			FROM `tabPayment Request`
+			WHERE (reference_name IN (
+			SELECT DISTINCT(`parent`)
+			FROM `tabPurchase Invoice Item`
+			WHERE `purchase_order` = '{purchase_order_name}') OR reference_name='{purchase_order_name}') AND `status`!="Cancelled";
+			""",
+			as_dict=True
+		)
+
+		if len(result)>0 and result[0].get('total_payment_request_amount'):
+			if float(grand_total) <= result[0].get('total_payment_request_amount'):
+				return True
+	
+	return False
+

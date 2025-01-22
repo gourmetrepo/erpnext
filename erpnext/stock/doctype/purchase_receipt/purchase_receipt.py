@@ -209,25 +209,25 @@ class PurchaseReceipt(BuyingController):
 						"data": data
 					}
 
-				# Maintain logs
-				nrp_integeration = {
-					"ref_doctype": "Purchase Receipt",
-					"doctype": "Nrp Integration",
-					"request": str(payload)
-				}
+					# Maintain logs
+					nrp_integeration = {
+						"ref_doctype": "Purchase Receipt",
+						"doctype": "Nrp Integration",
+						"request": str(payload)
+					}
 
-				nrp_integeration["title"] = "Purchase Receipt Sync with GSSM " + str(datetime.now())
-				nrp_logs = frappe.get_doc(nrp_integeration)
-				nrp_logs.save(ignore_permissions=True)
-				response_gssm = []
+					nrp_integeration["title"] = "Purchase Receipt Sync with GSSM " + str(datetime.now())
+					nrp_logs = frappe.get_doc(nrp_integeration)
+					nrp_logs.save(ignore_permissions=True)
+					response_gssm = []
 
-				data = json.dumps(payload, default=str)
-				headers = {'Content-Type': 'application/json'}
-				response = requests.request("POST", url , headers=headers, data=data)
-				response_gssm.append(response.text)
-				
-				# Maintain logs
-				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+					data = json.dumps(payload, default=str)
+					headers = {'Content-Type': 'application/json'}
+					response = requests.request("POST", url , headers=headers, data=data)
+					response_gssm.append(response.text)
+					
+					# Maintain logs
+					frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
 		except ValidationError as error:
 			return json_error_response(str(error))
 		except frappe.PermissionError as error:
