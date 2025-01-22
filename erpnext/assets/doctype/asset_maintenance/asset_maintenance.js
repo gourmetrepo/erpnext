@@ -196,6 +196,8 @@ frappe.ui.form.on('Asset Maintenance', {
 		frappe.call({
 			method: 'issue_mr_for_bill_of_material_and_services',
 			doc: frm.doc,
+			freeze: true,
+			freeze_message: "Creating Material Request",
 			callback: (r) => {
 				if (!r.message || !r.message.mr_reference) {
 					return;
