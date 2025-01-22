@@ -491,7 +491,9 @@ function project_frm_configuration(frm){
 	
 	if (frm.doc.project_based == "Yes"){
 		frm.set_df_property('project', 'reqd', 1)
+		frm.set_df_property('project', 'hidden', 0)
 	}else{
 		frm.set_df_property('project', 'reqd', 0)
+		frm.set_df_property('project', 'hidden', 1)
 	}
 }

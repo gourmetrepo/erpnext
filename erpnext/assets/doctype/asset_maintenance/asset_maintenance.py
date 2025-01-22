@@ -21,6 +21,7 @@ class AssetMaintenance(Document):
 	
 	def before_save(self):
 		self.load_section_details()
+		self.load_project_details()
 
 	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
@@ -64,19 +65,35 @@ class AssetMaintenance(Document):
 		if self.company and self.section:
 			data = frappe.db.sql(
 				f"""
-				SELECT `wip_warehouse`, `damage_warehouse` FROM `tabSection Warehouse`
+				SELECT `wip_warehouse`, `damage_warehouse`, `item_default_source_warehouse` FROM `tabSection Warehouse`
 				WHERE `parent`="{self.section}"
 				AND `company`="{self.company}"
 				""", as_dict=True
 			)
 
-			if len(data) > 0 and data[0].get('wip_warehouse'):
+			if len(data) > 0 and data[0].get('wip_warehouse') and data[0].get('item_default_source_warehouse'):
 				self.wip_warehouse = data[0].get('wip_warehouse', None)
+				self.source_warehouse = data[0].get('item_default_source_warehouse', None)
 				self.damage_warehouse = data[0].get('damage_warehouse', None)
 			else:
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
+	
+	def load_project_details(self):
+		if self.project and self.project_based == "Yes":
+			data = frappe.db.sql(
+				f"""
+				SELECT `cogs_account`, `cwip_account` FROM `tabProject`
+				WHERE `name`="{self.project}"
+				AND `company`="{self.company}"
+				""", as_dict=True
+			)
+			if len(data) > 0:
+				self.cogs_account = data[0].get('cogs_account', None)
+				self.cwip_account = data[0].get('cwip_account', None)
+			
+			
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
@@ -215,6 +232,8 @@ def make_issue_material_request(doc):
 			i["warehouse"]=warehouse[1]
 			i["asset_maintenance"] = doc.name
 			i["warehouse"] = doc.wip_warehouse
+			i["source_warehouse"] = doc.source_warehouse
+
 			
 			if doc.project_based == "Yes" and \
 				(doc.project is not None and doc.project != ""):
