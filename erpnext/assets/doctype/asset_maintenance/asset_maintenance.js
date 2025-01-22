@@ -478,10 +478,11 @@ frappe.ui.form.on('Bill of Material and Services', {
 function manage_workflow_buttons(frm){
 	
 	let status = frm.doc.status
-	if (status == "MR Generated"){
-		frm.add_custom_button(__('Not Started'), function() {
-			console.log("Not Started function called")
-		});
+	if (status == "Not Started"){
+		frm.add_custom_button(__('Start'), function() {
+			frm.set_value('status', 'In Process');
+			frm.save();
+		}).addClass('btn-primary');
 	}
 }
 
