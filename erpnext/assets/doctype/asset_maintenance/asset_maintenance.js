@@ -307,7 +307,28 @@ frappe.ui.form.on('Asset Maintenance', {
 		if (frm.doc.total_quantity !== undefined && frm.doc.total_quantity !== undefined){
 			frm.set_value("remaining_quantity", (frm.doc.total_quantity - frm.doc.quantity_produced));
 		}
-	}
+	},
+
+	make_material_consumption_stock_entry: async function(frm) {
+		debugger;
+		try {
+			const r = await frappe.call({
+				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.make_material_consumption_stock_entry',
+				args: {
+					'asset_maintenance_doc': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				frappe.model.sync(r.message);
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making material consumption stock entry:', error);
+			
+		}
+	},
+
 	
 });
 
@@ -483,6 +504,10 @@ function manage_workflow_buttons(frm){
 			frm.set_value('status', 'In Process');
 			frm.save();
 		}).addClass('btn-primary');
+	}else if(status == "In Process"){
+		frm.add_custom_button(__('Consumption'), function() {
+			erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
+		}).addClass('btn-primary');
 	}
 }
 
@@ -496,3 +521,5 @@ function project_frm_configuration(frm){
 		frm.set_df_property('project', 'reqd', 0)
 	}
 }
+
+

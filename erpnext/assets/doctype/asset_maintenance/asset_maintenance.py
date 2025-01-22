@@ -77,6 +77,9 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
+	
+	def make_material_consumption_stock_entry(self):
+		pass
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
