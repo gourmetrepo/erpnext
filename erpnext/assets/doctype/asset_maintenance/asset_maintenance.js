@@ -157,6 +157,156 @@ frappe.ui.form.on('Asset Maintenance', {
 				}
 			});
 		}
+	},
+
+	company: (frm) => {
+		frm.set_query('cost_center', function() {
+            return {
+                filters: {
+                    company: frm.doc.company
+                }
+            };
+        });
+
+		frm.set_query('asset_name', function() {
+            return {
+                filters: {
+                    company: frm.doc.company
+                }
+            };
+        });
+	},
+
+	issue_material: (frm) => {
+		if (!frm.doc.company){
+			frappe.throw("Select company first")
+		}
+
+		if (frm.is_dirty()) {
+			frappe.throw(__(`Save document before issuing Material Request`));
+		}
+		
+		frm.doc.bill_of_material_and_services.forEach(function(bill, index) {
+			if (!bill.item || !bill.demand_qty) {
+				frappe.throw(__(`Row ${index + 1}: Kindly provide item with demand quantity to issue material`));
+			}
+		});
+
+
+		frappe.call({
+			method: 'issue_mr_for_bill_of_material_and_services',
+			doc: frm.doc,
+			freeze: true,
+			freeze_message: "Creating Material Request",
+			callback: (r) => {
+				if (!r.message || !r.message.mr_reference) {
+					return;
+				}
+				
+				// Extract the MR reference from the response
+				const mr_reference = r.message.mr_reference;
+
+				if (frm.doc.bill_of_material_and_services) {
+					frm.doc.bill_of_material_and_services.forEach(row => {
+						if (!row.mr_reference) { // Check if mr_reference is not set
+							row.mr_reference = mr_reference; // Update the cell
+							frappe.model.set_value(row.doctype, row.name, 'mr_reference', row.mr_reference);
+						}
+					});
+
+					// Refresh the field to reflect changes in the UI
+					frm.refresh_field('bill_of_material_and_services');
+				}
+
+				frm.save(); // populate received_qty in after_save
+
+				make_bill_of_material_cdt_read_only(frm);
+	
+				// Show a message with a clickable link to the Material Request
+				frappe.msgprint({
+					message: __('Material Request Created: <a href="#Form/Material Request/' + mr_reference + '" target="_blank">' + mr_reference + '</a>'),
+					title: __('Success'),
+					indicator: 'green'
+				});
+			}
+		});
+	},
+
+	bill_of_material: function(frm) {
+        const fields_to_toggle = [
+            'bill_of_material_and_services',
+            'consumed_items',
+            'return_items',
+            'issue_material',
+            'charge_consumption',
+            'return_item'
+        ];
+
+        fields_to_toggle.forEach(field => {
+            let current_visibility = frm.fields_dict[field].df.hidden;
+            frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
+        });
+
+		frm.refresh();
+    },
+
+	maintenance_team: (frm, cdt, cdn) => {
+		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
+			const maintenanceTeamNames = frm.doc.maintenance_team.map(team => team.maintenance_team_name);
+			console.log("Maintenance Team Names:", maintenanceTeamNames);
+	
+			if (maintenanceTeamNames.length > 0) {
+				frappe.call({
+					method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members',
+					args: {
+						maintenance_teams: maintenanceTeamNames
+					},
+					callback: function(response) {
+						if (response.message) {
+							const teamMembers = response.message;
+	
+							frm.fields_dict['asset_maintenance_tasks'].grid.get_field('assign_to').get_query = function(doc, cdt, cdn) {
+								return {
+									filters: {
+										name: ['in', teamMembers]
+									}
+								};
+							};
+						} else {
+							frappe.msgprint(__('No team members found for the selected maintenance teams.'));
+						}
+					},
+					error: function(error) {
+						console.error("Error fetching team members:", error);
+						frappe.msgprint(__('There was an error fetching the team members.'));
+					}
+				});
+			} else {
+				frappe.msgprint(__('No maintenance team names found.'));
+			}
+		} else {
+			frappe.msgprint(__('No maintenance teams selected.'));
+		}
+	},	
+	bill_of_material_and_services: function(frm, cdt, cdn) {
+        console.log("bill_of_material_and_services_add");
+    },
+	
+	work_order_id: (frm) => {
+		if (!frm.doc.work_order_id) {
+            frm.set_value("order_item", null)
+			frm.set_df_property('order_item', 'hidden', 1);
+            frm.set_value("total_quantity", null)
+            frm.set_df_property('total_quantity', 'hidden', 1);
+            frm.set_value("quantity_produced", null)
+            frm.set_df_property('quantity_produced', 'hidden', 1);
+            frm.set_value("remaining_quantity", null)
+            frm.set_df_property('remaining_quantity', 'hidden', 1);
+        }
+
+		if (frm.doc.total_quantity !== undefined && frm.doc.total_quantity !== undefined){
+			frm.set_value("remaining_quantity", (frm.doc.total_quantity - frm.doc.quantity_produced));
+		}
 	}
 });
 
