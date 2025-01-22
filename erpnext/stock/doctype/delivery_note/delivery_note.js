@@ -95,6 +95,31 @@ frappe.ui.form.on("Delivery Note", {
 	print_without_amount: function(frm) {
 		erpnext.stock.delivery_note.set_print_hide(frm.doc);
 	},
+
+	onload: function(frm) {
+		  frm.fields_dict['items'].grid.wrapper.find('.grid-add-row').hide();
+		  frm.fields_dict['items'].grid.wrapper.find('.grid-add-multiple-rows').hide();
+		  frm.fields_dict['items'].grid.wrapper.find('.grid-upload').hide();
+	},
+
+	onload_post_render: function(frm) {
+		frm.remove_custom_button("Sales Order","Get items from");
+   },
+
+	reference_pos_return: function(frm){
+       
+        if ( frm.doc.is_return === 1 ) {
+	          var regex = /[^0-9]/g;
+				if (regex.test(frm.doc.return_ref) === true){
+			
+					frappe.msgprint(__(" Only  numbers are allowed."));
+					frm.refresh_field("return_ref");
+					frappe.validated = false;
+				}
+			}
+	},
+
+	
 	
 	refresh: function(frm) {
         if (frm.doc.queue_status == 'Queued'){
@@ -121,8 +146,86 @@ frappe.ui.form.on("Delivery Note", {
 			}
 		}
 		frm.refresh_field('driver');
-		
+
+		frm.add_custom_button(__('Print'), function() {
+            let names=[frm.doc.name]
+            var json_string = JSON.stringify(names);
+            frappe.call({
+				type:'GET',
+				method: "nrp_manufacturing.apis.custom_print.download_multi_pdf?"
+				 +"doctype="+encodeURIComponent("Delivery Note")
+				 +"&name="+encodeURIComponent(json_string)
+				 +"&format="+encodeURIComponent("Custom DN Print Format")
+				 +"&no_letterhead="+encodeURIComponent('0'),
+				callback: function(r) {
+					if(r){
+						var mywindow = window.open('', 'Delivery Note', 'height=500,width=800');
+						mywindow.document.write(r.message);
+						mywindow.document.close(); // necessary for IE >= 10
+						mywindow.focus(); // necessary for IE >= 10*/
+						setTimeout(() => {
+							mywindow.print();
+							mywindow.close();
+						}, 1000);
+					}	
+				}
+			});            
+        });        
+	    frm.set_df_property("set_warehouse", "reqd", 1);
+		frm.set_query('reference_gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1
+    				}
+    			};
+			}
+		});
+		setTimeout(function(){
+		    frm.remove_custom_button("Sales Order","Get items from");
+		}, 500);
 	},
+
+	reference_gate_pass: function(frm) {
+	    if (frm.doc.reference_gate_pass){
+            frappe.call({
+                    method: 'frappe.client.get_value',
+                    args: {
+                    doctype: 'Gate Pass',
+                    filters: {
+                      'name': frm.doc.reference_gate_pass
+                    },
+                    fieldname: ['driver','vehicle']
+                  },
+                  callback: function (data) {
+                    if (data.message)
+                    frm.set_value("driver_name",  data.message.driver);
+                    frm.set_value("vehicle_no",  data.message.vehicle);
+		            refresh_field("vehicle_no");
+		            refresh_field("driver_name");
+                  }
+                
+            });
+    	}
+	},
+
+	items_on_form_rendered:function(frm, cdt, cdn){
+        frm.fields_dict["items"].grid.wrapper.find('.grid-delete-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row-below').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-duplicate-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-append-row').hide();
+    },
 	customer_type:function(frm) {
 		if (frm.doc.customer_type === 'Employee'){
 			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC'){
@@ -461,3 +564,17 @@ erpnext.stock.delivery_note.set_print_hide = function(doc, cdt, cdn){
 			dn_fields['taxes'].print_hide = 0;
 	}
 }
+
+$(".btn-print-print").click(function(){
+	frappe.call({
+		method: "nrp_manufacturing.utils.update_print_count",
+		async: false,
+		args: {
+			name: cur_frm.doc.name,
+			doctype: cur_frm.doctype
+		},
+		callback: function(r) {
+			
+		}
+	});
+});
