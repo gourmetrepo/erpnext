@@ -216,7 +216,7 @@ def get_warehouse(item, company):
 
 def make_issue_material_request(doc):  
 	mr = frappe.new_doc("Material Request")
-	mr.material_request_type = "Material Issue"
+	mr.material_request_type = "Material Transfer"
 	mr.company = doc.company
 	mr.title="Material Issue for Asset Maintenance"
 	mr.naming_series="MAT-MR-.YYYY.-"
