@@ -29,6 +29,7 @@ frappe.ui.form.on("Payment Request", {
 			});
 	    }
 	}
+
 })
 
 frappe.ui.form.on("Payment Request", "onload", function(frm, dt, dn){
@@ -50,6 +51,10 @@ frappe.ui.form.on("Payment Request", "onload", function(frm, dt, dn){
 			}
 		}
 	})
+	if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		frm.set_value('naming_series', 'PRQSM-.YY.-');
+		refresh_field('naming_series')
+	}
 })
 
 frappe.ui.form.on("Payment Request", "refresh", function(frm) {
