@@ -3,27 +3,17 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-		// frm.set_query("assign_to", "asset_maintenance_tasks", function(doc) {
-		// 	return {
-		// 		query: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_team_members",
-		// 		filters: {
-		// 			maintenance_team: doc.maintenance_team
-		// 		}
-		// 	};
-		// });
-
-		frm.set_indicator_formatter('maintenance_status',
+		debugger
+		frm.set_indicator_formatter('status',
 			function(doc) {
-				let indicator = 'blue';
-				if (doc.maintenance_status == 'Overdue') {
+				let indicator = 'red'
+				if (doc.status == 'MR Generated') {
 					indicator = 'orange';
-				}
-				if (doc.maintenance_status == 'Cancelled') {
-					indicator = 'red';
 				}
 				return indicator;
 			}
 		);
+
 
 		frm.set_query('project', function() {
             return {
@@ -32,6 +22,8 @@ frappe.ui.form.on('Asset Maintenance', {
                 }
             };
         });
+
+		manage_workflow_buttons(frm);
 	},
 
 	refresh: (frm) => {
@@ -39,9 +31,13 @@ frappe.ui.form.on('Asset Maintenance', {
 			frm.trigger('make_dashboard');
 		}
 		make_bill_of_material_cdt_read_only(frm);
+		manage_workflow_buttons(frm);
+		set_indicator(frm);
 	},
 
 	onload: (frm) => {
+		manage_workflow_buttons(frm);
+		set_indicator(frm);
 		// Hide Bill of Material child tables when loading the Asset Maintenance document
 		frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
 		frm.set_df_property('consumed_items', 'hidden', 1);
@@ -471,3 +467,14 @@ frappe.ui.form.on('Bill of Material and Services', {
     },
 	
 });
+
+
+function manage_workflow_buttons(frm){
+	let status = frm.doc.status
+	if (status == "MR Generated"){
+		frm.add_custom_button(__('Not Started'), function() {
+			console.log("Not Started function called")
+		});
+	}
+}
+
