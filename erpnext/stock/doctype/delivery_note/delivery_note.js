@@ -92,7 +92,79 @@ frappe.ui.form.on("Delivery Note", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
-	}
+
+		frm.set_query('reference_gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1
+    				}
+    			};
+			    
+			}
+		});
+		setTimeout(function(){
+		    frm.remove_custom_button("Sales Order","Get items from");
+		}, 500);
+	},
+	onload: function(frm) {
+		frm.fields_dict['items'].grid.wrapper.find('.grid-add-row').hide();
+		frm.fields_dict['items'].grid.wrapper.find('.grid-add-multiple-rows').hide();
+		frm.fields_dict['items'].grid.wrapper.find('.grid-upload').hide();
+		 if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		   frm.set_value('naming_series', 'DNSM-.YY.-');
+		   refresh_field('naming_series')
+		   }
+   },
+
+   	on_submit: function(frm) {
+		frm.reload_doc();
+	},
+
+	onload_post_render(frm) {
+		frm.remove_custom_button("Sales Order","Get items from");
+	},
+
+	reference_gate_pass: function(frm) {
+	    if (frm.doc.reference_gate_pass){
+            frappe.call({
+                    method: 'frappe.client.get_value',
+                    args: {
+                    doctype: 'Gate Pass',
+                    filters: {
+                      'name': frm.doc.reference_gate_pass
+                    },
+                    fieldname: ['driver','vehicle']
+                  },
+                  callback: function (data) {
+                    if (data.message)
+                    frm.set_value("driver_name",  data.message.driver);
+                    frm.set_value("vehicle_no",  data.message.vehicle);
+		            refresh_field("vehicle_no");
+		            refresh_field("driver_name");
+                  }
+                
+            });
+    	}
+	},
+
+	items_on_form_rendered:function(frm, cdt, cdn){
+        frm.fields_dict["items"].grid.wrapper.find('.grid-delete-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row-below').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-duplicate-row').hide();
+        frm.fields_dict["items"].grid.wrapper.find('.grid-append-row').hide();
+    }
 });
 
 frappe.ui.form.on("Delivery Note Item", {
@@ -332,3 +404,16 @@ erpnext.stock.delivery_note.set_print_hide = function(doc, cdt, cdn){
 			dn_fields['taxes'].print_hide = 0;
 	}
 }
+$(".btn-print-print").click(function(){
+	frappe.call({
+		method: "nrp_manufacturing.utils.update_print_count",
+		async: false,
+		args: {
+			name: cur_frm.doc.name,
+			doctype: cur_frm.doctype
+		},
+		callback: function(r) {
+			
+		}
+	});
+});
