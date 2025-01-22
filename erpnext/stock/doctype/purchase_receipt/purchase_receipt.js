@@ -327,7 +327,15 @@ frappe.ui.form.on('Purchase Receipt Item', {
 	},
 
 	received_qty: function(frm, cdt, cdn) {
-        update_accepted_qty(frm, cdt, cdn);
+        let row = frappe.get_doc(cdt, cdn);
+		let received_qty = row.received_qty || 0;
+		let qty = row.qty || 0;
+		if (received_qty > qty) {	
+			frappe.msgprint(__("Validation Error: Received Quantity must satisfy the following formula: <br><br> <strong>Received = Accepted + Rejected + Returned</strong><br><br>Additionally, the Received Quantity must be equal to or greater than the Accepted Quantity."));
+			frappe.model.set_value(cdt, cdn, 'qty', received_qty);
+			frappe.model.set_value(cdt, cdn, 'rejected_qty', 0);
+			frappe.model.set_value(cdt, cdn, 'returned_quantity', 0);
+		}
     },
     rejected_qty: function(frm, cdt, cdn) {
         update_accepted_qty(frm, cdt, cdn, "rejected_qty");

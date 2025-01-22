@@ -179,7 +179,7 @@ erpnext.buying.BuyingController = erpnext.TransactionController.extend({
 		if ((doc.doctype == "Purchase Receipt") || (doc.doctype == "Purchase Invoice" && (doc.update_stock || doc.is_return))) {
 			frappe.model.round_floats_in(item, ["qty", "received_qty"]);
 
-			if(!doc.is_return && this.validate_negative_quantity(cdt, cdn, item, ["qty", "received_qty"])){ return }
+			if(!doc.is_return && this.validate_negative_quantity(cdt, cdn, item, ["qty", "received_qty", "rejected_qty", "returned_quantity"])){ return }
 
 			if(!item.rejected_qty && item.qty) {
 				item.received_qty = item.qty;
