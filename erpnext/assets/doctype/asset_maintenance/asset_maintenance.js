@@ -22,6 +22,15 @@ frappe.ui.form.on('Asset Maintenance', {
                 }
             };
         });
+
+		frm.set_query('cost_center', function() {
+            return {
+                filters: {
+                    company: frm.doc.company,
+					is_parent_asset: 1
+                }
+            };
+        });
 	},
 
 	refresh: (frm) => {
@@ -163,7 +172,8 @@ frappe.ui.form.on('Asset Maintenance', {
 		frm.set_query('cost_center', function() {
             return {
                 filters: {
-                    company: frm.doc.company
+                    company: frm.doc.company,
+					is_parent_asset: 1
                 }
             };
         });
