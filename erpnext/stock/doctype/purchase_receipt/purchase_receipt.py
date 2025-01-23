@@ -199,8 +199,8 @@ class PurchaseReceipt(BuyingController):
 					data = []
 					for it in self.get('items'):
 						data.append({
-							"ProductId": it.item_code,
-							"SupplierId": self.supplier if self.supplier else '',
+							"ProductCode": it.item_code,
+							"SupplierCode": self.supplier if self.supplier else '',
 							"Qty": it.qty,
 							"nrpInvoiceNo": self.name if self.name else ''
 							})
