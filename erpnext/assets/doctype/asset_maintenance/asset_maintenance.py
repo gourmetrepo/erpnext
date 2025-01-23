@@ -45,6 +45,7 @@ class AssetMaintenance(Document):
 			mr_reference = make_issue_material_request(self)
 			if self.status == "Draft":
 				self.status = "MR Generated"
+			update_issue_material(self, mr_reference)
 			return {'mr_reference': mr_reference.name}
 		except Exception as e:
 			frappe.log_error(e, "Plant Maintenance Issue Material Request Failed")
@@ -67,6 +68,7 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
+
 	
 
 
@@ -282,3 +284,22 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Material Consumption Stock Entry Error")
 		frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
+
+
+
+def update_issue_material(asset_maintenance_doc, material_request_doc):
+
+	for item in material_request_doc.items:
+		item_exists = False
+		for consumed_item in asset_maintenance_doc.consumed_items:
+			if consumed_item.get('item') == item.get('item_code'):
+				consumed_item.required_qty += item.get('qty')
+				item_exists = True
+
+		if not item_exists:
+			child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+			child_doc.item = item.get('item_code')
+			child_doc.item_name = item.get('item_name')
+			child_doc.required_qty = item.get('qty')
+			child_doc.uom = item.get('uom')
+			asset_maintenance_doc.append('consumed_items', child_doc)
