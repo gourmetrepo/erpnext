@@ -84,7 +84,7 @@ class AssetMaintenance(Document):
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
-	team_member = frappe.db.get_value('User', assign_to_member, "email")
+	team_member = frappe.db.get_value('Employee', assign_to_member, "user_id")
 	args = {
 		'doctype' : 'Asset Maintenance',
 		'assign_to' : team_member,
