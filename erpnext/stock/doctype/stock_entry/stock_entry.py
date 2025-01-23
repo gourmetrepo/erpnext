@@ -1851,6 +1851,24 @@ def update_plant_asset_maintenance_document(doc):
 	if asset_maintenance_doc_ref:
 		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
 		if asset_maintenance_doc.status == "Draft" or asset_maintenance_doc.status == "MR Generated":
+			# Update status of document to Not Started if document status is Draft or MR Generated
 			asset_maintenance_doc.status = "Not Started"
-			asset_maintenance_doc.save()
-			frappe.db.commit()
+
+		# Update issued items
+		for item in doc.items:
+			item_exists = False
+			for consumed_item in asset_maintenance_doc.consumed_items:
+				if consumed_item.get('item') == item.get('item_code'):
+					consumed_item.issued_qty += item.get('qty')
+					item_exists = True
+
+			if not item_exists:
+				child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+				child_doc.item = item.get('item_code')
+				child_doc.item_name = item.get('item_name')
+				child_doc.issued_qty = item.get('qty')
+				child_doc.uom = item.get('uom')
+				asset_maintenance_doc.append('consumed_items', child_doc)
+		
+		asset_maintenance_doc.save()
+		frappe.db.commit()
