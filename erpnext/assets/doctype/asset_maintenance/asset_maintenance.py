@@ -77,6 +77,8 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
+	
+
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
@@ -262,3 +264,32 @@ def get_team_members(maintenance_teams):
         fields=['team_member']
     )
     return [member.team_member for member in team_members]
+
+@frappe.whitelist()
+def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
+    try:
+        # Fetch the Asset Maintenance document
+        doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		return doc.as_dict()
+
+        # # Example: Create a new Stock Entry (customize this logic as needed)
+        # stock_entry = frappe.get_doc({
+        #     "doctype": "Stock Entry",
+        #     "stock_entry_type": "Material Consumption",
+        #     "items": [
+        #         {
+        #             "item_code": "ITEM001",  # Replace with actual logic
+        #             "qty": 1,
+        #             "s_warehouse": "Stores - WAREHOUSE"  # Replace with your warehouse
+        #         }
+        #     ]
+        # })
+
+        # stock_entry.insert()
+        # stock_entry.submit()
+
+        # return stock_entry.as_dict()
+
+    except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Material Consumption Stock Entry Error")
+        frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
