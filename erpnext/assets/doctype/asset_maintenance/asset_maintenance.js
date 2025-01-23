@@ -517,6 +517,34 @@ erpnext.asset_maintenance = {
 			frm.add_custom_button(__('Consumption'), function () {
 				erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
 			}).addClass('btn-primary');
+			frm.add_custom_button(__('Complete'), function () {
+				frm.set_value('status', 'Completed');
+				frm.save();
+			}).addClass('btn-success');
+			frm.add_custom_button('Stop', function () {
+				frm.set_value('status', 'Stopped');
+				frm.save();
+			}).addClass('btn-danger');
+		} else if (status === "Completed") {
+			frm.add_custom_button(__('Close'), function () {
+				frm.set_value('status', 'Closed');
+				frm.save();
+			}).addClass('btn-success');
+		} else if (status === "Closed"){
+			const buttons_to_remove = ['Start', 'Consumption', 'Completed']
+			for (var i = 0; i < buttons_to_remove.length; i++) {
+				this.frm.remove_custom_button(buttons_to_remove[i], __('Create'));
+			}
+		} else if (status === "Stopped") {	
+			frm.add_custom_button(__('Resume'), function () {
+				frm.set_value('status', 'In Process');
+				frm.save();
+			}).addClass('btn-danger');
+			frm.add_custom_button(__('Close'), function () {
+				frm.set_value('status', 'Closed');
+				frm.save();
+			}).addClass('btn-primary');
+
 		}
 	}
 };
