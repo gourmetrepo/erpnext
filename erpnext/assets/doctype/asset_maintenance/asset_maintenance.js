@@ -38,12 +38,12 @@ frappe.ui.form.on('Asset Maintenance', {
 		project_frm_configuration(frm);
 		
 		// Hide Bill of Material child tables when loading the Asset Maintenance document
-		frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
-		frm.set_df_property('consumed_items', 'hidden', 1);
-		frm.set_df_property('return_items', 'hidden', 1);
-		frm.set_df_property('issue_material', 'hidden', 1);
-		frm.set_df_property('charge_consumption', 'hidden', 1);
-		frm.set_df_property('return_item', 'hidden', 1);
+		// frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
+		// frm.set_df_property('consumed_items', 'hidden', 1);
+		// frm.set_df_property('return_items', 'hidden', 1);
+		// frm.set_df_property('issue_material', 'hidden', 1);
+		// frm.set_df_property('charge_consumption', 'hidden', 1);
+		// frm.set_df_property('return_item', 'hidden', 1);
 
 		// Collect unique MR references from the child table
         const mr_references = Array.from(new Set(
@@ -232,23 +232,23 @@ frappe.ui.form.on('Asset Maintenance', {
 		});
 	},
 
-	bill_of_material: function(frm) {
-        const fields_to_toggle = [
-            'bill_of_material_and_services',
-            'consumed_items',
-            'return_items',
-            'issue_material',
-            'charge_consumption',
-            'return_item'
-        ];
+	// bill_of_material: function(frm) {
+    //     const fields_to_toggle = [
+    //         'bill_of_material_and_services',
+    //         'consumed_items',
+    //         'return_items',
+    //         'issue_material',
+    //         'charge_consumption',
+    //         'return_item'
+    //     ];
 
-        fields_to_toggle.forEach(field => {
-            let current_visibility = frm.fields_dict[field].df.hidden;
-            frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
-        });
+    //     fields_to_toggle.forEach(field => {
+    //         let current_visibility = frm.fields_dict[field].df.hidden;
+    //         frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
+    //     });
 
-		frm.refresh();
-    },
+	// 	frm.refresh();
+    // },
 
 	maintenance_team: (frm, cdt, cdn) => {
 		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
