@@ -187,6 +187,10 @@ frappe.ui.form.on('Asset Maintenance', {
         });
 	},
 
+	cost_center: (frm) => {
+		load_assets(frm);
+	},
+
 	issue_material: (frm) => {
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
@@ -551,5 +555,38 @@ function project_frm_configuration(frm) {
 		frm.set_df_property('project', 'reqd', 1);
 	} else {
 		frm.set_df_property('project', 'reqd', 0);
+	}
+}
+
+
+// Function to load assets based on cost center
+function load_assets(frm) {
+	if (frm.doc.cost_center) {
+		frappe.call({
+			method: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_assets",
+			args: {
+				company: frm.doc.company,
+				cost_center: frm.doc.cost_center
+			},
+			freeze: true,
+			freeze_message: __("Loading Assets"),
+			callback: function (r) {
+				debugger;
+				if (r && r.message) {
+					let assets = r.message
+					frm.set_value('plant_maintenance_assets', []);
+					for(let i = 0; i < assets.length; i++) {
+						frm.add_child('plant_maintenance_assets', {
+							asset: assets[i]['name'],
+							asset_name: assets[i]['asset_name'],
+							total_repair_count: assets[i]['repair_count'],
+							cost_center: assets[i]['cost_center']
+						})
+					}
+					frm.refresh_field('plant_maintenance_assets');
+
+				}
+			}
+		});
 	}
 }

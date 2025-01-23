@@ -339,3 +339,19 @@ def update_issue_material(asset_maintenance_doc, material_request_doc):
 			child_doc.required_qty = item.get('qty')
 			child_doc.uom = item.get('uom')
 			asset_maintenance_doc.append('consumed_items', child_doc)
+
+
+@frappe.whitelist()
+def get_assets(company, cost_center):
+	if cost_center:
+		assets = frappe.db.sql(
+			f"""
+			SELECT `name`, `asset_name`, `repair_count`, `cost_center`
+			FROM `tabAsset`
+			WHERE `cost_center` IN (
+			SELECT `name`
+			FROM `tabCost Center`
+			WHERE `parent_cost_center`="{cost_center}" AND `company`="{company}");
+			""", as_dict=True
+		)
+		return assets
