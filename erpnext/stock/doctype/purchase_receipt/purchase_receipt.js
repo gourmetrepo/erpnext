@@ -328,13 +328,13 @@ frappe.ui.form.on('Purchase Receipt Item', {
 
 	received_qty: function(frm, cdt, cdn) {
         let row = frappe.get_doc(cdt, cdn);
-		let received_qty = row.received_qty || 0;
-		let qty = row.qty || 0;
+		let received_qty = flt(row.received_qty || 0, 3);
+    	let qty = flt(row.qty || 0, 3);
 		if (received_qty > qty) {	
 			frappe.msgprint(__("Validation Error: Received Quantity must satisfy the following formula: <br><br> <strong>Received = Accepted + Rejected + Returned</strong><br><br>Additionally, the Received Quantity must be equal to or greater than the Accepted Quantity."));
-			frappe.model.set_value(cdt, cdn, 'qty', received_qty);
-			frappe.model.set_value(cdt, cdn, 'rejected_qty', 0);
-			frappe.model.set_value(cdt, cdn, 'returned_quantity', 0);
+			frappe.model.set_value(cdt, cdn, 'qty', flt(received_qty, 3));
+			frappe.model.set_value(cdt, cdn, 'rejected_qty', flt(0, 3));
+			frappe.model.set_value(cdt, cdn, 'returned_quantity', flt(0, 3));
 		}
     },
     rejected_qty: function(frm, cdt, cdn) {
@@ -349,31 +349,31 @@ function update_accepted_qty(frm, cdt, cdn, field) {
     let row = frappe.get_doc(cdt, cdn);
 
     if (!row._original_qty) {
-        row._original_qty = row.qty || 0;
+        row._original_qty = flt(row.qty || 0, 3);
     }
-    row._prev_rejected_qty = row._prev_rejected_qty || 0;
-    row._prev_returned_qty = row._prev_returned_qty || 0;
+    row._prev_rejected_qty = flt(row._prev_rejected_qty || 0, 3);
+    row._prev_returned_qty = flt(row._prev_returned_qty || 0, 3);
 
     let original_qty = row._original_qty;
 
     let delta = 0;
     if (field === 'rejected_qty') {
-        delta = (row.rejected_qty || 0) - row._prev_rejected_qty;
-        row._prev_rejected_qty = row.rejected_qty || 0;
+        delta = flt((row.rejected_qty || 0) - row._prev_rejected_qty, 3);
+        row._prev_rejected_qty = flt(row.rejected_qty || 0, 3);
     } else if (field === 'returned_quantity') {
-        delta = (row.returned_quantity || 0) - row._prev_returned_qty;
-        row._prev_returned_qty = row.returned_quantity || 0;
+        delta = flt((row.returned_quantity || 0) - row._prev_returned_qty, 3);
+        row._prev_returned_qty = flt(row.returned_quantity || 0, 3);
     }
 
     let accepted_qty =
-        original_qty - (row.rejected_qty || 0) - (row.returned_quantity || 0);
+		flt(original_qty, 3) - flt(row.rejected_qty || 0, 3) - flt(row.returned_quantity || 0, 3);
 
     if (accepted_qty < 0) {
         frappe.msgprint(__('Accepted quantity cannot be negative.'));
-        accepted_qty = 0;
+        accepted_qty = flt(0, 3);
     }
 
-    frappe.model.set_value(cdt, cdn, 'qty', accepted_qty);
+    frappe.model.set_value(cdt, cdn, 'qty',  flt(accepted_qty, 3));
     frm.refresh_field('items');
 }
 
