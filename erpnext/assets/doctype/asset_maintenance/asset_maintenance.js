@@ -4,6 +4,7 @@
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
 		
+		frm_configuration(frm)
 		frm.set_indicator_formatter('status',
 			function(doc) {
 				let indicator = 'red'
@@ -34,6 +35,8 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	refresh: (frm) => {
+		
+		frm_configuration(frm)
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
@@ -43,6 +46,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	onload: (frm) => {
+		frm_configuration(frm)
 		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
 		
@@ -488,7 +492,7 @@ erpnext.asset_maintenance = {
 				
 				// If return stock entry flag is true, open the form for the newly created stock entry
 				// Otherwise, close the plant maintenance document
-				debugger
+				
 				let return_stock_entry_flag = r.message.return_stock_entry_flag
 				if (return_stock_entry_flag === true){
 					let stock_entry = r.message.stock_entry;
@@ -571,7 +575,7 @@ function load_assets(frm) {
 			freeze: true,
 			freeze_message: __("Loading Assets"),
 			callback: function (r) {
-				debugger;
+				
 				if (r && r.message) {
 					let assets = r.message
 					frm.set_value('plant_maintenance_assets', []);
@@ -589,4 +593,24 @@ function load_assets(frm) {
 			}
 		});
 	}
+}
+
+
+
+function frm_configuration(frm){
+	// $(frm.wrapper).find('.btn-primary').each(function () {
+	// 	if ($(this).text().trim() === 'Submit') {
+	// 		$(this).addClass('hidden');
+	// 	}
+	// });
+	// frm.page.set_primary_action('Save', function () {
+	// 	frm.save(); // Retain the Save button functionality
+	// });
+
+	frm.set_df_property('item_code', 'hidden', 1);
+	frm.set_df_property('item_name', 'hidden', 1);
+	frm.set_df_property('line_capacity_per_hour', 'hidden', 1);
+	frm.set_df_property('location', 'hidden', 1);
+	frm.set_df_property('asset_category', 'hidden', 1);
+
 }

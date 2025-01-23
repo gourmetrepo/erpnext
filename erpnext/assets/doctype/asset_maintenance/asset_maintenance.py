@@ -313,7 +313,9 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 				stock_entry.append('items',i)
 				return_stock_entry_flag = True
 			
-		
+		if not return_stock_entry_flag:
+			asset_maintenance_doc.submit()
+
 		return {'stock_entry': stock_entry, 'return_stock_entry_flag': return_stock_entry_flag}
 
 	except Exception as e:
