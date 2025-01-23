@@ -1888,6 +1888,9 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 						child_doc.return_qty = item.get('qty')
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
+				
+				asset_maintenance_doc.save()
+				asset_maintenance_doc.submit()
 						
 			# This means user is adding stock entry Material Transfer to transfer stock to wip warehouse
 			else:
@@ -1911,7 +1914,7 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
 			
-			asset_maintenance_doc.save()
+				asset_maintenance_doc.save()
 			frappe.db.commit()
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
