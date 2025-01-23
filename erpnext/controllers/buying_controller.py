@@ -514,7 +514,7 @@ class BuyingController(StockController):
 	# validate accepted and rejected qty
 	def validate_accepted_rejected_qty(self):
 		for d in self.get("items"):
-			self.validate_negative_quantity(d, ["received_qty","qty", "rejected_qty"])
+			self.validate_negative_quantity(d, ["received_qty","qty", "rejected_qty", "returned_quantity"])
 			if not flt(d.received_qty) and flt(d.qty):
 				d.received_qty = flt(d.qty) - flt(d.rejected_qty)
 
