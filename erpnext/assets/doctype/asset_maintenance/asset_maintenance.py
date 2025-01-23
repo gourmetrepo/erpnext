@@ -156,13 +156,14 @@ def update_maintenance_log(asset_maintenance, item_code, item_name, task):
 def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 	return frappe.db.get_values('Maintenance Team Member', { 'parent': filters.get("maintenance_team") }, "team_member")
 
-@frappe.whitelist()
-def get_maintenance_log(asset_name):
-	return frappe.db.sql("""
-		select maintenance_status, count(asset_name) as count, asset_name
-		from `tabAsset Maintenance Log`
-		where asset_name=%s group by maintenance_status""",
-		(asset_name), as_dict=1)
+# Comment this function as maintenance log link is not required in dashboard
+# @frappe.whitelist()
+# def get_maintenance_log(asset_name):
+# 	return frappe.db.sql("""
+# 		select maintenance_status, count(asset_name) as count, asset_name
+# 		from `tabAsset Maintenance Log`
+# 		where asset_name=%s group by maintenance_status""",
+# 		(asset_name), as_dict=1)
 
 
 
