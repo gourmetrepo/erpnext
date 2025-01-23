@@ -71,6 +71,7 @@
    "reqd": 1
   },
   {
+   "default": "Daily",
    "fieldname": "periodicity",
    "fieldtype": "Select",
    "label": "Periodicity",
@@ -164,7 +165,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-01-09 16:42:34.098497",
+ "modified": "2025-01-23 20:22:14.536999",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
