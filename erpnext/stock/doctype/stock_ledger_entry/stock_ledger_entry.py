@@ -46,7 +46,7 @@ class StockLedgerEntry(Document):
 			process_serial_no(self)
 		# Setting Qty after transaction, Stock Value and Stock Queue
 		if self.item_code == 'RI018':
-			frappe.enqueue("nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value",sle_name=self.name,warehouse=self.warehouse,item_code=self.item_code,created_on=self.creation,queue="slu_primary",enqueue_after_commit=True)  
+			frappe.enqueue("nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value",sle_name=self.name,warehouse=self.warehouse,item_code=self.item_code,created_on=self.creation,queue="slu_quaternary",enqueue_after_commit=True)  
 		elif self.voucher_type!='Stock Entry' and self.voucher_type!='Purchase Receipt':
 			frappe.enqueue("nrp_manufacturing.modules.gourmet.stock_ledger_entry.stock_ledger_entry.stock_ledger_entry_qty_stock_queue_and_value",sle_name=self.name,warehouse=self.warehouse,item_code=self.item_code,created_on=self.creation,queue="slu_secondary",enqueue_after_commit=True)
 		else:
