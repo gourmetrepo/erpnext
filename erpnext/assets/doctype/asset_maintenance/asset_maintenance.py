@@ -146,11 +146,11 @@ def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 
 @frappe.whitelist()
 def get_maintenance_log(asset_name):
-    return frappe.db.sql("""
-        select maintenance_status, count(asset_name) as count, asset_name
-        from `tabAsset Maintenance Log`
-        where asset_name=%s group by maintenance_status""",
-        (asset_name), as_dict=1)
+	return frappe.db.sql("""
+		select maintenance_status, count(asset_name) as count, asset_name
+		from `tabAsset Maintenance Log`
+		where asset_name=%s group by maintenance_status""",
+		(asset_name), as_dict=1)
 
 
 
@@ -158,33 +158,33 @@ def get_maintenance_log(asset_name):
 # Code by Moeiz
 @frappe.whitelist()
 def get_available_stock_for_bill_and_services(item_code, company):
-    # Query to get the total stock for the specified item code and company
-    stock_data = frappe.db.sql("""
-        SELECT 
-            SUM(actual_qty) AS total_qty
-        FROM 
-            `tabStock Ledger Entry`
-        WHERE 
-            item_code = %s AND company = %s
-    """, (item_code, company), as_dict=True)
-    
-    # Return the total stock quantity, defaulting to 0 if no record is found
-    total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
-    return total_qty
+	# Query to get the total stock for the specified item code and company
+	stock_data = frappe.db.sql("""
+		SELECT 
+			SUM(actual_qty) AS total_qty
+		FROM 
+			`tabStock Ledger Entry`
+		WHERE 
+			item_code = %s AND company = %s
+	""", (item_code, company), as_dict=True)
+	
+	# Return the total stock quantity, defaulting to 0 if no record is found
+	total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
+	return total_qty
 
 
 def get_warehouse(item, company):
-    warehouse = frappe.db.get_list('Item Default',
-                                   filters={
-                                       'company': company,
-                                       'parent': item
-                                   },
-                                   fields=['company', 'default_warehouse'],
-                                   as_list=True)
-    if warehouse:
-        return warehouse[0]
-    else:
-        frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
+	warehouse = frappe.db.get_list('Item Default',
+								   filters={
+									   'company': company,
+									   'parent': item
+								   },
+								   fields=['company', 'default_warehouse'],
+								   as_list=True)
+	if warehouse:
+		return warehouse[0]
+	else:
+		frappe.throw(_("""Warehouse does not found in item {item} for company {company}""".format(item=item,company=company)))
 
 
 
@@ -245,41 +245,41 @@ def get_received_qty_from_material_request(mr_references):
 
 @frappe.whitelist()
 def get_team_members(maintenance_teams):
-    if isinstance(maintenance_teams, str):
-        maintenance_teams = frappe.parse_json(maintenance_teams)
-    
-    team_members = frappe.get_all(
-        'Maintenance Team Member',
-        filters={'parent': ['in', maintenance_teams]},
-        fields=['team_member']
-    )
-    return [member.team_member for member in team_members]
+	if isinstance(maintenance_teams, str):
+		maintenance_teams = frappe.parse_json(maintenance_teams)
+	
+	team_members = frappe.get_all(
+		'Maintenance Team Member',
+		filters={'parent': ['in', maintenance_teams]},
+		fields=['team_member']
+	)
+	return [member.team_member for member in team_members]
 
 @frappe.whitelist()
 def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
-    try:
-        # Fetch the Asset Maintenance document
-        doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+	try:
+		# Fetch the Asset Maintenance document
+		doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
 		return doc.as_dict()
 
-        # # Example: Create a new Stock Entry (customize this logic as needed)
-        # stock_entry = frappe.get_doc({
-        #     "doctype": "Stock Entry",
-        #     "stock_entry_type": "Material Consumption",
-        #     "items": [
-        #         {
-        #             "item_code": "ITEM001",  # Replace with actual logic
-        #             "qty": 1,
-        #             "s_warehouse": "Stores - WAREHOUSE"  # Replace with your warehouse
-        #         }
-        #     ]
-        # })
+		# # Example: Create a new Stock Entry (customize this logic as needed)
+		# stock_entry = frappe.get_doc({
+		#     "doctype": "Stock Entry",
+		#     "stock_entry_type": "Material Consumption",
+		#     "items": [
+		#         {
+		#             "item_code": "ITEM001",  # Replace with actual logic
+		#             "qty": 1,
+		#             "s_warehouse": "Stores - WAREHOUSE"  # Replace with your warehouse
+		#         }
+		#     ]
+		# })
 
-        # stock_entry.insert()
-        # stock_entry.submit()
+		# stock_entry.insert()
+		# stock_entry.submit()
 
-        # return stock_entry.as_dict()
+		# return stock_entry.as_dict()
 
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), "Material Consumption Stock Entry Error")
-        frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Material Consumption Stock Entry Error")
+		frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
