@@ -38,12 +38,12 @@ frappe.ui.form.on('Asset Maintenance', {
 		project_frm_configuration(frm);
 		
 		// Hide Bill of Material child tables when loading the Asset Maintenance document
-		frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
-		frm.set_df_property('consumed_items', 'hidden', 1);
-		frm.set_df_property('return_items', 'hidden', 1);
-		frm.set_df_property('issue_material', 'hidden', 1);
-		frm.set_df_property('charge_consumption', 'hidden', 1);
-		frm.set_df_property('return_item', 'hidden', 1);
+		// frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
+		// frm.set_df_property('consumed_items', 'hidden', 1);
+		// frm.set_df_property('return_items', 'hidden', 1);
+		// frm.set_df_property('issue_material', 'hidden', 1);
+		// frm.set_df_property('charge_consumption', 'hidden', 1);
+		// frm.set_df_property('return_item', 'hidden', 1);
 
 		// Collect unique MR references from the child table
         const mr_references = Array.from(new Set(
@@ -232,23 +232,23 @@ frappe.ui.form.on('Asset Maintenance', {
 		});
 	},
 
-	bill_of_material: function(frm) {
-        const fields_to_toggle = [
-            'bill_of_material_and_services',
-            'consumed_items',
-            'return_items',
-            'issue_material',
-            'charge_consumption',
-            'return_item'
-        ];
+	// bill_of_material: function(frm) {
+    //     const fields_to_toggle = [
+    //         'bill_of_material_and_services',
+    //         'consumed_items',
+    //         'return_items',
+    //         'issue_material',
+    //         'charge_consumption',
+    //         'return_item'
+    //     ];
 
-        fields_to_toggle.forEach(field => {
-            let current_visibility = frm.fields_dict[field].df.hidden;
-            frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
-        });
+    //     fields_to_toggle.forEach(field => {
+    //         let current_visibility = frm.fields_dict[field].df.hidden;
+    //         frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
+    //     });
 
-		frm.refresh();
-    },
+	// 	frm.refresh();
+    // },
 
 	maintenance_team: (frm, cdt, cdn) => {
 		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
@@ -517,6 +517,34 @@ erpnext.asset_maintenance = {
 			frm.add_custom_button(__('Consumption'), function () {
 				erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
 			}).addClass('btn-primary');
+			frm.add_custom_button(__('Complete'), function () {
+				frm.set_value('status', 'Completed');
+				frm.save();
+			}).addClass('btn-success');
+			frm.add_custom_button('Stop', function () {
+				frm.set_value('status', 'Stopped');
+				frm.save();
+			}).addClass('btn-danger');
+		} else if (status === "Completed") {
+			frm.add_custom_button(__('Close'), function () {
+				frm.set_value('status', 'Closed');
+				frm.save();
+			}).addClass('btn-success');
+		} else if (status === "Closed"){
+			const buttons_to_remove = ['Start', 'Consumption', 'Completed']
+			for (var i = 0; i < buttons_to_remove.length; i++) {
+				this.frm.remove_custom_button(buttons_to_remove[i], __('Create'));
+			}
+		} else if (status === "Stopped") {	
+			frm.add_custom_button(__('Resume'), function () {
+				frm.set_value('status', 'In Process');
+				frm.save();
+			}).addClass('btn-danger');
+			frm.add_custom_button(__('Close'), function () {
+				frm.set_value('status', 'Closed');
+				frm.save();
+			}).addClass('btn-primary');
+
 		}
 	}
 };

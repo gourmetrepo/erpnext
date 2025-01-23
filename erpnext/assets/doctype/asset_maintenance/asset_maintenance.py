@@ -269,26 +269,25 @@ def get_team_members(maintenance_teams):
 def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 	try:
 		# Fetch the Asset Maintenance document
-		doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
-		return doc.as_dict()
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
 
-		# # Example: Create a new Stock Entry (customize this logic as needed)
-		# stock_entry = frappe.get_doc({
-		#     "doctype": "Stock Entry",
-		#     "stock_entry_type": "Material Consumption",
-		#     "items": [
-		#         {
-		#             "item_code": "ITEM001",  # Replace with actual logic
-		#             "qty": 1,
-		#             "s_warehouse": "Stores - WAREHOUSE"  # Replace with your warehouse
-		#         }
-		#     ]
-		# })
+		stock_entry = frappe.new_doc('Stock Entry')
+		stock_entry.stock_entry_type = 'Material Issue'
+		stock_entry.company = asset_maintenance_doc.get('company')
+		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
+		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
 
-		# stock_entry.insert()
-		# stock_entry.submit()
-
-		# return stock_entry.as_dict()
+		for item in asset_maintenance_doc.bill_of_material_and_services:
+			i = frappe.new_doc('Stock Entry Detail')
+			i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
+			i.item_code =  item.get('item')
+			i.qty = item.get('remaining_qty')
+			i.uom = item.get('uom')
+			i.stock_uom = item.get('uom')
+			stock_entry.append('items',i)
+		
+		
+		return stock_entry
 
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Material Consumption Stock Entry Error")
