@@ -501,6 +501,40 @@ erpnext.asset_maintenance = {
 			// Optionally handle error display or recovery
 		}
 	},
+	
+	make_return_stock_entry: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.make_return_stock_entry',
+				freeze: true,
+				freeze_message: __("Closing the Maintenance Document"),
+				args: {
+					'asset_maintenance_doc_ref': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				
+				// If return stock entry flag is true, open the form for the newly created stock entry
+				// Otherwise, close the plant maintenance document
+				debugger
+				let return_stock_entry_flag = r.message.return_stock_entry_flag
+				if (return_stock_entry_flag === true){
+					let stock_entry = r.message.stock_entry;
+					frappe.model.sync(stock_entry);
+					frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+				}else{
+					frm.set_value('status', 'Closed');
+					frm.save();
+				}
+				
+			}
+		} catch (error) {
+			console.error('Error making material consumption stock entry:', error);
+			// Optionally handle error display or recovery
+		}
+	},
 
 	// Function to manage workflow buttons dynamically
 	manage_workflow_buttons: function(frm) {
@@ -525,9 +559,8 @@ erpnext.asset_maintenance = {
 			}).addClass('btn-danger');
 		} else if (status === "Completed") {
 			frm.add_custom_button(__('Close'), function () {
-				frm.set_value('status', 'Closed');
-				frm.save();
-			}).addClass('btn-success');
+				erpnext.asset_maintenance.make_return_stock_entry(frm);
+			}).addClass('btn-danger');
 		} else if (status === "Closed"){
 			const buttons_to_remove = ['Start', 'Consumption', 'Completed']
 			for (var i = 0; i < buttons_to_remove.length; i++) {
@@ -539,9 +572,8 @@ erpnext.asset_maintenance = {
 				frm.save();
 			}).addClass('btn-danger');
 			frm.add_custom_button(__('Close'), function () {
-				frm.set_value('status', 'Closed');
-				frm.save();
-			}).addClass('btn-primary');
+				erpnext.asset_maintenance.make_return_stock_entry(frm);
+			}).addClass('btn-danger');
 
 		}
 	}

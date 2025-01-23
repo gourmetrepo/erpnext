@@ -298,6 +298,41 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 
 
+@frappe.whitelist()
+def make_return_stock_entry(asset_maintenance_doc_ref):
+	try:
+		return_stock_entry_flag = False
+		# Fetch the Asset Maintenance document
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+
+		stock_entry = frappe.new_doc('Stock Entry')
+		stock_entry.stock_entry_type = 'Material Transfer'
+		stock_entry.company = asset_maintenance_doc.get('company')
+		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
+		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
+
+		for item in asset_maintenance_doc.consumed_items:
+			if item.get('issued_qty') - item.get('consumed_qty') > 0:
+				i = frappe.new_doc('Stock Entry Detail')
+				i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
+				i.item_code =  item.get('item')
+				i.qty = item.get('issued_qty') - item.get('consumed_qty')
+				i.uom = item.get('uom')
+				i.stock_uom = item.get('uom')
+				i.asset_maintenance = asset_maintenance_doc.get('name')
+				stock_entry.append('items',i)
+				return_stock_entry_flag = True
+			
+		
+		return {'stock_entry': stock_entry, 'return_stock_entry_flag': return_stock_entry_flag}
+
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Material Return Stock Entry Error")
+		frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
+
+
+
+
 def update_issue_material(asset_maintenance_doc, material_request_doc):
 
 	for item in material_request_doc.items:
