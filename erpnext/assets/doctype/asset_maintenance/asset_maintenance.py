@@ -41,7 +41,7 @@ class AssetMaintenance(Document):
 		tasks_names = []
 		for task in self.get('asset_maintenance_tasks'):
 			tasks_names.append(task.name)
-			update_maintenance_log(asset_maintenance = self.name, item_code = self.item_code, item_name = self.item_name, task = task)
+			# update_maintenance_log(asset_maintenance = self.name, item_code = self.item_code, item_name = self.item_name, task = task)
 		asset_maintenance_logs = frappe.get_all("Asset Maintenance Log", fields=["name"], filters = {"asset_maintenance": self.name,
 			"task": ("not in", tasks_names)})
 		if asset_maintenance_logs:
