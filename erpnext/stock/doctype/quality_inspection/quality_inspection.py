@@ -13,10 +13,99 @@ class QualityInspection(Document):
 		if not self.readings and self.item_code:
 			self.get_item_specification_details()
 
+		parameters = get_template_details(self.quality_inspection_template)
+		for reading in self.readings:
+			matching_parameter = next((d for d in parameters if d["specification"] == reading.specification), None)
+
+			if not matching_parameter:
+				frappe.throw(f"Specification {reading.specification} not found in the template parameters.")
+
+			expected_type = matching_parameter["type"]
+			actual_type = type(reading.reading_1).__name__.capitalize()
+			if expected_type == "String":
+				if actual_type == "Str":
+					actual_type = "String"
+
+				if expected_type != actual_type:
+					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+				else:
+					min_value = matching_parameter.get("min_value")
+					max_value = matching_parameter.get("max_value")
+					if reading.reading_1 not in [min_value, max_value]:
+						frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+			if expected_type == "Char":
+				min_value = matching_parameter.get("min_value")
+				max_value = matching_parameter.get("max_value")
+				if reading.reading_1 not in [min_value, max_value]:
+					frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} must be {min_value} or {max_value}.")
+
+
+			if expected_type in ["Int", "Float"]:
+				min_value = matching_parameter.get("min_value")
+				max_value = matching_parameter.get("max_value")
+
+
+				if min_value is not None:
+					min_value = float(min_value) if expected_type == "Float" else int(min_value)
+				if max_value is not None:
+					max_value = float(max_value) if expected_type == "Float" else int(max_value)
+					
+				if expected_type != type(min_value).__name__.capitalize() or expected_type != type(max_value).__name__.capitalize():
+					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+
+				if min_value is not None and max_value is not None:
+					if expected_type == "Int":
+						try:
+							reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
+						except ValueError:
+							frappe.throw(f"Invalid value for {reading.specification}: {reading.reading_1} cannot be interpreted as an integer.")
+
+					if expected_type != type(reading.reading_1).__name__.capitalize():
+						frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
+     
+					if not (min_value <= reading.reading_1 <= max_value):
+						frappe.msgprint(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
+      
+	def before_save(self):
+		if self.received_quantity is None or self.received_quantity == 0  and self.accepted_quantity is None or self.accepted_quantity == 0:
+			self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
+			self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
+		
+	
+	def fetch_recevied_qty_of_item(self):
+		if self.reference_type == 'Purchase Receipt' and self.reference_name:
+			self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
+			self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
+			total_qty = (
+				int(self.accepted_quantity or 0) - int(self.rejected_quantity or 0) + 
+				int(self.return_quantity or 0)
+			)
+
+			purchase_receipt_item = frappe.get_doc('Purchase Receipt Item', {
+				'parent': self.reference_name,
+				'item_code': self.item_code
+			}, "*")
+
+			if purchase_receipt_item:
+				purchase_receipt_item.qty = total_qty
+				purchase_receipt_item.rejected_qty = self.rejected_quantity
+				purchase_receipt_item.returned_quantity = self.return_quantity
+				purchase_receipt_item.save()
+				frappe.db.commit()
+			else:
+				frappe.throw("Purchase Receipt Item not found for the given criteria.")
+
 	def get_item_specification_details(self):
 		if not self.quality_inspection_template:
-			self.quality_inspection_template = frappe.db.get_value('Item',
-				self.item_code, 'quality_inspection_template')
+			self.company = frappe.db.get_value(self.reference_type, self.reference_name, 'company')
+
+			purchase_check, delivery_check = frappe.db.get_value('Item', self.item_code, ['inspection_required_before_purchase', 'inspection_required_before_delivery'])
+
+			# Fetch company wise quality inspection template from Item master
+			if purchase_check or delivery_check:
+				self.quality_inspection_template = frappe.db.get_value('Item Quality Inspection', {'parent': self.item_code, 'company': self.company}, 'quality_inspection_template')
+			else:
+				self.quality_inspection_template = ""
 
 		if not self.quality_inspection_template: return
 
@@ -41,6 +130,7 @@ class QualityInspection(Document):
 
 	def on_submit(self):
 		self.update_qc_reference()
+		self.fetch_recevied_qty_of_item()
 
 	def on_cancel(self):
 		self.update_qc_reference()

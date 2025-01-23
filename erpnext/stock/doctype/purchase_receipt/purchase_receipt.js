@@ -64,27 +64,26 @@ frappe.ui.form.on("Purchase Receipt", {
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
 
-		frm.set_query('gate_pass', function () {
-			if(!frm.doc.company){
-                frappe.msgprint("Please select Company First");
-				return {
-					filters: {
-						"docstatus": 3
+				frm.set_query('gate_pass', function () {
+					if(!frm.doc.company){
+						frappe.msgprint("Please select Company First");
+						return {
+							filters: {
+								"docstatus": 3
+							}
+						}
+					}else{
+						return {
+							query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+							filters: {
+								'type': "IN",
+								'company': frm.doc.company,
+								"docstatus":1
+							}
+						};
+						
 					}
-				}
-			}else{
-    			return {
-    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
-    				filters: {
-    					'type': "IN",
-    					'company': frm.doc.company,
-    					"docstatus":1,
-    					"gate_pass_type": "Against Purchase Order"
-    				}
-    			};
-			    
-			}
-		});
+	});
 	},
 
 	company: function(frm) {
@@ -310,8 +309,8 @@ frappe.ui.form.on("Purchase Receipt", "is_subcontracted", function(frm) {
 });
 
 frappe.ui.form.on('Purchase Receipt Item', {
-	item_code: function(frm, cdt, cdn) {
-		var d = locals[cdt][cdn];
+    item_code: function(frm, cdt, cdn) {
+        var d = locals[cdt][cdn];
 		frappe.db.get_value('Item', {name: d.item_code}, 'sample_quantity', (r) => {
 			frappe.model.set_value(cdt, cdn, "sample_quantity", r.sample_quantity);
 			validate_sample_quantity(frm, cdt, cdn);
@@ -326,13 +325,56 @@ frappe.ui.form.on('Purchase Receipt Item', {
 	batch_no: function(frm, cdt, cdn) {
 		validate_sample_quantity(frm, cdt, cdn);
 	},
+
+	received_qty: function(frm, cdt, cdn) {
+        let row = frappe.get_doc(cdt, cdn);
+		let received_qty = row.received_qty || 0;
+		let qty = row.qty || 0;
+		if (received_qty > qty) {	
+			frappe.msgprint(__("Validation Error: Received Quantity must satisfy the following formula: <br><br> <strong>Received = Accepted + Rejected + Returned</strong><br><br>Additionally, the Received Quantity must be equal to or greater than the Accepted Quantity."));
+			frappe.model.set_value(cdt, cdn, 'qty', received_qty);
+			frappe.model.set_value(cdt, cdn, 'rejected_qty', 0);
+			frappe.model.set_value(cdt, cdn, 'returned_quantity', 0);
+		}
+    },
+    rejected_qty: function(frm, cdt, cdn) {
+        update_accepted_qty(frm, cdt, cdn, "rejected_qty");
+    },
+    returned_quantity: function(frm, cdt, cdn) {
+        update_accepted_qty(frm, cdt, cdn, "returned_quantity");
+    }
 });
 
-cur_frm.cscript['Make Stock Entry'] = function() {
-	frappe.model.open_mapped_doc({
-		method: "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_stock_entry",
-		frm: cur_frm,
-	})
+function update_accepted_qty(frm, cdt, cdn, field) {
+    let row = frappe.get_doc(cdt, cdn);
+
+    if (!row._original_qty) {
+        row._original_qty = row.qty || 0;
+    }
+    row._prev_rejected_qty = row._prev_rejected_qty || 0;
+    row._prev_returned_qty = row._prev_returned_qty || 0;
+
+    let original_qty = row._original_qty;
+
+    let delta = 0;
+    if (field === 'rejected_qty') {
+        delta = (row.rejected_qty || 0) - row._prev_rejected_qty;
+        row._prev_rejected_qty = row.rejected_qty || 0;
+    } else if (field === 'returned_quantity') {
+        delta = (row.returned_quantity || 0) - row._prev_returned_qty;
+        row._prev_returned_qty = row.returned_quantity || 0;
+    }
+
+    let accepted_qty =
+        original_qty - (row.rejected_qty || 0) - (row.returned_quantity || 0);
+
+    if (accepted_qty < 0) {
+        frappe.msgprint(__('Accepted quantity cannot be negative.'));
+        accepted_qty = 0;
+    }
+
+    frappe.model.set_value(cdt, cdn, 'qty', accepted_qty);
+    frm.refresh_field('items');
 }
 
 var validate_sample_quantity = function(frm, cdt, cdn) {
