@@ -3,8 +3,7 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-		
-		frm_configuration(frm)
+		frm.page.btn_primary.addClass('hidden');
 		frm.set_indicator_formatter('status',
 			function(doc) {
 				let indicator = 'red'
@@ -35,8 +34,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	refresh: (frm) => {
-		
-		frm_configuration(frm)
+		frm.page.btn_primary.addClass('hidden');
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
@@ -46,7 +44,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	onload: (frm) => {
-		frm_configuration(frm)
+		frm.page.btn_primary.addClass('hidden');
 		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
 		
@@ -562,25 +560,35 @@ erpnext.asset_maintenance = {
 			frm.add_custom_button(__('Start'), function () {
 				frm.set_value('status', 'In Process');
 				frm.save();
+			}).addClass('btn-danger');
+			frm.add_custom_button(__('Save'), function () {
+				frm.save();
 			}).addClass('btn-primary');
 		} else if (status === "In Process") {
 			frm.add_custom_button(__('Consumption'), function () {
 				erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
 			}).addClass('btn-primary');
+			
 			frm.add_custom_button(__('Complete'), function () {
 				frm.set_value('status', 'Completed');
 				frm.save();
 			}).addClass('btn-success');
+			
 			frm.add_custom_button('Stop', function () {
 				frm.set_value('status', 'Stopped');
 				frm.save();
 			}).addClass('btn-danger');
+			
+			frm.add_custom_button(__('Save'), function () {
+				frm.save();
+			}).addClass('btn-primary');
 		} else if (status === "Completed") {
 			frm.add_custom_button(__('Close'), function () {
 				erpnext.asset_maintenance.make_return_stock_entry(frm);
 			}).addClass('btn-danger');
+
 		} else if (status === "Closed"){
-			const buttons_to_remove = ['Start', 'Consumption', 'Completed']
+			const buttons_to_remove = ['Start', 'Consumption', 'Completed', 'Save']
 			for (var i = 0; i < buttons_to_remove.length; i++) {
 				this.frm.remove_custom_button(buttons_to_remove[i], __('Create'));
 			}
@@ -593,7 +601,12 @@ erpnext.asset_maintenance = {
 				erpnext.asset_maintenance.make_return_stock_entry(frm);
 			}).addClass('btn-danger');
 
+		} else if (status === "Draft") {
+			frm.add_custom_button(__('Save'), function () {
+				frm.save();
+			}).addClass('btn-primary');
 		}
+
 	}
 };
 
@@ -637,24 +650,4 @@ function load_assets(frm) {
 			}
 		});
 	}
-}
-
-
-
-function frm_configuration(frm){
-	// $(frm.wrapper).find('.btn-primary').each(function () {
-	// 	if ($(this).text().trim() === 'Submit') {
-	// 		$(this).addClass('hidden');
-	// 	}
-	// });
-	// frm.page.set_primary_action('Save', function () {
-	// 	frm.save(); // Retain the Save button functionality
-	// });
-
-	frm.set_df_property('item_code', 'hidden', 1);
-	frm.set_df_property('item_name', 'hidden', 1);
-	frm.set_df_property('line_capacity_per_hour', 'hidden', 1);
-	frm.set_df_property('location', 'hidden', 1);
-	frm.set_df_property('asset_category', 'hidden', 1);
-
 }
