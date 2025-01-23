@@ -44,6 +44,13 @@ class QualityInspection(Document):
 				min_value = matching_parameter.get("min_value")
 				max_value = matching_parameter.get("max_value")
 
+				if expected_type == "Int":
+					min_value = int(float(min_value)) if min_value is not None else None
+					max_value = int(float(max_value)) if max_value is not None else None
+				elif expected_type == "Float":
+					min_value = float(min_value) if min_value is not None else None
+					max_value = float(max_value) if max_value is not None else None
+
 
 				if min_value is not None:
 					min_value = float(min_value) if expected_type == "Float" else int(min_value)
@@ -54,7 +61,7 @@ class QualityInspection(Document):
 					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 
 				if min_value is not None and max_value is not None:
-					if expected_type == "Int":
+					if expected_type == "Int" or  expected_type == "Float":
 						try:
 							reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
 						except ValueError:
