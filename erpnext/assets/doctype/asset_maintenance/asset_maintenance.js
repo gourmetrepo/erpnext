@@ -3,6 +3,10 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
+		frm.add_custom_button(__('Save'), function () {
+			frm.save();
+		}).addClass('btn-primary');
+
 		frm.page.btn_primary.addClass('hidden');
 		frm.set_indicator_formatter('status',
 			function(doc) {
@@ -34,7 +38,11 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	refresh: (frm) => {
+		debugger;
 		frm.page.btn_primary.addClass('hidden');
+		frm.add_custom_button(__('Save'), function () {
+			frm.save();
+		}).addClass('btn-primary');
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
@@ -602,6 +610,10 @@ erpnext.asset_maintenance = {
 			}).addClass('btn-danger');
 
 		} else if (status === "Draft") {
+			frm.add_custom_button(__('Save'), function () {
+				frm.save();
+			}).addClass('btn-primary');
+		} else {
 			frm.add_custom_button(__('Save'), function () {
 				frm.save();
 			}).addClass('btn-primary');
