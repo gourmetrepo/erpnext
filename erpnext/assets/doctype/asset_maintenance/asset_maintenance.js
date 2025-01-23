@@ -436,7 +436,6 @@ erpnext.asset_maintenance = {
 	// Function to make material consumption stock entry
 	make_material_consumption_stock_entry: async function(frm) {
 		try {
-			console.log("Initiating consumption...")
 			// Call the server-side function directly using frappe.call
 			const r = await frappe.call({
 				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.make_material_consumption_stock_entry',
@@ -448,7 +447,6 @@ erpnext.asset_maintenance = {
 			});
 	
 			if (r && r.message) {
-				console.log("Response returned: ", r)
 				// Sync the returned stock entry with the local model
 				frappe.model.sync(r.message);
 				// Open the form for the newly created stock entry

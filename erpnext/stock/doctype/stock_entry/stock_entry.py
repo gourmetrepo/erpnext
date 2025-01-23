@@ -104,7 +104,12 @@ class StockEntry(StockController):
 				i.valuation_rate = 0.001
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
+
 		
+		# Changes by Moeiz for FS-Plant Maintenance 2.0
+		if self.stock_entry_type == 'Material Issue':
+			validate_plant_maintenance_consumption_stock_entry(self)
+
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
@@ -166,7 +171,10 @@ class StockEntry(StockController):
 
 		# Changes by Moeiz for FS-Plant Maintenance 2.0
 		if self.purpose == "Material Transfer":
-			update_plant_asset_maintenance_document(self)
+			update_plant_asset_maintenance_document_on_transfer(self)
+		
+		if self.purpose == "Material Issue":
+			update_plant_asset_maintenance_document_on_consumption(self)
 
 
 	def on_cancel(self):
@@ -1842,7 +1850,10 @@ def validate_company_cost_center_and_accounts(stock_entry):
 
 
 
-def update_plant_asset_maintenance_document(doc):
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will reflect the changes of Material Transfer stock entry to Plant Maintenance Document (Asset Maintenance)
+def update_plant_asset_maintenance_document_on_transfer(doc):
 	asset_maintenance_doc_ref = None
 	for item in doc.items:
 		if item.asset_maintenance:
@@ -1873,3 +1884,60 @@ def update_plant_asset_maintenance_document(doc):
 		
 		asset_maintenance_doc.save()
 		frappe.db.commit()
+
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will reflect the changes of Material Consumption stock entry to Plant Maintenance Document (Asset Maintenance)
+def update_plant_asset_maintenance_document_on_consumption(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+
+		# Update consumed items
+		for item in doc.items:
+			item_exists = False
+			for consumed_item in asset_maintenance_doc.consumed_items:
+				if consumed_item.get('item') == item.get('item_code'):
+					consumed_item.consumed_qty += item.get('qty')
+					item_exists = True
+
+			if not item_exists:
+				child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+				child_doc.item = item.get('item_code')
+				child_doc.item_name = item.get('item_name')
+				child_doc.consumed_qty = item.get('qty')
+				child_doc.uom = item.get('uom')
+				asset_maintenance_doc.append('consumed_items', child_doc)
+		
+		asset_maintenance_doc.save()
+		frappe.db.commit()
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will validate the material consumption (material issue) stock entry for Plant Maintenance
+# This will check that the consumed qty is not greater than the available qty in the corresponding warehouse (issued_qty - previous consumed qty)
+def validate_plant_maintenance_consumption_stock_entry(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	stock_entry_items = {}
+	for item in doc.items:
+		if item.get('item_code') not in stock_entry_items:
+			stock_entry_items[item.get('item_code')] = item.get('qty')
+		else:
+			stock_entry_items[item.get('item_code')] += item.get('qty')
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		for item in asset_maintenance_doc.consumed_items:
+			if stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
+				frappe.throw(f"Consumed quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
