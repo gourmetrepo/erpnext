@@ -29,12 +29,12 @@ frappe.ui.form.on('Asset Maintenance', {
 			frm.trigger('make_dashboard');
 		}
 		make_bill_of_material_cdt_read_only(frm);
-		manage_workflow_buttons(frm);
+		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
 	},
 
 	onload: (frm) => {
-		manage_workflow_buttons(frm);
+		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
 		
 		// Hide Bill of Material child tables when loading the Asset Maintenance document
@@ -308,28 +308,8 @@ frappe.ui.form.on('Asset Maintenance', {
 			frm.set_value("remaining_quantity", (frm.doc.total_quantity - frm.doc.quantity_produced));
 		}
 	},
-
-	make_material_consumption_stock_entry: async function(frm) {
-		debugger;
-		try {
-			const r = await frappe.call({
-				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.make_material_consumption_stock_entry',
-				args: {
-					'asset_maintenance_doc': frm.doc.name
-				}
-			});
 	
-			if (r && r.message) {
-				frappe.model.sync(r.message);
-				frappe.set_route('Form', r.message.doctype, r.message.name);
-			}
-		} catch (error) {
-			console.error('Error making material consumption stock entry:', error);
-			
-		}
-	},
 
-	
 });
 
 frappe.ui.form.on('Asset Maintenance Task', {
@@ -496,30 +476,56 @@ frappe.ui.form.on('Bill of Material and Services', {
 });
 
 
-function manage_workflow_buttons(frm){
+erpnext.asset_maintenance = {
+	// Function to make material consumption stock entry
+	make_material_consumption_stock_entry: async function(frm) {
+		try {
+			console.log("Initiating consumption...")
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.make_material_consumption_stock_entry',
+				freeze: true,
+				freeze_message: __("Creating Material Consumption Stock Entry"),
+				args: {
+					'asset_maintenance_doc_ref': frm.doc.name
+				}
+			});
 	
-	let status = frm.doc.status
-	if (status == "Not Started"){
-		frm.add_custom_button(__('Start'), function() {
-			frm.set_value('status', 'In Process');
-			frm.save();
-		}).addClass('btn-primary');
-	}else if(status == "In Process"){
-		frm.add_custom_button(__('Consumption'), function() {
-			erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
-		}).addClass('btn-primary');
+			if (r && r.message) {
+				console.log("Response returned: ", r)
+				// Sync the returned stock entry with the local model
+				frappe.model.sync(r.message);
+				// Open the form for the newly created stock entry
+				frappe.set_route('Form', r.message.doctype, r.message.name);
+			}
+		} catch (error) {
+			console.error('Error making material consumption stock entry:', error);
+			// Optionally handle error display or recovery
+		}
+	},
+
+	// Function to manage workflow buttons dynamically
+	manage_workflow_buttons: function(frm) {
+		let status = frm.doc.status;
+
+		if (status === "Not Started") {
+			frm.add_custom_button(__('Start'), function () {
+				frm.set_value('status', 'In Process');
+				frm.save();
+			}).addClass('btn-primary');
+		} else if (status === "In Process") {
+			frm.add_custom_button(__('Consumption'), function () {
+				erpnext.asset_maintenance.make_material_consumption_stock_entry(frm);
+			}).addClass('btn-primary');
+		}
+	}
+};
+
+// Function to configure project-based fields
+function project_frm_configuration(frm) {
+	if (frm.doc.project_based === "Yes") {
+		frm.set_df_property('project', 'reqd', 1);
+	} else {
+		frm.set_df_property('project', 'reqd', 0);
 	}
 }
-
-
-
-function project_frm_configuration(frm){
-	
-	if (frm.doc.project_based == "Yes"){
-		frm.set_df_property('project', 'reqd', 1)
-	}else{
-		frm.set_df_property('project', 'reqd', 0)
-	}
-}
-
-
