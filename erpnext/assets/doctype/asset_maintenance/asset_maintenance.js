@@ -40,6 +40,10 @@ frappe.ui.form.on('Asset Maintenance', {
 		make_bill_of_material_cdt_read_only(frm);
 		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
+
+		if (frm.page.sidebar.find('.form-assignments').length) {
+            frm.page.sidebar.find('.form-assignments').hide();
+        }
 	},
 
 	onload: (frm) => {
@@ -124,7 +128,10 @@ frappe.ui.form.on('Asset Maintenance', {
 							const child = frm.add_child('asset_maintenance_tasks');
                             if (child) {
                                 child.maintenance_task = task.name || "";
-								child.assign_to = task.completed_by
+								if (task._assign) {
+									const parsedAssignTo = JSON.parse(task._assign);
+									child.assign_to = parsedAssignTo.join(',');
+								}
                             }
                         });
 

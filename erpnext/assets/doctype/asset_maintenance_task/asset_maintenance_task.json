@@ -101,10 +101,9 @@
   },
   {
    "fieldname": "assign_to",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Assign To",
-   "options": "Employee"
+   "label": "Assign To"
   },
   {
    "fieldname": "column_break_10",
@@ -165,7 +164,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-01-23 20:22:14.536999",
+ "modified": "2025-01-24 14:51:35.761675",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
