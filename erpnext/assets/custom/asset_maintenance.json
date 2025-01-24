@@ -35,7 +35,7 @@
    "modified_by": "Administrator",
    "name": "Asset Maintenance-maintenance_category",
    "no_copy": 0,
-   "options": "\nMachine Breakdown",
+   "options": "\nPlanned Maintenance\nUnplanned Maintenance",
    "owner": "Administrator",
    "parent": null,
    "parentfield": null,
