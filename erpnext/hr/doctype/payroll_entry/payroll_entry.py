@@ -141,7 +141,7 @@ class PayrollEntry(Document):
 				"deduct_tax_for_unsubmitted_tax_exemption_proof": self.deduct_tax_for_unsubmitted_tax_exemption_proof,
 				"payroll_entry": self.name
 			})
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, employees=emp_list, args=args)
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.create_salary_slips_for_employees", queue='hr_tertiary', enqueue_after_commit=True, timeout=13600, employees=emp_list, args=args)
 		self.reload()
 
 	def get_sal_slip_list(self, ss_status, as_dict=False):
@@ -161,7 +161,7 @@ class PayrollEntry(Document):
 		try:
 			self.check_permission('write')
 			ss_list = self.get_sal_slip_list(ss_status=0)
-			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry_name=self.name, salary_slips=ss_list)
+			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', enqueue_after_commit=True, timeout=13600, payroll_entry_name=self.name, salary_slips=ss_list)
 			change_queue_status(self.doctype, self.name, "Queued")
 			self.reload()
 		except Exception as error:
