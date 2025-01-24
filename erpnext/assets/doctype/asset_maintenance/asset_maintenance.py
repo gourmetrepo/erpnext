@@ -325,6 +325,8 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 				return_stock_entry_flag = True
 			
 		if not return_stock_entry_flag:
+			asset_maintenance_doc.status = "Closed"
+			asset_maintenance_doc.save()
 			asset_maintenance_doc.submit()
 
 		return {'stock_entry': stock_entry, 'return_stock_entry_flag': return_stock_entry_flag}

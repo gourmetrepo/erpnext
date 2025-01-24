@@ -529,18 +529,16 @@ erpnext.asset_maintenance = {
 			});
 	
 			if (r && r.message) {
-				
+				debugger;
 				// If return stock entry flag is true, open the form for the newly created stock entry
 				// Otherwise, close the plant maintenance document
-				
 				let return_stock_entry_flag = r.message.return_stock_entry_flag
 				if (return_stock_entry_flag === true){
 					let stock_entry = r.message.stock_entry;
 					frappe.model.sync(stock_entry);
 					frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
 				}else{
-					frm.set_value('status', 'Closed');
-					frm.save();
+					frm.reload_doc();
 				}
 				
 			}
