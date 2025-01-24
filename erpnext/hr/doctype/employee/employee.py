@@ -73,7 +73,12 @@ class Employee(NestedSet):
 
 
 	def on_update(self):
-		frappe.enqueue("frappe.utils.nestedset.update_nsm", doc=self, queue="sync")
+		if self.status=='Active':
+			frappe.enqueue("frappe.utils.nestedset.update_nsm", doc=self, queue="sync")
+		else:
+			self.rgt=0
+			self.lft=0
+
 		if self.user_id:
 			self.update_user()
 			self.update_user_permissions()
@@ -202,7 +207,7 @@ class Employee(NestedSet):
 			throw(_("Employee cannot report to himself."))
 
 	def on_trash(self):
-		frappe.enqueue("frappe.utils.nestedset.update_nsm", doc=self, queue="hr_secondary")
+		frappe.enqueue("frappe.utils.nestedset.update_nsm", doc=self, queue="sync")
 		delete_events(self.doctype, self.name)
 		if frappe.db.exists("Employee Transfer", {'new_employee_id': self.name, 'docstatus': 1}):
 			emp_transfer = frappe.get_doc("Employee Transfer", {'new_employee_id': self.name, 'docstatus': 1})
