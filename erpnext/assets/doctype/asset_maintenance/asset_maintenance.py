@@ -404,7 +404,7 @@ def load_tasks(doc):
 			SELECT `name`, `status`
 			FROM `tabTask`
 			WHERE `project`="{doc.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
-			""", as_dict=True, debug=True
+			""", as_dict=True
 		)
 		
 		for task in tasks:
