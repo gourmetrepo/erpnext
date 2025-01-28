@@ -51,12 +51,12 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Planned",
+   "default": "Open",
    "fieldname": "maintenance_status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Maintenance Status",
-   "options": "Planned\nOverdue\nCancelled\nCompleted",
+   "options": "Open\nWorking\nPending Review\nOverdue\nCompleted\nCancelled",
    "read_only": 1
   },
   {
@@ -164,7 +164,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-01-24 14:51:35.761675",
+ "modified": "2025-01-28 17:10:06.015149",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
