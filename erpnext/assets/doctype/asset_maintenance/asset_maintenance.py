@@ -21,6 +21,10 @@ class AssetMaintenance(Document):
 	
 	def before_save(self):
 		self.load_section_details()
+		
+		# Check if tasks are added against this project
+		if self.project and self.project_based == "Yes":
+			load_tasks(self)
 
 	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
@@ -370,3 +374,45 @@ def get_assets(company, cost_center):
 			""", as_dict=True
 		)
 		return assets
+
+
+
+
+@frappe.whitelist()
+def get_assets(company, cost_center):
+	if cost_center:
+		assets = frappe.db.sql(
+			f"""
+			SELECT `name`, `asset_name`, `repair_count`, `cost_center`
+			FROM `tabAsset`
+			WHERE `cost_center` IN (
+			SELECT `name`
+			FROM `tabCost Center`
+			WHERE `parent_cost_center`="{cost_center}" AND `company`="{company}");
+			""", as_dict=True
+		)
+		return assets
+
+
+
+
+@frappe.whitelist()
+def load_tasks(doc):
+	if doc.get('project'):
+		tasks = frappe.db.sql(
+			f"""
+			SELECT `name`, `status`
+			FROM `tabTask`
+			WHERE `project`="{doc.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
+			""", as_dict=True, debug=True
+		)
+		
+		for task in tasks:
+			child_doc = frappe.new_doc("Asset Maintenance Task")
+			child_doc.maintenance_task = task.get('name')
+			child_doc.maintenance_status = task.get('status')
+			doc.append('asset_maintenance_tasks', child_doc)
+
+			frappe.db.sql(f"""
+			Update `tabTask` set `asset_maintenance`="{doc.name}" where `name`="{task.get('name')}";
+			""")

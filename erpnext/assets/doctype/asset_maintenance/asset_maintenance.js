@@ -107,42 +107,40 @@ frappe.ui.form.on('Asset Maintenance', {
 	project_based: function(frm){
 		project_frm_configuration(frm)
 	},
-	project: function(frm) {
-        if (frm.doc.project) {
+	// project: function(frm) {
+    //     if (frm.doc.project) {
 
-            frappe.call({
-                method: 'frappe.client.get_list',
-                args: {
-                    doctype: 'Task',
-                    filters: {
-                        project: frm.doc.project,
-                        status: 'Open'
-                    },
-                    fields: "*"
-                },
-                callback: function(response) {
-                    if (response.message) {
-                        const tasks = response.message;
-						frm.clear_table('asset_maintenance_tasks');
-                        tasks.forEach(task => {
-							const child = frm.add_child('asset_maintenance_tasks');
-                            if (child) {
-                                child.maintenance_task = task.name || "";
-								if (task._assign) {
-									const parsedAssignTo = JSON.parse(task._assign);
-									child.assign_to = parsedAssignTo.join(',');
-								}
-                            }
-                        });
+    //         frappe.call({
+    //             method: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_tasks",
+	// 			args: {
+	// 				project: frm.doc.project,
+	// 				status: 'Open'
+	// 			},
+	// 			freeze: true,
+	// 			freeze_message: __("Loading Tasks"),
+    //             callback: function(response) {
+    //                 if (response.message) {
+    //                     const tasks = response.message;
+	// 					frm.clear_table('asset_maintenance_tasks');
+    //                     tasks.forEach(task => {
+	// 						const child = frm.add_child('asset_maintenance_tasks');
+    //                         if (child) {
+    //                             child.maintenance_task = task.name || "";
+	// 							if (task._assign) {
+	// 								const parsedAssignTo = JSON.parse(task._assign);
+	// 								child.assign_to = parsedAssignTo.join(',');
+	// 							}
+    //                         }
+    //                     });
 
-                        frm.refresh_field('asset_maintenance_tasks');
-                    } else {
-                        frappe.throw(`"No tasks found for project: ${frm.doc.project}`);
-                    }
-                }
-            });
-        }
-    },
+    //                     frm.refresh_field('asset_maintenance_tasks');
+    //                 } else {
+    //                     frappe.throw(`"No tasks found for project: ${frm.doc.project}`);
+    //                 }
+    //             }
+    //         });
+    //     }
+    // },
 
 
 	// Comment this function as dashboard with Maintenance Log link is not required
@@ -607,8 +605,14 @@ erpnext.asset_maintenance = {
 function project_frm_configuration(frm) {
 	if (frm.doc.project_based === "Yes") {
 		frm.set_df_property('project', 'reqd', 1);
+		frm.set_df_property('project', 'hidden', 0);
+		frm.set_df_property('asset_maintenance_tasks', 'reqd', 0);
+		hide_add_rows(frm, 'asset_maintenance_tasks', true);
 	} else {
 		frm.set_df_property('project', 'reqd', 0);
+		frm.set_df_property('project', 'hidden', 1);
+		frm.set_df_property('asset_maintenance_tasks', 'reqd', 1);
+		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
 }
 
@@ -642,5 +646,19 @@ function load_assets(frm) {
 				}
 			}
 		});
+	}
+}
+
+function hide_add_rows(frm, field, is_hide){
+	if (is_hide) {
+	frm.set_df_property(field, 'cannot_add_rows', is_hide);
+	frm.set_df_property(field, 'cannot_delete_rows', is_hide);
+	frm.set_df_property(field, 'cannot_delete_all_rows', is_hide);
+	frm.fields_dict[field].grid.wrapper.find('.grid-remove-rows').hide();
+	}else{
+	frm.set_df_property(field, 'cannot_add_rows', is_hide);
+	frm.set_df_property(field, 'cannot_delete_rows', is_hide);
+	frm.set_df_property(field, 'cannot_delete_all_rows', is_hide);
+	frm.fields_dict[field].grid.wrapper.find('.grid-remove-rows').show();
 	}
 }
