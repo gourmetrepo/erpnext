@@ -10,21 +10,18 @@ from frappe import throw, _
 from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 
 class AssetMaintenance(Document):
-	def validate(self):
-		for task in self.get('asset_maintenance_tasks'):
-			if task.end_date and (getdate(task.start_date) >= getdate(task.end_date)):
-				throw(_("Start date should be less than end date for task {0}").format(task.maintenance_task))
-			if getdate(task.next_due_date) < getdate(nowdate()):
-				task.maintenance_status = "Overdue"
-			if not task.assign_to and self.docstatus == 0:
-				throw(_("Row #{}: Please asign task to a member.").format(task.idx))
+	# def validate(self):
+		# for task in self.get('asset_maintenance_tasks'):
+		# 	if task.end_date and (getdate(task.start_date) >= getdate(task.end_date)):
+		# 		throw(_("Start date should be less than end date for task {0}").format(task.maintenance_task))
+		# 	if getdate(task.next_due_date) < getdate(nowdate()):
+		# 		task.maintenance_status = "Overdue"
+		# 	if not task.assign_to and self.docstatus == 0:
+		# 		throw(_("Row #{}: Please asign task to a member.").format(task.idx))
 	
 	def before_save(self):
 		self.load_section_details()
 		
-		# Check if tasks are added against this project
-		if self.project and self.project_based == "Yes":
-			load_tasks(self)
 
 	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
@@ -36,10 +33,10 @@ class AssetMaintenance(Document):
 				task_doc.save()
 				frappe.db.commit()
 
-	def on_update(self):
-		for task in self.get('asset_maintenance_tasks'):
-			assign_tasks(self.name, task.assign_to, task.maintenance_task, task.next_due_date)
-		self.sync_maintenance_tasks()
+	# def on_update(self):
+	# 	for task in self.get('asset_maintenance_tasks'):
+	# 		assign_tasks(self.name, task.assign_to, task.maintenance_task, task.next_due_date)
+	# 	self.sync_maintenance_tasks()
 
 	def sync_maintenance_tasks(self):
 		tasks_names = []
@@ -82,6 +79,25 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
+		
+
+	def load_tasks(self):
+		if self.get('project'):
+			tasks = frappe.db.sql(
+				f"""
+				SELECT `name`, `exp_start_date`
+				FROM `tabTask`
+				WHERE `project`="{self.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
+				""", as_dict=True
+			)
+			
+			for task in tasks:
+				frappe.db.sql(f"""
+				Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
+				""")
+			
+			return {'tasks': tasks}
+
 
 	
 
@@ -394,25 +410,3 @@ def get_assets(company, cost_center):
 		return assets
 
 
-
-
-@frappe.whitelist()
-def load_tasks(doc):
-	if doc.get('project'):
-		tasks = frappe.db.sql(
-			f"""
-			SELECT `name`, `status`
-			FROM `tabTask`
-			WHERE `project`="{doc.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
-			""", as_dict=True
-		)
-		
-		for task in tasks:
-			child_doc = frappe.new_doc("Asset Maintenance Task")
-			child_doc.maintenance_task = task.get('name')
-			child_doc.maintenance_status = task.get('status')
-			doc.append('asset_maintenance_tasks', child_doc)
-
-			frappe.db.sql(f"""
-			Update `tabTask` set `asset_maintenance`="{doc.name}" where `name`="{task.get('name')}";
-			""")

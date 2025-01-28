@@ -251,6 +251,41 @@ frappe.ui.form.on('Asset Maintenance', {
 		});
 	},
 
+	get_project_tasks: (frm) => {
+		if (!frm.doc.project){
+			frappe.throw("Select project first")
+		}
+
+		if (frm.is_dirty()) {
+			frappe.throw(__(`Save document before fetching project tasks`));
+		}
+
+
+		frappe.call({
+			method: 'load_tasks',
+			doc: frm.doc,
+			freeze: true,
+			freeze_message: "Fetching Project Tasks",
+			callback: (r) => {
+				debugger
+				if (!r.message || !r.message.tasks) {
+					return;
+				}
+				
+				// Tasks mapped against this project
+				const tasks = r.message.tasks;
+
+				for(let i = 0; i < tasks.length; i++) {
+					frm.add_child('asset_maintenance_tasks', {
+						maintenance_task: tasks[i]['name'],
+						start_date: tasks[i]['exp_start_date']
+					})
+				}
+				frm.refresh_field('asset_maintenance_tasks');
+				frm.save(); 
+			}
+		});
+	},
 	// bill_of_material: function(frm) {
     //     const fields_to_toggle = [
     //         'bill_of_material_and_services',
@@ -603,15 +638,20 @@ erpnext.asset_maintenance = {
 
 // Function to configure project-based fields
 function project_frm_configuration(frm) {
+	// Make project field read-only if project is set
+	frm.set_df_property('project', 'reqd', 0);
+	if (project){
+		frm.set_df_property('project', 'read_only', 1);
+	}else{
+		frm.set_df_property('project', 'read_only', 0);
+	}
 	if (frm.doc.project_based === "Yes") {
 		frm.set_df_property('project', 'reqd', 1);
 		frm.set_df_property('project', 'hidden', 0);
-		frm.set_df_property('asset_maintenance_tasks', 'reqd', 0);
 		hide_add_rows(frm, 'asset_maintenance_tasks', true);
 	} else {
 		frm.set_df_property('project', 'reqd', 0);
 		frm.set_df_property('project', 'hidden', 1);
-		frm.set_df_property('asset_maintenance_tasks', 'reqd', 1);
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
 }
