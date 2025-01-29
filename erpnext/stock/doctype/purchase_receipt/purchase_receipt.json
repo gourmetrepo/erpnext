@@ -78,6 +78,7 @@
   "taxes_and_charges_added",
   "taxes_and_charges_deducted",
   "total_taxes_and_charges",
+  "total_landed_cost",
   "section_break_42",
   "apply_discount_on",
   "base_discount_amount",
@@ -1065,13 +1066,19 @@
    "fieldtype": "Link",
    "label": "Project",
    "options": "Project"
+  },
+  {
+   "fieldname": "total_landed_cost",
+   "fieldtype": "Currency",
+   "label": "Total Landed Cost",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-truck",
  "idx": 261,
  "is_submittable": 1,
- "modified": "2023-12-21 16:19:35.957962",
- "modified_by": "dilnawaz.sajid@gourmetpakistan.com",
+ "modified": "2025-01-29 12:16:33.180287",
+ "modified_by": "Administrator",
  "module": "Stock",
  "name": "Purchase Receipt",
  "owner": "Administrator",
