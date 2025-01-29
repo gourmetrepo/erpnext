@@ -84,12 +84,12 @@
    "fieldtype": "Column Break"
   },
   {
-   "default": "Unplanned CIP",
+   "default": "Without Work Order",
    "depends_on": "eval:doc.task == \"CIP\"",
    "fieldname": "cip_category",
    "fieldtype": "Select",
    "label": "CIP Category",
-   "options": "Planned CIP\nUnplanned CIP"
+   "options": "Planned CIP\nUnplanned CIP\nWithout Work Order"
   },
   {
    "depends_on": "eval:doc.task == \"Unplanned Maintenance\"",
@@ -154,8 +154,7 @@
    "fieldname": "work_order_item",
    "fieldtype": "Link",
    "label": "Work Order Item",
-   "options": "Item",
-   "read_only": 1
+   "options": "Item"
   },
   {
    "depends_on": "eval:doc.task != \"Unplanned Maintenance\"",
@@ -322,7 +321,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-01 15:09:35.869042",
+ "modified": "2025-01-20 11:29:21.773089",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Maintenance",
