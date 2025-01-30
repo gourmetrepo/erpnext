@@ -36,6 +36,14 @@ class Task(NestedSet):
 		self.validate_status()
 		self.update_depends_on()
 
+	def before_save(self):
+		# Update asset maintenance doc if taks is linked to the asset
+		if self.asset_maintenance and self.status:
+			self.update_asset_maintenance_doc()
+		
+		if self.status == "Completed" and not self.completed_by:
+			self.completed_by = frappe.session.user
+
 	def validate_dates(self):
 		if self.exp_start_date and self.exp_end_date and getdate(self.exp_start_date) > getdate(self.exp_end_date):
 			frappe.throw(_("{0} can not be greater than {1}").format(frappe.bold("Expected Start Date"), \
@@ -189,6 +197,20 @@ class Task(NestedSet):
 				self.db_set('status', 'Overdue', update_modified=False)
 				self.update_project()
 
+	def update_asset_maintenance_doc(self):
+		users_list = ""
+		for user in self.assigned_users:
+			users_list += user.get('user') + ", "
+
+		frappe.db.sql(f"""
+		UPDATE `tabAsset Maintenance Task`
+		SET `maintenance_status`="{self.status}", `assigned_users`="{users_list}"
+		WHERE `maintenance_task`="{self.name}"
+		AND `parent`="{self.asset_maintenance}"
+		""")
+		frappe.db.commit()
+	
+
 @frappe.whitelist()
 def check_if_child_exists(name):
 	child_tasks = frappe.get_all("Task", filters={"parent_task": name})
@@ -309,3 +331,14 @@ def validate_project_dates(project_end_date, task, task_start, task_end, actual_
 
 	if task.get(task_end) and date_diff(project_end_date, getdate(task.get(task_end))) < 0:
 		frappe.throw(_("Task's {0} End Date cannot be after Project's End Date.").format(actual_or_expected_date))
+
+
+@frappe.whitelist()
+def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters):
+	query = """
+		SELECT DISTINCT(user) FROM `tabMaintenance Team Member`
+		WHERE user LIKE %s
+	"""
+	
+	users = frappe.db.sql(query, ("%" + txt + "%",))
+	return users

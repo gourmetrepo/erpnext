@@ -4,21 +4,12 @@
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
 
-		frm.set_indicator_formatter('status',
-			function(doc) {
-				let indicator = 'red'
-				if (doc.status == 'MR Generated') {
-					indicator = 'orange';
-				}
-				return indicator;
-			}
-		);
-
 
 		frm.set_query('project', function() {
             return {
                 filters: {
-                    status: 'Open'
+                    status: 'Open',
+					company: frm.doc.company
                 }
             };
         });
@@ -197,6 +188,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	issue_material: (frm) => {
+		debugger;
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
 		}
@@ -278,7 +270,8 @@ frappe.ui.form.on('Asset Maintenance', {
 				for(let i = 0; i < tasks.length; i++) {
 					frm.add_child('asset_maintenance_tasks', {
 						maintenance_task: tasks[i]['name'],
-						start_date: tasks[i]['exp_start_date']
+						start_date: tasks[i]['exp_start_date'],
+						assigned_users: tasks[i]['assigned_users']
 					})
 				}
 				frm.refresh_field('asset_maintenance_tasks');
@@ -555,6 +548,27 @@ erpnext.asset_maintenance = {
 			// Optionally handle error display or recovery
 		}
 	},
+
+
+	complete_asset_maintenance: async function(frm) {
+		try {
+			let not_completed = false
+			for (let i = 0; i < frm.doc.asset_maintenance_tasks.length; i++) {
+				if (frm.doc.asset_maintenance_tasks[i].maintenance_status !== 'Completed') {
+					not_completed = true
+					break
+				}
+			}
+			if (not_completed){
+				frappe.throw("All tasks must be completed before completing the maintenance")
+			}else{
+				frm.set_value('status', 'Completed');
+				frm.save();
+			}		
+		} catch (error) {
+			console.error('Error completing asset maintenance:', error);
+		}
+	},
 	
 	make_return_stock_entry: async function(frm) {
 		try {
@@ -603,11 +617,10 @@ erpnext.asset_maintenance = {
 			}).addClass('btn-primary');
 			
 			frm.add_custom_button(__('Complete'), function () {
-				frm.set_value('status', 'Completed');
-				frm.save();
+				erpnext.asset_maintenance.complete_asset_maintenance(frm);
 			}).addClass('btn-success');
 			
-			frm.add_custom_button('Stop', function () {
+			frm.add_custom_button('On Hold', function () {
 				frm.set_value('status', 'Stopped');
 				frm.save();
 			}).addClass('btn-danger');
@@ -638,6 +651,7 @@ erpnext.asset_maintenance = {
 
 // Function to configure project-based fields
 function project_frm_configuration(frm) {
+	hide_add_rows(frm, 'consumed_items', true);
 	// Make project field read-only if project is set
 	frm.set_df_property('project', 'reqd', 0);
 	if (project){
@@ -654,6 +668,7 @@ function project_frm_configuration(frm) {
 		frm.set_df_property('project', 'hidden', 1);
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
+
 }
 
 

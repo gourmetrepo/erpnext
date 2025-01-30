@@ -79,7 +79,7 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
-		
+	
 
 	def load_tasks(self):
 		if self.get('project'):
@@ -90,14 +90,32 @@ class AssetMaintenance(Document):
 				WHERE `project`="{self.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
 				""", as_dict=True
 			)
-			
-			for task in tasks:
-				frappe.db.sql(f"""
-				Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
-				""")
-			
-			return {'tasks': tasks}
 
+			tasks_names = tuple([task.get('name') for task in tasks])
+			if tasks_names:
+				users_task = frappe.db.sql(
+					f"""
+					SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {tasks_names};
+					""", as_dict=True
+				)
+
+				mapped_task_users = {}
+				for user_task in users_task:
+					if user_task.get('parent') not in mapped_task_users:
+						mapped_task_users[user_task.get('parent')] = ""
+					mapped_task_users[user_task.get('parent')] += user_task.get('user') + ", "
+
+
+				for task in tasks:
+					frappe.db.sql(f"""
+					Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
+					""")
+					task['assigned_users'] = mapped_task_users.get(task.get('name'))
+				if len(tasks) > 0:
+					frappe.db.commit()
+				return {'tasks': tasks}
+			else:
+				frappe.throw("No tasks available for this project")
 
 	
 
@@ -296,6 +314,9 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 		stock_entry = frappe.new_doc('Stock Entry')
 		stock_entry.stock_entry_type = 'Material Issue'
+		stock_entry.sub_branch = "Plant Maintenance"
+		stock_entry.cost_association = "Plant Maintenance"
+		# stock_entry
 		stock_entry.company = asset_maintenance_doc.get('company')
 		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
 		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
@@ -319,7 +340,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 
 
-@frappe.whitelist()
+@frappe.whitelist()	
 def make_return_stock_entry(asset_maintenance_doc_ref):
 	try:
 		return_stock_entry_flag = False
@@ -374,24 +395,6 @@ def update_issue_material(asset_maintenance_doc, material_request_doc):
 			child_doc.required_qty = item.get('qty')
 			child_doc.uom = item.get('uom')
 			asset_maintenance_doc.append('consumed_items', child_doc)
-
-
-@frappe.whitelist()
-def get_assets(company, cost_center):
-	if cost_center:
-		assets = frappe.db.sql(
-			f"""
-			SELECT `name`, `asset_name`, `repair_count`, `cost_center`
-			FROM `tabAsset`
-			WHERE `cost_center` IN (
-			SELECT `name`
-			FROM `tabCost Center`
-			WHERE `parent_cost_center`="{cost_center}" AND `company`="{company}");
-			""", as_dict=True
-		)
-		return assets
-
-
 
 
 @frappe.whitelist()

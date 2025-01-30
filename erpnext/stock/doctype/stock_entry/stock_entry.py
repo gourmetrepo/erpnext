@@ -1977,7 +1977,7 @@ def validate_plant_maintenance_consumption_stock_entry(doc):
 			
 
 			for item in asset_maintenance_doc.consumed_items:
-				if stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
+				if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
 					frappe.throw(f"Consumed quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
@@ -2006,7 +2006,7 @@ def validate_plant_maintenance_material_transfer_stock_entry(doc):
 						stock_entry_items[item.get('item_code')] += item.get('qty')
 
 				for item in asset_maintenance_doc.consumed_items:
-					if stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
+					if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
 						frappe.throw(f"Returned quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")

@@ -6,20 +6,19 @@
  "engine": "InnoDB",
  "field_order": [
   "maintenance_task",
+  "task_name",
   "maintenance_type",
   "maintenance_status",
   "start_date",
-  "estimated_time",
+  "estimated_time_in_hrs",
   "column_break_4",
   "end_date",
-  "item_used",
-  "section_break_14",
-  "assign_to",
-  "column_break_10",
-  "assign_to_name"
+  "assigned_users",
+  "item_used"
  ],
  "fields": [
   {
+   "columns": 1,
    "fieldname": "maintenance_task",
    "fieldtype": "Link",
    "in_filter": 1,
@@ -30,57 +29,44 @@
    "reqd": 1
   },
   {
+   "columns": 1,
    "fieldname": "maintenance_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Maintenance Type",
-   "options": "Preventive Maintenance\nCorrective Maintenance"
+   "options": "Preventive Maintenance\nCorrective Maintenance",
+   "read_only": 1
   },
   {
+   "columns": 1,
    "default": "Open",
    "fieldname": "maintenance_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Maintenance Status",
+   "label": "Status",
    "options": "Open\nWorking\nPending Review\nOverdue\nCompleted\nCancelled",
    "read_only": 1
   },
   {
+   "columns": 1,
    "default": "Today",
    "fieldname": "start_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Start Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
   },
   {
+   "columns": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
-   "label": "End Date"
-  },
-  {
-   "fieldname": "assign_to",
-   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Assign To"
-  },
-  {
-   "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "assign_to.employee_name",
-   "fieldname": "assign_to_name",
-   "fieldtype": "Read Only",
-   "label": "Assign to Name"
-  },
-  {
-   "fieldname": "estimated_time",
-   "fieldtype": "Time",
-   "in_list_view": 1,
-   "label": "Estimated Time"
+   "label": "End Date",
+   "read_only": 1
   },
   {
    "fieldname": "item_used",
@@ -90,12 +76,32 @@
    "options": "Item"
   },
   {
-   "fieldname": "section_break_14",
-   "fieldtype": "Section Break"
+   "columns": 1,
+   "fieldname": "assigned_users",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Assigned Users",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "maintenance_task.subject",
+   "fieldname": "task_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Task Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "maintenance_task.expected_time",
+   "fieldname": "estimated_time_in_hrs",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Estimated Time",
+   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2025-01-28 17:27:08.666867",
+ "modified": "2025-01-30 19:29:46.297097",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
