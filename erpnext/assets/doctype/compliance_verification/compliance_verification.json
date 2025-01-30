@@ -8,10 +8,12 @@
   "company",
   "location",
   "inspection_date",
-  "ranking_setup",
+  "parameter_setup",
   "column_break_5",
   "inspector",
+  "inspector_name",
   "area_incharge",
+  "area_incharge_name",
   "cost_center",
   "section_break_9",
   "compliance_verification_item",
@@ -47,14 +49,6 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Inspection Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "ranking_setup",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Ranking Setup",
-   "options": "Ranking Setup",
    "reqd": 1
   },
   {
@@ -99,7 +93,8 @@
   {
    "fieldname": "total_score",
    "fieldtype": "Float",
-   "label": "Total Score"
+   "label": "Total Score",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_13",
@@ -108,7 +103,8 @@
   {
    "fieldname": "rank",
    "fieldtype": "Data",
-   "label": "Rank"
+   "label": "Rank",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_15",
@@ -126,7 +122,8 @@
   {
    "fieldname": "score_criteria",
    "fieldtype": "Small Text",
-   "label": "Score Criteria"
+   "label": "Score Criteria",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -136,10 +133,31 @@
    "options": "Compliance Verification",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "parameter_setup",
+   "fieldtype": "Link",
+   "label": "Parameter Setup",
+   "options": "Parameter Setup",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "inspector.employee_name",
+   "fieldname": "inspector_name",
+   "fieldtype": "Data",
+   "label": "Inspector Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "area_incharge.employee_name",
+   "fieldname": "area_incharge_name",
+   "fieldtype": "Data",
+   "label": "Area Incharge Name",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-29 18:48:16.280649",
+ "modified": "2025-01-30 20:38:06.256683",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Compliance Verification",

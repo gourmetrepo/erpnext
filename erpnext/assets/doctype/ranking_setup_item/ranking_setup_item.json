@@ -18,7 +18,7 @@
   },
   {
    "fieldname": "rank_split_percentage",
-   "fieldtype": "Float",
+   "fieldtype": "Percent",
    "in_list_view": 1,
    "label": "Rank Split Percentage"
   },
@@ -36,7 +36,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-01-29 15:57:13.556787",
+ "modified": "2025-01-30 18:15:15.446376",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Ranking Setup Item",

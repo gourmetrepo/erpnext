@@ -14,29 +14,33 @@
    "fieldname": "parameter",
    "fieldtype": "Text",
    "in_list_view": 1,
-   "label": "Parameter"
+   "label": "Parameter",
+   "read_only": 1
   },
   {
    "fieldname": "ranking",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Ranking"
+   "label": "Ranking",
+   "read_only": 1
   },
   {
    "fieldname": "rank_value",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Rank Value"
+   "label": "Rank Value",
+   "read_only": 1
   },
   {
    "fieldname": "score",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Score"
+   "label": "Score",
+   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2025-01-29 17:14:03.475086",
+ "modified": "2025-01-30 15:54:41.960550",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Parameter Setup Details",
