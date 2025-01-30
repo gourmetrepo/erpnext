@@ -314,8 +314,8 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 		stock_entry = frappe.new_doc('Stock Entry')
 		stock_entry.stock_entry_type = 'Material Issue'
-		# stock_entry.sub_branch = "Plant Maintenance"
-		# stock_entry.cost_association = "Plant Maintenance"
+		stock_entry.sub_branch = "Plant Maintenance"
+		stock_entry.cost_association = "Plant Maintenance"
 		# stock_entry
 		stock_entry.company = asset_maintenance_doc.get('company')
 		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
