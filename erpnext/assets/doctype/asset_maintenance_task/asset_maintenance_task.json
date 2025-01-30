@@ -14,9 +14,7 @@
   "end_date",
   "item_used",
   "section_break_14",
-  "assign_to",
-  "column_break_10",
-  "assign_to_name"
+  "assigned_users"
  ],
  "fields": [
   {
@@ -61,22 +59,6 @@
    "label": "End Date"
   },
   {
-   "fieldname": "assign_to",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Assign To"
-  },
-  {
-   "fieldname": "column_break_10",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fetch_from": "assign_to.employee_name",
-   "fieldname": "assign_to_name",
-   "fieldtype": "Read Only",
-   "label": "Assign to Name"
-  },
-  {
    "fieldname": "estimated_time",
    "fieldtype": "Time",
    "in_list_view": 1,
@@ -92,10 +74,17 @@
   {
    "fieldname": "section_break_14",
    "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "maintenance_task.assigned_users",
+   "fieldname": "assigned_users",
+   "fieldtype": "Data",
+   "label": "Assigned Users",
+   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2025-01-28 17:27:08.666867",
+ "modified": "2025-01-30 15:15:39.493283",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
