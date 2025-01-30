@@ -556,6 +556,30 @@ erpnext.asset_maintenance = {
 			// Optionally handle error display or recovery
 		}
 	},
+
+
+	complete_asset_maintenance: async function(frm) {
+		try {
+			// Call the server-side function directly using frappe.call
+			const r = await frappe.call({
+				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.complete_asset_maintenance',
+				freeze: true,
+				freeze_message: __("Completing the Maintenance"),
+				args: {
+					'asset_maintenance_doc_ref': frm.doc.name
+				}
+			});
+	
+			if (r && r.message) {
+				if(r.message){
+					frm.set_value('status', 'Completed');
+					frm.save();
+				}
+			}
+		} catch (error) {
+			console.error('Error completing asset maintenance:', error);
+		}
+	},
 	
 	make_return_stock_entry: async function(frm) {
 		try {
@@ -604,8 +628,7 @@ erpnext.asset_maintenance = {
 			}).addClass('btn-primary');
 			
 			frm.add_custom_button(__('Complete'), function () {
-				frm.set_value('status', 'Completed');
-				frm.save();
+				erpnext.asset_maintenance.complete_asset_maintenance(frm);
 			}).addClass('btn-success');
 			
 			frm.add_custom_button('Stop', function () {

@@ -336,8 +336,24 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 		frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
 
 
-
 @frappe.whitelist()
+def complete_asset_maintenance(asset_maintenance_doc_ref):
+	try:
+		# Fetch the Asset Maintenance document
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		for asset_maintenance_task in asset_maintenance_doc.get('asset_maintenance_tasks'):
+			if asset_maintenance_task.get('maintenance_status') != "Completed":
+				frappe.throw(_("Please complete all the tasks before completing the Maintenance"))
+		
+		return True
+
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Error while completing asset maintenance")
+		frappe.throw(_("An error occurred while completing asset maintenance: {0}").format(str(e)))
+
+
+
+@frappe.whitelist()	
 def make_return_stock_entry(asset_maintenance_doc_ref):
 	try:
 		return_stock_entry_flag = False
