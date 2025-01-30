@@ -92,29 +92,30 @@ class AssetMaintenance(Document):
 			)
 
 			tasks_names = tuple([task.get('name') for task in tasks])
-			
-			users_task = frappe.db.sql(
-				f"""
-				SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {tasks_names};
-				""", as_dict=True
-			)
+			if tasks_names:
+				users_task = frappe.db.sql(
+					f"""
+					SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {tasks_names};
+					""", as_dict=True
+				)
 
-			mapped_task_users = {}
-			for user_task in users_task:
-				if user_task.get('parent') not in mapped_task_users:
-					mapped_task_users[user_task.get('parent')] = ""
-				mapped_task_users[user_task.get('parent')] += user_task.get('user') + ", "
+				mapped_task_users = {}
+				for user_task in users_task:
+					if user_task.get('parent') not in mapped_task_users:
+						mapped_task_users[user_task.get('parent')] = ""
+					mapped_task_users[user_task.get('parent')] += user_task.get('user') + ", "
 
 
-			for task in tasks:
-				frappe.db.sql(f"""
-				Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
-				""")
-				task['assigned_users'] = mapped_task_users.get(task.get('name'))
-			if len(tasks) > 0:
-				frappe.db.commit()
-			return {'tasks': tasks}
-
+				for task in tasks:
+					frappe.db.sql(f"""
+					Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
+					""")
+					task['assigned_users'] = mapped_task_users.get(task.get('name'))
+				if len(tasks) > 0:
+					frappe.db.commit()
+				return {'tasks': tasks}
+			else:
+				frappe.throw("No tasks available for this project")
 
 	
 
