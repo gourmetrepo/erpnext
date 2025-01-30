@@ -638,6 +638,7 @@ erpnext.asset_maintenance = {
 
 // Function to configure project-based fields
 function project_frm_configuration(frm) {
+	hide_add_rows(frm, 'consumed_items', true);
 	// Make project field read-only if project is set
 	frm.set_df_property('project', 'reqd', 0);
 	if (project){
@@ -654,6 +655,7 @@ function project_frm_configuration(frm) {
 		frm.set_df_property('project', 'hidden', 1);
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
+
 }
 
 

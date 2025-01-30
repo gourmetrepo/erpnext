@@ -98,6 +98,7 @@ frappe.ui.form.on("Task", {
 				change_timeline_dialogue.show();
 			});
 		}
+		setup_assigned_team_users(frm);
 	},
 
 	onload: function (frm) {
@@ -168,3 +169,13 @@ frappe.ui.form.on("Task", {
 			frm.doc.project);
 	}
 });
+
+
+
+function setup_assigned_team_users(frm) {
+    frm.fields_dict['assigned_users'].get_query = function() {
+        return {
+            query: "erpnext.projects.doctype.task.task.get_assigned_team_users"
+        };
+    };
+}
