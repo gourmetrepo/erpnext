@@ -198,9 +198,13 @@ class Task(NestedSet):
 				self.update_project()
 
 	def update_asset_maintenance_doc(self):
+		users_list = ""
+		for user in self.assigned_users:
+			users_list += user.get('user') + ", "
+
 		frappe.db.sql(f"""
 		UPDATE `tabAsset Maintenance Task`
-		SET `maintenance_status`="{self.status}"
+		SET `maintenance_status`="{self.status}", `assigned_users`="{users_list}"
 		WHERE `maintenance_task`="{self.name}"
 		AND `parent`="{self.asset_maintenance}"
 		""")

@@ -187,6 +187,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	issue_material: (frm) => {
+		debugger;
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
 		}
@@ -618,7 +619,7 @@ erpnext.asset_maintenance = {
 				erpnext.asset_maintenance.complete_asset_maintenance(frm);
 			}).addClass('btn-success');
 			
-			frm.add_custom_button('Stop', function () {
+			frm.add_custom_button('Halt', function () {
 				frm.set_value('status', 'Stopped');
 				frm.save();
 			}).addClass('btn-danger');

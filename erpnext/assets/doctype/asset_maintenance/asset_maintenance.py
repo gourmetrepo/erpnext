@@ -79,7 +79,7 @@ class AssetMaintenance(Document):
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
-		
+	
 
 	def load_tasks(self):
 		if self.get('project'):
@@ -314,6 +314,9 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 		stock_entry = frappe.new_doc('Stock Entry')
 		stock_entry.stock_entry_type = 'Material Issue'
+		# stock_entry.sub_branch = "Plant Maintenance"
+		# stock_entry.cost_association = "Plant Maintenance"
+		# stock_entry
 		stock_entry.company = asset_maintenance_doc.get('company')
 		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
 		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
@@ -326,7 +329,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = asset_maintenance_doc.get('name')
-			stock_entry.append('items',load_tasksi)
+			stock_entry.append('items',i)
 		
 		
 		return stock_entry
