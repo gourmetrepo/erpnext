@@ -19,6 +19,23 @@ frappe.ui.form.on('Payment Order', {
 				frm.trigger("get_from_payment_request");
 			}, __("Get Payments from"));
 		}
+
+		frm.add_custom_button(__('Payment Entry'), function() {
+			frm.trigger("get_from_payment_entry");
+		}, __("Get Payments from"));
+
+		frm.trigger('remove_button');
+		frm.add_custom_button(__('Get Supplier Payment History'), function () {
+			// Function to open the blank pop-up
+			frm.trigger("openSupplierPaymentHistory");
+		});
+	
+		if (frm.doc.docstatus===1 && frm.doc.payment_order_type==='Payment Request') {
+			frm.add_custom_button(__('Create Payment Entries'), function() {
+				frm.trigger("make_payment_records");
+			});
+	}
+
 	},
 
 	onload: function(frm) {
