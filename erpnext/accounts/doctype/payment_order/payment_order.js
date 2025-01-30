@@ -13,7 +13,6 @@ frappe.ui.form.on('Payment Order', {
 		});
 	},
 	refresh: function(frm) {
-		frm.remove_custom_button("Payment Request", "Get Payments from");
 		if (frm.doc.docstatus == 0) {
 			frm.add_custom_button(__('Payment Request'), function() {
 				frm.trigger("get_from_payment_request");
@@ -34,6 +33,13 @@ frappe.ui.form.on('Payment Order', {
 			frm.add_custom_button(__('Create Payment Entries'), function() {
 				frm.trigger("make_payment_records");
 			});
+
+		frm.remove_custom_button("Payment Request", "Get Payments from");
+		if (frm.doc.docstatus == 0) {
+			frm.add_custom_button(__('Payment Request'), function() {
+				frm.trigger("get_from_payment_request");
+			}, __("Get Payments from"));
+		}
 	}
 
 	},
