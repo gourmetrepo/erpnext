@@ -90,11 +90,27 @@ class AssetMaintenance(Document):
 				WHERE `project`="{self.get('project')}" and `status`="Open" and `asset_maintenance` IS NULL;
 				""", as_dict=True
 			)
+
+			tasks_names = tuple([task.get('name') for task in tasks])
 			
+			users_task = frappe.db.sql(
+				f"""
+				SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {tasks_names};
+				""", as_dict=True
+			)
+
+			mapped_task_users = {}
+			for user_task in users_task:
+				if user_task.get('parent') not in mapped_task_users:
+					mapped_task_users[user_task.get('parent')] = ""
+				mapped_task_users[user_task.get('parent')] += user_task.get('user') + ", "
+
+
 			for task in tasks:
 				frappe.db.sql(f"""
 				Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
 				""")
+				task['assigned_users'] = mapped_task_users.get(task.get('name'))
 			
 			return {'tasks': tasks}
 
@@ -308,7 +324,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = asset_maintenance_doc.get('name')
-			stock_entry.append('items',i)
+			stock_entry.append('items',load_tasksi)
 		
 		
 		return stock_entry
@@ -374,24 +390,6 @@ def update_issue_material(asset_maintenance_doc, material_request_doc):
 			child_doc.required_qty = item.get('qty')
 			child_doc.uom = item.get('uom')
 			asset_maintenance_doc.append('consumed_items', child_doc)
-
-
-@frappe.whitelist()
-def get_assets(company, cost_center):
-	if cost_center:
-		assets = frappe.db.sql(
-			f"""
-			SELECT `name`, `asset_name`, `repair_count`, `cost_center`
-			FROM `tabAsset`
-			WHERE `cost_center` IN (
-			SELECT `name`
-			FROM `tabCost Center`
-			WHERE `parent_cost_center`="{cost_center}" AND `company`="{company}");
-			""", as_dict=True
-		)
-		return assets
-
-
 
 
 @frappe.whitelist()

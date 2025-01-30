@@ -278,7 +278,8 @@ frappe.ui.form.on('Asset Maintenance', {
 				for(let i = 0; i < tasks.length; i++) {
 					frm.add_child('asset_maintenance_tasks', {
 						maintenance_task: tasks[i]['name'],
-						start_date: tasks[i]['exp_start_date']
+						start_date: tasks[i]['exp_start_date'],
+						assigned_users: tasks[i]['assigned_users']
 					})
 				}
 				frm.refresh_field('asset_maintenance_tasks');
