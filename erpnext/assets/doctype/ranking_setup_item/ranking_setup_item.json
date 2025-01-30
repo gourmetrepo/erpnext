@@ -1,0 +1,49 @@
+{
+ "creation": "2025-01-29 15:56:54.644425",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ranking",
+  "rank_split_percentage",
+  "range_slab_start",
+  "range_slab_end"
+ ],
+ "fields": [
+  {
+   "fieldname": "ranking",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ranking"
+  },
+  {
+   "fieldname": "rank_split_percentage",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Rank Split Percentage"
+  },
+  {
+   "fieldname": "range_slab_start",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Range Slab Start"
+  },
+  {
+   "fieldname": "range_slab_end",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Range Slab End"
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-01-29 15:57:13.556787",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Ranking Setup Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

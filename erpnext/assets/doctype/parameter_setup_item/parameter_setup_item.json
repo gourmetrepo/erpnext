@@ -1,0 +1,46 @@
+{
+ "creation": "2025-01-29 16:13:26.044373",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter",
+  "weight",
+  "rank_type"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Parameter",
+   "reqd": 1
+  },
+  {
+   "fieldname": "weight",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Weight",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rank_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Rank Type",
+   "options": "Ranking Setup",
+   "reqd": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-01-29 16:53:04.154980",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Parameter Setup Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

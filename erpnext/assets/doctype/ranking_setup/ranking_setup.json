@@ -1,0 +1,62 @@
+{
+ "autoname": "RS.-.######",
+ "creation": "2025-01-29 16:01:52.270088",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "rank_name",
+  "section_break_2",
+  "ranking_setup_item",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "rank_name",
+   "fieldtype": "Data",
+   "label": "Rank Name"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ranking_setup_item",
+   "fieldtype": "Table",
+   "label": "Ranking Setup Item",
+   "options": "Ranking Setup Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ranking Setup",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2025-01-29 16:01:52.270088",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Ranking Setup",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

@@ -1,0 +1,42 @@
+{
+ "creation": "2025-01-29 18:16:15.224955",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter",
+  "ranking",
+  "score"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Parameter"
+  },
+  {
+   "fieldname": "ranking",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Ranking"
+  },
+  {
+   "fieldname": "score",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Score"
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-01-29 18:16:30.439428",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Compliance Verification Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
