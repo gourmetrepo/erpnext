@@ -4,16 +4,6 @@
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
 
-		frm.set_indicator_formatter('status',
-			function(doc) {
-				let indicator = 'red'
-				if (doc.status == 'MR Generated') {
-					indicator = 'orange';
-				}
-				return indicator;
-			}
-		);
-
 
 		frm.set_query('project', function() {
             return {
@@ -560,22 +550,19 @@ erpnext.asset_maintenance = {
 
 	complete_asset_maintenance: async function(frm) {
 		try {
-			// Call the server-side function directly using frappe.call
-			const r = await frappe.call({
-				method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.complete_asset_maintenance',
-				freeze: true,
-				freeze_message: __("Completing the Maintenance"),
-				args: {
-					'asset_maintenance_doc_ref': frm.doc.name
-				}
-			});
-	
-			if (r && r.message) {
-				if(r.message){
-					frm.set_value('status', 'Completed');
-					frm.save();
+			let not_completed = false
+			for (let i = 0; i < frm.doc.asset_maintenance_tasks.length; i++) {
+				if (frm.doc.asset_maintenance_tasks[i].maintenance_status !== 'Completed') {
+					not_completed = true
+					break
 				}
 			}
+			if (not_completed){
+				frappe.throw("All tasks must be completed before completing the maintenance")
+			}else{
+				frm.set_value('status', 'Completed');
+				frm.save();
+			}		
 		} catch (error) {
 			console.error('Error completing asset maintenance:', error);
 		}
