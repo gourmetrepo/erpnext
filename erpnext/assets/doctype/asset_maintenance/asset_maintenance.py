@@ -111,7 +111,8 @@ class AssetMaintenance(Document):
 				Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
 				""")
 				task['assigned_users'] = mapped_task_users.get(task.get('name'))
-			
+			if len(tasks) > 0:
+				frappe.db.commit()
 			return {'tasks': tasks}
 
 
