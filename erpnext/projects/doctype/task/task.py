@@ -42,7 +42,7 @@ class Task(NestedSet):
 			self.update_asset_maintenance_doc()
 		
 		if self.status == "Completed" and not self.completed_by:
-        	doc.completed_by = frappe.session.user
+			doc.completed_by = frappe.session.user
 
 	def validate_dates(self):
 		if self.exp_start_date and self.exp_end_date and getdate(self.exp_start_date) > getdate(self.exp_end_date):
@@ -330,10 +330,10 @@ def validate_project_dates(project_end_date, task, task_start, task_end, actual_
 
 @frappe.whitelist()
 def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters):
-    query = """
-        SELECT DISTINCT(user) FROM `tabMaintenance Team Member`
-        WHERE user LIKE %s
-    """
-    
-    users = frappe.db.sql(query, ("%" + txt + "%",))
-    return users
+	query = """
+		SELECT DISTINCT(user) FROM `tabMaintenance Team Member`
+		WHERE user LIKE %s
+	"""
+	
+	users = frappe.db.sql(query, ("%" + txt + "%",))
+	return users
