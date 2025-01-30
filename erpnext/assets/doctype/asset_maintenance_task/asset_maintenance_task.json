@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "maintenance_task",
+  "task_name",
   "maintenance_type",
   "maintenance_status",
   "start_date",
@@ -42,7 +43,7 @@
    "fieldname": "maintenance_status",
    "fieldtype": "Select",
    "in_list_view": 1,
-   "label": "Maintenance Status",
+   "label": "Status",
    "options": "Open\nWorking\nPending Review\nOverdue\nCompleted\nCancelled",
    "read_only": 1
   },
@@ -87,10 +88,18 @@
    "in_list_view": 1,
    "label": "Assigned Users",
    "read_only": 1
+  },
+  {
+   "fetch_from": "maintenance_task.subject",
+   "fieldname": "task_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Task Name",
+   "read_only": 1
   }
  ],
  "istable": 1,
- "modified": "2025-01-30 15:42:50.142576",
+ "modified": "2025-01-30 18:37:21.579504",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
