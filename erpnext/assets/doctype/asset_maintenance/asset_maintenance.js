@@ -8,7 +8,8 @@ frappe.ui.form.on('Asset Maintenance', {
 		frm.set_query('project', function() {
             return {
                 filters: {
-                    status: 'Open'
+                    status: 'Open',
+					company: frm.doc.company
                 }
             };
         });
@@ -619,7 +620,7 @@ erpnext.asset_maintenance = {
 				erpnext.asset_maintenance.complete_asset_maintenance(frm);
 			}).addClass('btn-success');
 			
-			frm.add_custom_button('Halt', function () {
+			frm.add_custom_button('On Hold', function () {
 				frm.set_value('status', 'Stopped');
 				frm.save();
 			}).addClass('btn-danger');
