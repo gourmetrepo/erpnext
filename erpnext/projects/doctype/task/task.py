@@ -42,7 +42,7 @@ class Task(NestedSet):
 			self.update_asset_maintenance_doc()
 		
 		if self.status == "Completed" and not self.completed_by:
-			doc.completed_by = frappe.session.user
+			self.completed_by = frappe.session.user
 
 	def validate_dates(self):
 		if self.exp_start_date and self.exp_end_date and getdate(self.exp_start_date) > getdate(self.exp_end_date):
@@ -200,10 +200,11 @@ class Task(NestedSet):
 	def update_asset_maintenance_doc(self):
 		frappe.db.sql(f"""
 		UPDATE `tabAsset Maintenance Task`
-		SET `status`={self.status}
-		WHERE `maintenance_status`={self.name}
-		AND `parent`={self.asset_maintenance}
+		SET `maintenance_status`="{self.status}"
+		WHERE `maintenance_task`="{self.name}"
+		AND `parent`="{self.asset_maintenance}"
 		""")
+		frappe.db.commit()
 	
 
 @frappe.whitelist()
