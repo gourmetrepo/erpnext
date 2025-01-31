@@ -3,53 +3,16 @@
 
 frappe.ui.form.on('Compliance Verification', {
 	refresh: function(frm) {
-		// frm.set_query("inspector", function() {
-        //     if(!frm.doc.company){
-        //         frappe.msgprint("Please select Company first.");
-        //     }
-        //     return {
-        //         "filters": {"company": frm.doc.company}
-        //     };
-        // });
 
-		// frm.set_query("area_incharge", function() {
-        //     if(!frm.doc.company){
-        //         frappe.msgprint("Please select Company first.");
-        //     }
-        //     return {
-        //         "filters": {"company": frm.doc.company}
-        //     };
-        // });
-
-		// frm.set_query("cost_center", function() {
-        //     if(!frm.doc.company){
-        //         frappe.msgprint("Please select Company first.");
-        //     }
-        //     return {
-        //         "filters": {"company": frm.doc.company}
-        //     };
-        // });
-
-		// frm.set_query("parameter_setup", function() {
-        //     if(!frm.doc.company){
-        //         frappe.msgprint("Please select Company first.");
-        //     }
-		// 	if(!frm.doc.location){
-        //         frappe.msgprint("Please select Location first.");
-        //     }
-		// 	if(!frm.doc.cost_center){
-        //         frappe.msgprint("Please select Cost Center first.");
-        //     }
-        //     return {
-        //         "filters": {
-		// 			"company": frm.doc.company,
-		// 			"location": frm.doc.location,
-		// 			"cost_center": frm.doc.cost_center
-		// 		}
-        //     };
-        // });
 	},
 	onload: function(frm) {
+		if (frm.is_new()) {
+			frappe.db.get_value('Employee', {'user_id': frappe.session.user}, 'employee', (r) => {
+				if (r && r.employee) {
+					frm.set_value('inspector', r.employee);
+				}
+			});
+		}
 		if (frm.doc.compliance_verification_item.length){
 			frappe.call({
 				method: "erpnext.assets.doctype.compliance_verification.compliance_verification.get_rank_options",
@@ -71,5 +34,9 @@ frappe.ui.form.on('Compliance Verification', {
 				}
 			});
 		}
+	},
+	after_save: function(frm) {
+		//To load LOVs in the child table
+		frm.reload_doc();
 	}
 });

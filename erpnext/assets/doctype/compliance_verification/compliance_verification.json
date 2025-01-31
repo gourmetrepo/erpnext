@@ -5,8 +5,8 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "compliance_verification_name",
   "parameter_setup",
+  "compliance_verification_name",
   "company",
   "location",
   "ranking",
@@ -47,11 +47,12 @@
    "read_only": 1
   },
   {
+   "default": "Today",
    "fieldname": "inspection_date",
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Inspection Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "column_break_5",
@@ -157,10 +158,11 @@
    "read_only": 1
   },
   {
+   "fetch_from": "parameter_setup.parameter_name",
    "fieldname": "compliance_verification_name",
    "fieldtype": "Data",
    "label": "Compliance Verification Name",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fetch_from": "parameter_setup.ranking",
@@ -172,7 +174,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-31 16:30:44.888572",
+ "modified": "2025-01-31 19:29:57.572961",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Compliance Verification",
