@@ -270,6 +270,41 @@ frappe.ui.form.on("Work Order", {
 
 	},
 
+	item_section: function(frm){
+	    if(frm.doc.item_section){
+	       // frm.set_value("for_warehouse", "");
+	        frappe.db.get_doc("Section", frm.doc.item_section)
+			.then(doc => {
+                if(doc){
+                    doc.section_warehouse.forEach(function(element){
+                        if(element.company == frm.doc.company){
+                            frm.set_value("wip_warehouse", element.wip_warehouse);
+                            frm.refresh_field("wip_warehouse");
+                            
+                            frm.set_value("fg_warehouse", element.finished_goods_warehouse);
+                            frm.refresh_field("fg_warehouse");
+                            
+                            frm.set_value("scrap_warehouse", element.scrap_warehouse);
+                            frm.refresh_field("scrap_warehouse");
+                        } 
+                    });
+                }
+			});
+	    }
+	    let item_sections = ["FG CSD","FG Juices","FG RGB","FG Water"];
+	    if (item_sections.includes(frm.doc.item_section)) {
+	        frm.toggle_display("production_line",true);
+            frm.set_df_property("production_line", "reqd", 1);
+        }
+        else{
+            frm.doc.production_line = '';
+            frm.refresh_field('production_line');
+            frm.set_df_property("production_line", "reqd", 0);
+            frm.toggle_display("production_line",false);
+        }
+
+	},
+
 	make_job_card: function(frm) {
 		let qty = 0;
 		let operations_data = [];
@@ -779,3 +814,7 @@ erpnext.work_order = {
 		});
 	}
 };
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
