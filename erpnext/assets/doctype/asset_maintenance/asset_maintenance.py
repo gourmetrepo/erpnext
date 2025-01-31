@@ -366,7 +366,7 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 				return_stock_entry_flag = True
 			
 		if not return_stock_entry_flag:
-			asset_maintenance_doc.status = "Closed"
+			asset_maintenance_doc.status = get_closing_status(asset_maintenance_doc)
 			asset_maintenance_doc.save()
 			asset_maintenance_doc.submit()
 
@@ -413,3 +413,12 @@ def get_assets(company, cost_center):
 		return assets
 
 
+
+
+
+def get_closing_status(asset_maintenance_doc):
+	final_status = 'Finished'
+	for task in asset_maintenance_doc.get('asset_maintenance_tasks'):
+		if task.get('maintenance_status') != "Completed" and task.get('maintenance_status') != "Cancelled":
+			final_status = 'Closed'
+	return final_status
