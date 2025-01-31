@@ -35,6 +35,10 @@ frappe.ui.form.on("Leave Application", {
 				}
 			});
 		}
+
+		if(!frm.doc.docstatus){
+			frm.trigger("make_dashboard");
+		}
 	},
 
 	validate: function(frm) {
@@ -45,47 +49,130 @@ frappe.ui.form.on("Leave Application", {
 	},
 
 	make_dashboard: function(frm) {
+		console.log("We have override it");
 		var leave_details;
 		let lwps;
-		if (frm.doc.employee) {
-			frappe.call({
-				method: "erpnext.hr.doctype.leave_application.leave_application.get_leave_details",
-				async: false,
-				args: {
-					employee: frm.doc.employee,
-					date: frm.doc.from_date || frm.doc.posting_date
-				},
-				callback: function(r) {
-					if (!r.exc && r.message['leave_allocation']) {
-						leave_details = r.message['leave_allocation'];
-					}
-					if (!r.exc && r.message['leave_approver']) {
-						frm.set_value('leave_approver', r.message['leave_approver']);
-					}
-					lwps = r.message["lwps"];
-				}
-			});
-			$("div").remove(".form-dashboard-section");
-			frm.dashboard.add_section(
-				frappe.render_template('leave_application_dashboard', {
-					data: leave_details
-				})
-			);
-			frm.dashboard.show();
-			let allowed_leave_types =  Object.keys(leave_details);
+	 var monthly_leaves;
+	 var month_names;
+	 if (frm.doc.employee) {
+		 frappe.call({
+			 method: "nerp.modules.gourmet.leave_application.leave_application.get_leave_details",
+			 async: false,
+			 args: {
+				 employee: frm.doc.employee,
+				 date: frm.doc.from_date || frm.doc.posting_date
+			 },
+			 callback: function(r) {
+				 if (!r.exc && r.message['leave_allocation']) {
+					 console.log(r.message['leave_allocation']);
+					 leave_details = r.message['leave_allocation'];
+				 }
+				 if (!r.exc && r.message['leave_approver']) {
+					 frm.set_value('leave_approver', r.message['leave_approver']);
+				 }
+				 if (!r.exc && r.message['monthly_leaves']) {
+					 console.log(r.message['monthly_leaves']);
+					 monthly_leaves = r.message['monthly_leaves'];
+				 }
+				 if (!r.exc && r.message['month_names']) {
+					 console.log(r.message['month_names']);
+					 month_names = r.message['month_names'];
+				 }
+				 lwps = r.message["lwps"];
+			 }
+		 });
+		 
+		 let allowed_leave_types =  Object.keys(leave_details);
+		 
+		 // lwps should be allowed, lwps don't have any allocation
+		 allowed_leave_types = allowed_leave_types.concat(lwps);
+		 
+		 if(!frappe.user.has_role("HR Manager") && !frappe.user.has_role("HR User")){
+			 frm.set_query('leave_type', function(){
+				 return {
+					 filters : [
+						 ['leave_type_name', 'in', allowed_leave_types]
+					 ]
+				 };
+			 });
+		 }
+		var myvar = '{% if data %}'+
+		'<h5 style="margin-top: 20px;"> {{ __("Allocated Leaves") }} </h5>'+
+		'<table class="table table-bordered small">'+
+		'	<thead>'+
+		'		<tr>'+
+		'			<th style="width: 16%">{{ __("Leave Type") }}</th>'+
+		'			<th style="width: 16%" class="text-right">{{ __("Total Allocated Leaves") }}</th>'+
+		'			<th style="width: 16%" class="text-right">{{ __("Expired Leaves") }}</th>'+
+		'			<th style="width: 16%" class="text-right">{{ __("Used Leaves") }}</th>'+
+		'			<th style="width: 16%" class="text-right">{{ __("Pending Leaves") }}</th>'+
+		'			<th style="width: 16%" class="text-right">{{ __("Available Leaves") }}</th>'+
+		'		</tr>'+
+		''+
+		'	</thead>'+
+		'	<tbody>'+
+		'		{% for(const [key, value] of Object.entries(data)) { %}'+
+		'			<tr>'+
+		'				<td> {%= key %} </td>'+
+		'				<td class="text-right"> {%= value["total_leaves"] %} </td>'+
+		'				<td class="text-right"> {%= value["expired_leaves"] %} </td>'+
+		'				<td class="text-right"> {%= value["leaves_taken"] %} </td>'+
+		'				<td class="text-right"> {%= value["pending_leaves"] %} </td>'+
+		'				<td class="text-right"> {%= value["remaining_leaves"] %} </td>'+
+		'			</tr>'+
+		'		{% } %}'+
+		'	</tbody>'+
+		'</table>'+
+		'{% } else { %}'+
+		'<p style="margin-top: 30px;"> No Leaves have been allocated. </p>'+
+		'{% } %}'+
+		''+
+		''+
+		''+
+		'{% if monthly_leaves %}'+
+		''+
+		'<h5 style="margin-top: 20px;"> {{ __("Monthly Leaves") }} </h5>'+
+		'<table class="table table-bordered small">'+
+		'	<thead>'+
+		'		<tr>'+
+		'			<th style="width: 16%">{{ __("Leave Type") }}</th>'+
+		'            {% for(const [key, month_name] of Object.entries(month_names)) { %}'+
+		'                <th style="width: 16%" class="text-right"> {%= month_name %} </th>'+
+		'            {% } %}'+
+		'		</tr>'+
+		''+
+		'	</thead>'+
+		'	<tbody>'+
+		'        {% for(const [key, value] of Object.entries(monthly_leaves)) { %}'+
+		'            <tr>'+
+		'                <td> {%= key %} </td>'+
+		''+
+		'                {% for(const [sub_key, sub_value] of Object.entries(value)) { %}'+
+		'                    <td class="text-right"> {%= sub_value %} </td>'+
+		'                {% } %}'+
+		'            </tr>'+
+		'        {% } %}'+
+		'	</tbody>'+
+		'</table>'+
+		''+
+		'{% } else { %}'+
+		'<p style="margin-top: 30px;"> No Leaves in previous months. </p>'+
+		'{% } %}';
+		
 
-			// lwps should be allowed, lwps don't have any allocation
-			allowed_leave_types = allowed_leave_types.concat(lwps);
+ 
 
-			frm.set_query('leave_type', function(){
-				return {
-					filters : [
-						['leave_type_name', 'in', allowed_leave_types]
-					]
-				};
-			});
-		}
-	},
+		$("div").remove(".form-dashboard-section");
+		frm.dashboard.add_section(
+			frappe.render_template(myvar, {
+				data: leave_details,
+				monthly_leaves: monthly_leaves,
+				month_names: month_names
+			})
+		);
+		frm.dashboard.show();
+	 }
+},
 
 	refresh: function(frm) {
 		if (frm.is_new()) {
@@ -118,6 +205,7 @@ frappe.ui.form.on("Leave Application", {
 
 	leave_type: function(frm) {
 		frm.trigger("get_leave_balance");
+		frm.trigger("to_date");
 	},
 
 	half_day: function(frm) {
@@ -139,6 +227,8 @@ frappe.ui.form.on("Leave Application", {
 		frm.trigger("make_dashboard");
 		frm.trigger("half_day_datepicker");
 		frm.trigger("calculate_total_days");
+		frm.set_value("to_date", frm.doc.from_date);
+		frm.refresh_field("to_date");
 	},
 
 	to_date: function(frm) {
