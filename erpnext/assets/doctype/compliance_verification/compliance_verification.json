@@ -6,12 +6,12 @@
  "engine": "InnoDB",
  "field_order": [
   "compliance_verification_name",
+  "parameter_setup",
   "company",
   "location",
-  "inspection_date",
-  "parameter_setup",
   "ranking",
   "column_break_5",
+  "inspection_date",
   "inspector",
   "inspector_name",
   "area_incharge",
@@ -31,20 +31,20 @@
  ],
  "fields": [
   {
+   "fetch_from": "parameter_setup.company",
    "fieldname": "company",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "read_only": 1
   },
   {
+   "fetch_from": "parameter_setup.location",
    "fieldname": "location",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Location",
    "options": "Location",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "inspection_date",
@@ -61,22 +61,21 @@
    "fieldname": "inspector",
    "fieldtype": "Link",
    "label": "Inspector",
-   "options": "Employee",
-   "reqd": 1
+   "options": "Employee"
   },
   {
    "fieldname": "area_incharge",
    "fieldtype": "Link",
    "label": "Area Incharge",
-   "options": "Employee",
-   "reqd": 1
+   "options": "Employee"
   },
   {
+   "fetch_from": "parameter_setup.cost_center",
    "fieldname": "cost_center",
    "fieldtype": "Link",
    "label": "Cost Center",
    "options": "Cost Center",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "section_break_9",
@@ -173,7 +172,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-31 12:56:15.883817",
+ "modified": "2025-01-31 16:30:44.888572",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Compliance Verification",
