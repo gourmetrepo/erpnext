@@ -1871,7 +1871,10 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 			# This means user is adding stock entry Material Transfer to return stock back to the warehouse
 			# This stock entry will be initiated on action of Close button on asset maintenance 
 			if asset_maintenance_doc.status == "Completed" or asset_maintenance_doc.status == "Stopped":
-				asset_maintenance_doc.status = "Closed"
+				if asset_maintenance_doc.status == "Completed":
+					asset_maintenance_doc.status = "Finished"
+				elif asset_maintenance_doc.status == "Stopped":
+					asset_maintenance_doc.status = "Closed"
 				
 				# Update returned items
 				for item in doc.items:
