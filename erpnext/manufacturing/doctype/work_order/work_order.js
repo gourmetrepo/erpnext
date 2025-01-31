@@ -120,6 +120,21 @@ frappe.ui.form.on("Work Order", {
 			});
 			erpnext.work_order.set_default_warehouse(frm);
 		}
+
+		frm.set_query("bom_no", function() {
+			if (frm.doc.production_item && frm.doc.company) {
+				return {
+					query: "erpnext.controllers.queries.bom",
+					filters: {item: cstr(frm.doc.production_item),company: cstr(frm.doc.company)}
+				};
+			} else {
+			    if(!frm.doc.production_item)
+				    frappe.msgprint(__("Please enter Production Item first"));
+			    if(!frm.doc.company)
+				    frappe.msgprint(__("Please enter Company first"));
+
+			}
+		});  
 	},
 
 	source_warehouse: function(frm) {
@@ -182,6 +197,77 @@ frappe.ui.form.on("Work Order", {
 				frm.trigger("make_bom");
 			});
 		}
+
+		if(frm.doc.closed == 1){
+            frm.remove_custom_button("Re-open","Status");
+            frm.remove_custom_button("Returnable Transfer");
+        }
+		if((cur_frm.doc.status == 'Completed' || cur_frm.doc.status == 'Stopped') && cur_frm.doc.closed != 1 ){
+            cur_frm.add_custom_button(__("Close"), function() {
+                frappe.call({
+        			method: "nrp_manufacturing.modules.gourmet.work_order.work_order.close_work_order",
+        			args: {
+        				work_order: cur_frm.doc.name,
+        				status : cur_frm.doc.status
+        			},
+        			callback: function(r) {
+        				if(r.message) {
+        				    let stock_entry = r.message;
+        				    if(isEmpty(stock_entry)){
+            				   location.reload()
+        				    }else{
+        				        frappe.model.sync(stock_entry);
+    				            frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+        				    }
+        				}
+        			}
+        		});
+            }).addClass("btn-primary");
+        }
+        if((cur_frm.doc.status == 'Completed' || cur_frm.doc.status == 'Stopped') && cur_frm.doc.has_returnable && cur_frm.doc.production_return != 1 &&  cur_frm.doc.closed != 1 ){
+            cur_frm.add_custom_button(__("Returnable Transfer"), function() {
+                frappe.call({
+        			method: "nrp_manufacturing.modules.gourmet.work_order.work_order.returnable_transfer_entry",
+        			args: {
+        				work_order: cur_frm.doc.name
+        			},
+        			callback: function(r) {
+        				if(r.message) {
+        				    let stock_entry = r.message;
+        				    if(isEmpty(stock_entry)){
+            				   location.reload()
+        				    }else{
+        				        frappe.model.sync(stock_entry);
+    				            frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+        				    }
+        				}
+        			}
+        		});
+            }).addClass("btn-primary");
+        }
+        if((cur_frm.doc.status == 'Completed' || cur_frm.doc.status == 'Stopped') && cur_frm.doc.has_returnable && cur_frm.doc.production_return == 1 && cur_frm.doc.waste_return != 1 &&  cur_frm.doc.closed != 1 ){
+            cur_frm.add_custom_button(__("Returnable Wastage"), function() {
+                frappe.call({
+        			method: "nrp_manufacturing.modules.gourmet.work_order.work_order.returnable_transfer_entry",
+        			args: {
+        				work_order: cur_frm.doc.name,
+        				status : 1
+        			},
+        			callback: function(r) {
+        				if(r.message) {
+        				    let stock_entry = r.message;
+        				    if(isEmpty(stock_entry)){
+            				   location.reload()
+        				    }else{
+        				        frappe.model.sync(stock_entry);
+    				            frappe.set_route('Form', stock_entry.doctype, stock_entry.name);
+        				    }
+        				}
+        			}
+        		});
+            }).addClass("btn-primary");
+        }
+
 	},
 
 	make_job_card: function(frm) {
@@ -347,7 +433,8 @@ frappe.ui.form.on("Work Order", {
 				method: "erpnext.manufacturing.doctype.work_order.work_order.get_item_details",
 				args: {
 					item: frm.doc.production_item,
-					project: frm.doc.project
+					project: frm.doc.project,
+					company: frm.doc.company
 				},
 				freeze: true,
 				callback: function(r) {

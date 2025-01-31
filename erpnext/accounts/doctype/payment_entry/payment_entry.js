@@ -8,6 +8,10 @@ frappe.ui.form.on('Payment Entry', {
 			if (!frm.doc.paid_from) frm.set_value("paid_from_account_currency", null);
 			if (!frm.doc.paid_to) frm.set_value("paid_to_account_currency", null);
 		}
+		if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		    frm.set_value('naming_series', 'PAYSM-.YY.-');
+		    refresh_field('naming_series')
+		    }
 	},
 
 	setup: function(frm) {
@@ -350,6 +354,24 @@ frappe.ui.form.on('Payment Entry', {
 				}
 			});
 		}
+		if (frm.doc.party_type == 'Customer'){
+	        frm.set_value("territory", null)
+	        frappe.call({
+    			method: "frappe.client.get_value",
+    			args: {
+    				doctype: "Customer",
+    				filters: {"name": frm.doc.party},
+    				fieldname: "territory"
+    			},
+    			callback: function(r){
+    				if(r.message){
+    					frm.set_value("territory", r.message.territory)
+    				}
+    				refresh_field("territory");
+    			}
+			
+	    	});
+	    }
 	},
 
 	paid_from: function(frm) {

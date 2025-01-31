@@ -63,6 +63,11 @@ frappe.ui.form.on("Supplier", {
 			// indicators
 			erpnext.utils.set_party_dashboard_indicators(frm);
 		}
+
+		frappe.require("assets/nerp/js/jquery.maskedinput.min.js", () => {
+            $.mask.definitions['3'] = null;
+            $('input[data-fieldname="cnic"]').mask(frappe.utils.get_config_by_name('CNIC_MASK','99999-9999999-9'),{autoclear: false});
+        })
 	},
 
 	is_internal_supplier: function(frm) {
@@ -72,5 +77,36 @@ frappe.ui.form.on("Supplier", {
 		else {
 			frm.toggle_reqd("represents_company", false);
 		}
-	}
+	},
+	onload: function(frm) {
+        frm.fields_dict['grower_location'].grid.get_field('location').get_query = "sugar_mill.sugar_mill.doctype.supplier_location_information.supplier_location_information.get_location";
+    },
+	supplier_type: function(frm) {
+		frm.toggle_reqd('cnic',frm.doc.supplier_type === 'Grower');
+		frm.toggle_reqd('father_name',frm.doc.supplier_type === 'Grower');
+		if(frm.doc.supplier_type == 'Grower'){
+		    frm.set_value('naming_series', 'GWR-.YY.-.######');
+		    refresh_field('naming_series')
+		}
+	},
+	naming_series: function(frm){
+		if(frm.doc.supplier_type == 'Grower'){
+			frm.set_value('naming_series','GWR-.YY.-.######');
+			refresh_field('naming_series');
+		}  
+	},
 });
+
+// Child table Grower Location
+frappe.ui.form.on('Supplier Location Information',{
+    location:function(frm,cdt,cdn){
+        let row = frappe.get_doc(cdt,cdn);
+		frappe.call({
+		    doc:row,
+			method: "get_grower_information",
+			callback: function(r) {
+				refresh_field('grower_location');
+			}
+		});
+    }
+})

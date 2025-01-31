@@ -35,6 +35,31 @@ frappe.ui.form.on("Sales Order", {
 			};
 		})
 	},
+
+	validate: function(frm) {
+
+		console.log(frm.doc.items);
+		for (let i = 0; i < frm.doc.items.length; i++) {
+			if (frm.doc.items[i].rate > 0) {
+				console.log(frm.doc.items[i].rate);
+				continue;
+			}
+			
+			return new Promise(function(resolve, reject) {
+				frappe.confirm(
+					'The rate of this item <b>' + frm.doc.items[i].item_name + '</b> is <b>' + frm.doc.items[i].rate + '</b>. Do you really want to Continue?',
+					function() {
+						var negative = 'frappe.validated = false';
+						resolve(negative);
+					},
+					function() {
+						reject();
+					}
+				)
+			})
+		}
+		
+	},
 	refresh: function(frm) {
 		if(frm.doc.docstatus === 1 && frm.doc.status !== 'Closed'
 			&& flt(frm.doc.per_delivered, 6) < 100 && flt(frm.doc.per_billed, 6) < 100) {
@@ -47,6 +72,18 @@ frappe.ui.form.on("Sales Order", {
 				})
 			});
 		}
+		if(frm.doc.status !== 'Closed') {
+			if(frm.doc.status !== 'On Hold') {
+				let allow_delivery = frm.doc.items.some(item => item.delivered_by_supplier === 0 && item.qty > flt(item.delivered_qty))
+				//if(frm.doc.order_type == 'Inter Unit Sales'  && allow_delivery) 
+				if((frm.doc.order_type == 'Inter Unit Sales' || frm.doc.order_type == 'Special Order' || frm.doc.order_type == 'Scrap')  && allow_delivery)
+				{
+					let salesorder_controller = new erpnext.selling.SalesOrderController({frm: cur_frm});
+					frm.add_custom_button(__('Delivery Note'), () => salesorder_controller.make_delivery_note_based_on_delivery_date(), __('Create'));
+					frm.add_custom_button(__('Work Order'), () => salesorder_controller.make_work_order(), __('Create'));
+				}
+			}
+	}
 	},
 	onload: function(frm) {
 		if (!frm.doc.transaction_date){
@@ -66,6 +103,68 @@ frappe.ui.form.on("Sales Order", {
 		});
 
 		erpnext.queries.setup_warehouse_query(frm);
+	},
+
+	onload_post_render(frm) {
+		if (frm.doc.docstatus == 1) {
+		    frm.remove_custom_button("Update Items");
+		}
+		frm.set_query("shipping_rule", function() {
+			return {
+				query: "nrp_manufacturing.utils.get_shipping_rules",
+				filters: {'company': frm.doc.company, 'territory': frm.doc.territory}
+			}
+		});
+		if(frm.doc.docstatus == 0){
+	        frm.trigger('price_lock');
+		}
+	},
+	customer: function(frm){
+	    if(frm.doc.customer){
+	       frappe.call({
+        			method: "nrp_manufacturing.modules.gourmet.sales_order.sales_order.load_customer_balance",
+        			args: {
+        				customer: frm.doc.customer
+        			},
+        			callback: function(r) {
+        				if(r.message) {
+        				   let data = r.message[0];
+        				   frm.set_value('balance',data.total_unpaid);
+        				}
+        			}
+        		});
+	    }
+	},
+	price_lock: function(frm){
+	    if (frm.doc.selling_price_list){
+            frappe.call({
+                    method: 'frappe.client.get_value',
+                    args: {
+                    doctype: 'Price List',
+                    filters: {
+                      'name': frm.doc.selling_price_list
+                    },
+                    fieldname: ['price_lock']
+                  },
+                  callback: function (data) {
+                    if (data.message){
+                        console.log(data.message);
+                        if(data.message.price_lock == 1)
+                        {
+                            let df = frappe.meta.get_docfield("Sales Order Item","rate", cur_frm.doc.name);
+                            df.read_only = 1;
+                            
+                        }
+                        else{
+                            let df = frappe.meta.get_docfield("Sales Order Item","rate", cur_frm.doc.name);
+                            df.read_only = 0;
+                        }
+                        frm.refresh_fields();
+                    }
+                  }
+                
+            });
+    	}
 	},
 
 	delivery_date: function(frm) {
