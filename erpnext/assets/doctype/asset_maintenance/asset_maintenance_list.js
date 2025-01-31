@@ -8,7 +8,8 @@ frappe.listview_settings['Asset Maintenance'] = {
 			"Completed": "green",
 			"Stopped": "red",
 			"Closed": "green",
-			"Cancelled": "red"
+			"Cancelled": "red",
+			"Finished": "green"
 		}
 		return [__(doc.status), colors[doc.status], "status,=," + doc.status];
 	},

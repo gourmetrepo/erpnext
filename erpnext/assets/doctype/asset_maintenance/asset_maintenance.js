@@ -583,7 +583,6 @@ erpnext.asset_maintenance = {
 			});
 	
 			if (r && r.message) {
-				debugger;
 				// If return stock entry flag is true, open the form for the newly created stock entry
 				// Otherwise, close the plant maintenance document
 				let return_stock_entry_flag = r.message.return_stock_entry_flag
