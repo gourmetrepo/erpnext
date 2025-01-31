@@ -7,6 +7,7 @@
  "field_order": [
   "parameter_name",
   "company",
+  "ranking",
   "column_break_3",
   "cost_center",
   "location",
@@ -74,10 +75,17 @@
    "fieldtype": "Data",
    "label": "Parameter Name",
    "reqd": 1
+  },
+  {
+   "fieldname": "ranking",
+   "fieldtype": "Link",
+   "label": "Ranking",
+   "options": "Ranking Setup",
+   "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-30 20:39:04.920385",
+ "modified": "2025-01-31 12:52:42.092256",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Parameter Setup",
@@ -96,7 +104,9 @@
    "write": 1
   }
  ],
+ "search_fields": "parameter_name",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "title_field": "parameter_name",
  "track_changes": 1
 }
