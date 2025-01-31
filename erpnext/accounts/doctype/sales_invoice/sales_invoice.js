@@ -705,6 +705,34 @@ frappe.ui.form.on('Sales Invoice', {
 			}
 		};
 	},
+
+	refresh(frm) {
+		setTimeout(function(){
+		    frm.remove_custom_button("Sales Order","Get items from");
+            frm.remove_custom_button("Delivery Note", "Get items from");
+            frm.remove_custom_button("Quotation", "Get items from");
+		}, 500);
+		frm.set_query("supplier","transporter_freight_charges" , function(doc, cdt, cdn) {
+        	var d = locals[cdt][cdn];
+        	return{
+        		filters: [
+        			['Supplier', 'is_transporter', '=', 1]
+        		]
+        	}
+        });
+        
+        frm.set_query("freight_account", "transporter_freight_charges", function(doc, cdt, cdn) {
+        	var d = locals[cdt][cdn];
+        	return{
+        		filters: [
+        			['Account', 'root_type', '=', 'Expense'],
+        			['Account', 'is_group', '=', 0],
+        			['Account', 'company', '=', frm.doc.company]
+        		]
+        	}
+        });
+        
+	},
 	// When multiple companies are set up. in case company name is changed set default company address
 	company:function(frm){
 		if (frm.doc.company)
@@ -736,8 +764,76 @@ frappe.ui.form.on('Sales Invoice', {
 
 	onload: function(frm) {
 		frm.redemption_conversion_factor = null;
+
+		frm.fields_dict['items'].grid.wrapper.find('.grid-add-row').hide();
+         frm.fields_dict['items'].grid.wrapper.find('.grid-add-multiple-rows').hide();
+         frm.fields_dict['items'].grid.wrapper.find('.grid-upload').hide();
+         if (!cur_frm.doc.is_return){
+            frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').hide();
+         }
+         if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		    frm.set_value('naming_series', 'SISM-.YY.-');
+		    refresh_field('naming_series')
+		    }
 	},
 
+	onload_post_render(frm) {
+		// your code here
+		frm.remove_custom_button("Sales Order","Get items from");
+        frm.remove_custom_button("Delivery Note", "Get items from");
+        frm.remove_custom_button("Quotation", "Get items from");
+	},
+
+	transporter_freight: function(frm){
+	    frm.clear_table("transporter_freight_charges");
+	    frm.refresh_fields();
+	    
+	    if(!frm.doc.company){
+	        frappe.msgprint("Please select Company First");
+	    }
+	    if(!frm.doc.territory){
+	        frappe.msgprint("Please select Territory First");
+	    }
+	    
+	    if(frm.doc.company && frm.doc.territory){
+	        return frappe.call({
+    			method: 'nrp_manufacturing.modules.gourmet.sales_invoice.sales_invoice.get_shipping_rule',
+    			args: {
+    				"company": frm.doc.company,
+    				"territory": frm.doc.territory
+    			},
+    			callback: function(r) {
+    				if (r && r.message) {
+        				var tf_item = frappe.model.add_child(frm.doc, 'Transporter Freight', 'transporter_freight_charges');
+                        frappe.model.set_value(tf_item.doctype, tf_item.name, 'freight_account', r.message[0].account);
+                        frappe.model.set_value(tf_item.doctype, tf_item.name, 'shipping_rule', r.message[0].name);
+                        frm.refresh_fields();
+    				}
+    			}
+    		});
+	    }
+	},
+	is_return: function(frm){
+	    console.log('here');
+	    if(frm.doc.is_return == 1){
+		    frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').show();
+		}
+		else{
+		    frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').hide();
+		}
+	},
+	items_on_form_rendered:function(frm, cdt, cdn){
+	    if(!frm.doc.is_return){
+            frm.fields_dict["items"].grid.wrapper.find('.grid-delete-row').hide();
+            frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row-below').hide();
+            frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row').hide();
+            frm.fields_dict["items"].grid.wrapper.find('.grid-duplicate-row').hide();
+            frm.fields_dict["items"].grid.wrapper.find('.grid-append-row').hide();
+	    }
+	    else{
+	        frm.fields_dict["items"].grid.wrapper.find('.grid-delete-row').show();
+	    }
+    },
 	redeem_loyalty_points: function(frm) {
 		frm.events.get_loyalty_details(frm);
 	},
@@ -1183,3 +1279,23 @@ var add_to_item_line = function(frm, checked_values, invoice_healthcare_services
 		frm.refresh_fields();
 	}
 };
+frappe.ui.form.on('Transporter Freight', {
+	shipping_rule:function(frm, cdt, cdn){
+	    frappe.model.set_value(cdt, cdn, "amount", 0);
+	    
+	    if(locals[cdt][cdn].shipping_rule){
+    	    return frappe.call({
+    			method: 'nrp_manufacturing.modules.gourmet.sales_invoice.sales_invoice.get_freight_amount',
+    			args: {
+    				"doc": frm.doc,
+    				"cdn": cdn
+    			},
+    			callback: function(r) {
+    				if (r && r.message) {
+    					frappe.model.set_value(cdt, cdn, "amount", r.message);
+    				}
+    			}
+    		});
+	    }
+	}
+})

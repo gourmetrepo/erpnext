@@ -48,7 +48,7 @@ frappe.ui.form.on('Production Plan', {
 			if (d.item_code) {
 				return {
 					query: "erpnext.controllers.queries.bom",
-					filters:{'item': cstr(d.item_code)}
+					filters:{'item': cstr(d.item_code),'company': cstr(frm.doc.company)}
 				}
 			} else frappe.msgprint(__("Please enter Item first"));
 		}
@@ -128,6 +128,7 @@ frappe.ui.form.on('Production Plan', {
 		</table>`;
 
 		set_field_options("projected_qty_formula", projected_qty_formula);
+		frm.trigger("planed_for_datepicker");
 	},
 
 	make_work_order: function(frm) {
@@ -152,14 +153,20 @@ frappe.ui.form.on('Production Plan', {
 			}
 		);
 	},
+	planed_for_datepicker: function(frm) {
+		frm.set_value('planed_for', '');
+		var planed_for_datepicker = frm.fields_dict.planed_for.datepicker;
+		planed_for_datepicker.update({
+			minDate: new Date()
+		})
+	},
 
 	create_material_request: function(frm, submit) {
 		frm.doc.submit_material_request = submit;
-
 		frappe.call({
-			method: "make_material_request",
+			method: "nrp_manufacturing.modules.gourmet.production_plan.production_plan.make_material_request",
 			freeze: true,
-			doc: frm.doc,
+			args: {name: frm.doc.name},
 			callback: function(r) {
 				frm.reload_doc();
 			}
@@ -194,14 +201,17 @@ frappe.ui.form.on('Production Plan', {
 			freeze: true,
 			doc: frm.doc,
 			callback: function() {
-				refresh_field('po_items');
+			    frm.doc.po_items.forEach(function(element, index){
+    			    frm.doc.po_items[index]["include_exploded_items"] = 0;
+    				refresh_field('po_items');
+			    });
 			}
 		});
 	},
 
 	get_items_for_mr: function(frm) {
 		const set_fields = ['actual_qty', 'item_code','item_name', 'description', 'uom',
-			'min_order_qty', 'quantity', 'sales_order', 'warehouse', 'projected_qty', 'material_request_type'];
+			'min_order_qty', 'quantity', 'sales_order', 'warehouse', 'projected_qty', 'material_request_type', 'total_weight', 'weight_uom', 'item_category'];
 		frappe.call({
 			method: "erpnext.manufacturing.doctype.production_plan.production_plan.get_items_for_material_requests",
 			freeze: true,
@@ -273,9 +283,11 @@ frappe.ui.form.on("Production Plan Item", {
 		const row = locals[cdt][cdn];
 		if (row.item_code) {
 			frappe.call({
-				method: "erpnext.manufacturing.doctype.production_plan.production_plan.get_item_data",
+				method: "nrp_manufacturing.modules.gourmet.production_plan.production_plan.get_item_data",
 				args: {
-					item_code: row.item_code
+					item_code: row.item_code,
+					company: frm.doc.company,
+					warehouse: row.warehouse
 				},
 				callback: function(r) {
 					for (let key in r.message) {
@@ -288,23 +300,22 @@ frappe.ui.form.on("Production Plan Item", {
 });
 
 frappe.ui.form.on("Material Request Plan Item", {
-	warehouse: function(frm, cdt, cdn) {
-		const row = locals[cdt][cdn];
-		if (row.warehouse && row.item_code && frm.doc.company) {
-			frappe.call({
-				method: "erpnext.manufacturing.doctype.production_plan.production_plan.get_bin_details",
-				args: {
-					row: row,
-					company: frm.doc.company,
-					for_warehouse: row.warehouse
-				},
-				callback: function(r) {
-					let {projected_qty, actual_qty} = r.message;
-
-					frappe.model.set_value(cdt, cdn, 'projected_qty', projected_qty);
-					frappe.model.set_value(cdt, cdn, 'actual_qty', actual_qty);
-				}
-			})
+	warehouse: function (frm, cdt, cdn) {
+        var row = locals[cdt][cdn];
+		if(row.warehouse && row.item_code){
+            frappe.call({
+                method: "nrp_manufacturing.modules.gourmet.production_plan.production_plan.get_actual_quantity_for_item",
+                args: { item_code: row.item_code, company: frm.doc.company, warehouse: row.warehouse},
+                callback: function (r) {
+                    if (r.message) {
+                        let data = r.message[0]
+                            if(data){
+                                row.actual_qty = data.actual_qty;
+                                refresh_field("po_items");
+                            }
+                    }
+                }
+            });
 		}
 	}
 });
