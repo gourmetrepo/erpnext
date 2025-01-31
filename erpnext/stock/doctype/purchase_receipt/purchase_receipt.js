@@ -40,6 +40,10 @@ frappe.ui.form.on("Purchase Receipt", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+		if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
+		    frm.set_value('naming_series', 'PRSM-.YY.-');
+		    refresh_field('naming_series')
+		}
 	},
 
 	refresh: function(frm) {
@@ -56,6 +60,26 @@ frappe.ui.form.on("Purchase Receipt", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
+		frm.set_query('gate_pass', function () {
+			if(!frm.doc.company){
+                frappe.msgprint("Please select Company First");
+				return {
+					filters: {
+						"docstatus": 3
+					}
+				}
+			}else{
+    			return {
+    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
+    				filters: {
+    					'type': "IN",
+    					'company': frm.doc.company,
+    					"docstatus":1
+    				}
+    			};
+			    
+			}
+		});
 	},
 
 	company: function(frm) {
