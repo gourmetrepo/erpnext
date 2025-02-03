@@ -15,12 +15,12 @@ frappe.ui.form.on('Delivery Trip', {
 
 		frm.set_query("address", "delivery_stops", function (doc, cdt, cdn) {
 			var row = locals[cdt][cdn];
-			if (row.customer) {
+			if (row.customer_name) {
 				return {
 					query: 'frappe.contacts.doctype.address.address.address_query',
 					filters: {
-						link_doctype: "Customer",
-						link_name: row.customer
+						link_doctype: row.customer_type,
+						link_name: row.customer_name
 					}
 				};
 			}
@@ -28,12 +28,12 @@ frappe.ui.form.on('Delivery Trip', {
 
 		frm.set_query("contact", "delivery_stops", function (doc, cdt, cdn) {
 			var row = locals[cdt][cdn];
-			if (row.customer) {
+			if (row.customer_name) {
 				return {
 					query: 'frappe.contacts.doctype.contact.contact.contact_query',
 					filters: {
-						link_doctype: "Customer",
-						link_name: row.customer
+						link_doctype: row.customer_type,
+						link_name: row.customer_name
 					}
 				};
 			}
