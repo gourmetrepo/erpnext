@@ -246,7 +246,7 @@ def get_flavour_change_setup(maintenance_doc):
 		FROM `tabCIP Standard Time`
 		WHERE parent IN (SELECT name FROM `tabCIP Standard Time Setup` WHERE cip_type='Flavour Change' AND `cip_section`=%(cip_section)s)
 		AND from_flavor=%(from_flavor)s
-	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True, debug=True)
+	""", {"from_flavor": maintenance_doc.change_flavour_from, "cip_section": maintenance_doc.section}, as_dict=True)
 
 	for setup in flavour_change_setups:
 		if setup.to_flavor.lower() == maintenance_doc.flavour_change_to.lower():

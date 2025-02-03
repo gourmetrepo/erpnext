@@ -158,7 +158,7 @@ def calculate_segment_profit(f_date=''):
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
 												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
-												""".format(account,date_yesterday,single_unit),as_dict=True ,debug=True)
+												""".format(account,date_yesterday,single_unit),as_dict=True )
 									sumtotal = DistributorRevenue.get('csd')+DistributorRevenue.get('Juice')+DistributorRevenue.get('Water')+DistributorRevenue.get('nineteenLtr')+DistributorRevenue.get('Confectionery')+DistributorRevenue.get('Concentrate')+ShopRevenue.get('csd')+ShopRevenue.get('Juice')+ShopRevenue.get('Water')+ShopRevenue.get('nineteenLtr')+ShopRevenue.get('Confectionery')+ShopRevenue.get('Concentrate')+InterunitRevenue.get('csd')+InterunitRevenue.get('Juice')+InterunitRevenue.get('Water')+InterunitRevenue.get('nineteenLtr')+InterunitRevenue.get('Confectionery')+InterunitRevenue.get('Concentrate')
 									print(sumtotal)			
 									for index,bgroup_data in enumerate(bgroup):
@@ -247,7 +247,7 @@ def calculate_segment_profit(f_date=''):
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
 												AND DATE(posting_date) BETWEEN '{1}' AND '{1}' AND voucher_type!='Delivery Note'
-												""".format(account,date_yesterday,single_unit),as_dict=True ,debug=True)
+												""".format(account,date_yesterday,single_unit),as_dict=True )
 									sumtotal = DistributorRevenue.get('csd')+DistributorRevenue.get('Juice')+DistributorRevenue.get('Water')+DistributorRevenue.get('nineteenLtr')+DistributorRevenue.get('Confectionery')+DistributorRevenue.get('Concentrate')+ShopRevenue.get('csd')+ShopRevenue.get('Juice')+ShopRevenue.get('Water')+ShopRevenue.get('nineteenLtr')+ShopRevenue.get('Confectionery')+ShopRevenue.get('Concentrate')+InterunitRevenue.get('csd')+InterunitRevenue.get('Juice')+InterunitRevenue.get('Water')+InterunitRevenue.get('nineteenLtr')+InterunitRevenue.get('Confectionery')+InterunitRevenue.get('Concentrate')
 									print(sumtotal)			
 									for index,bgroup_data in enumerate(bgroup):
@@ -659,7 +659,7 @@ def calculate_segment_profit(f_date=''):
 												SELECT IFNULL(SUM(`credit_in_account_currency`-`debit_in_account_currency`),0.000) AS account_value 
 												FROM `tabGL Entry` WHERE account in ({0})  AND company='{2}' 
 												AND DATE(posting_date) BETWEEN '{1}' AND '{1}'
-												""".format(account,date_yesterday,single_unit),as_dict=True ,debug=True)
+												""".format(account,date_yesterday,single_unit),as_dict=True )
 											
 									for index,bgroup_data in enumerate(bgroup):
 								
