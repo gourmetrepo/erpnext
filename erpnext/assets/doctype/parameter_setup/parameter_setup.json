@@ -10,6 +10,7 @@
   "ranking",
   "column_break_3",
   "cost_center",
+  "department",
   "location",
   "section_break_6",
   "parameter_setup_item",
@@ -82,10 +83,17 @@
    "label": "Ranking",
    "options": "Ranking Setup",
    "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-31 12:52:42.092256",
+ "modified": "2025-02-04 11:25:06.807271",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Parameter Setup",

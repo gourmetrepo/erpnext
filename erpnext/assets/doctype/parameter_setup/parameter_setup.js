@@ -12,5 +12,15 @@ frappe.ui.form.on('Parameter Setup', {
                 "filters": filters
             };
         });
+        frm.set_query("department", function() {
+            if(!frm.doc.company){
+                frappe.msgprint("Please select Company first.");
+            }
+            return {
+                "filters": {
+					"company": frm.doc.company,
+				}
+            };
+        });
 	}
 });

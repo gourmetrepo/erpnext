@@ -8,6 +8,7 @@
   "parameter_setup",
   "compliance_verification_name",
   "company",
+  "department",
   "location",
   "ranking",
   "column_break_5",
@@ -68,7 +69,8 @@
    "fieldname": "area_incharge",
    "fieldtype": "Link",
    "label": "Area Incharge",
-   "options": "Employee"
+   "options": "Employee",
+   "reqd": 1
   },
   {
    "fetch_from": "parameter_setup.cost_center",
@@ -171,10 +173,18 @@
    "label": "Ranking",
    "options": "Ranking Setup",
    "read_only": 1
+  },
+  {
+   "fetch_from": "parameter_setup.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-01-31 19:29:57.572961",
+ "modified": "2025-02-04 11:25:55.920656",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Compliance Verification",

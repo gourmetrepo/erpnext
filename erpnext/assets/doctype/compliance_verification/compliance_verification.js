@@ -3,7 +3,30 @@
 
 frappe.ui.form.on('Compliance Verification', {
 	refresh: function(frm) {
-
+		if (frm.doc.docstatus == 0){
+			frm.add_custom_button(__('Fetch Data'), function () {
+				frappe.call({
+					freeze: true,
+					doc: frm.doc,
+					method: 'fetch_data',
+					callback: function() {
+						frm.dirty()
+						frm.save()
+					}
+				});
+			});
+		}
+		frm.set_query("area_incharge", function() {
+            if(!frm.doc.parameter_setup){
+                frappe.msgprint("Please select Parameter first.");
+            }
+            return {
+                "filters": {
+					"company": frm.doc.company,
+					"department": frm.doc.department
+				}
+            };
+        });
 	},
 	onload: function(frm) {
 		if (frm.is_new()) {

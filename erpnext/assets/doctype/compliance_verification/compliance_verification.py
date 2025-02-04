@@ -8,7 +8,8 @@ import json
 from frappe.model.document import Document
 
 class ComplianceVerification(Document):
-	def before_save(self):
+	@frappe.whitelist()
+	def fetch_data(self):
 		self.get_parameter_setup()
 
 	def get_parameter_setup(self):
@@ -23,6 +24,33 @@ class ComplianceVerification(Document):
 				cvi.parameter = psi.parameter
 				cvi.rank_type = psi.rank_type
 				self.append('compliance_verification_item', cvi)
+
+	def on_submit(self):
+		parameter = frappe.get_doc("Parameter Setup", self.parameter_setup)
+		total_score = 0
+		final_rank = ""
+
+		for cvi in self.compliance_verification_item:
+			for pd in parameter.parameter_setup_details:
+				if pd.parameter == cvi.parameter and pd.ranking == cvi.ranking:
+					cvi.score = pd.score
+					total_score += pd.score
+					cvi.db_update()
+					break
+		
+		# Getting Scoring Criteria
+		grade_range = "Scoring Criteria:"
+		ranking = frappe.get_doc("Ranking Setup", self.ranking)
+		if len(ranking.ranking_setup_item) > 0:
+			for rsi in ranking.ranking_setup_item:
+				if total_score >= rsi.range_slab_start and total_score <= rsi.range_slab_end:
+					final_rank = rsi.ranking
+				grade_range = f"{grade_range} {rsi.range_slab_start} - {rsi.range_slab_end} {rsi.ranking}"
+
+		self.score_criteria = grade_range
+		self.rank = final_rank
+		self.total_score = total_score
+		self.db_update()
 
 
 @frappe.whitelist()
