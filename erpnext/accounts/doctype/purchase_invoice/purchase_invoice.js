@@ -25,32 +25,6 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 				this.frm.set_df_property("credit_to", "print_hide", 0);
 			}
 		}
-
-		console.log(frm.doc.token_no);
-        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no == undefined){
-		    frm.set_value('naming_series', 'PISM-.YY.-');
-		    refresh_field('naming_series');
-	    }else if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no != ''){
-		    frm.set_value('naming_series', 'CPR-' + frappe.utils.get_config_by_name("SERIES_YEAR") + '-');
-		    refresh_field('naming_series');
-            var df = frappe.meta.get_docfield("Purchase Invoice Item", "qty", frm.doc.name);
-            df.read_only = 1;		    
-            var df = frappe.meta.get_docfield("Purchase Invoice Item", "rate", frm.doc.name);
-            df.read_only = 1;		    
-            var df = frappe.meta.get_docfield("Purchase Invoice Item", "amount", frm.doc.name);
-            df.read_only = 1;		    
-            frm.set_df_property("items", "read_only", 1);
-            refresh_field("items");
-	    }
-	    frappe.db.get_value('Purchase Invoice',frm.doc.name,'taxes_and_charges_deducted',
-          function(d) {
-            var tax_and_charges = d.taxes_and_charges_deducted
-    	    console.log('tax_and_charges',tax_and_charges);
-    	    if(frm.doc.token_no != '' && tax_and_charges == 0){
-    	         frm.trigger('taxes_and_charges')
-    	    }
-        })
-		    
 	},
 
 	refresh: function(doc) {
@@ -165,27 +139,6 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 				}
 			});
 		}
-	},
-	make_payment_request: function() {
-		console.log("make_payment_request");
-		var me = this;
-		frappe.call({
-			method: "erpnext.accounts.doctype.payment_request.payment_request.make_payment_request",
-			args: {
-				dt: me.frm.doc.doctype,
-				dn: me.frm.doc.name,
-				recipient_id: me.frm.doc.contact_email,
-				payment_request_type: "Outward",
-				party_type: "Supplier",
-				party: me.frm.doc.supplier
-			},
-			callback: function(r) {
-				if (!r.exc) {
-					frappe.model.sync(r.message);
-					frappe.set_route("Form", r.message.doctype, r.message.name);
-				}
-			}
-		});
 	},	
 
 	unblock_invoice: function() {
@@ -572,6 +525,31 @@ frappe.ui.form.on("Purchase Invoice", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+
+		console.log(frm.doc.token_no);
+        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no == undefined){
+		    frm.set_value('naming_series', 'PISM-.YY.-');
+		    refresh_field('naming_series');
+	    }else if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no != ''){
+		    frm.set_value('naming_series', 'CPR-' + frappe.utils.get_config_by_name("SERIES_YEAR") + '-');
+		    refresh_field('naming_series');
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "qty", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "rate", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "amount", frm.doc.name);
+            df.read_only = 1;		    
+            frm.set_df_property("items", "read_only", 1);
+            refresh_field("items");
+	    }
+	    frappe.db.get_value('Purchase Invoice',frm.doc.name,'taxes_and_charges_deducted',
+          function(d) {
+            var tax_and_charges = d.taxes_and_charges_deducted
+    	    console.log('tax_and_charges',tax_and_charges);
+    	    if(frm.doc.token_no != '' && tax_and_charges == 0){
+    	         frm.trigger('taxes_and_charges')
+    	    }
+        })
 	},
 
 	is_subcontracted: function(frm) {
@@ -581,3 +559,26 @@ frappe.ui.form.on("Purchase Invoice", {
 		frm.toggle_reqd("supplier_warehouse", frm.doc.is_subcontracted==="Yes");
 	}
 })
+
+cur_frm.cscript.make_payment_request = function() {
+	var me = this;
+	const payment_request_type = "Outward";
+
+	frappe.call({
+		method:"nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_request",
+		args: {
+			dt: me.frm.doc.doctype,
+			dn: me.frm.doc.name,
+			recipient_id: me.frm.doc.contact_email,
+			payment_request_type: payment_request_type,
+			party_type: payment_request_type == 'Outward' ? "Supplier" : "Customer",
+			party: payment_request_type == 'Outward' ? me.frm.doc.supplier : me.frm.doc.customer
+		},
+		callback: function(r) {
+			if(!r.exc){
+				var doc = frappe.model.sync(r.message);
+				frappe.set_route("Form", r.message.doctype, r.message.name);
+			}
+		}
+	});
+},
