@@ -25,6 +25,32 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 				this.frm.set_df_property("credit_to", "print_hide", 0);
 			}
 		}
+
+		console.log(frm.doc.token_no);
+        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no == undefined){
+		    frm.set_value('naming_series', 'PISM-.YY.-');
+		    refresh_field('naming_series');
+	    }else if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no != ''){
+		    frm.set_value('naming_series', 'CPR-' + frappe.utils.get_config_by_name("SERIES_YEAR") + '-');
+		    refresh_field('naming_series');
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "qty", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "rate", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "amount", frm.doc.name);
+            df.read_only = 1;		    
+            frm.set_df_property("items", "read_only", 1);
+            refresh_field("items");
+	    }
+	    frappe.db.get_value('Purchase Invoice',frm.doc.name,'taxes_and_charges_deducted',
+          function(d) {
+            var tax_and_charges = d.taxes_and_charges_deducted
+    	    console.log('tax_and_charges',tax_and_charges);
+    	    if(frm.doc.token_no != '' && tax_and_charges == 0){
+    	         frm.trigger('taxes_and_charges')
+    	    }
+        })
+		    
 	},
 
 	refresh: function(doc) {
