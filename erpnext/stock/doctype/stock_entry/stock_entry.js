@@ -12,7 +12,7 @@ frappe.ui.form.on('Stock Entry', {
 		}
 		
 	},
-	setup: function(frm) {
+	setup: function(frm) {		
 		frm.set_query('work_order', function() {
 			return {
 				filters: [
@@ -152,6 +152,7 @@ frappe.ui.form.on('Stock Entry', {
 	},
 
 	refresh: function(frm) {
+		
         if (frm.doc.queue_status == 'Queued'){
             $('.primary-action').hide();
         }

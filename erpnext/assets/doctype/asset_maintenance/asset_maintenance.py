@@ -321,6 +321,10 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
 		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
 
+		difference_account = asset_maintenance_doc.get('cwip_account') if asset_maintenance_doc.get('cwip_account') else asset_maintenance_doc.get('cogs_account')
+		if asset_maintenance_doc.get('project_based') == "Yes" and asset_maintenance_doc.get('project') and not difference_account:
+			frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
+
 		for item in asset_maintenance_doc.consumed_items:
 			i = frappe.new_doc('Stock Entry Detail')
 			i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
@@ -329,6 +333,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = asset_maintenance_doc.get('name')
+			i.expense_account = difference_account
 			stock_entry.append('items',i)
 		
 		
