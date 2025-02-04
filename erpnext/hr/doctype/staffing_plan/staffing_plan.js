@@ -26,6 +26,36 @@ frappe.ui.form.on('Staffing Plan', {
 			};
 		});
 	},
+	onload:function(frm){
+        
+        frm.set_query("branch", function() {
+            if(!frm.doc.department){
+                frappe.msgprint("Please select Department first");
+            }
+            return {
+                "filters": {
+                    "department": frm.doc.department,
+                    "parent":["<","0"]
+                }
+            };
+        });
+        
+        frm.set_query("sub_branch", function() {
+            if(!frm.doc.branch){
+                frappe.msgprint("Please select Branch first");
+            }
+            return {
+                "filters": {
+                    "branch": frm.doc.branch
+                }
+            };
+        });
+
+    },
+	department: function(frm){
+        frm.set_value('branch', "");
+	    frm.set_value('sub_branch', "");
+    }
 });
 
 frappe.ui.form.on('Staffing Plan Detail', {
