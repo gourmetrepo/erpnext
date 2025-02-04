@@ -33,5 +33,10 @@ frappe.ui.form.on("Job Applicant", {
 			};
 		});
 
+		frappe.require("assets/nerp/js/jquery.maskedinput.min.js", () => {
+            $.mask.definitions['3'] = null;
+            $('input[data-fieldname="personal_cell_number"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
+        });
+
 	}
 });

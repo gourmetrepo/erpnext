@@ -140,6 +140,27 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 			});
 		}
 	},
+	make_payment_request: function() {
+		console.log("make_payment_request");
+		var me = this;
+		frappe.call({
+			method: "erpnext.accounts.doctype.payment_request.payment_request.make_payment_request",
+			args: {
+				dt: me.frm.doc.doctype,
+				dn: me.frm.doc.name,
+				recipient_id: me.frm.doc.contact_email,
+				payment_request_type: "Outward",
+				party_type: "Supplier",
+				party: me.frm.doc.supplier
+			},
+			callback: function(r) {
+				if (!r.exc) {
+					frappe.model.sync(r.message);
+					frappe.set_route("Form", r.message.doctype, r.message.name);
+				}
+			}
+		});
+	},	
 
 	unblock_invoice: function() {
 		const me = this;

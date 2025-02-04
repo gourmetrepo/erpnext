@@ -10,15 +10,42 @@ frappe.ui.form.on('Job Opening', {
 				}
 			};
 		});
+
+		frm.set_query("branch", function() {
+            if(!frm.doc.department){
+                frappe.msgprint("Please select Department first");
+            }
+            return {
+                "filters": {
+                    "department": frm.doc.department,
+                    "parent":["<","0"]
+                }
+            };
+        });
+        
+        frm.set_query("sub_branch", function() {
+            if(!frm.doc.branch){
+                frappe.msgprint("Please select Branch first");
+            }
+            return {
+                "filters": {
+                    "branch": frm.doc.branch
+                }
+            };
+        });
+
 	},
-	designation: function(frm) {
-		if(frm.doc.designation && frm.doc.company){
+	designation: function(frm){
+	    if(frm.doc.designation && frm.doc.company && frm.doc.department && frm.doc.branch && frm.doc.sub_branch){
 			frappe.call({
 				"method": "erpnext.hr.doctype.staffing_plan.staffing_plan.get_active_staffing_plan_details",
 				args: {
 					company: frm.doc.company,
 					designation: frm.doc.designation,
-					date: frappe.datetime.now_date() // ToDo - Date in Job Opening?
+					date: frappe.datetime.now_date(), // ToDo - Date in Job Opening?
+					department: frm.doc.department,
+					branch: frm.doc.branch,
+					sub_branch: frm.doc.sub_branch
 				},
 				callback: function (data) {
 					if(data.message){

@@ -11,7 +11,28 @@ frappe.ui.form.on("Territory", {
 				}
 			}
 		};
-	}
+	},
+	refresh(frm) {
+	    frm.set_query("customer", function() {
+            let filters = {
+                "is_internal_customer": 1
+            }
+            return {
+                "filters": filters
+            };
+        });
+		frm.trigger("territory_type");
+	},
+	
+	territory_type:function(frm){
+        if(frm.doc.territory_type == "Internal"){
+            frm.toggle_reqd("warehouse",true);
+            frm.toggle_reqd("customer",false);
+        }else if(frm.doc.territory_type == "Customer"){
+            frm.toggle_reqd("customer",true);
+            frm.toggle_reqd("warehouse",false);
+        }
+    }
 });
 
 cur_frm.cscript.refresh = function(doc, cdt, cdn) {
