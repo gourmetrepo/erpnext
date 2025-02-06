@@ -78,16 +78,6 @@ frappe.ui.form.on("Project", {
 		frm.events.set_buttons(frm);
 	},
 
-	project_type: function(frm){
-	if(frm.doc.project_type == 'ADP'){
-		frm.set_df_property('cogs_account', 'reqd', 0);
-		frm.set_df_property('cwip_acccount', 'reqd', 1);
-	}else if (frm.doc.project_type){
-		frm.set_df_property('cogs_account', 'reqd', 1);
-		frm.set_df_property('cwip_acccount', 'reqd', 0);
-	}
-	},
-
 	set_buttons: function(frm) {
 		if (!frm.is_new()) {
 			frm.add_custom_button(__('Duplicate Project with Tasks'), () => {
