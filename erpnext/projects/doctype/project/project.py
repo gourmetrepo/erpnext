@@ -208,7 +208,7 @@ class Project(Document):
 	def validate_account_mapping(self):
 		if self.project_type:
 			if self.project_type == "ADP":
-				if not self.cwip_acccount:
+				if not self.cwip_account:
 					frappe.throw(_("Please select CWIP Account for project type ADP"))
 			else:
 				if not self.cogs_account:
