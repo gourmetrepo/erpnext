@@ -38,6 +38,8 @@ class Project(Document):
 		self.send_welcome_email()
 		self.update_costing()
 		self.update_percent_complete()
+		# Code by Moeiz
+		self.validate_account_mapping()
 
 	def copy_from_template(self):
 		'''
@@ -202,6 +204,15 @@ class Project(Document):
 				frappe.sendmail(user.user, subject=_("Project Collaboration Invitation"),
 								content=content.format(*messages))
 				user.welcome_email_sent = 1
+
+	def validate_account_mapping(self):
+		if self.project_type:
+			if self.project_type == "ADP":
+				if not self.cwip_acccount:
+					frappe.throw(_("Please select CWIP Account for project type ADP"))
+			else:
+				if not self.cogs_account:
+					frappe.throw(_("Please select COGS Account"))
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''
