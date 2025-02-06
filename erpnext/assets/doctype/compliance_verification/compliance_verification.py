@@ -39,13 +39,13 @@ class ComplianceVerification(Document):
 					break
 		
 		# Getting Scoring Criteria
-		grade_range = "Scoring Criteria:"
+		grade_range = "<b>Scoring Criteria:</b>"
 		ranking = frappe.get_doc("Ranking Setup", self.ranking)
 		if len(ranking.ranking_setup_item) > 0:
 			for rsi in ranking.ranking_setup_item:
 				if total_score >= rsi.range_slab_start and total_score <= rsi.range_slab_end:
 					final_rank = rsi.ranking
-				grade_range = f"{grade_range} {rsi.range_slab_start} - {rsi.range_slab_end} {rsi.ranking}"
+				grade_range = f"{grade_range} {rsi.range_slab_start} - {rsi.range_slab_end} <b>{rsi.ranking}</b>"
 
 		self.score_criteria = grade_range
 		self.rank = final_rank
