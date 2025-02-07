@@ -378,7 +378,7 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 				i = frappe.new_doc('Stock Entry Detail')
 				i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
 				i.item_code =  item.get('item')
-				i.qty = (item.get('issued_qty') - item.get('consumed_qty')) - item.get('returned_qty')
+				i.qty = (item.get('issued_qty') - item.get('consumed_qty')) - item.get('return_qty')
 				i.uom = item.get('uom')
 				i.stock_uom = item.get('uom')
 				i.asset_maintenance = asset_maintenance_doc.get('name')

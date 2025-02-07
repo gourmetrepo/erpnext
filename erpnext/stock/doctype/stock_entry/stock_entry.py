@@ -117,27 +117,27 @@ class StockEntry(StockController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
-	def submit(self):
-		import time
-		from nrp_manufacturing.utils import get_config_by_name
-		time.sleep(1)
-		se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
-		if se_type:
-			se_type_section = se_type[0][0]+self.stock_entry_type
-		else:
-			se_type_section = self.stock_entry_type
-		se_bifurcations = get_config_by_name('stock_entry_queues')
-		for queue in se_bifurcations:
-			if self.request_from=='RMS':
-				queue="sync"
-			elif se_type_section in se_bifurcations.get(queue):
-				break
-			else:
-				queue="primary"
-		if self.request_from=='RMS':
-			self.queue_action('submit',queue_name=queue)
-		else:
-			self.queue_action('submit',queue_name="se_"+queue)
+	# def submit(self):
+	# 	import time
+	# 	from nrp_manufacturing.utils import get_config_by_name
+	# 	time.sleep(1)
+	# 	se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
+	# 	if se_type:
+	# 		se_type_section = se_type[0][0]+self.stock_entry_type
+	# 	else:
+	# 		se_type_section = self.stock_entry_type
+	# 	se_bifurcations = get_config_by_name('stock_entry_queues')
+	# 	for queue in se_bifurcations:
+	# 		if self.request_from=='RMS':
+	# 			queue="sync"
+	# 		elif se_type_section in se_bifurcations.get(queue):
+	# 			break
+	# 		else:
+	# 			queue="primary"
+	# 	if self.request_from=='RMS':
+	# 		self.queue_action('submit',queue_name=queue)
+	# 	else:
+	# 		self.queue_action('submit',queue_name="se_"+queue)
 
 	
 	def on_submit(self):
@@ -1856,7 +1856,7 @@ def validate_company_cost_center_and_accounts(stock_entry):
 
 # Changes by Moeiz for FS-Plant Maintenance 2.0
 # This code will reflect the changes of Material Transfer stock entry to Plant Maintenance Document (Asset Maintenance)
-def (doc):
+def update_plant_asset_maintenance_document_on_transfer(doc):
 	asset_maintenance_doc_ref = None
 	for item in doc.items:
 		if item.asset_maintenance:
@@ -1878,7 +1878,7 @@ def (doc):
 					for consumed_item in asset_maintenance_doc.consumed_items:
 						if consumed_item.get('item') == item.get('item_code'):
 							# Check if return qty is less than issued qty then we won't submit asset maintenance doc (Partial Return)
-							if item.get('qty') < (consumed_item.issued_qty - consumed_item.return_qty):
+							if item.get('qty') < (consumed_item.issued_qty - consumed_item.consumed_qty - consumed_item.return_qty):
 								submit_doc = False
 							consumed_item.return_qty += item.get('qty')
 							item_exists = True
@@ -1892,6 +1892,7 @@ def (doc):
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
 				
+				asset_maintenance_doc.save()
 				# Update status only if all items (complete stock) are returned
 				if submit_doc:
 					if asset_maintenance_doc.status == "Completed":
@@ -1899,7 +1900,6 @@ def (doc):
 					elif asset_maintenance_doc.status == "Stopped":
 						asset_maintenance_doc.status = "Closed"
 
-					asset_maintenance_doc.save()
 					asset_maintenance_doc.submit()
 						
 			# This means user is adding stock entry Material Transfer to transfer stock to wip warehouse
@@ -2016,7 +2016,7 @@ def validate_plant_maintenance_material_transfer_stock_entry(doc):
 						stock_entry_items[item.get('item_code')] += item.get('qty')
 
 				for item in asset_maintenance_doc.consumed_items:
-					if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
+					if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > ((item.get('issued_qty') - item.get('consumed_qty'))- item.get('return_qty')):
 						frappe.throw(f"Returned quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
