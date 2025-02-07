@@ -43,8 +43,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Cost Center",
-   "options": "Cost Center",
-   "reqd": 1
+   "options": "Cost Center"
   },
   {
    "fieldname": "section_break_6",
@@ -93,7 +92,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-02-04 11:25:06.807271",
+ "modified": "2025-02-07 19:23:09.121326",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Parameter Setup",

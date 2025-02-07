@@ -35,6 +35,7 @@
    "fetch_from": "parameter_setup.company",
    "fieldname": "company",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Company",
    "options": "Company",
    "read_only": 1
@@ -43,6 +44,7 @@
    "fetch_from": "parameter_setup.location",
    "fieldname": "location",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Location",
    "options": "Location",
    "read_only": 1
@@ -149,6 +151,7 @@
    "fetch_from": "inspector.employee_name",
    "fieldname": "inspector_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Inspector Name",
    "read_only": 1
   },
@@ -178,13 +181,14 @@
    "fetch_from": "parameter_setup.department",
    "fieldname": "department",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Department",
    "options": "Department",
    "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-02-04 11:25:55.920656",
+ "modified": "2025-02-07 19:29:09.204360",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Compliance Verification",
