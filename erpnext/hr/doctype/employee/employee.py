@@ -20,6 +20,22 @@ class EmployeeLeftValidationError(frappe.ValidationError): pass
 class Employee(NestedSet):
 	nsm_parent_field = 'reports_to'
 
+	def calculate_reporting_to(self):
+		name = self.name
+		reporting_dict = []
+		self.get_underlying_reports(name,reporting_dict)
+		self.reporting_dict = ",".join(r for r in reporting_dict)
+		self.db_update()
+	def get_underlying_reports(self,report,reporting_dict):
+		reporting = frappe.db.sql(f"SELECT name FROM `tabEmployee` WHERE reports_to = '{report}'",as_dict=True)
+		if reporting:
+			for r in reporting:
+				reporting_dict.append(r.name)
+				self.get_underlying_reports(r.name,reporting_dict)
+
+		return reporting_dict
+	
+
 	def autoname(self):
 		naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
 		if not naming_method:
