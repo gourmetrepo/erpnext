@@ -1856,7 +1856,7 @@ def validate_company_cost_center_and_accounts(stock_entry):
 
 # Changes by Moeiz for FS-Plant Maintenance 2.0
 # This code will reflect the changes of Material Transfer stock entry to Plant Maintenance Document (Asset Maintenance)
-def update_plant_asset_maintenance_document_on_transfer(doc):
+def (doc):
 	asset_maintenance_doc_ref = None
 	for item in doc.items:
 		if item.asset_maintenance:
@@ -1865,24 +1865,24 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 	
 	if asset_maintenance_doc_ref:
 		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
-
+		submit_doc = True
 		if asset_maintenance_doc:
 		
 			# This means user is adding stock entry Material Transfer to return stock back to the warehouse
 			# This stock entry will be initiated on action of Close button on asset maintenance 
 			if asset_maintenance_doc.status == "Completed" or asset_maintenance_doc.status == "Stopped":
-				if asset_maintenance_doc.status == "Completed":
-					asset_maintenance_doc.status = "Finished"
-				elif asset_maintenance_doc.status == "Stopped":
-					asset_maintenance_doc.status = "Closed"
 				
 				# Update returned items
 				for item in doc.items:
 					item_exists = False
 					for consumed_item in asset_maintenance_doc.consumed_items:
 						if consumed_item.get('item') == item.get('item_code'):
+							# Check if return qty is less than issued qty then we won't submit asset maintenance doc (Partial Return)
+							if item.get('qty') < (consumed_item.issued_qty - consumed_item.return_qty):
+								submit_doc = False
 							consumed_item.return_qty += item.get('qty')
 							item_exists = True
+							
 
 					if not item_exists:
 						child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
@@ -1892,8 +1892,15 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
 				
-				asset_maintenance_doc.save()
-				asset_maintenance_doc.submit()
+				# Update status only if all items (complete stock) are returned
+				if submit_doc:
+					if asset_maintenance_doc.status == "Completed":
+						asset_maintenance_doc.status = "Finished"
+					elif asset_maintenance_doc.status == "Stopped":
+						asset_maintenance_doc.status = "Closed"
+
+					asset_maintenance_doc.save()
+					asset_maintenance_doc.submit()
 						
 			# This means user is adding stock entry Material Transfer to transfer stock to wip warehouse
 			else:
