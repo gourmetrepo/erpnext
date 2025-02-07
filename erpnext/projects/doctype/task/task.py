@@ -336,7 +336,7 @@ def validate_project_dates(project_end_date, task, task_start, task_end, actual_
 @frappe.whitelist()
 def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters):
 	query = """
-		SELECT DISTINCT(user) FROM `tabMaintenance Team Member`
+		SELECT DISTINCT(team_member) FROM `tabMaintenance Team Member`
 		WHERE user LIKE %s
 	"""
 	
