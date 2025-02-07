@@ -10,14 +10,8 @@ from frappe import throw, _
 from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 
 class AssetMaintenance(Document):
-	# def validate(self):
-		# for task in self.get('asset_maintenance_tasks'):
-		# 	if task.end_date and (getdate(task.start_date) >= getdate(task.end_date)):
-		# 		throw(_("Start date should be less than end date for task {0}").format(task.maintenance_task))
-		# 	if getdate(task.next_due_date) < getdate(nowdate()):
-		# 		task.maintenance_status = "Overdue"
-		# 	if not task.assign_to and self.docstatus == 0:
-		# 		throw(_("Row #{}: Please asign task to a member.").format(task.idx))
+	def validate(self):
+		self.validate_tasks()
 	
 	def before_save(self):
 		self.load_section_details()
@@ -117,7 +111,21 @@ class AssetMaintenance(Document):
 			else:
 				frappe.throw("No tasks available for this project")
 
-	
+	def validate_tasks(self):
+		tasks_names = []
+		for task in self.get('asset_maintenance_tasks'):
+			tasks_names.append(task.get('maintenance_task'))
+		
+		task_names = tuple(tasks_names)
+		if task_names:
+			asset_maintenance_references = frappe.db.sql(f"""
+				SELECT distinct(`asset_maintenance`), `name` FROM `tabTask` WHERE `name` in {task_names};
+			""", as_dict=True)
+
+			for asset_maintenance_reference in asset_maintenance_references:
+				if asset_maintenance_reference.get('asset_maintenance') != self.name:
+					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
+
 
 
 @frappe.whitelist()
