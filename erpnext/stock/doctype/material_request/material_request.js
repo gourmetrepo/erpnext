@@ -169,6 +169,13 @@ frappe.ui.form.on('Material Request', {
 				}
 			};
 		});
+		
+		if (frm.doc.material_request_type == "Purchase" && frm.doc.docstatus == 1) {
+			frm.add_custom_button(__('Select Project'), function() {
+				show_project_selection_modal(frm);
+			});
+		}
+
 	},
 
 	make_custom_buttons: function(frm) {
@@ -656,4 +663,86 @@ function set_schedule_date(frm) {
 	if(frm.doc.schedule_date){
 		erpnext.utils.copy_value_in_all_rows(frm.doc, frm.doc.doctype, frm.doc.name, "items", "schedule_date");
 	}
+}
+function show_project_selection_modal(frm) {
+    let dialog = new frappe.ui.Dialog({
+        title: __("Select Project"),
+        fields: [
+            {
+                fieldtype: "Link",
+                label: __("Select Project"),
+                fieldname: "selected_project",
+                options: "Project",
+                reqd: 1,
+                get_query: function () {
+                    return {
+                        filters: {
+                            company: frm.doc.company
+                        }
+                    };
+                }
+            }
+        ],
+        primary_action_label: __("Select"),
+        primary_action: function () {
+            let selected_project = dialog.get_value("selected_project");
+
+            if (!selected_project) {
+                frappe.msgprint(__('Please select a project.'));
+                return;
+            }
+
+            // Fetch project details
+            frappe.call({
+                method: "frappe.client.get",
+                args: {
+                    doctype: "Project",
+                    name: selected_project
+                },
+                callback: function (response) {
+                    if (response.message) {
+                        let project_id = response.message.name;
+                        let project_name = response.message.project_name;
+
+                        frappe.confirm(
+                            `Do you want to add project <b>${project_name} (${project_id})</b> to the items?`,
+                            function () {
+                                frappe.call({
+                                    method: "erpnext.stock.doctype.material_request.material_request.update_project_reference",
+                                    args: {
+                                        project_id: project_id,
+                                        docname: frm.doc.name
+                                    },
+                                    callback: function (res) {
+                                        if (res.message.status === "success") {
+                                            frappe.msgprint(__("Project updated successfully!"));
+                                            frm.refresh();
+                                            let items_list = res.message.material_request_items.map(item =>
+                                                `Item: ${item.item_code} - ${item.item_name} (Qty: ${item.qty} ${item.stock_uom})`
+                                            ).join("<br>");
+
+                                            frappe.msgprint({
+                                                title: __("Material Request Items"),
+                                                message: items_list || __("No items found."),
+                                                indicator: "blue"
+                                            });
+                                        } else {
+                                            frappe.msgprint(__("Failed to update project."));
+                                        }
+                                    }
+                                });
+
+                                dialog.hide();
+                            },
+                            function () {
+                                dialog.hide();
+                            }
+                        );
+                    }
+                }
+            });
+        }
+    });
+
+    dialog.show();
 }
