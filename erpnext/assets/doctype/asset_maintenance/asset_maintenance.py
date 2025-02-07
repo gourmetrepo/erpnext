@@ -112,18 +112,18 @@ class AssetMaintenance(Document):
 				frappe.throw("No tasks available for this project")
 
 	def validate_tasks(self):
-		tasks_names = []
-		for task in self.get('asset_maintenance_tasks'):
-			tasks_names.append(task.get('maintenance_task'))
+		tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
 		
-		task_names = tuple(tasks_names)
-		if task_names:
+		if tasks_names:
+			task_names = f"({', '.join(frappe.db.escape(name) for name in tasks_names)})"
 			asset_maintenance_references = frappe.db.sql(f"""
 				SELECT distinct(`asset_maintenance`), `name` FROM `tabTask` WHERE `name` in {task_names};
 			""", as_dict=True)
 
 			for asset_maintenance_reference in asset_maintenance_references:
-				if asset_maintenance_reference.get('asset_maintenance') != self.name:
+				if not asset_maintenance_reference.get('asset_maintenance'):
+					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is not assigned to any Asset Maintenance. Please use Get Project Tasks button to fetch this task")
+				elif asset_maintenance_reference.get('asset_maintenance') != self.name:
 					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
 
 
