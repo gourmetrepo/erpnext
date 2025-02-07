@@ -373,13 +373,13 @@
    "fieldname": "assigned_users",
    "fieldtype": "Table MultiSelect",
    "label": "Assigned Users",
-   "options": "Task Assigned User"
+   "options": "Task Assigned Employee"
   }
  ],
  "icon": "fa fa-check",
  "idx": 1,
  "is_tree": 1,
- "modified": "2025-01-30 12:41:51.207382",
+ "modified": "2025-02-07 14:22:59.869576",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Task",
