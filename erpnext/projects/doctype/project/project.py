@@ -211,7 +211,7 @@ class Project(Document):
 				if not self.cwip_account:
 					frappe.throw(_("Please select CWIP Account for project type ADP"))
 			else:
-				if not self.cogs_account:
+				if not self.cogs_account and self.project_type != "Import":
 					frappe.throw(_("Please select COGS Account"))
 
 def get_timeline_data(doctype, name):
