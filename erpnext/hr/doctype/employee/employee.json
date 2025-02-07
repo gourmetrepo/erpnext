@@ -106,7 +106,8 @@
   "feedback",
   "lft",
   "rgt",
-  "old_parent"
+  "old_parent",
+  "reporting_dict"
  ],
  "fields": [
   {
@@ -162,7 +163,6 @@
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Full Name",
@@ -208,7 +208,6 @@
   {
    "fieldname": "employee_number",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Employee Number",
    "oldfieldname": "employee_number",
    "oldfieldtype": "Data"
@@ -370,7 +369,6 @@
   {
    "fieldname": "designation",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "in_list_view": 1,
    "label": "Designation",
    "oldfieldname": "designation",
@@ -777,12 +775,18 @@
    "fieldtype": "Link",
    "label": "Leave Approver",
    "options": "User"
+  },
+  {
+   "fieldname": "reporting_dict",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "Reporting Dict"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2020-01-09 05:23:55.611366",
+ "modified": "2025-02-07 14:38:23.387619",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",

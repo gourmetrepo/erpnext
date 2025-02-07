@@ -12,6 +12,7 @@ erpnext.hr.EmployeeController = frappe.ui.form.Controller.extend({
 		}
 		this.frm.fields_dict.reports_to.get_query = function(doc, cdt, cdn) {
 			return { query: "erpnext.controllers.queries.employee_query"} }
+
 	},
 
 	refresh: function() {
@@ -46,6 +47,24 @@ frappe.ui.form.on('Employee',{
 			};
 		});
 	},
+	calculate_reporting_to: function(frm){
+		frappe.call({
+			method: "calculate_reporting_to",
+			doc: frm.doc,
+			freeze: true,
+			callback: function(r) {
+				if(!r.exc) {
+					if(r.message) {
+						// frappe.set_route("Form", "Account", r.message);
+					} else {
+						// frm.set_value("account_number", data.account_number);
+						// frm.set_value("account_name", data.account_name);
+					}
+					// d.hide();
+				}
+			}
+		});
+	},
 	refresh(frm) {
 	    setTimeout(function() {
             frm.trigger("show_progress");
@@ -74,6 +93,9 @@ frappe.ui.form.on('Employee',{
 		    $('input[data-fieldname="emergency_phone_number"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
             $('input[data-fieldname="company_cell_number"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
         });
+		frm.add_custom_button(__('Calculate Reporting To'), function () {
+			frm.trigger("calculate_reporting_to");
+		});
     },
 	show_progress: function(frm) {
 		let bars = [];
