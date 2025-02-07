@@ -3,7 +3,7 @@
 
 frappe.ui.form.on('Compliance Verification', {
 	refresh: function(frm) {
-		if (frm.doc.docstatus == 0){
+		if (frm.doc.docstatus == 0 && !frm.is_new()){
 			frm.add_custom_button(__('Fetch Data'), function () {
 				frappe.call({
 					freeze: true,

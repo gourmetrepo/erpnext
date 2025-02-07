@@ -26,10 +26,14 @@ class ComplianceVerification(Document):
 				self.append('compliance_verification_item', cvi)
 
 	def on_submit(self):
+		# Validate ranking for each parameter
+		self.validate_ranking()
+		
 		parameter = frappe.get_doc("Parameter Setup", self.parameter_setup)
 		total_score = 0
 		final_rank = ""
 
+		# Set Score for each parameter and calculate total score
 		for cvi in self.compliance_verification_item:
 			for pd in parameter.parameter_setup_details:
 				if pd.parameter == cvi.parameter and pd.ranking == cvi.ranking:
@@ -51,6 +55,11 @@ class ComplianceVerification(Document):
 		self.rank = final_rank
 		self.total_score = total_score
 		self.db_update()
+	
+	def validate_ranking(self):
+		for cvi in self.compliance_verification_item:
+			if not cvi.ranking:
+				frappe.throw(f"Please select ranking for '{cvi.parameter}'")
 
 
 @frappe.whitelist()
