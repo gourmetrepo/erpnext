@@ -588,3 +588,32 @@ def validate_company_cost_center_and_accounts(self):
 			
 			if item.cost_center and item.cost_center not in cost_centers:
 				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
+
+@frappe.whitelist()
+def update_project_reference(project_id, docname):
+    """Updates the project reference in Material Request Items and returns a response"""
+    if not project_id or not docname:
+        return {"status": "error", "message": _("Missing required parameters.")}
+
+    try:
+        user = frappe.session.user
+        
+        frappe.db.sql("""
+            UPDATE `tabMaterial Request Item`
+            SET project = %s
+            WHERE parent = %s
+        """, (project_id, docname))
+
+        frappe.db.commit()
+        doc = frappe.get_doc("Material Request", docname)
+        doc.add_comment("Comment", text=f"Project field updated to {project_id} by {user}")
+        frappe.db.commit()
+
+        return {"status": "success", "message": _("Project updated successfully!")}
+
+    except frappe.DoesNotExistError:
+        return {"status": "error", "message": _("Document not found.")}
+
+    except Exception as e:
+        frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
+        return {"status": "error", "message": str(e)}
