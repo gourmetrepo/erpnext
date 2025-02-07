@@ -3,8 +3,18 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-
-
+		var colors = {
+			"Draft": "red",
+			"Not Started": "yellow",
+			"MR Generated": "orange",
+			"In Process": "orange",
+			"Completed": "green",
+			"Stopped": "red",
+			"Closed": "green",
+			"Cancelled": "red",
+			"Finished": "green"
+		}
+		frm.set_indicator_formatter('status', colors[frm.doc.status])
 		frm.set_query('project', function() {
             return {
                 filters: {
