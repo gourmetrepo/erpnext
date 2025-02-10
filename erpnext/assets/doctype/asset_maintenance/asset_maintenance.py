@@ -12,6 +12,7 @@ from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 class AssetMaintenance(Document):
 	def validate(self):
 		self.validate_tasks()
+		self.validate_item_replacement_and_scrap()
 	
 	def before_save(self):
 		self.load_section_details()
@@ -27,12 +28,8 @@ class AssetMaintenance(Document):
 				task_doc.save()
 				frappe.db.commit()
 		
-		self.create_damage_and_repair_stock_entries()
+		self.create_damage_and_scrap_stock_entries()
 
-	# def on_update(self):
-	# 	for task in self.get('asset_maintenance_tasks'):
-	# 		assign_tasks(self.name, task.assign_to, task.maintenance_task, task.next_due_date)
-	# 	self.sync_maintenance_tasks()
 
 	def sync_maintenance_tasks(self):
 		tasks_names = []
@@ -62,7 +59,7 @@ class AssetMaintenance(Document):
 		if self.company and self.section:
 			data = frappe.db.sql(
 				f"""
-				SELECT `wip_warehouse`, `damage_warehouse` FROM `tabSection Warehouse`
+				SELECT `wip_warehouse`, `damage_warehouse`, `scrap_warehouse` FROM `tabSection Warehouse`
 				WHERE `parent`="{self.section}"
 				AND `company`="{self.company}"
 				""", as_dict=True
@@ -71,6 +68,7 @@ class AssetMaintenance(Document):
 			if len(data) > 0 and data[0].get('wip_warehouse'):
 				self.wip_warehouse = data[0].get('wip_warehouse', None)
 				self.damage_warehouse = data[0].get('damage_warehouse', None)
+				self.scrap_warehouse = data[0].get('scrap_warehouse', None)
 			else:
 				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
@@ -128,23 +126,29 @@ class AssetMaintenance(Document):
 				elif asset_maintenance_reference.get('asset_maintenance') != self.name:
 					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
 
-	def create_damage_and_repair_stock_entries(self):
-		create_damage_stock_entry = False
-		create_repair_stock_entry = False
+	def validate_item_replacement_and_scrap(self):
+		for item in self.get('items_replacement_and_repair'):
+			if item.get('remarks') == "Damaged" and not self.get('damage_warehouse'):
+				frappe.throw("Please setup damage warehouse configuration at section master data to proceed with damaged items")
+			if item.get('remarks') == "Scrap" and not self.get('scrap_warehouse'):
+				frappe.throw("Please setup scrap warehouse configuration at section master data to proceed with scrap items")
 
-		for item in self.get('item_replacement_and_repair'):
+
+	def create_damage_and_scrap_stock_entries(self):
+		create_damage_stock_entry = False
+		create_scrap_stock_entry = False
+
+		for item in self.get('items_replacement_and_repair'):
 			if item.get('remarks') == "Damaged":
 				create_damage_stock_entry = True
-				break
-			if item.get('remarks') == "Repair":
-				create_repair_stock_entry = True
-				break
+			if item.get('remarks') == "Scrap":
+				create_scrap_stock_entry = True
 		
 		if create_damage_stock_entry:
 			make_damage_stock_entry(self)
 		
-		if create_repair_stock_entry:
-			make_repair_stock_entry(self)
+		if create_scrap_stock_entry:
+			make_scrap_stock_entry(self)
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
@@ -459,8 +463,55 @@ def get_closing_status(asset_maintenance_doc):
 
 
 def make_damage_stock_entry(doc):
-	pass
+	damaged_items = []
+	for item in doc.get('items_replacement_and_repair'):
+		if item.get('remarks') == "Damaged":
+			damaged_items.append(item)
+	
+	if damaged_items:
+		stock_entry = frappe.new_doc('Stock Entry')
+		stock_entry.stock_entry_type = 'Material Transfer'
+		stock_entry.company = doc.get('company')
+		stock_entry.asset_maintenance = doc.get('name')
+		stock_entry.from_warehouse = doc.get('wip_warehouse')
+
+		for item in damaged_items:
+			i = frappe.new_doc('Stock Entry Detail')
+			i.s_warehouse =  doc.get('wip_warehouse')
+			i.t_warehouse = doc.get('damage_warehouse')
+			i.item_code =  item.get('item')
+			i.qty = item.get('qty')
+			i.uom = item.get('uom')
+			i.stock_uom = item.get('uom')
+			i.asset_maintenance = doc.get('name')
+			stock_entry.append('items',i)
+			
+		stock_entry.save()
 
 
-def make_repair_stock_entry(doc):
-	pass
+
+def make_scrap_stock_entry(doc):
+	scrapping_items = []
+	for item in doc.get('items_replacement_and_repair'):
+		if item.get('remarks') == "Scrap":
+			scrapping_items.append(item)
+	
+	if scrapping_items:
+		stock_entry = frappe.new_doc('Stock Entry')
+		stock_entry.stock_entry_type = 'Material Transfer'
+		stock_entry.company = doc.get('company')
+		stock_entry.asset_maintenance = doc.get('name')
+		stock_entry.from_warehouse = doc.get('wip_warehouse')
+
+		for item in scrapping_items:
+			i = frappe.new_doc('Stock Entry Detail')
+			i.s_warehouse =  doc.get('wip_warehouse')
+			i.t_warehouse = doc.get('scrap_warehouse')
+			i.item_code =  item.get('item')
+			i.qty = item.get('qty')
+			i.uom = item.get('uom')
+			i.stock_uom = item.get('uom')
+			i.asset_maintenance = doc.get('name')
+			stock_entry.append('items',i)
+			
+		stock_entry.save()
