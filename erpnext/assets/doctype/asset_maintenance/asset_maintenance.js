@@ -683,6 +683,9 @@ function project_frm_configuration(frm) {
 
 // Function to load assets based on cost center
 function load_assets(frm) {
+	if (!frm.doc.company) {
+		frappe.throw("Select company first")
+	}
 	if (frm.doc.cost_center) {
 		frappe.call({
 			method: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_assets",
