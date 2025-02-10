@@ -26,6 +26,8 @@ class AssetMaintenance(Document):
 				task_doc.asset_maintenance = self.name
 				task_doc.save()
 				frappe.db.commit()
+		
+		self.create_damage_and_repair_stock_entries()
 
 	# def on_update(self):
 	# 	for task in self.get('asset_maintenance_tasks'):
@@ -126,7 +128,23 @@ class AssetMaintenance(Document):
 				elif asset_maintenance_reference.get('asset_maintenance') != self.name:
 					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
 
+	def create_damage_and_repair_stock_entries(self):
+		create_damage_stock_entry = False
+		create_repair_stock_entry = False
 
+		for item in self.get('item_replacement_and_repair'):
+			if item.get('remarks') == "Damaged":
+				create_damage_stock_entry = True
+				break
+			if item.get('remarks') == "Repair":
+				create_repair_stock_entry = True
+				break
+		
+		if create_damage_stock_entry:
+			make_damage_stock_entry(self)
+		
+		if create_repair_stock_entry:
+			make_repair_stock_entry(self)
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
@@ -432,13 +450,17 @@ def get_assets(company, cost_center):
 		)
 		return assets
 
-
-
-
-
 def get_closing_status(asset_maintenance_doc):
 	final_status = 'Finished'
 	for task in asset_maintenance_doc.get('asset_maintenance_tasks'):
 		if task.get('maintenance_status') != "Completed" and task.get('maintenance_status') != "Cancelled":
 			final_status = 'Closed'
 	return final_status
+
+
+def make_damage_stock_entry(doc):
+	pass
+
+
+def make_repair_stock_entry(doc):
+	pass

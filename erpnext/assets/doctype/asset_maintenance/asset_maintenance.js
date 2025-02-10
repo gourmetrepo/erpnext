@@ -50,14 +50,6 @@ frappe.ui.form.on('Asset Maintenance', {
 	onload: (frm) => {
 		erpnext.asset_maintenance.manage_workflow_buttons(frm);
 		project_frm_configuration(frm);
-		
-		// Hide Bill of Material child tables when loading the Asset Maintenance document
-		// frm.set_df_property('bill_of_material_and_services', 'hidden', 1);
-		// frm.set_df_property('consumed_items', 'hidden', 1);
-		// frm.set_df_property('return_items', 'hidden', 1);
-		// frm.set_df_property('issue_material', 'hidden', 1);
-		// frm.set_df_property('charge_consumption', 'hidden', 1);
-		// frm.set_df_property('return_item', 'hidden', 1);
 
 		// Collect unique MR references from the child table
         const mr_references = Array.from(new Set(
@@ -108,72 +100,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	project_based: function(frm){
 		project_frm_configuration(frm)
 	},
-	// project: function(frm) {
-    //     if (frm.doc.project) {
-
-    //         frappe.call({
-    //             method: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_tasks",
-	// 			args: {
-	// 				project: frm.doc.project,
-	// 				status: 'Open'
-	// 			},
-	// 			freeze: true,
-	// 			freeze_message: __("Loading Tasks"),
-    //             callback: function(response) {
-    //                 if (response.message) {
-    //                     const tasks = response.message;
-	// 					frm.clear_table('asset_maintenance_tasks');
-    //                     tasks.forEach(task => {
-	// 						const child = frm.add_child('asset_maintenance_tasks');
-    //                         if (child) {
-    //                             child.maintenance_task = task.name || "";
-	// 							if (task._assign) {
-	// 								const parsedAssignTo = JSON.parse(task._assign);
-	// 								child.assign_to = parsedAssignTo.join(',');
-	// 							}
-    //                         }
-    //                     });
-
-    //                     frm.refresh_field('asset_maintenance_tasks');
-    //                 } else {
-    //                     frappe.throw(`"No tasks found for project: ${frm.doc.project}`);
-    //                 }
-    //             }
-    //         });
-    //     }
-    // },
-
-
-	// Comment this function as dashboard with Maintenance Log link is not required
-	// make_dashboard: (frm) => {
-	// 	if(!frm.is_new()) {
-	// 		frappe.call({
-	// 			method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_maintenance_log',
-	// 			args: {asset_name: frm.doc.asset_name},
-	// 			callback: (r) => {
-	// 				if(!r.message) {
-	// 					return;
-	// 				}
-	// 				var section = frm.dashboard.add_section(`<h5 style="margin-top: 0px;">
-	// 					${ __("Maintenance Log") }</a></h5>`);
-	// 				var rows = $('<div></div>').appendTo(section);
-	// 				// show
-	// 				(r.message || []).forEach(function(d) {
-	// 					$(`<div class='row' style='margin-bottom: 10px;'>
-	// 						<div class='col-sm-3 small'>
-	// 							<a onclick="frappe.set_route('List', 'Asset Maintenance Log', 
-	// 								{'asset_name': '${d.asset_name}','maintenance_status': '${d.maintenance_status}' });">
-	// 								${d.maintenance_status} <span class="badge">${d.count}</span>
-	// 							</a>
-	// 						</div>
-	// 					</div>`).appendTo(rows);
-	// 				});
-	// 				frm.dashboard.show();
-	// 			}
-	// 		});
-	// 	}
-	// },
-
+	
 	company: (frm) => {
 		frm.set_query('cost_center', function() {
             return {
@@ -289,23 +216,7 @@ frappe.ui.form.on('Asset Maintenance', {
 			}
 		});
 	},
-	// bill_of_material: function(frm) {
-    //     const fields_to_toggle = [
-    //         'bill_of_material_and_services',
-    //         'consumed_items',
-    //         'return_items',
-    //         'issue_material',
-    //         'charge_consumption',
-    //         'return_item'
-    //     ];
 
-    //     fields_to_toggle.forEach(field => {
-    //         let current_visibility = frm.fields_dict[field].df.hidden;
-    //         frm.set_df_property(field, 'hidden', current_visibility ? 0 : 1);
-    //     });
-
-	// 	frm.refresh();
-    // },
 
 	maintenance_team: (frm, cdt, cdn) => {
 		if (frm.doc.maintenance_team && frm.doc.maintenance_team.length > 0) {
@@ -499,16 +410,6 @@ frappe.ui.form.on('Bill of Material and Services', {
             frappe.throw("Please select Company first");
         }
 
-		// if (frm.doc.bill_of_material_and_services) {
-		// 	let items_list = frm.doc.bill_of_material_and_services.map(row => row.item);
-		// 	 frm.fields_dict['asset_maintenance_tasks'].grid.get_field('item_used').get_query = function () {
-		// 		return {
-		// 			"filters": {
-		// 				"item_used": ['in', items_list]
-		// 			},
-		// 		};
-		// 	};
-		// }
 		function collect_items_and_update_field(frm) {
 			let item_list = [];
 		
