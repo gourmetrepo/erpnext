@@ -468,3 +468,21 @@ def has_user_permission_for_employee(user_name, employee_name):
 		'allow': 'Employee',
 		'for_value': employee_name
 	})
+
+
+
+@frappe.whitelist()
+def update_employee(employee):
+	employee.update_nsm_model()
+
+	if employee.user_id:
+		employee.update_user()
+		employee.update_user_permissions()
+	employee.reset_employee_emails_cache()
+
+
+
+@frappe.whitelist()
+def support_calculate_reporting_to(doc):
+	if doc:
+		doc.calculate_reporting_to()
