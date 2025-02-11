@@ -110,79 +110,74 @@ frappe.ui.form.on("Delivery Note", {
 			}, __('Create'));
 			frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
-
-		frm.set_query('reference_gate_pass', function () {
-			if(!frm.doc.company){
-                frappe.msgprint("Please select Company First");
-				return {
-					filters: {
-						"docstatus": 3
-					}
-				}
-			}else{
-    			return {
-    			    query: 'nrp_manufacturing.nrp_manufacturing.doctype.gate_pass.gate_pass.get_reference_gate_pass',
-    				filters: {
-    					'type': "IN",
-    					'company': frm.doc.company,
-    					"docstatus":1
-    				}
-    			};
-			    
+		
+		//load drivers
+		cur_frm.fields_dict['driver'].get_query = function (doc) {
+			return {
+				filters: [ 
+					["designation","LIKE" , "%Driver%"],
+					["company","=", frm.doc.company ]
+				]
 			}
-		});
-		setTimeout(function(){
-		    frm.remove_custom_button("Sales Order","Get items from");
-		}, 500);
+		}
+		frm.refresh_field('driver');
+		
 	},
-	onload: function(frm) {
-		frm.fields_dict['items'].grid.wrapper.find('.grid-add-row').hide();
-		frm.fields_dict['items'].grid.wrapper.find('.grid-add-multiple-rows').hide();
-		frm.fields_dict['items'].grid.wrapper.find('.grid-upload').hide();
-		 if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
-		   frm.set_value('naming_series', 'DNSM-.YY.-');
-		   refresh_field('naming_series')
-		   }
-   },
-
-   	on_submit: function(frm) {
-		frm.reload_doc();
+	customer_type:function(frm) {
+		if (frm.doc.customer_type === 'Employee'){
+			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC'){
+				frm.set_df_property('vehicle_no', 'hidden', true);		
+				frm.set_df_property('vehicle', 'hidden', false);
+				frm.set_df_property('vehicle', 'read_only', 0);
+				frm.set_df_property('vehicle_no', 'read_only', 1);
+				frm.set_value("vehicle_no", '');
+				frm.set_df_property('vehicle', 'reqd', 1);
+				frm.set_df_property('vehicle_no', 'reqd', 0);
+			}else {
+				frm.set_df_property('vehicle_no','hidden', false);		
+				frm.set_df_property('vehicle','hidden', true);
+				frm.set_df_property('vehicle', 'read_only', 1);
+				frm.set_df_property('vehicle_no', 'read_only', 0);
+				frm.set_value("vehicle_no", null);
+				frm.set_df_property('vehicle', 'reqd', 0);
+				frm.set_df_property('vehicle_no', 'reqd', 1);
+			}
+			frm.set_df_property('transporter','hidden',true);
+			frm.set_df_property('transporter_name','hidden',true);		
+			frm.set_df_property('driver','hidden',false);
+			frm.set_df_property('driver_name','hidden',false);		
+			frm.set_df_property('driver_name','read_only',1);	
+			frm.set_value("transporter", '');
+			frm.set_value("transporter_name", null);
+			frm.set_df_property('driver', 'reqd', 1);
+			frm.set_df_property('transporter', 'reqd', 0);
+		}else if(frm.doc.customer_type === 'Supplier'){
+			if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC') {
+				frm.set_df_property('vehicle_no', 'hidden', true);		
+				frm.set_df_property('vehicle', 'hidden', false);
+				frm.set_df_property('vehicle', 'read_only', 0);
+				frm.set_df_property('vehicle_no', 'read_only', 1);
+				frm.set_value("vehicle_no", '');
+				frm.set_df_property('vehicle', 'reqd', 1);
+				frm.set_df_property('vehicle_no', 'reqd', 0);
+			}
+			frm.set_df_property('transporter','hidden',false);
+			frm.set_df_property('transporter_name','hidden',false);		
+			frm.set_df_property('driver','hidden',true);
+			frm.set_df_property('driver_name','hidden',true);	
+			frm.set_df_property('driver', 'reqd', 0);
+			frm.set_df_property('transporter', 'reqd', 1);
+			frm.set_value("driver_name", null);
+			frm.set_value("driver", null);
+		}
 	},
-
-	onload_post_render(frm) {
-		frm.remove_custom_button("Sales Order","Get items from");
-	},
-
-	reference_gate_pass: function(frm) {
-	    if (frm.doc.reference_gate_pass){
-            frappe.call({
-                    method: 'frappe.client.get_value',
-                    args: {
-                    doctype: 'Gate Pass',
-                    filters: {
-                      'name': frm.doc.reference_gate_pass
-                    },
-                    fieldname: ['driver','vehicle']
-                  },
-                  callback: function (data) {
-                    if (data.message)
-                    frm.set_value("driver_name",  data.message.driver);
-                    frm.set_value("vehicle_no",  data.message.vehicle);
-		            refresh_field("vehicle_no");
-		            refresh_field("driver_name");
-                  }
-                
-            });
-    	}
-	},
-
-	items_on_form_rendered:function(frm, cdt, cdn){
-        frm.fields_dict["items"].grid.wrapper.find('.grid-delete-row').hide();
-        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row-below').hide();
-        frm.fields_dict["items"].grid.wrapper.find('.grid-insert-row').hide();
-        frm.fields_dict["items"].grid.wrapper.find('.grid-duplicate-row').hide();
-        frm.fields_dict["items"].grid.wrapper.find('.grid-append-row').hide();
-    }
+	vehicle: function(frm) {
+		if (frm.doc.company === 'Unit 6' || frm.doc.company === 'Unit 6 IC'){
+				frm.set_df_property('vehicle_no', 'hidden', false);		
+				frm.set_value("vehicle_no", frm.doc.vehicle);
+				frm.set_df_property('vehicle_no', 'read_only', 1);
+		}
+	}
 });
 
 frappe.ui.form.on("Delivery Note Item", {
@@ -466,16 +461,3 @@ erpnext.stock.delivery_note.set_print_hide = function(doc, cdt, cdn){
 			dn_fields['taxes'].print_hide = 0;
 	}
 }
-$(".btn-print-print").click(function(){
-	frappe.call({
-		method: "nrp_manufacturing.utils.update_print_count",
-		async: false,
-		args: {
-			name: cur_frm.doc.name,
-			doctype: cur_frm.doctype
-		},
-		callback: function(r) {
-			
-		}
-	});
-});

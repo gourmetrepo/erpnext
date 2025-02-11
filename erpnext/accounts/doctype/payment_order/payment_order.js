@@ -6,7 +6,7 @@ frappe.ui.form.on('Payment Order', {
 		frm.set_query("company_bank_account", function() {
 			return {
 				filters: {
-				//	"is_company_account":1,
+					"is_company_account":1,
 					"company": frm.doc.company
 				}
 			}
@@ -18,6 +18,52 @@ frappe.ui.form.on('Payment Order', {
 			frm.add_custom_button(__('Payment Request'), function() {
 				frm.trigger("get_from_payment_request");
 			}, __("Get Payments from"));
+
+			frm.add_custom_button(__('Payment Entry'), function() {
+				frm.trigger("get_from_payment_entry");
+			}, __("Get Payments from"));
+
+			 frm.add_custom_button(__('Get Supplier Payment History'), function () {
+            // Function to open the blank pop-up
+			frm.trigger("openSupplierPaymentHistory");
+       			 });
+
+			frm.trigger('remove_button');
+		}
+
+		// payment Entry
+		if (frm.doc.docstatus===1 && frm.doc.payment_order_type==='Payment Request') {
+			frm.add_custom_button(__('Create Payment Entries'), function() {
+				frm.trigger("make_payment_records");
+			});
+			frm.add_custom_button(__('Create Payment Entry With Single Cheque'), function() {
+				frappe.call({
+					method: "erpnext.accounts.doctype.payment_order.payment_order.make_payment_with_single_cheque",
+					args: {
+						"name": frm.doc.name,
+					},
+					freeze: true,
+					callback: function(r) {
+						frm.refresh();
+					}
+				})
+				setTimeout(() => {
+					frm.remove_custom_button('Create Payment Entry With Single Cheque','Create');
+
+				}, 100);
+			},('Create'));
+			frm.add_custom_button(__('Create Payment Entry For All Suppliers'), function() {
+				frappe.call({
+					method: "erpnext.accounts.doctype.payment_order.payment_order.make_payment_entry_on_single_click",
+					args: {
+						"name": frm.doc.name,
+					},
+					freeze: true,
+					callback: function(r) {
+						frm.refresh();
+					}
+				})
+			},('Create'));
 		}
 		if ( frm.doc.__unsaved){
 			console.log("Unsaved Document")
@@ -42,15 +88,6 @@ frappe.ui.form.on('Payment Order', {
 			}
 		});
 	},
-
-	onload: function(frm) {
-        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.'){
-		    frm.set_value('naming_series', 'PMOSM-.YY.-');
-		    refresh_field('naming_series')
-		    frm.refresh_field('vendor_details');
-		    console.log('check');
-		    }
-   },
 
 	remove_row_if_empty: function(frm) {
 		// remove if first row is empty
@@ -112,7 +149,6 @@ frappe.ui.form.on('Payment Order', {
 				company: frm.doc.company,
 			}
 		});
-		
 	},
 	company: function(frm) {
         frm.set_value("company_bank_account", null);
