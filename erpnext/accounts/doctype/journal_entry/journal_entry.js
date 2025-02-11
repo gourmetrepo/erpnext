@@ -9,15 +9,9 @@ frappe.ui.form.on("Journal Entry", {
 	setup: function(frm) {
 		frm.add_fetch("bank_account", "account", "account");
 	},
-
-	onload(frm){
-        frm.set_df_property("generated", "read_only", 1);
-        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && doc.status==0){
-            frm.set_value('naming_series', 'JVSM-.YY.-');
-            refresh_field('naming_series')
-            }
-    },
-
+	onload: function(frm) {
+		frm.set_df_property("generated", "read_only", 1);
+	},
 	refresh: function(frm) {
 		erpnext.toggle_naming_series();
 		frm.cscript.voucher_type(frm.doc);

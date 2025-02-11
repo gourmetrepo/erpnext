@@ -27,85 +27,18 @@ frappe.ui.form.on("Quality Inspection", {
 			});
 		}
 	},
-	before_submit(frm) {
-		if(! cur_frm.doc.quality_inspection_template)
-		{
-		    frappe.throw(__('Please seclect Quality Inspection Template before submiting document'))
+
+	reference_name: function(frm) {
+		if (frm.doc.reference_type == "Purchase Receipt" || frm.doc.reference_type == "Purchase Invoice" || frm.doc.reference_type == "Stock Entry") {
+			frappe.call({
+				doc: frm.doc,
+				method: "set_supplier_fields",
+				callback: function(r){
+					frm.refresh();
+				}
+			});
 		}
-	},
-
-	brix_value:function(frm,cdt, cdn) {
-		var child = locals[cdt][cdn];
-		frappe.call({
-	        method: 'nrp_manufacturing.modules.gourmet.quality_inspection.quality_inspection.get_brix_value',
-	        args: {
-			    self: frm.doc
-    		},
-		    callback: function(data) {
-		          if(isNaN(data.message) || data.message == "" || data.message == null || data.message <= 0.0  ){
-		        data.message =0.00
-		        }
-		            frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[0].name, "reading_1", parseFloat(data.message).toFixed(3));
-           var child = locals[cdt][cdn];
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[2].name, "reading_1", parseFloat(((parseFloat(child.readings[1].reading_1)*0.26)/parseFloat(frappe.utils.get_config_by_name("SPECIFIC_GRAVITY")))).toFixed(3));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[3].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)/parseFloat(child.readings[0].reading_1))*parseFloat(100).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[6].name, "reading_1", parseFloat(((parseFloat(500)-parseFloat(child.readings[4].reading_1))/parseFloat(500).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[7].name, "reading_1", parseFloat( (parseFloat( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") )*( parseFloat(child.readings[3].reading_1) - parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))) )) / (parseFloat(child.readings[3].reading_1) * ( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") ) -  parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))))).toFixed(3));
-            frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[5].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)*parseFloat(child.readings[7].reading_1)*parseFloat(child.readings[6].reading_1)*parseFloat(frappe.utils.get_config_by_name("LIQUIDATION_FACTOR"))*parseFloat(frappe.utils.get_config_by_name("BHE")).toFixed(3)))));
-                 
-               
-                }
-        });
-        
-	},
-
-	pol_value:function(frm,cdt, cdn) {
-		var child = locals[cdt][cdn];
-		frappe.call({
-	        method: 'nrp_manufacturing.modules.gourmet.quality_inspection.quality_inspection.get_poles_value',
-	        args: {
-			    self: frm.doc
-    		},
-		    callback: function(data) {
-		        if(isNaN(data.message) || data.message == "" || data.message == null || data.message <= 0.0  ){
-		        data.message =0.00
-		        }
-		       frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[1].name, "reading_1", parseFloat(data.message).toFixed(3));
-            var child = locals[cdt][cdn];
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[2].name, "reading_1", parseFloat(((parseFloat(child.readings[1].reading_1)*0.26)/parseFloat(frappe.utils.get_config_by_name("SPECIFIC_GRAVITY")))).toFixed(3));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[3].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)/parseFloat(child.readings[0].reading_1))*parseFloat(100).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[6].name, "reading_1", parseFloat(((parseFloat(500)-parseFloat(child.readings[4].reading_1))/parseFloat(500).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[7].name, "reading_1", parseFloat( (parseFloat( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") )*( parseFloat(child.readings[3].reading_1) - parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))) )) / (parseFloat(child.readings[3].reading_1) * ( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") ) -  parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))))).toFixed(3));
-            frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[5].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)*parseFloat(child.readings[7].reading_1)*parseFloat(child.readings[6].reading_1)*parseFloat(frappe.utils.get_config_by_name("LIQUIDATION_FACTOR"))*parseFloat(frappe.utils.get_config_by_name("BHE")).toFixed(3)))));
-               }
-        });
-                             
-	},
-
-	cake_weight:function(frm,cdt, cdn) {
-		var child = locals[cdt][cdn];
-		frappe.call({
-	        method: 'nrp_manufacturing.modules.gourmet.quality_inspection.quality_inspection.cake_weight_value',
-	        args: {
-			    self: frm.doc
-    		},
-		    callback: function(data) {
-		            if(isNaN(data.message) || data.message == "" || data.message == null || data.message <= 0.0  ){
-		        data.message =0.00
-		        }
-		            frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[4].name, "reading_1", parseFloat(data.message).toFixed(3));
-              var child = locals[cdt][cdn];
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[2].name, "reading_1", parseFloat(((parseFloat(child.readings[1].reading_1)*0.26)/parseFloat(frappe.utils.get_config_by_name("SPECIFIC_GRAVITY")))).toFixed(3));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[3].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)/parseFloat(child.readings[0].reading_1))*parseFloat(100).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[6].name, "reading_1", parseFloat(((parseFloat(500)-parseFloat(child.readings[4].reading_1))/parseFloat(500).toFixed(3))));
-             frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[7].name, "reading_1", parseFloat( (parseFloat( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") )*( parseFloat(child.readings[3].reading_1) - parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))) )) / (parseFloat(child.readings[3].reading_1) * ( parseFloat(frappe.utils.get_config_by_name("SUGAR_PURITY") ) -  parseFloat(frappe.utils.get_config_by_name("FINAL_MOLASSES"))))).toFixed(3));
-            frappe.model.set_value(frm.doc.readings[0].doctype, frm.doc.readings[5].name, "reading_1", parseFloat(((parseFloat(child.readings[2].reading_1)*parseFloat(child.readings[7].reading_1)*parseFloat(child.readings[6].reading_1)*parseFloat(frappe.utils.get_config_by_name("LIQUIDATION_FACTOR"))*parseFloat(frappe.utils.get_config_by_name("BHE")).toFixed(3)))));
-              
-                }
-        });
 	}
-
-
 })
 
 // item code based on GRN/DN
