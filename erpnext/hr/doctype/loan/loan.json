@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "autoname": "ACC-LOAN-.YYYY.-.#####",
  "creation": "2016-12-02 10:11:49.673604",
@@ -47,7 +46,7 @@
    "fieldname": "applicant_type",
    "fieldtype": "Select",
    "label": "Applicant Type",
-   "options": "Employee\nMember",
+   "options": "Employee\nCompany\nMember",
    "reqd": 1
   },
   {
@@ -61,7 +60,6 @@
   {
    "fieldname": "applicant_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Applicant Name",
    "read_only": 1
   },
@@ -265,8 +263,7 @@
   }
  ],
  "is_submittable": 1,
- "links": [],
- "modified": "2019-12-25 17:59:58.122823",
+ "modified": "2025-02-11 17:16:08.044221",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Loan",
