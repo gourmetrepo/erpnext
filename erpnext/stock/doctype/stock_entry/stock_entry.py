@@ -117,27 +117,27 @@ class StockEntry(StockController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
-	# def submit(self):
-	# 	import time
-	# 	from nrp_manufacturing.utils import get_config_by_name
-	# 	time.sleep(1)
-	# 	se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
-	# 	if se_type:
-	# 		se_type_section = se_type[0][0]+self.stock_entry_type
-	# 	else:
-	# 		se_type_section = self.stock_entry_type
-	# 	se_bifurcations = get_config_by_name('stock_entry_queues')
-	# 	for queue in se_bifurcations:
-	# 		if self.request_from=='RMS':
-	# 			queue="sync"
-	# 		elif se_type_section in se_bifurcations.get(queue):
-	# 			break
-	# 		else:
-	# 			queue="primary"
-	# 	if self.request_from=='RMS':
-	# 		self.queue_action('submit',queue_name=queue)
-	# 	else:
-	# 		self.queue_action('submit',queue_name="se_"+queue)
+	def submit(self):
+		import time
+		from nrp_manufacturing.utils import get_config_by_name
+		time.sleep(1)
+		se_type = frappe.db.sql(f"""SELECT wo.item_section FROM `tabWork Order` as wo WHERE wo.name ='{self.work_order}' """)
+		if se_type:
+			se_type_section = se_type[0][0]+self.stock_entry_type
+		else:
+			se_type_section = self.stock_entry_type
+		se_bifurcations = get_config_by_name('stock_entry_queues')
+		for queue in se_bifurcations:
+			if self.request_from=='RMS':
+				queue="sync"
+			elif se_type_section in se_bifurcations.get(queue):
+				break
+			else:
+				queue="primary"
+		if self.request_from=='RMS':
+			self.queue_action('submit',queue_name=queue)
+		else:
+			self.queue_action('submit',queue_name="se_"+queue)
 
 	
 	def on_submit(self):

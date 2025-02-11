@@ -224,15 +224,6 @@ def update_maintenance_log(asset_maintenance, item_code, item_name, task):
 def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 	return frappe.db.get_values('Maintenance Team Member', { 'parent': filters.get("maintenance_team") }, "team_member")
 
-# Comment this function as maintenance log link is not required in dashboard
-# @frappe.whitelist()
-# def get_maintenance_log(asset_name):
-# 	return frappe.db.sql("""
-# 		select maintenance_status, count(asset_name) as count, asset_name
-# 		from `tabAsset Maintenance Log`
-# 		where asset_name=%s group by maintenance_status""",
-# 		(asset_name), as_dict=1)
-
 
 
 
@@ -396,7 +387,7 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
 
 		for item in asset_maintenance_doc.consumed_items:
-			if item.get('issued_qty') - item.get('consumed_qty') > 0:
+			if ((item.get('issued_qty') - item.get('consumed_qty')) - item.get('return_qty')) > 0:
 				i = frappe.new_doc('Stock Entry Detail')
 				i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
 				i.item_code =  item.get('item')
@@ -470,14 +461,12 @@ def make_damage_stock_entry(doc):
 	
 	if damaged_items:
 		stock_entry = frappe.new_doc('Stock Entry')
-		stock_entry.stock_entry_type = 'Material Transfer'
+		stock_entry.stock_entry_type = 'Material Receipt'
 		stock_entry.company = doc.get('company')
 		stock_entry.asset_maintenance = doc.get('name')
-		stock_entry.from_warehouse = doc.get('wip_warehouse')
 
 		for item in damaged_items:
 			i = frappe.new_doc('Stock Entry Detail')
-			i.s_warehouse =  doc.get('wip_warehouse')
 			i.t_warehouse = doc.get('damage_warehouse')
 			i.item_code =  item.get('item')
 			i.qty = item.get('qty')
@@ -487,6 +476,7 @@ def make_damage_stock_entry(doc):
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
+		stock_entry.submit()
 
 
 
@@ -498,14 +488,12 @@ def make_scrap_stock_entry(doc):
 	
 	if scrapping_items:
 		stock_entry = frappe.new_doc('Stock Entry')
-		stock_entry.stock_entry_type = 'Material Transfer'
+		stock_entry.stock_entry_type = 'Material Receipt'
 		stock_entry.company = doc.get('company')
 		stock_entry.asset_maintenance = doc.get('name')
-		stock_entry.from_warehouse = doc.get('wip_warehouse')
 
 		for item in scrapping_items:
 			i = frappe.new_doc('Stock Entry Detail')
-			i.s_warehouse =  doc.get('wip_warehouse')
 			i.t_warehouse = doc.get('scrap_warehouse')
 			i.item_code =  item.get('item')
 			i.qty = item.get('qty')
@@ -515,3 +503,4 @@ def make_scrap_stock_entry(doc):
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
+		stock_entry.submit()
