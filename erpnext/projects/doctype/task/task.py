@@ -200,7 +200,7 @@ class Task(NestedSet):
 	def update_asset_maintenance_doc(self):
 		users_list = ""
 		for user in self.assigned_users:
-			users_list += user.get('user') + ", "
+			users_list += user.get('employee') + ", "
 
 		frappe.db.sql(f"""
 		UPDATE `tabAsset Maintenance Task`
@@ -336,8 +336,9 @@ def validate_project_dates(project_end_date, task, task_start, task_end, actual_
 @frappe.whitelist()
 def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters):
 	query = """
-		SELECT DISTINCT(team_member) FROM `tabMaintenance Team Member`
-		WHERE user LIKE %s
+		(SELECT team_member, full_name
+		 FROM `tabMaintenance Team Member`
+		WHERE user LIKE %s)
 	"""
 	
 	users = frappe.db.sql(query, ("%" + txt + "%",))

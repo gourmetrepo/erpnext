@@ -26,9 +26,18 @@ frappe.ui.form.on("Task", {
 				}
 			}
 		});
+		frm.fields_dict["assigned_users"].get_query = function() {
+            return {
+                query: "erpnext.projects.doctype.task.task.get_assigned_team_users"
+            };
+        };
+		
 	},
 
 	refresh: function (frm) {
+		frm.fields_dict["assigned_users"].grid.get_field("assigned_users").format_input = function(value, data) {
+            return data ? `${data.team_member} - ${data.full_name}` : value;
+        };
 		if (!frm.is_new()) {
 			frm.set_df_property("exp_start_date", "read_only", 1);
 			frm.set_df_property("exp_end_date", "read_only", 1);
