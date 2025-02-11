@@ -27,7 +27,7 @@ class Employee(NestedSet):
 		self.reporting_dict = ",".join(r for r in reporting_dict)
 		self.db_update()
 	def get_underlying_reports(self,report,reporting_dict):
-		reporting = frappe.db.sql(f"SELECT name FROM `tabEmployee` WHERE reports_to = '{report}'",as_dict=True)
+		reporting = frappe.db.sql(f"SELECT name FROM `tabEmployee` WHERE status = 'Active' and reports_to = '{report}'",as_dict=True)
 		if reporting:
 			for r in reporting:
 				reporting_dict.append(r.name)
