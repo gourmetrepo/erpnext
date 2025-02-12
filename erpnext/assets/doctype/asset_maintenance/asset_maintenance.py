@@ -88,9 +88,10 @@ class AssetMaintenance(Document):
 
 			tasks_names = tuple([task.get('name') for task in tasks])
 			if tasks_names:
+				formatted_tasks_names = f"({', '.join([f"'{name}'" for name in tasks_names])})"
 				users_task = frappe.db.sql(
 					f"""
-					SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {tasks_names};
+					SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {formatted_tasks_names};
 					""", as_dict=True
 				)
 
