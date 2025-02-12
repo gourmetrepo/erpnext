@@ -29,6 +29,7 @@ class AssetMaintenance(Document):
 				frappe.db.commit()
 		
 		self.create_damage_and_scrap_stock_entries()
+		
 
 
 	def sync_maintenance_tasks(self):
@@ -146,9 +147,11 @@ class AssetMaintenance(Document):
 		
 		if create_damage_stock_entry:
 			make_damage_stock_entry(self)
+			frappe.db.commit()
 		
 		if create_scrap_stock_entry:
 			make_scrap_stock_entry(self)
+			frappe.db.commit()
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
