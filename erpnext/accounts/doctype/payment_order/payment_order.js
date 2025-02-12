@@ -31,6 +31,16 @@ frappe.ui.form.on('Payment Order', {
 			frm.trigger('remove_button');
 		}
 
+		frm.add_custom_button(__('Cash and Bank Summary Report'), function() {
+			if (!frm.doc.company) {
+				frappe.msgprint(__('Please select a company first.'));
+				return;
+			}
+			let report_url = `/desk#query-report/Cash%20and%20Bank%20Summary?company=${encodeURIComponent(frm.doc.company)}&account_type=Cash`;
+
+			window.open(report_url, '_blank');
+		});
+	
 		// payment Entry
 		if (frm.doc.docstatus===1 && frm.doc.payment_order_type==='Payment Request') {
 			frm.add_custom_button(__('Create Payment Entries'), function() {
