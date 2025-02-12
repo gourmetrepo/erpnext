@@ -57,9 +57,11 @@ class ComplianceVerification(Document):
 		self.db_update()
 	
 	def validate_ranking(self):
+		if not len(self.compliance_verification_item):
+			frappe.throw(f"Please fetch data from '{self.parameter_setup}'.")
 		for cvi in self.compliance_verification_item:
 			if not cvi.ranking:
-				frappe.throw(f"Please select ranking for '{cvi.parameter}'")
+				frappe.throw(f"Please select ranking for '{cvi.parameter}'.")
 
 
 @frappe.whitelist()

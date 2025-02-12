@@ -47,10 +47,7 @@ frappe.ui.form.on('Compliance Verification', {
 					frm.doc.compliance_verification_item.forEach(function(row) {
 						let options = data[row.parameter];
 						if (options) {
-							frm.fields_dict.compliance_verification_item.grid.update_docfield_property(
-								'ranking',
-								'options',
-								[''].concat(options));
+							frappe.meta.get_docfield('Compliance Verification Item', 'ranking', row.name).options = [''].concat(options);
 						}
 					});
 					frm.refresh_field('compliance_verification_item');
