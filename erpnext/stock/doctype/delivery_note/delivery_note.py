@@ -395,7 +395,7 @@ class DeliveryNote(SellingController):
 						AND d.start_date <= '{current_date}'
 						AND d.end_date >= '{current_date}'
 						ORDER BY m.creation DESC
-				LIMIT 1;""".format(customer=self.customer, item_code=item.item_code,warehouse=item.warehouse, current_date=frappe.utils.nowdate()), as_dict=True,debug=True)
+				LIMIT 1;""".format(customer=self.customer, item_code=item.item_code,warehouse=item.warehouse, current_date=frappe.utils.nowdate()), as_dict=True)
 
 			if not item_tax_template:
 				item_tax_template = frappe.db.sql("""SELECT 
@@ -412,7 +412,7 @@ class DeliveryNote(SellingController):
 									AND d.start_date <='{current_date}'
 									AND d.end_date >= '{current_date}'
 									ORDER BY m.creation DESC
-							LIMIT 1;""".format(customer=self.customer, item_group=item.item_group, current_date=frappe.utils.nowdate()), as_dict=True, debug=True)
+							LIMIT 1;""".format(customer=self.customer, item_group=item.item_group, current_date=frappe.utils.nowdate()), as_dict=True)
 			if(item_tax_template):
 				item.item_tax_template = item_tax_template[0].item_tax_template
 				item.item_tax_rate = get_item_tax_map( self.company, item.item_tax_template, as_json=True)
@@ -543,7 +543,7 @@ class DeliveryNote(SellingController):
 		if status == 'Closed':
 			frappe.db.sql(f"update `tabDelivery Note` set closing_time = '{get_datetime()}' where name = '{self.name}'")
 			frappe.db.commit()
-            
+			
 		self.set_status(update=True, status=status)
 		self.notify_update()
 		clear_doctype_notifications(self)
@@ -871,3 +871,13 @@ def update_delivery_note_status(docname, status):
 @frappe.whitelist()
 def delete_returnable(self,arg):
 	print('test')
+
+
+def validate_palletized_items(doc):
+	for item in doc.get("returnable_items", []):	
+		if item.get("actual_qty", 0) == '':
+			item.actual_qty = 0
+		actual_qty = item.get("actual_qty", 0)
+		# Ensure qty is a whole number (0 or positive integer) and not a decimal or negative number
+		if not isinstance(actual_qty, (int, float)) or actual_qty < 0 or (isinstance(actual_qty, float) and not actual_qty.is_integer()):
+			frappe.throw("Returnable Item qty must be a whole number for Row {0}".format(item.get("idx")))
