@@ -102,7 +102,7 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 		var me = this;
 		this._super();
 		let allow_delivery = false;
-
+		debugger;
 		if (doc.docstatus==1) {
 
 			if(this.frm.has_perm("submit")) {
