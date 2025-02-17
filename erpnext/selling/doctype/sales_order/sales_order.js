@@ -102,6 +102,7 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 		var me = this;
 		this._super();
 		let allow_delivery = false;
+		console.log("Refresh hook called at sales order by moeiz")
 		debugger;
 		if (doc.docstatus==1) {
 
