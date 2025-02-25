@@ -6,6 +6,33 @@ frappe.provide("erpnext.buying");
 {% include 'erpnext/public/js/controllers/buying.js' %};
 
 frappe.ui.form.on("Purchase Order", {
+	validate: function(frm) {
+		for (let i = 0; i < frm.doc.items.length; i++) {
+			if (frm.doc.items[i].rate > 0) {
+				continue;
+			}
+			
+			return new Promise(function(resolve, reject) {
+				frappe.confirm(
+					'The rate of this item <b>' + frm.doc.items[i].item_name + '</b> is <b>' + frm.doc.items[i].rate + '</b>. Do you really want to Continue?',
+					function() {
+						var negative = 'frappe.validated = false';
+						resolve(negative);
+					},
+					function() {
+						reject();
+					}
+				)
+			})
+		}
+		if (frm.doc.purchase_order_type === "Import") {
+            frm.doc.items.forEach(item => {
+                if (!item.project) {
+                    frappe.throw(__('Project is compulsory for Import type Purchase Order.'));
+                }
+            });
+        }
+	},
 	setup: function(frm) {
 
 		frm.set_query("reserve_warehouse", "supplied_items", function() {
@@ -835,5 +862,3 @@ function showHistoryPopup(historyData) {
     });
 
 }
-
-
