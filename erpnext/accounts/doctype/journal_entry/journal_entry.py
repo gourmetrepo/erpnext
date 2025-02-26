@@ -47,23 +47,28 @@ class JournalEntry(AccountsController):
 		validate_company_cost_center_and_accounts(self)
 
 	def on_submit(self):
-		self.validate_cheque_info()
-		self.check_credit_limit()
-		#self.make_gl_entries()
 		try:
-			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+			self.validate_cheque_info()
+			self.check_credit_limit()
+			#self.make_gl_entries()
+			try:
+				frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
+			except Exception as e:
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+
+
+			self.update_advance_paid()
+			self.update_expense_claim()
+			self.update_loan()
+			self.update_inter_company_jv()
+			self.update_invoice_discounting()
 		except Exception as e:
 			traceback = frappe.get_traceback()
-			frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
+			frappe.log_error(message=traceback,title=self.voucher_type+' Submit Error  '+str(self.name))
 			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
-
-
-		self.update_advance_paid()
-		self.update_expense_claim()
-		self.update_loan()
-		self.update_inter_company_jv()
-		self.update_invoice_discounting()
-		
+		#self.make_gl_entries()
 
 	def on_cancel(self):
 		from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
