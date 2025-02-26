@@ -55,8 +55,8 @@ class JournalEntry(AccountsController):
 				frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 			except Exception as e:
 				traceback = frappe.get_traceback()
-				frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
-				self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+				frappe.log_error(message=traceback, title=f'Exc GL entry Adding Queue {str(self.name)}')
+				self.add_comment('Comment', f'{_('Action Failed')} <br><br> {traceback}')
 
 
 			self.update_advance_paid()
@@ -66,8 +66,8 @@ class JournalEntry(AccountsController):
 			self.update_invoice_discounting()
 		except Exception as e:
 			traceback = frappe.get_traceback()
-			frappe.log_error(message=traceback,title=self.voucher_type+' Submit Error  '+str(self.name))
-			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+			frappe.log_error(message=traceback, title=f'{self.voucher_type} Submit Error {str(self.name)}')
+			self.add_comment('Comment', f'{_('Action Failed')} <br><br> {traceback}')
 		#self.make_gl_entries()
 
 	def on_cancel(self):
