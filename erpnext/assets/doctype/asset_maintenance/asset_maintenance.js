@@ -122,6 +122,12 @@ frappe.ui.form.on('Asset Maintenance', {
 
 	cost_center: (frm) => {
 		load_assets(frm);
+		frm.set_value('plant_maintenance_assets', []);
+		if(frm.doc.cost_center){
+			frm.set_df_property('plant_maintenance_assets', 'cannot_add_rows', true);
+		}else{
+			frm.set_df_property('plant_maintenance_assets', 'cannot_add_rows', false);
+		}
 	},
 
 	issue_material: (frm) => {
@@ -579,11 +585,22 @@ function project_frm_configuration(frm) {
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
 
+	/* In case of assets are fetched from Cost Centers, then user can not add assets, only he will be able 
+	to delete assets from the child table. In case of assets are not fetched from Cost Centers, 
+	then user can add or remove assets in child table, plant maintenance status is in progress.*/
+
+	if(frm.doc.cost_center){
+		frm.set_df_property('plant_maintenance_assets', 'cannot_add_rows', true);
+	}else{
+		frm.set_df_property('plant_maintenance_assets', 'cannot_add_rows', false);
+	}
+
 }
 
 
 // Function to load assets based on cost center
 function load_assets(frm) {
+	debugger;
 	if (!frm.doc.company) {
 		frappe.throw("Select company first")
 	}
