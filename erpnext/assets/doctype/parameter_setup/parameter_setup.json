@@ -1,0 +1,119 @@
+{
+ "autoname": "PS.-.#####",
+ "creation": "2025-01-29 16:23:05.112547",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter_name",
+  "company",
+  "ranking",
+  "column_break_3",
+  "cost_center",
+  "department",
+  "location",
+  "section_break_6",
+  "parameter_setup_item",
+  "parameter_setup_details",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Location",
+   "options": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Cost Center",
+   "options": "Cost Center"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "parameter_setup_item",
+   "fieldtype": "Table",
+   "label": "Parameter Setup Item",
+   "options": "Parameter Setup Item"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Parameter Setup",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "parameter_setup_details",
+   "fieldtype": "Table",
+   "label": "Parameter Setup Details",
+   "options": "Parameter Setup Details"
+  },
+  {
+   "fieldname": "parameter_name",
+   "fieldtype": "Data",
+   "label": "Parameter Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ranking",
+   "fieldtype": "Link",
+   "label": "Ranking",
+   "options": "Ranking Setup",
+   "reqd": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2025-02-07 19:23:09.121326",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Parameter Setup",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "parameter_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "parameter_name",
+ "track_changes": 1
+}
