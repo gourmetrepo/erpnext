@@ -146,7 +146,37 @@ frappe.ui.form.on('Asset', {
 			frm.refresh_field('finance_books');
 		}
 	},
+	company: function(frm) {
+        if (frm.doc.company === "Desert Agriculture and Development") {
+			console.log("company is Desert Agriculture and Development")
+            let fields = [
+                "address",
+                "transfer_status",
+                "transfer_type",
+                "dc_value",
+                "owner_details_table"
+			    ];
 
+            fields.forEach(field => {
+                frm.set_df_property(field, "reqd", 1);
+                frm.set_df_property(field, "hidden", 0);
+            });
+
+        } else {
+            let fields = [
+                "address",
+                "transfer_status",
+                "transfer_type",
+                "dc_value",
+                "owner_details_table"
+            ];
+
+            fields.forEach(field => {
+                frm.set_df_property(field, "reqd", 0);
+                frm.set_df_property(field, "hidden", 1);
+            });
+        }
+    },
 	toggle_reference_doc: function(frm) {
 		if (frm.doc.purchase_receipt && frm.doc.purchase_invoice && frm.doc.docstatus === 1) {
 			frm.set_df_property('purchase_invoice', 'read_only', 1);
