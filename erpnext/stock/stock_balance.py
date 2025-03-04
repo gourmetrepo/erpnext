@@ -159,18 +159,23 @@ def get_planned_qty(item_code, warehouse):
 
 
 def update_bin_qty(item_code, warehouse, qty_dict=None):
-	from erpnext.stock.utils import get_bin
-	bin = get_bin(item_code, warehouse)
-	mismatch = False
-	for field, value in qty_dict.items():
-		if flt(bin.get(field)) != flt(value):
-			bin.set(field, flt(value))
-			mismatch = True
+	# from erpnext.stock.utils import get_bin
+	# bin = get_bin(item_code, warehouse)
+	# mismatch = False
+	# for field, value in qty_dict.items():
+	# 	if flt(bin.get(field)) != flt(value):
+	# 		bin.set(field, flt(value))
+	# 		mismatch = True
 
-	if mismatch:
-		bin.set_projected_qty()
-		bin.db_update()
-		bin.clear_cache()
+	# if mismatch:
+	# 	bin.set_projected_qty()
+	# 	bin.db_update()
+	# 	bin.clear_cache()
+
+	from nrp_manufacturing.utils import update_bin_queue
+	update_bin_queue(item_code=item_code, warehouse=warehouse, qty_dict=qty_dict, update_projected_qty=True)
+
+
 
 def set_stock_balance_as_per_serial_no(item_code=None, posting_date=None, posting_time=None,
 	 	fiscal_year=None):
