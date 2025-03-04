@@ -130,28 +130,37 @@ class update_entries_after(object):
 		#self.update_bin()
 
 	def update_bin(self):
+		
 		# update bin
-		bin_name = frappe.db.get_value("Bin", {
-			"item_code": self.item_code,
-			"warehouse": self.warehouse
-		})
+		# bin_name = frappe.db.get_value("Bin", {
+		# 	"item_code": self.item_code,
+		# 	"warehouse": self.warehouse
+		# })
 
-		if not bin_name:
-			bin_doc = frappe.get_doc({
-				"doctype": "Bin",
-				"item_code": self.item_code,
-				"warehouse": self.warehouse
-			})
-			bin_doc.insert(ignore_permissions=True)
-		else:
-			bin_doc = frappe.get_doc("Bin", bin_name)
+		# if not bin_name:
+		# 	bin_doc = frappe.get_doc({
+		# 		"doctype": "Bin",
+		# 		"item_code": self.item_code,
+		# 		"warehouse": self.warehouse
+		# 	})
+		# 	bin_doc.insert(ignore_permissions=True)
+		# else:
+		# 	bin_doc = frappe.get_doc("Bin", bin_name)
 
-		bin_doc.update({
-			"valuation_rate": self.valuation_rate,
-			"actual_qty": self.qty_after_transaction,
-			"stock_value": self.stock_value
-		})
-		bin_doc.flags.via_stock_ledger_entry = True
+		# bin_doc.update({
+		# 	"valuation_rate": self.valuation_rate,
+		# 	"actual_qty": self.qty_after_transaction,
+		# 	"stock_value": self.stock_value
+		# })
+		# bin_doc.flags.via_stock_ledger_entry = True
+
+		# Code by Moeiz
+		# To update and create bin from queue
+		from nrp_manufacturing.utils import update_bin_queue
+		qty_dict = {}
+		qty_dict["actual_qty"] = self.qty_after_transaction
+
+		update_bin_queue(item_code=self.item_code, warehouse=self.warehouse, qty_dict=qty_dict, valuation_rate=self.valuation_rate, stock_value=self.stock_value, via_stock_ledger_entry_flag=True)
 
 		bin_doc.save(ignore_permissions=True)
 
