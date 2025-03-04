@@ -56,7 +56,7 @@ class JournalEntry(AccountsController):
 			except Exception as e:
 				traceback = frappe.get_traceback()
 				frappe.log_error(message=traceback, title=f'Exc GL entry Adding Queue {str(self.name)}')
-				self.add_comment('Comment', f'{_('Action Failed')} <br><br> {traceback}')
+				self.add_comment('Comment', f"""{"Action Failed"} <br><br> {traceback}""")
 
 
 			self.update_advance_paid()
@@ -67,7 +67,7 @@ class JournalEntry(AccountsController):
 		except Exception as e:
 			traceback = frappe.get_traceback()
 			frappe.log_error(message=traceback, title=f'{self.voucher_type} Submit Error {str(self.name)}')
-			self.add_comment('Comment', f'{_('Action Failed')} <br><br> {traceback}')
+			self.add_comment('Comment', f"""{"Action Failed"} <br><br> {traceback}""")
 		#self.make_gl_entries()
 
 	def on_cancel(self):
