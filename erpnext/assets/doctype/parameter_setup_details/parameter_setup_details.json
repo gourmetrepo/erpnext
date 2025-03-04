@@ -1,0 +1,53 @@
+{
+ "creation": "2025-01-29 17:13:20.811009",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter",
+  "ranking",
+  "rank_value",
+  "score"
+ ],
+ "fields": [
+  {
+   "fieldname": "parameter",
+   "fieldtype": "Text",
+   "in_list_view": 1,
+   "label": "Parameter",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ranking",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ranking",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rank_value",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Rank Value",
+   "read_only": 1
+  },
+  {
+   "fieldname": "score",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Score",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-01-30 15:54:41.960550",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Parameter Setup Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

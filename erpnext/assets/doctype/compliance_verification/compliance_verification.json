@@ -1,0 +1,215 @@
+{
+ "autoname": "CV.-.#####",
+ "creation": "2025-01-29 18:39:03.829622",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "parameter_setup",
+  "compliance_verification_name",
+  "company",
+  "department",
+  "location",
+  "ranking",
+  "column_break_5",
+  "inspection_date",
+  "inspector",
+  "inspector_name",
+  "area_incharge",
+  "area_incharge_name",
+  "cost_center",
+  "section_break_9",
+  "compliance_verification_item",
+  "section_break_11",
+  "total_score",
+  "column_break_13",
+  "rank",
+  "section_break_15",
+  "remarks",
+  "section_break_17",
+  "score_criteria",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fetch_from": "parameter_setup.company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "parameter_setup.location",
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Location",
+   "options": "Location",
+   "read_only": 1
+  },
+  {
+   "default": "Today",
+   "fieldname": "inspection_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Inspection Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "inspector",
+   "fieldtype": "Link",
+   "label": "Inspector",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "area_incharge",
+   "fieldtype": "Link",
+   "label": "Area Incharge",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "parameter_setup.cost_center",
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "options": "Cost Center",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "compliance_verification_item",
+   "fieldtype": "Table",
+   "label": "Compliance Verification Item",
+   "options": "Compliance Verification Item"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_score",
+   "fieldtype": "Float",
+   "label": "Total Score",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rank",
+   "fieldtype": "Data",
+   "label": "Rank",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_15",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_17",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "score_criteria",
+   "fieldtype": "Small Text",
+   "label": "Score Criteria",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Compliance Verification",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "parameter_setup",
+   "fieldtype": "Link",
+   "label": "Parameter Setup",
+   "options": "Parameter Setup",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "inspector.employee_name",
+   "fieldname": "inspector_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Inspector Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "area_incharge.employee_name",
+   "fieldname": "area_incharge_name",
+   "fieldtype": "Data",
+   "label": "Area Incharge Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "parameter_setup.parameter_name",
+   "fieldname": "compliance_verification_name",
+   "fieldtype": "Data",
+   "label": "Compliance Verification Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "parameter_setup.ranking",
+   "fieldname": "ranking",
+   "fieldtype": "Link",
+   "label": "Ranking",
+   "options": "Ranking Setup",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "parameter_setup.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Department",
+   "options": "Department",
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2025-02-07 19:29:09.204360",
+ "modified_by": "Administrator",
+ "module": "Assets",
+ "name": "Compliance Verification",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "compliance_verification_name",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "compliance_verification_name",
+ "track_changes": 1
+}
