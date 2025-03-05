@@ -120,7 +120,6 @@
   {
    "fieldname": "reference_name",
    "fieldtype": "Dynamic Link",
-   "in_global_search": 1,
    "in_standard_filter": 1,
    "label": "Reference Name",
    "no_copy": 1,
@@ -235,13 +234,11 @@
   {
    "fieldname": "email_to",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "To"
   },
   {
    "fieldname": "subject",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Subject"
   },
   {
@@ -348,8 +345,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-03-28 16:07:31.960798",
- "modified_by": "Administrator",
+ "modified": "2025-02-20 14:33:14.953313",
+ "modified_by": "muhammadyasir@gourmetpakistan.com",
  "module": "Accounts",
  "name": "Payment Request",
  "owner": "Administrator",
