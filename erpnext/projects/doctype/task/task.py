@@ -337,9 +337,8 @@ def validate_project_dates(project_end_date, task, task_start, task_end, actual_
 def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters):
 	query = """
 		(SELECT team_member, full_name
-		 FROM `tabMaintenance Team Member`
-		WHERE user LIKE %s)
+		 FROM `tabMaintenance Team Member`)
 	"""
 	
-	users = frappe.db.sql(query, ("%" + txt + "%",))
+	users = frappe.db.sql(query)
 	return users
