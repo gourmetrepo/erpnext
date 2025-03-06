@@ -155,6 +155,27 @@ def get_data():
                     "description": _("Cost Center"),
                     "label": _("Cost Center"),
                     "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Ranking Setup",
+                    "description": _("Ranking Setup"),
+                    "label": _("Ranking Setup"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Parameter Setup",
+                    "description": _("Parameter Setup"),
+                    "label": _("Parameter Setup"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Compliance Verification",
+                    "description": _("Compliance Verification"),
+                    "label": _("Compliance Verification"),
+                    "onboard": 1
                 }
             ]
         }
