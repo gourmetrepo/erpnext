@@ -1366,8 +1366,10 @@ class StockEntry(StockController):
 			se_child.qty = round_decimals_down(item_dict[d]["qty"], se_child.precision("qty"))
 			se_child.allow_alternative_item = item_dict[d].get("allow_alternative_item", 0)
 			se_child.subcontracted_item = item_dict[d].get("main_item_code")
-			se_child.cost_center = _cost_center[0]['cost_center'] or (item_dict[d].get("cost_center") or
-				get_default_cost_center(item_dict[d], company = self.company))
+			cost_center = _cost_center[0]['cost_center'] if _cost_center and _cost_center[0].get('cost_center') else None
+			item_cost_center = item_dict[d].get("cost_center")
+			default_cost_center = get_default_cost_center(item_dict[d], company=self.company)
+			se_child.cost_center = str(cost_center or item_cost_center or default_cost_center)
 
 			for field in ["idx", "po_detail", "original_item",
 				"expense_account", "description", "item_name"]:
