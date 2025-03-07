@@ -331,7 +331,7 @@ def get_received_qty_from_material_request(mr_references):
 	items = frappe.db.sql(f"""
 			SELECT tmri.parent, tmri.item_code, tmri.qty FROM `tabMaterial Request` AS tmr
 			LEFT JOIN `tabMaterial Request Item` AS tmri ON tmr.name = tmri.parent
-			WHERE tmr.docstatus = 1 AND tmri.parent in ({mr_ref_query});""", as_dict=True, debug=True)
+			WHERE tmr.docstatus = 1 AND tmri.parent in ({mr_ref_query});""", as_dict=True)
 	
 	return items
 

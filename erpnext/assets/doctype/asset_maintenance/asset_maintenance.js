@@ -526,8 +526,7 @@ erpnext.asset_maintenance = {
 
 		if (status === "Not Started") {
 			frm.add_custom_button(__('Start'), function () {
-				frm.set_value('status', 'In Process');
-				frm.save();
+				in_process_validations(frm);
 			}).addClass('btn-danger');
 		} else if (status === "In Process") {
 			frm.add_custom_button(__('Consumption'), function () {
@@ -647,4 +646,19 @@ function hide_add_rows(frm, field, is_hide){
 	frm.set_df_property(field, 'cannot_delete_all_rows', is_hide);
 	frm.fields_dict[field].grid.wrapper.find('.grid-remove-rows').show();
 	}
+}
+
+
+function in_process_validations(frm){
+	// Tasks cannot be empty when moving from Not Started to In Process
+	if (frm.doc.asset_maintenance_tasks.length === 0) {
+		frappe.throw(__('Please add maintenance tasks before starting the plant maintenance'));
+	}
+
+	// Assets cannot be empty when moving from Not Started to In Process
+	if (frm.doc.plant_maintenance_assets.length === 0) {
+		frappe.throw(__('Please add assets before starting the plant maintenance'));
+	}
+	frm.set_value('status', 'In Process');
+	frm.save();
 }
