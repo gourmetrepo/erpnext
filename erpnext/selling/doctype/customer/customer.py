@@ -234,7 +234,7 @@ class Customer(TransactionBase):
 
 	def before_save(self):
 		try:
-			if self.customer_group == "Key-Account Customer":
+			if self.customer_group in ["Key-Account Customer", "Key-Account Utility Store"]:
 				from datetime import datetime
 				today =  datetime.now()
 				credit_limit = ''
@@ -375,6 +375,7 @@ def get_loyalty_programs(doc):
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_customer_list(doctype, txt, searchfield, start, page_len, filters=None):
+	searchfield = "`tabCustomer`." + searchfield
 	from erpnext.controllers.queries import get_fields
 
 	if frappe.db.get_default("cust_master_name") == "Customer Name":
@@ -394,15 +395,16 @@ def get_customer_list(doctype, txt, searchfield, start, page_len, filters=None):
 	return frappe.db.sql("""
 			select %s
 			from `tabCustomer`
-			where docstatus < 2
+			LEFT JOIN `tabParty Account` ON `tabParty Account`.parenttype = 'Customer' and `tabCustomer`.name = `tabParty Account`.parent
+			where `tabCustomer`.docstatus < 2
 				and (%s like %s or customer_name like %s)
 					{match_conditions}
 			order by
-				case when name like %s then 0 else 1 end,
-				case when customer_name like %s then 0 else 1 end,
-				name, customer_name limit %s, %s
-		""".format(match_conditions=match_conditions) % (", ".join(fields), searchfield, "%s", "%s", "%s", "%s", "%s", "%s"),
-			("%%%s%%" % txt, "%%%s%%" % txt, "%%%s%%" % txt, "%%%s%%" % txt, start, page_len))
+				case when `tabCustomer`.name like %s then 0 else 1 end,
+				case when `tabCustomer`.customer_name like %s then 0 else 1 end,
+				`tabCustomer`.name, `tabCustomer`.customer_name limit %s, %s
+		""".format(match_conditions=match_conditions) % (", ".join(f"`tabCustomer`.{f}" for f in fields), searchfield, "%s", "%s", "%s", "%s", "%s", "%s"),
+			("%%%s%%" % txt, "%%%s%%" % txt, "%%%s%%" % txt, "%%%s%%" % txt, start, page_len),debug=True)
 
 
 def check_credit_limit(customer, company, ignore_outstanding_sales_order=False, extra_amount=0):
