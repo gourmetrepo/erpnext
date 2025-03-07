@@ -234,7 +234,7 @@ class Customer(TransactionBase):
 
 	def before_save(self):
 		try:
-			if self.customer_group == "Key-Account Customer":
+			if self.customer_group in ["Key-Account Customer", "Key-Account Utility Store"]:
 				from datetime import datetime
 				today =  datetime.now()
 				credit_limit = ''
