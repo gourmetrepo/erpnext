@@ -51,7 +51,6 @@ frappe.ui.form.on('Asset', {
 				fields: ["name"],
 			},
 			callback: function(r) {
-				debugger;
 				if (r.message) {
 					const recordCount = r.message.length;
 					if (recordCount)

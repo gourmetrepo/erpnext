@@ -131,7 +131,6 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	issue_material: (frm) => {
-		debugger;
 		if (!frm.doc.company){
 			frappe.throw("Select company first")
 		}
@@ -202,7 +201,6 @@ frappe.ui.form.on('Asset Maintenance', {
 			freeze: true,
 			freeze_message: "Fetching Project Tasks",
 			callback: (r) => {
-				debugger
 				if (!r.message || !r.message.tasks) {
 					return;
 				}
@@ -600,7 +598,6 @@ function project_frm_configuration(frm) {
 
 // Function to load assets based on cost center
 function load_assets(frm) {
-	debugger;
 	if (!frm.doc.company) {
 		frappe.throw("Select company first")
 	}

@@ -151,8 +151,7 @@ frappe.ui.form.on('Stock Entry', {
 		});
 	},
 
-	refresh: function(frm) {
-		
+	refresh: function(frm) {		
         if (frm.doc.queue_status == 'Queued'){
             $('.primary-action').hide();
         }
@@ -527,7 +526,6 @@ if (frm.doc.docstatus === 0) {
 				frm.trigger("make_retention_stock_entry");
 			});
 		}
-
 		if (frm.doc.stock_entry_type == "Material Issue"){
             frm.get_field("items").grid.toggle_enable("expense_account", 0);
             refresh_field("items");
