@@ -135,6 +135,10 @@ frappe.ui.form.on('Asset Maintenance', {
 			frappe.throw("Select company first")
 		}
 
+		if (!frm.doc.wip_warehouse){
+			frappe.throw("WIP Warehouse is missing. Please fetch it for this section, as it may not be assigned in the section master data")
+		}
+
 		if (frm.is_dirty()) {
 			frappe.throw(__(`Save document before issuing Material Request`));
 		}
@@ -144,7 +148,7 @@ frappe.ui.form.on('Asset Maintenance', {
 				frappe.throw(__(`Row ${index + 1}: Kindly provide item with demand quantity to issue material`));
 			}
 		});
-
+		
 
 		frappe.call({
 			method: 'issue_mr_for_bill_of_material_and_services',

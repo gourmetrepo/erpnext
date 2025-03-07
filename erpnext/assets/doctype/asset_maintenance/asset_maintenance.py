@@ -272,6 +272,22 @@ def make_issue_material_request(doc):
 	mr.title="Material Issue for Asset Maintenance"
 	mr.naming_series="MAT-MR-.YYYY.-"
 	mr_items_list = []
+
+	if not doc.get('wip_warehouse', None):
+		frappe.throw("Please set WIP warehouse in Asset Maintenance")
+
+	warehouse_expense_account = frappe.db.sql(f"""
+	SELECT `account` FROM `tabWarehouse` WHERE `name`="{doc.get('wip_warehouse')}";
+	""", as_dict=True)
+
+	expense_account = None
+
+	if len(warehouse_expense_account) > 0 and warehouse_expense_account[0].get('account'):
+		expense_account = warehouse_expense_account[0].get('account')
+
+	if not expense_account:
+		frappe.throw(f"Please set account for warehouse: {doc.wip_warehouse} in warehouse master data")
+
 	for item in doc.bill_of_material_and_services:
 		if not item.mr_reference:
 			warehouse=get_warehouse(item.item,doc.company)
@@ -284,6 +300,7 @@ def make_issue_material_request(doc):
 			i["asset_maintenance"] = doc.name
 			i["warehouse"] = doc.wip_warehouse
 			i["source_warehouse"] = doc.source_warehouse
+			i["expense_account"] = expense_account
 			if doc.project_based == "Yes" and \
 				(doc.project is not None and doc.project != ""):
 				i["project"] = doc.project
