@@ -1437,11 +1437,17 @@ class StockEntry(StockController):
 			WHERE pos.docstatus = 1 and pos.parent = %(po)s""", {"po": self.purchase_order})
 
 		#Update reserved sub contracted quantity in bin based on Supplied Item Details and
+		from nrp_manufacturing.utils import update_bin_queue
+		from erpnext.stock.doctype.bin.bin import get_reserved_qty_for_sub_contract
 		for d in self.get("items"):
 			item_code = d.get('original_item') or d.get('item_code')
 			reserve_warehouse = item_wh.get(item_code)
-			stock_bin = get_bin(item_code, reserve_warehouse)
-			stock_bin.update_reserved_qty_for_sub_contracting()
+			# stock_bin = get_bin(item_code, reserve_warehouse)
+			# stock_bin.update_reserved_qty_for_sub_contracting()
+			warehouse = reserve_warehouse
+			reserved_qty_for_sub_contract = get_reserved_qty_for_sub_contract(item_code=item_code, warehouse=warehouse)
+			qty_dict = {"reserved_qty_for_sub_contract": reserved_qty_for_sub_contract}
+			update_bin_queue(item_code=item_code, warehouse=warehouse, qty_dict=qty_dict, update_projected_qty=True)
 
 	def update_so_in_serial_number(self):
 		so_name, item_code = frappe.db.get_value("Work Order", self.work_order, ["sales_order", "production_item"])
