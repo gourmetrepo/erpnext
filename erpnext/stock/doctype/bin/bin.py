@@ -134,3 +134,69 @@ class Bin(Document):
 
 def on_doctype_update():
 	frappe.db.add_index("Bin", ["item_code", "warehouse"])
+
+
+
+
+def get_reserved_qty_for_sub_contract(item_code, warehouse):
+	#reserved qty
+	reserved_qty_for_sub_contract = frappe.db.sql('''
+		select ifnull(sum(itemsup.required_qty),0)
+		from `tabPurchase Order` po, `tabPurchase Order Item Supplied` itemsup
+		where
+			itemsup.rm_item_code = %s
+			and itemsup.parent = po.name
+			and po.docstatus = 1
+			and po.is_subcontracted = 'Yes'
+			and po.status != 'Closed'
+			and po.per_received < 100
+			and itemsup.reserve_warehouse = %s''', (item_code, warehouse))[0][0]
+
+	#Get Transferred Entries
+	materials_transferred = frappe.db.sql("""
+		select
+			ifnull(sum(transfer_qty),0)
+		from
+			`tabStock Entry` se, `tabStock Entry Detail` sed, `tabPurchase Order` po
+		where
+			se.docstatus=1
+			and se.purpose='Send to Subcontractor'
+			and ifnull(se.purchase_order, '') !=''
+			and (sed.item_code = %(item)s or sed.original_item = %(item)s)
+			and se.name = sed.parent
+			and se.purchase_order = po.name
+			and po.docstatus = 1
+			and po.is_subcontracted = 'Yes'
+			and po.status != 'Closed'
+			and po.per_received < 100
+	""", {'item': item_code})[0][0]
+
+	if reserved_qty_for_sub_contract > materials_transferred:
+		reserved_qty_for_sub_contract = reserved_qty_for_sub_contract - materials_transferred
+	else:
+		reserved_qty_for_sub_contract = 0
+
+	return reserved_qty_for_sub_contract
+
+
+def get_reserved_qty_for_production(item_code, warehouse):
+	'''Update qty reserved for production from Production Item tables
+		in open work orders'''
+	reserved_qty_for_production = frappe.db.sql('''
+		SELECT
+			CASE WHEN ifnull(skip_transfer, 0) = 0 THEN
+				SUM(item.required_qty - item.transferred_qty)
+			ELSE
+				SUM(item.required_qty - item.consumed_qty)
+			END
+		FROM `tabWork Order` pro, `tabWork Order Item` item
+		WHERE
+			item.item_code = %s
+			and item.parent = pro.name
+			and pro.docstatus = 1
+			and item.source_warehouse = %s
+			and pro.status not in ("Stopped", "Completed")
+			and (item.required_qty > item.transferred_qty or item.required_qty > item.consumed_qty)
+	''', (item_code, warehouse))[0][0]
+
+	return reserved_qty_for_production
