@@ -322,10 +322,17 @@ class PurchaseOrder(BuyingController):
 				item.received_qty = item.qty
 
 	def update_reserved_qty_for_subcontract(self):
+		from nrp_manufacturing.utils import update_bin_queue
+		from erpnext.stock.doctype.bin.bin import get_reserved_qty_for_sub_contract
 		for d in self.supplied_items:
 			if d.rm_item_code:
-				stock_bin = get_bin(d.rm_item_code, d.reserve_warehouse)
-				stock_bin.update_reserved_qty_for_sub_contracting()
+				# stock_bin = get_bin(d.rm_item_code, d.reserve_warehouse)
+				# stock_bin.update_reserved_qty_for_sub_contracting()
+				item_code = d.rm_item_code
+				warehouse = d.reserve_warehouse
+				reserved_qty_for_sub_contract = get_reserved_qty_for_sub_contract(item_code=item_code, warehouse=warehouse)
+				qty_dict = {"reserved_qty_for_sub_contract": reserved_qty_for_sub_contract}
+				update_bin_queue(item_code=item_code, warehouse=warehouse, qty_dict=qty_dict, update_projected_qty=True)
 
 	def update_receiving_percentage(self):
 		total_qty, received_qty = 0.0, 0.0

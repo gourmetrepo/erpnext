@@ -446,10 +446,18 @@ class WorkOrder(Document):
 
 	def update_reserved_qty_for_production(self, items=None):
 		'''update reserved_qty_for_production in bins'''
+		from nrp_manufacturing.utils import update_bin_queue
+		from erpnext.stock.doctype.bin.bin import get_reserved_qty_for_production
+
 		for d in self.required_items:
 			if d.source_warehouse:
-				stock_bin = get_bin(d.item_code, d.source_warehouse)
-				stock_bin.update_reserved_qty_for_production()
+				# stock_bin = get_bin(d.item_code, d.source_warehouse)
+				# stock_bin.update_reserved_qty_for_production()
+				item_code = d.item_code
+				warehouse = d.source_warehouse
+				reserved_qty_for_production = get_reserved_qty_for_production(item_code=item_code, warehouse=warehouse)
+				qty_dict = {"reserved_qty_for_production": reserved_qty_for_production}
+				update_bin_queue(item_code=item_code, warehouse=warehouse, qty_dict=qty_dict, update_projected_qty=True)
 
 	def get_items_and_operations_from_bom(self):
 		self.set_required_items()
