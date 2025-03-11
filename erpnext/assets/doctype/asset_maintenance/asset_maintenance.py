@@ -15,7 +15,7 @@ class AssetMaintenance(Document):
 		self.validate_item_replacement_and_scrap()
 	
 	def before_save(self):
-		if self.project_based == "No" and not self.project:
+		if self.project_based == "No" and self.is_new():
 			self.load_project()
 		self.load_section_details()
 
