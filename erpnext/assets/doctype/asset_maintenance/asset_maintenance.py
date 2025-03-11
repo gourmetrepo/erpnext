@@ -384,11 +384,16 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 				difference_account = asset_maintenance_doc.get('cwip_account')
 			elif asset_maintenance_doc.get('cogs_account'):
 				difference_account = asset_maintenance_doc.get('cogs_account')
+		elif asset_maintenance_doc.get('project_based') == "No" and asset_maintenance_doc.get('project'):
+			difference_account = asset_maintenance_doc.get('clearing_account')
 
 				
-		# difference_account = asset_maintenance_doc.get('cwip_account') if asset_maintenance_doc.get('cwip_account') else asset_maintenance_doc.get('cogs_account')
+		
 		if difference_account is None:
-			frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
+			if asset_maintenance_doc.get('project_based') == "Yes":
+				frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
+			else:
+				frappe.throw("Please set clearing account in asset maintenance for non project based asset maintenance in current Annual General Project")
 
 		for item in asset_maintenance_doc.consumed_items:
 			i = frappe.new_doc('Stock Entry Detail')
