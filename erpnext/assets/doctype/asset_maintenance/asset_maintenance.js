@@ -570,10 +570,9 @@ erpnext.asset_maintenance = {
 
 // Function to configure project-based fields
 function project_frm_configuration(frm) {
-	hide_add_rows(frm, 'consumed_items', true);
-
-	
+	hide_add_rows(frm, 'consumed_items', true);	
 	if (frm.doc.project_based === "Yes") {
+		frm.toggle_display('get_project_tasks', 1);
 		if (frm.doc.project){
 			frm.set_df_property('project', 'read_only', 1);
 		}else{
@@ -582,9 +581,10 @@ function project_frm_configuration(frm) {
 		frm.set_df_property('project', 'reqd', 1);
 		frm.set_df_property('project', 'hidden', 0);
 		hide_add_rows(frm, 'asset_maintenance_tasks', true);
-		frm.set_df_property('get_project_tasks', 'hidden', 0);
+		
 	} else {
-		frm.set_df_property('get_project_tasks', 'hidden', 1);
+		frm.set_df_property('project_based', 'read_only', 1);
+		frm.toggle_display('get_project_tasks', 0);
 		frm.set_df_property('project', 'read_only', 1);
 		frm.set_df_property('project', 'reqd', 0);
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
