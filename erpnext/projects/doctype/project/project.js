@@ -63,9 +63,19 @@ frappe.ui.form.on("Project", {
 		if(frm.doc.project_type == 'ADP'){
 			frm.set_df_property('cogs_account', 'reqd', 0);
 			frm.set_df_property('cwip_acccount', 'reqd', 1);
-		}else if (frm.doc.project_type){
+			frm.set_df_property('clearing_account', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'hidden', 1);
+		}else if (frm.doc.project_type == 'Annual General'){
+			frm.set_df_property('cogs_account', 'reqd', 0);
+			frm.set_df_property('cwip_acccount', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'reqd', 1);
+			frm.set_df_property('clearing_account', 'hidden', 0);
+		}
+		else if (frm.doc.project_type){
 			frm.set_df_property('cogs_account', 'reqd', 1);
 			frm.set_df_property('cwip_acccount', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'hidden', 1);
 		}
 
 		if (frm.doc.__islocal) {
