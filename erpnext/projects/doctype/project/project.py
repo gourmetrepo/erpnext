@@ -40,6 +40,10 @@ class Project(Document):
 		self.update_percent_complete()
 		# Code by Moeiz
 		self.validate_account_mapping()
+	
+	def before_save(self):
+		if self.project_type == "Annual General" and self.is_new():
+			self.validate_if_previous_project_exists()
 
 	def copy_from_template(self):
 		'''
@@ -213,6 +217,21 @@ class Project(Document):
 			else:
 				if not self.cogs_account and self.project_type != "Import":
 					frappe.throw(_("Please select COGS Account"))
+	
+	def validate_if_previous_project_exists(self):
+		project_names = frappe.db.sql(f"""
+		SELECT `name` FROM `tabProject` 
+		WHERE `project_type`="Annual General"
+		AND `company`="{self.company}"
+		AND `status`="Open";
+		""", as_dict=True)
+		if project_names:
+			links = "<br>".join([
+				f"""<a href="#Form/Project/{project["name"]}" target="_blank">{project.get('name')}</a>"""
+				for project in project_names
+			])
+			
+			frappe.throw(f"Please complete the previous Annual General Projects for {self.company}: <br>{links}")
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''

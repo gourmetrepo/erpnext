@@ -15,8 +15,22 @@ class AssetMaintenance(Document):
 		self.validate_item_replacement_and_scrap()
 	
 	def before_save(self):
+		if self.project_based == "No" and not self.project:
+			self.load_project()
 		self.load_section_details()
-		
+
+	def load_project(self):
+		annual_general_project = frappe.db.sql(f"""
+			SELECT `name` FROM `tabProject` 
+			WHERE `project_type`="Annual General" 
+			AND `company`="{self.company}"
+			AND `status`="Open"
+			ORDER BY creation DESC LIMIT 1;
+			""", as_dict=True)
+		if len(annual_general_project) > 0 and annual_general_project[0].get('name'):
+			self.project = annual_general_project[0].get('name')
+		else:
+			frappe.throw(f"""Please create an Annual General Project to proceed for company {self.company}""")
 
 	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')

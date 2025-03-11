@@ -190,12 +190,14 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	get_project_tasks: (frm) => {
-		if (!frm.doc.project){
-			frappe.throw("Select project first")
-		}
+
 
 		if (frm.is_dirty()) {
 			frappe.throw(__(`Save document before fetching project tasks`));
+		}
+
+		if (!frm.doc.project){
+			frappe.throw("Select project first")
 		}
 
 
@@ -568,21 +570,23 @@ erpnext.asset_maintenance = {
 
 // Function to configure project-based fields
 function project_frm_configuration(frm) {
-	debugger;
 	hide_add_rows(frm, 'consumed_items', true);
 
-	if (frm.doc.project){
-		frm.set_df_property('project', 'read_only', 1);
-	}else{
-		frm.set_df_property('project', 'read_only', 0);
-	}
+	
 	if (frm.doc.project_based === "Yes") {
+		if (frm.doc.project){
+			frm.set_df_property('project', 'read_only', 1);
+		}else{
+			frm.set_df_property('project', 'read_only', 0);
+		}
 		frm.set_df_property('project', 'reqd', 1);
 		frm.set_df_property('project', 'hidden', 0);
 		hide_add_rows(frm, 'asset_maintenance_tasks', true);
+		frm.set_df_property('get_project_tasks', 'hidden', 0);
 	} else {
+		frm.set_df_property('get_project_tasks', 'hidden', 1);
+		frm.set_df_property('project', 'read_only', 1);
 		frm.set_df_property('project', 'reqd', 0);
-		frm.set_df_property('project', 'hidden', 1);
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
 
