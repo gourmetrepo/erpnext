@@ -12,6 +12,7 @@ from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 class AssetMaintenance(Document):
 	def validate(self):
 		self.validate_item_replacement_and_scrap()
+		self.validate_assets()
 	
 	def before_save(self):
 		""""
@@ -151,6 +152,13 @@ class AssetMaintenance(Document):
 				frappe.throw("No tasks available for this project")
 
 	def validate_tasks(self):
+		# Validate tasks duplication
+		distinct_tasks = set()
+		for task in self.get('asset_maintenance_tasks'):
+			if task.get('maintenance_task') in distinct_tasks:
+				frappe.throw(f"Task {task.get('maintenance_task')} is already added in the above rows and can be assigned only once. Please check Row#: {task.idx}")
+			distinct_tasks.add(task.get('maintenance_task'))
+			
 		# Validate tasks if document has not gone in process state
 		if self.status not in ("Draft", "MR Generated", "Not Started"):
 			tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
@@ -166,6 +174,14 @@ class AssetMaintenance(Document):
 						frappe.throw(f"Task {asset_maintenance_reference.get('name')} is not assigned to any Asset Maintenance. Please use Get Project Tasks button to fetch this task")
 					elif asset_maintenance_reference.get('asset_maintenance') != self.name:
 						frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
+
+	def validate_assets(self):
+		# Validate assets duplication
+		distinct_assets = set()
+		for asset in self.get('plant_maintenance_assets'):
+			if asset.get('asset') in distinct_assets:
+				frappe.throw(f"Asset {asset.get('asset')} is already added in the above rows and can be assigned only once. Please check Row#: {asset.idx}")
+			distinct_assets.add(asset.get('asset'))
 
 	def validate_item_replacement_and_scrap(self):
 		for item in self.get('items_replacement_and_repair'):
