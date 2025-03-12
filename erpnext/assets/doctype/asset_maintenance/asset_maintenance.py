@@ -15,8 +15,22 @@ class AssetMaintenance(Document):
 		self.validate_item_replacement_and_scrap()
 	
 	def before_save(self):
+		if self.project_based == "No" and self.is_new():
+			self.load_project()
 		self.load_section_details()
-		
+
+	def load_project(self):
+		annual_general_project = frappe.db.sql(f"""
+			SELECT `name` FROM `tabProject` 
+			WHERE `project_type`="Annual General" 
+			AND `company`="{self.company}"
+			AND `status`="Open"
+			ORDER BY creation DESC LIMIT 1;
+			""", as_dict=True)
+		if len(annual_general_project) > 0 and annual_general_project[0].get('name'):
+			self.project = annual_general_project[0].get('name')
+		else:
+			frappe.throw(f"""Please create an Annual General Project to proceed for company {self.company}""")
 
 	def before_submit(self):
 		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
@@ -370,11 +384,16 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 				difference_account = asset_maintenance_doc.get('cwip_account')
 			elif asset_maintenance_doc.get('cogs_account'):
 				difference_account = asset_maintenance_doc.get('cogs_account')
+		elif asset_maintenance_doc.get('project_based') == "No" and asset_maintenance_doc.get('project'):
+			difference_account = asset_maintenance_doc.get('clearing_account')
 
 				
-		# difference_account = asset_maintenance_doc.get('cwip_account') if asset_maintenance_doc.get('cwip_account') else asset_maintenance_doc.get('cogs_account')
+		
 		if difference_account is None:
-			frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
+			if asset_maintenance_doc.get('project_based') == "Yes":
+				frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
+			else:
+				frappe.throw("Please set clearing account in asset maintenance for non project based asset maintenance in current Annual General Project")
 
 		for item in asset_maintenance_doc.consumed_items:
 			i = frappe.new_doc('Stock Entry Detail')
