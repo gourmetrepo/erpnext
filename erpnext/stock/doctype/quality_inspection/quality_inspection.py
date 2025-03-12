@@ -44,6 +44,13 @@ class QualityInspection(Document):
 				min_value = matching_parameter.get("min_value")
 				max_value = matching_parameter.get("max_value")
 
+				if expected_type == "Int":
+					min_value = int(float(min_value)) if min_value is not None else None
+					max_value = int(float(max_value)) if max_value is not None else None
+				elif expected_type == "Float":
+					min_value = float(min_value) if min_value is not None else None
+					max_value = float(max_value) if max_value is not None else None
+
 
 				if min_value is not None:
 					min_value = float(min_value) if expected_type == "Float" else int(min_value)
@@ -54,7 +61,7 @@ class QualityInspection(Document):
 					frappe.throw(f"Invalid type for {reading.specification}: expected {expected_type}, got {actual_type}.")
 
 				if min_value is not None and max_value is not None:
-					if expected_type == "Int":
+					if expected_type == "Int" or  expected_type == "Float":
 						try:
 							reading.reading_1 = float(reading.reading_1) if expected_type == "Float" else int(reading.reading_1)
 						except ValueError:
@@ -66,34 +73,34 @@ class QualityInspection(Document):
 					if not (min_value <= reading.reading_1 <= max_value):
 						frappe.msgprint(f"Value for {reading.specification} is out of range: {reading.reading_1} not between {min_value} and {max_value}.")
       
-	def before_save(self):
-		if self.received_quantity is None or self.received_quantity == 0  and self.accepted_quantity is None or self.accepted_quantity == 0:
-			self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
-			self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
+	# def before_save(self):
+	# 	if self.received_quantity is None or self.received_quantity == 0  and self.accepted_quantity is None or self.accepted_quantity == 0:
+	# 		self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
+	# 		self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
 		
 	
-	def fetch_recevied_qty_of_item(self):
-		if self.reference_type == 'Purchase Receipt' and self.reference_name:
-			self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
-			self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
-			total_qty = (
-				int(self.accepted_quantity or 0) - int(self.rejected_quantity or 0) + 
-				int(self.return_quantity or 0)
-			)
+	# def fetch_recevied_qty_of_item(self):
+	# 	if self.reference_type == 'Purchase Receipt' and self.reference_name:
+	# 		self.received_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'received_qty')
+	# 		self.accepted_quantity = frappe.db.get_value('Purchase Receipt Item', {'parent': self.reference_name, 'item_code': self.item_code}, 'qty')
+	# 		total_qty = (
+	# 			int(self.accepted_quantity or 0) - int(self.rejected_quantity or 0) + 
+	# 			int(self.return_quantity or 0)
+	# 		)
 
-			purchase_receipt_item = frappe.get_doc('Purchase Receipt Item', {
-				'parent': self.reference_name,
-				'item_code': self.item_code
-			}, "*")
+	# 		purchase_receipt_item = frappe.get_doc('Purchase Receipt Item', {
+	# 			'parent': self.reference_name,
+	# 			'item_code': self.item_code
+	# 		}, "*")
 
-			if purchase_receipt_item:
-				purchase_receipt_item.qty = total_qty
-				purchase_receipt_item.rejected_qty = self.rejected_quantity
-				purchase_receipt_item.returned_quantity = self.return_quantity
-				purchase_receipt_item.save()
-				frappe.db.commit()
-			else:
-				frappe.throw("Purchase Receipt Item not found for the given criteria.")
+	# 		if purchase_receipt_item:
+	# 			purchase_receipt_item.qty = total_qty
+	# 			purchase_receipt_item.rejected_qty = self.rejected_quantity
+	# 			purchase_receipt_item.returned_quantity = self.return_quantity
+	# 			purchase_receipt_item.save()
+	# 			frappe.db.commit()
+	# 		else:
+	# 			frappe.throw("Purchase Receipt Item not found for the given criteria.")
 
 	def get_item_specification_details(self):
 		if not self.quality_inspection_template:
@@ -130,7 +137,7 @@ class QualityInspection(Document):
 
 	def on_submit(self):
 		self.update_qc_reference()
-		self.fetch_recevied_qty_of_item()
+		# self.fetch_recevied_qty_of_item()
 
 	def on_cancel(self):
 		self.update_qc_reference()
