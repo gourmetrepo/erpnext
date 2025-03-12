@@ -11,12 +11,22 @@ from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 
 class AssetMaintenance(Document):
 	def validate(self):
-		self.validate_tasks()
 		self.validate_item_replacement_and_scrap()
 	
 	def before_save(self):
-		if self.project_based == "No" and self.is_new():
-			self.load_project()
+		""""
+		1. If the document is not project based, it's Annual General Project and in that case maintenance tasks would be added by the user itself.
+		Asset maintenance reference would be assigned to tasks in this case using sync maintenance tasks.
+		2. If the document is project based, asset maintenance reference is assigned to tasks when fetching using Fetch Project Tasks button
+		3. Load Project would be executed only the first time document is being created
+		4. Tasks would be validated only if document state has not gone to In Process yet
+		5. Section details would keep loading from the database unless all warehouses are fetched from the section master data
+		"""
+		if self.project_based == "No":
+			if self.is_new():
+				self.load_project()
+			self.sync_maintenance_tasks()
+		self.validate_tasks()
 		self.load_section_details()
 
 	def load_project(self):
@@ -33,30 +43,33 @@ class AssetMaintenance(Document):
 			frappe.throw(f"""Please create an Annual General Project to proceed for company {self.company}""")
 
 	def before_submit(self):
-		asset_maintenance_tasks = self.get('asset_maintenance_tasks')
-
-		for task in asset_maintenance_tasks:
-			if task.maintenance_task:
-				task_doc = frappe.get_doc('Task', task.maintenance_task)
-				task_doc.asset_maintenance = self.name
-				task_doc.save()
-				frappe.db.commit()
-		
 		self.create_damage_and_scrap_stock_entries()
 		
-
-
 	def sync_maintenance_tasks(self):
-		tasks_names = []
-		for task in self.get('asset_maintenance_tasks'):
-			tasks_names.append(task.name)
-			# update_maintenance_log(asset_maintenance = self.name, item_code = self.item_code, item_name = self.item_name, task = task)
-		asset_maintenance_logs = frappe.get_all("Asset Maintenance Log", fields=["name"], filters = {"asset_maintenance": self.name,
-			"task": ("not in", tasks_names)})
-		if asset_maintenance_logs:
-			for asset_maintenance_log in asset_maintenance_logs:
-				maintenance_log = frappe.get_doc('Asset Maintenance Log', asset_maintenance_log.name)
-				maintenance_log.db_set('maintenance_status', 'Cancelled')
+		tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
+		if tasks_names:
+			tasks_with_no_reference_tuple = f"({', '.join(frappe.db.escape(name) for name in tasks_names)})"
+			
+			frappe.db.sql(f"""
+				Update `tabTask` SET `asset_maintenance`="{self.name}" where `name` in {tasks_with_no_reference_tuple} and asset_maintenance IS NULL;
+			""")
+			
+			users_task = frappe.db.sql(
+			f"""
+				SELECT `employee`, `parent` FROM `tabTask Assigned Employee` WHERE `parent` in {tasks_with_no_reference_tuple};
+			""", as_dict=True
+			)
+
+			mapped_task_users = {}
+			for user_task in users_task:
+				if user_task.get('parent') not in mapped_task_users:
+					mapped_task_users[user_task.get('parent')] = ""
+				mapped_task_users[user_task.get('parent')] += user_task.get('employee') + ", "
+
+			for task in self.get('asset_maintenance_tasks'):
+				task.assigned_users = mapped_task_users.get(task.get('maintenance_task'))	
+			
+			frappe.db.commit()
 
 	
 	def issue_mr_for_bill_of_material_and_services(self):
@@ -71,25 +84,31 @@ class AssetMaintenance(Document):
 			frappe.throw("Issue Material Request Failed")
 		
 	def load_section_details(self):
+		# Load section details if all warehouses are not fetched from the section master data
 		if self.company and self.section:
-			data = frappe.db.sql(
-				f"""
-				SELECT `wip_warehouse`, `damage_warehouse`, `scrap_warehouse` FROM `tabSection Warehouse`
-				WHERE `parent`="{self.section}"
-				AND `company`="{self.company}"
-				""", as_dict=True
-			)
+			if not self.wip_warehouse or not self.damage_warehouse or not self.scrap_warehouse:
+				data = frappe.db.sql(
+					f"""
+					SELECT `wip_warehouse`, `damage_warehouse`, `scrap_warehouse` FROM `tabSection Warehouse`
+					WHERE `parent`="{self.section}"
+					AND `company`="{self.company}"
+					""", as_dict=True
+				)
 
-			if len(data) > 0 and data[0].get('wip_warehouse'):
-				self.wip_warehouse = data[0].get('wip_warehouse', None)
-				self.damage_warehouse = data[0].get('damage_warehouse', None)
-				self.scrap_warehouse = data[0].get('scrap_warehouse', None)
-			else:
-				frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
+				if len(data) > 0 and data[0].get('wip_warehouse'):
+					if not self.wip_warehouse:
+						self.wip_warehouse = data[0].get('wip_warehouse', None)
+					if not self.damage_warehouse:
+						self.damage_warehouse = data[0].get('damage_warehouse', None)
+					if not self.scrap_warehouse:
+						self.scrap_warehouse = data[0].get('scrap_warehouse', None)
+				else:
+					frappe.throw(f"Please do warehouse configuration for section {self.section} in company {self.company}")
 		else:
 			frappe.throw("Please select a company and a section")
 	
 
+	# Called on Fetch Project Tasks button and would be called only for Project based 'Yes'
 	def load_tasks(self):
 		if self.get('project'):
 			tasks = frappe.db.sql(
@@ -105,7 +124,7 @@ class AssetMaintenance(Document):
 				formatted_tasks_names = f"""({', '.join([f"'{name}'" for name in tasks_names])})"""
 				users_task = frappe.db.sql(
 					f"""
-					SELECT `user`, `parent` FROM `tabTask Assigned User` WHERE `parent` in {formatted_tasks_names};
+					SELECT `employee`, `parent` FROM `tabTask Assigned Employee` WHERE `parent` in {formatted_tasks_names};
 					""", as_dict=True
 				)
 
@@ -113,34 +132,40 @@ class AssetMaintenance(Document):
 				for user_task in users_task:
 					if user_task.get('parent') not in mapped_task_users:
 						mapped_task_users[user_task.get('parent')] = ""
-					mapped_task_users[user_task.get('parent')] += user_task.get('user') + ", "
+					mapped_task_users[user_task.get('parent')] += user_task.get('employee') + ", "
 
 
-				for task in tasks:
+				tasks_names_references_to_be_updated = [task.get('name') for task in tasks]
+				if tasks_names_references_to_be_updated:
+					task_names_tuple = f"({', '.join(frappe.db.escape(name) for name in tasks_names_references_to_be_updated)})"
 					frappe.db.sql(f"""
-					Update `tabTask` set `asset_maintenance`="{self.name}" where `name`="{task.get('name')}";
+						Update `tabTask` set `asset_maintenance`="{self.name}" where `name` in {task_names_tuple};
 					""")
-					task['assigned_users'] = mapped_task_users.get(task.get('name'))
-				if len(tasks) > 0:
 					frappe.db.commit()
+				
+				for task in tasks:
+					task['assigned_users'] = mapped_task_users.get(task.get('name'))
+				
 				return {'tasks': tasks}
 			else:
 				frappe.throw("No tasks available for this project")
 
 	def validate_tasks(self):
-		tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
-		
-		if tasks_names:
-			task_names = f"({', '.join(frappe.db.escape(name) for name in tasks_names)})"
-			asset_maintenance_references = frappe.db.sql(f"""
-				SELECT distinct(`asset_maintenance`), `name` FROM `tabTask` WHERE `name` in {task_names};
-			""", as_dict=True)
+		# Validate tasks if document has not gone in process state
+		if self.status not in ("Draft", "MR Generated", "Not Started"):
+			tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
+			
+			if tasks_names:
+				task_names_referenece = f"({', '.join(frappe.db.escape(name) for name in tasks_names)})"
+				asset_maintenance_references = frappe.db.sql(f"""
+					SELECT distinct(`asset_maintenance`), `name` FROM `tabTask` WHERE `name` in {task_names_referenece};
+				""", as_dict=True)
 
-			for asset_maintenance_reference in asset_maintenance_references:
-				if not asset_maintenance_reference.get('asset_maintenance'):
-					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is not assigned to any Asset Maintenance. Please use Get Project Tasks button to fetch this task")
-				elif asset_maintenance_reference.get('asset_maintenance') != self.name:
-					frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
+				for asset_maintenance_reference in asset_maintenance_references:
+					if not asset_maintenance_reference.get('asset_maintenance'):
+						frappe.throw(f"Task {asset_maintenance_reference.get('name')} is not assigned to any Asset Maintenance. Please use Get Project Tasks button to fetch this task")
+					elif asset_maintenance_reference.get('asset_maintenance') != self.name:
+						frappe.throw(f"Task {asset_maintenance_reference.get('name')} is already assigned to another Asset Maintenance {asset_maintenance_reference.get('asset_maintenance')}")
 
 	def validate_item_replacement_and_scrap(self):
 		for item in self.get('items_replacement_and_repair'):
@@ -248,6 +273,8 @@ def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 # Code by Moeiz
 @frappe.whitelist()
 def get_available_stock_for_bill_and_services(item_code, company):
+	if not item_code:
+		frappe.throw("Please add an item code to issue bill and services")
 	# Query to get the total stock for the specified item code and company
 	stock_data = frappe.db.sql("""
 		SELECT 

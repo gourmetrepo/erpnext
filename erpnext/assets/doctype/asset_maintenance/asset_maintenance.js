@@ -590,6 +590,16 @@ function project_frm_configuration(frm) {
 		hide_add_rows(frm, 'asset_maintenance_tasks', false);
 	}
 
+	if (frm.doc.task){
+		frm.set_df_property('task', 'read_only', 1);
+	}
+	if (frm.doc.maintenance_category){
+		frm.set_df_property('maintenance_category', 'read_only', 1);
+	}
+	if (frm.doc.maintenance_type){
+		frm.set_df_property('maintenance_type', 'read_only', 1);
+	}
+
 	/* In case of assets are fetched from Cost Centers, then user can not add assets, only he will be able 
 	to delete assets from the child table. In case of assets are not fetched from Cost Centers, 
 	then user can add or remove assets in child table, plant maintenance status is in progress.*/
