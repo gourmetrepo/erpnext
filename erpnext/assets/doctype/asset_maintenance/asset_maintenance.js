@@ -395,7 +395,7 @@ frappe.ui.form.on('Bill of Material and Services', {
         // Get the current child row data
         let row = locals[cdt][cdn];
 
-        if (frm.doc.company) {
+        if (frm.doc.company && row.item) {
             // Run server-side code to get stock available for the selected item
             frappe.call({
                 method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_available_stock_for_bill_and_services',
@@ -417,7 +417,7 @@ frappe.ui.form.on('Bill of Material and Services', {
                 }
             });
         } else {
-            frappe.throw("Please select Company first");
+            frappe.throw("Please select Company and item code first");
         }
 
 		function collect_items_and_update_field(frm) {

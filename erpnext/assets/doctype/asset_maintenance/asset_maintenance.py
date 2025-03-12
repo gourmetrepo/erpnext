@@ -169,6 +169,8 @@ class AssetMaintenance(Document):
 
 	def validate_item_replacement_and_scrap(self):
 		for item in self.get('items_replacement_and_repair'):
+			if not item.get('item', None) or not item.get('qty', None) or not item.get('remarks', None):
+				frappe.throw(f"Item, Qty and Remarks are mandatory if you are adding items for replacement and repair. Please check Row#: {item.idx}")
 			if item.get('remarks') == "Damaged" and not self.get('damage_warehouse'):
 				frappe.throw("Please setup damage warehouse configuration at section master data to proceed with damaged items")
 			if item.get('remarks') == "Scrap" and not self.get('scrap_warehouse'):
