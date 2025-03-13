@@ -27,6 +27,13 @@ frappe.ui.form.on('Compliance Verification', {
 				}
             };
         });
+		frm.set_query("parameter_setup", function() {
+            return {
+                "filters": {
+					"docstatus": 1,
+				}
+            };
+        });
 	},
 	onload: function(frm) {
 		if (frm.is_new()) {
