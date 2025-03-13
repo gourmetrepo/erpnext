@@ -22,5 +22,20 @@ frappe.ui.form.on('Parameter Setup', {
 				}
             };
         });
+        frm.set_query("ranking", function() {
+            return {
+                "filters": {
+					"docstatus": 1,
+				}
+            };
+        });
+        frm.fields_dict['parameter_setup_item'].grid.get_field('rank_type').get_query = function(doc, cdt, cdn) {
+			var row = locals[cdt][cdn];
+			return {
+				"filters": {
+					"docstatus": 1
+				}
+			};
+		};
 	}
 });
