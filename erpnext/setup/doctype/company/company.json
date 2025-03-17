@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:company_name",
@@ -17,6 +16,7 @@
   "cb0",
   "domain",
   "parent_company",
+  "business_group",
   "charts_section",
   "default_currency",
   "default_letter_head",
@@ -723,14 +723,19 @@
    "fieldtype": "Link",
    "label": "Default Buying Terms",
    "options": "Terms and Conditions"
+  },
+  {
+   "fieldname": "business_group",
+   "fieldtype": "Select",
+   "label": "Business Group",
+   "options": "Bakery\nCSD\nHead Office"
   }
  ],
  "icon": "fa fa-building",
  "idx": 1,
  "image_field": "company_logo",
  "is_tree": 1,
- "links": [],
- "modified": "2020-03-22 18:26:03.145312",
+ "modified": "2025-03-17 12:22:35.684444",
  "modified_by": "Administrator",
  "module": "Setup",
  "name": "Company",
