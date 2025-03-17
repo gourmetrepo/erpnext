@@ -31,6 +31,14 @@ frappe.ui.form.on("Leave Allocation", {
 				});
 			}
 		}
+
+		frm.set_query("employee", function() {
+			return {
+				filters: {
+					status: ["!=", "Left"]
+				}
+			};
+		});
 	},
 
 	expire_allocation: function(frm) {

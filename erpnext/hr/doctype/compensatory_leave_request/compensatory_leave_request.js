@@ -10,6 +10,14 @@ frappe.ui.form.on('Compensatory Leave Request', {
 				}
 			};
 		});
+
+		frm.set_query("employee", function() {
+			return {
+				filters: {
+					status: ["!=", "Left"]
+				}
+			};
+		});
 	},
 	half_day: function(frm) {
 		if(frm.doc.half_day == 1){

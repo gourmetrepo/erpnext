@@ -51,6 +51,14 @@ frappe.ui.form.on('Loan', {
 			}
 		}
 		frm.trigger("toggle_fields");
+
+		frm.set_query("applicant", function() {
+			return {
+				filters: {
+					status: ["!=", "Left"]
+				}
+			};
+		});
 	},
 
 	make_jv: function (frm) {

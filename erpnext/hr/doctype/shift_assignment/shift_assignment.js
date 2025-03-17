@@ -3,6 +3,12 @@
 
 frappe.ui.form.on('Shift Assignment', {
 	refresh: function(frm) {
-
-	}
+        frm.set_query("employee", function() {
+            return {
+                filters: {
+                    status: ["!=", "Left"]
+                }
+            };
+        });
+    }
 });

@@ -102,6 +102,15 @@ frappe.ui.form.on("Leave Application", {
 				frm.set_value('employee', perm['Employee'].map(perm_doc => perm_doc.doc)[0]);
 			}
 		}
+
+		frm.set_query("employee", function() {
+			return {
+				filters: {
+					status: ["!=", "Left"]
+				}
+			};
+		});
+		
 	},
 
 	employee: function(frm) {
