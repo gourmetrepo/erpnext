@@ -312,23 +312,24 @@ class AssetMaintenance(Document):
 				total_cost = total_cost_from_db[0].get('total_amount')
 
 				# Create a debit entry in the journal
-				debit_account_entry = frappe.new_doc('Journal Entry Account', {
+				debit_account_entry = frappe.new_doc('Journal Entry Account')
+				debit_account_entry.update({
 					'account': self.clearing_account,
 					'debit_in_account_currency': total_cost,
-					'credit_in_account_currency': 0,
 				})
 				jv_doc.append('accounts', debit_account_entry)
 
 				# Create a credit entry in the journal
-				credit_account_entry = frappe.new_doc('Journal Entry Account', {
+				credit_account_entry = frappe.new_doc('Journal Entry Account')
+				credit_account_entry.update({
 					'account': self.clearing_account,
-					'debit_in_account_currency': 0,
 					'credit_in_account_currency': total_cost,
 				})
 				jv_doc.append('accounts', credit_account_entry)
 
 				# Save the journal entry document
 				jv_doc.save()
+				frappe.db.commit()
 			else:
 				# Delete the journal entry document if no cost was retrieved
 				del jv_doc
@@ -764,3 +765,9 @@ def make_scrap_stock_entry(doc):
 			
 		stock_entry.save()
 		stock_entry.submit()
+
+
+@frappe.whitelist()
+def create_jv_for_asset_maintenance(asset_maintenance_name):
+	asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_name)
+	asset_maintenance_doc.create_project_based_journal_entry()

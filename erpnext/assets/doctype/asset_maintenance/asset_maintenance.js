@@ -675,7 +675,6 @@ function in_process_validations(frm){
 	if (frm.doc.plant_maintenance_assets.length === 0) {
 		frappe.throw(__('Please add assets before starting the plant maintenance'));
 	}
-
 	// Logging the starting time
 	if (frm.doc.status === "Not Started") {
 		frm.set_value('starting_time', frappe.datetime.now_datetime());
