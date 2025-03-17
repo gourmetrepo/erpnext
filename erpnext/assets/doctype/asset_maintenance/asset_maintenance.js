@@ -483,6 +483,8 @@ erpnext.asset_maintenance = {
 			if (not_completed){
 				frappe.throw("All tasks must be completed before completing the maintenance")
 			}else{
+				// Logging the completion time
+				frm.set_value('completion_time', frappe.datetime.now_datetime());
 				frm.set_value('status', 'Completed');
 				frm.save();
 			}		
@@ -672,6 +674,11 @@ function in_process_validations(frm){
 	// Assets cannot be empty when moving from Not Started to In Process
 	if (frm.doc.plant_maintenance_assets.length === 0) {
 		frappe.throw(__('Please add assets before starting the plant maintenance'));
+	}
+
+	// Logging the starting time
+	if (frm.doc.status === "Not Started") {
+		frm.set_value('starting_time', frappe.datetime.now_datetime());
 	}
 	frm.set_value('status', 'In Process');
 	frm.save();

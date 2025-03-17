@@ -31,6 +31,11 @@ class AssetMaintenance(Document):
 		self.load_section_details()
 
 	def load_project(self):
+		"""
+		Load the most recent 'Annual General' project for the company.
+		If no such project exists, raise an exception.
+		"""
+		# Query to fetch the latest 'Annual General' project for the given company
 		annual_general_project = frappe.db.sql(f"""
 			SELECT `name` FROM `tabProject` 
 			WHERE `project_type`="Annual General" 
@@ -38,13 +43,39 @@ class AssetMaintenance(Document):
 			AND `status`="Open"
 			ORDER BY creation DESC LIMIT 1;
 			""", as_dict=True)
-		if len(annual_general_project) > 0 and annual_general_project[0].get('name'):
+
+		# Check if any project was found
+		if annual_general_project and annual_general_project[0].get('name'):
 			self.project = annual_general_project[0].get('name')
 		else:
-			frappe.throw(f"""Please create an Annual General Project to proceed for company {self.company}""")
+			frappe.throw(
+				f"Please create an Annual General Project to proceed for company {self.company}"
+			)
 
 	def before_submit(self):
+		"""
+		Validations before submitting the Asset Maintenance document.
+		- Raises an exception if the clearing account is not set for non project based asset maintenance.
+		- Creates Damage and Scrap stock entries.
+		"""
+		if self.project_based == "No" and not self.clearing_account:
+			frappe.throw("Please set clearing account to proceed for non project based asset maintenance. Contact support team for more information.")
+
+		# Create Damage and Scrap stock entries
 		self.create_damage_and_scrap_stock_entries()
+
+		# Logging closing time in the document
+		self.close_time = frappe.utils.now_datetime()
+	
+	def on_submit(self):
+		"""
+		Creates a project based journal entry if the document is not project based.
+		"""
+		if self.project_based == "No":
+			# Create a project based journal entry if the document is not project based
+			self.create_project_based_journal_entry()
+		
+
 		
 	def sync_maintenance_tasks(self):
 		tasks_names = [task.get('maintenance_task') for task in self.get('asset_maintenance_tasks')]
@@ -74,10 +105,15 @@ class AssetMaintenance(Document):
 
 	
 	def issue_mr_for_bill_of_material_and_services(self):
+		"""
+		This method would be used to issue Material Requests for the services and materials which are part of the Bill of Materials for the maintenance tasks.
+		It will update the status of the document to MR Generated if the status is Draft.
+		"""
 		try:
 			mr_reference = make_issue_material_request(self)
 			if self.status == "Draft":
 				self.status = "MR Generated"
+			# Update the Asset Maintenance document with the Material Request reference
 			update_issue_material(self, mr_reference)
 			return {'mr_reference': mr_reference.name}
 		except Exception as e:
@@ -184,32 +220,119 @@ class AssetMaintenance(Document):
 			distinct_assets.add(asset.get('asset'))
 
 	def validate_item_replacement_and_scrap(self):
+		"""
+		Validate items for replacement and scrap.
+
+		This function checks the items listed for replacement and repair.
+		It ensures that each item has the necessary details filled out and 
+		that appropriate warehouse configurations are set up for damaged and scrap items.
+
+		Raises:
+			frappe.exceptions.ValidationError: If any required field is missing or 
+			if warehouse configurations are not set for damaged or scrap items.
+		"""
 		for item in self.get('items_replacement_and_repair'):
-			if not item.get('item', None) or not item.get('qty', None) or not item.get('remarks', None):
+			# Ensure 'item', 'qty', and 'remarks' fields are filled
+			if not item.get('item') or not item.get('qty') or not item.get('remarks'):
 				frappe.throw(f"Item, Qty and Remarks are mandatory if you are adding items for replacement and repair. Please check Row#: {item.idx}")
+
+			# Check for damage warehouse configuration if item is marked as damaged
 			if item.get('remarks') == "Damaged" and not self.get('damage_warehouse'):
 				frappe.throw("Please setup damage warehouse configuration at section master data to proceed with damaged items")
+
+			# Check for scrap warehouse configuration if item is marked as scrap
 			if item.get('remarks') == "Scrap" and not self.get('scrap_warehouse'):
 				frappe.throw("Please setup scrap warehouse configuration at section master data to proceed with scrap items")
 
 
 	def create_damage_and_scrap_stock_entries(self):
+		"""
+		Create stock entries for items marked as 'Damaged' or 'Scrap'.
+
+		This function iterates through the items listed for replacement and repair.
+		If any item is marked as 'Damaged', it triggers the creation of a damage stock entry.
+		If any item is marked as 'Scrap', it triggers the creation of a scrap stock entry.
+		Commits the transaction to the database after each stock entry creation.
+		"""
 		create_damage_stock_entry = False
 		create_scrap_stock_entry = False
 
+		# Determine if there are any items marked as 'Damaged' or 'Scrap'
 		for item in self.get('items_replacement_and_repair'):
 			if item.get('remarks') == "Damaged":
 				create_damage_stock_entry = True
 			if item.get('remarks') == "Scrap":
 				create_scrap_stock_entry = True
 		
+		# Create a stock entry for damaged items if any exist
 		if create_damage_stock_entry:
 			make_damage_stock_entry(self)
 			frappe.db.commit()
 		
+		# Create a stock entry for scrap items if any exist
 		if create_scrap_stock_entry:
 			make_scrap_stock_entry(self)
 			frappe.db.commit()
+	
+	def create_project_based_journal_entry(self):
+		"""
+		Create a journal entry for project-based asset maintenance.
+
+		This function creates a system-generated journal entry for plant maintenance if a clearing account is specified.
+		It calculates the total cost from GL entries related to stock entries marked for material issue and associates 
+		them with the asset maintenance document. The calculated total cost is then used to create debit and credit entries.
+		"""
+		if self.clearing_account:
+			# Initialize a new Journal Entry document
+			jv_doc = frappe.new_doc('Journal Entry')
+			jv_doc.voucher_type = "Journal Entry"
+			jv_doc.company = self.company
+			jv_doc.generated = "System Generated"
+			jv_doc.plant_maintenance_reference = self.name
+			jv_doc.user_remark = "Journal Entry for Plant Maintenance"
+
+			# Query total cost from GL Entry based on stock entries associated with this maintenance
+			total_cost_from_db = frappe.db.sql(
+				f""" 
+				SELECT SUM(gl.`debit`) as total_amount
+				FROM `tabGL Entry` gl
+				WHERE gl.`voucher_no` IN (
+					SELECT DISTINCT se.`name`
+					FROM `tabStock Entry` se
+					JOIN `tabStock Entry Detail` sed ON se.`name` = sed.`parent`
+					WHERE sed.`asset_maintenance` = "{self.name}"
+					AND se.`stock_entry_type` = "Material Issue"
+					AND se.`docstatus` = 1
+				);
+				""", as_dict=True
+			)
+
+			# Check if any cost was retrieved and proceed with journal entry creation
+			if len(total_cost_from_db) > 0 and total_cost_from_db[0].get('total_amount'):
+				total_cost = total_cost_from_db[0].get('total_amount')
+
+				# Create a debit entry in the journal
+				debit_account_entry = frappe.new_doc('Journal Entry Account', {
+					'account': self.clearing_account,
+					'debit_in_account_currency': total_cost,
+					'credit_in_account_currency': 0,
+				})
+				jv_doc.append('accounts', debit_account_entry)
+
+				# Create a credit entry in the journal
+				credit_account_entry = frappe.new_doc('Journal Entry Account', {
+					'account': self.clearing_account,
+					'debit_in_account_currency': 0,
+					'credit_in_account_currency': total_cost,
+				})
+				jv_doc.append('accounts', credit_account_entry)
+
+				# Save the journal entry document
+				jv_doc.save()
+			else:
+				# Delete the journal entry document if no cost was retrieved
+				del jv_doc
+
 
 @frappe.whitelist()
 def assign_tasks(asset_maintenance_name, assign_to_member, maintenance_task, next_due_date):
@@ -291,9 +414,21 @@ def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 # Code by Moeiz
 @frappe.whitelist()
 def get_available_stock_for_bill_and_services(item_code, company):
+	"""
+	Fetch the total available stock quantity for a given item code and company.
+
+	Args:
+	item_code (str): The code of the item to check stock for.
+	company (str): The name of the company to check stock within.
+
+	Returns:
+	float: The total available stock quantity for the specified item and company.
+	"""
+
 	if not item_code:
 		frappe.throw("Please add an item code to issue bill and services")
-	# Query to get the total stock for the specified item code and company
+	
+	# Execute a SQL query to get the total stock for the specified item code and company
 	stock_data = frappe.db.sql("""
 		SELECT 
 			SUM(actual_qty) AS total_qty
@@ -324,7 +459,12 @@ def get_warehouse(item, company):
 
 
 
-def make_issue_material_request(doc):  
+def make_issue_material_request(doc):
+	"""
+	Create a Material Request for the items in the Bill of Materials table of the Asset Maintenance document.
+
+	This function is called when the Asset Maintenance document is submitted.
+	"""
 	mr = frappe.new_doc("Material Request")
 	mr.material_request_type = "Material Transfer"
 	mr.company = doc.company
@@ -335,6 +475,7 @@ def make_issue_material_request(doc):
 	if not doc.get('wip_warehouse', None):
 		frappe.throw("Please set WIP warehouse in Asset Maintenance")
 
+	# Get the expense account for the WIP warehouse
 	warehouse_expense_account = frappe.db.sql(f"""
 	SELECT `account` FROM `tabWarehouse` WHERE `name`="{doc.get('wip_warehouse')}";
 	""", as_dict=True)
@@ -347,9 +488,13 @@ def make_issue_material_request(doc):
 	if not expense_account:
 		frappe.throw(f"Please set account for warehouse: {doc.wip_warehouse} in warehouse master data")
 
+	# Loop through the items in the Bill of Materials table
 	for item in doc.bill_of_material_and_services:
+		# If the item does not have a Material Request reference, create a new Material Request item
 		if not item.mr_reference:
+			# Get the warehouse for the item
 			warehouse=get_warehouse(item.item,doc.company)
+
 			i={}
 			i['item_code']= item.item
 			i["qty"]= item.demand_qty
@@ -360,20 +505,25 @@ def make_issue_material_request(doc):
 			i["warehouse"] = doc.wip_warehouse
 			i["source_warehouse"] = doc.source_warehouse
 			i["expense_account"] = expense_account
+
+			# If the document is project-based and has a project set, add the project to the Material Request item
 			if doc.project_based == "Yes" and \
 				(doc.project is not None and doc.project != ""):
 				i["project"] = doc.project
 
+			# Add the item to the Material Request items list
 			mr_items_list.append(i)
 		else:
 			continue
 	
+	# If there are items in the Material Request items list, create a new Material Request document
 	if mr_items_list:
 		mr.extend("items", mr_items_list)
 		mr.insert(ignore_permissions=True)
 		mr.submit()
 		return mr
 	else:
+		# If there are no items in the Material Request items list, throw an error
 		frappe.throw("Please add new items to BOM to create material request for issue")
 
 
@@ -409,6 +559,9 @@ def get_team_members(maintenance_teams):
 
 @frappe.whitelist()
 def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
+	"""
+	Create a stock entry to record the consumption of materials for the asset maintenance
+	"""
 	try:
 		# Fetch the Asset Maintenance document
 		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
@@ -424,6 +577,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 		difference_account = None
 
+		# Determine the account to use for the difference
 		if asset_maintenance_doc.get('project_based') == "Yes" and asset_maintenance_doc.get('project'):
 			if asset_maintenance_doc.get('project_type') == "ADP" and asset_maintenance_doc.get('cwip_account'):
 				difference_account = asset_maintenance_doc.get('cwip_account')
@@ -432,14 +586,14 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 		elif asset_maintenance_doc.get('project_based') == "No" and asset_maintenance_doc.get('project'):
 			difference_account = asset_maintenance_doc.get('clearing_account')
 
-				
-		
+		# Throw an error if the account is not set
 		if difference_account is None:
 			if asset_maintenance_doc.get('project_based') == "Yes":
 				frappe.throw("Please set CWIP or COGS account in project for project based asset maintenance")
 			else:
 				frappe.throw("Please set clearing account in asset maintenance for non project based asset maintenance in current Annual General Project")
 
+		# Loop through the consumed items and create a stock entry detail for each one
 		for item in asset_maintenance_doc.consumed_items:
 			i = frappe.new_doc('Stock Entry Detail')
 			i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
@@ -451,7 +605,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 			i.expense_account = difference_account
 			stock_entry.append('items',i)
 		
-		
+		# Return the stock entry
 		return stock_entry
 
 	except Exception as e:
@@ -460,36 +614,55 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 
 
 
-@frappe.whitelist()	
+@frappe.whitelist()
 def make_return_stock_entry(asset_maintenance_doc_ref):
+	"""
+	Create a stock entry to transfer back the unused materials to the source warehouse
+
+	Args:
+		asset_maintenance_doc_ref (str): The name of the Asset Maintenance document
+
+	Returns:
+		dict: A dictionary containing the stock entry document and a flag indicating if a new stock entry was created
+	"""
 	try:
-		return_stock_entry_flag = False
 		# Fetch the Asset Maintenance document
 		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
 
+		# Create a new stock entry
 		stock_entry = frappe.new_doc('Stock Entry')
 		stock_entry.stock_entry_type = 'Material Transfer'
 		stock_entry.company = asset_maintenance_doc.get('company')
 		stock_entry.asset_maintenance = asset_maintenance_doc.get('name')
 		stock_entry.from_warehouse = asset_maintenance_doc.get('wip_warehouse')
 
+		return_stock_entry_flag = False
+
+		# Loop through the consumed items and create a stock entry detail for each one
 		for item in asset_maintenance_doc.consumed_items:
-			if ((item.get('issued_qty') - item.get('consumed_qty')) - item.get('return_qty')) > 0:
+			# Calculate the quantity to return
+			qty_to_return = (item.get('issued_qty') - item.get('consumed_qty')) - item.get('return_qty')
+			if qty_to_return > 0:
+				# Create a new stock entry detail
 				i = frappe.new_doc('Stock Entry Detail')
 				i.s_warehouse =  asset_maintenance_doc.get('wip_warehouse')
 				i.item_code =  item.get('item')
-				i.qty = (item.get('issued_qty') - item.get('consumed_qty')) - item.get('return_qty')
+				i.qty = qty_to_return
 				i.uom = item.get('uom')
 				i.stock_uom = item.get('uom')
 				i.asset_maintenance = asset_maintenance_doc.get('name')
 				stock_entry.append('items',i)
+
+				# Set the return stock entry flag to True
 				return_stock_entry_flag = True
-			
+
+		# If no new stock entry was created, set the status of the Asset Maintenance document to the closing status
 		if not return_stock_entry_flag:
 			asset_maintenance_doc.status = get_closing_status(asset_maintenance_doc)
 			asset_maintenance_doc.save()
 			asset_maintenance_doc.submit()
 
+		# Return the stock entry and the return stock entry flag
 		return {'stock_entry': stock_entry, 'return_stock_entry_flag': return_stock_entry_flag}
 
 	except Exception as e:
