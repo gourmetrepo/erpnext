@@ -838,19 +838,19 @@ function subcontracting_configuration(frm){
 		frm.fields_dict['subcontracting_configuration'].grid.get_field('rm_warehouse').get_query = function(doc, cdt, cdn) {
 			let row = locals[cdt][cdn];
 			return {
-				"filters": {
-					"parent": "Supplier Virtual Warehouse",
-					"company": row.company
-				}
+				"filters": [
+                    ["Warehouse", "parent_warehouse", "like", "%Supplier Virtual Warehouse%"],
+                    ["company", "=", row.company]
+                ]
 			};
 		};
 		frm.fields_dict['subcontracting_configuration'].grid.get_field('wip_warehouse').get_query = function(doc, cdt, cdn) {
 			let row = locals[cdt][cdn];
 			return {
-				"filters": {
-					"parent": "Supplier Virtual Warehouse",
-					"company": row.company
-				}
+				"filters": [
+                    ["Warehouse", "parent_warehouse", "like", "%Supplier Virtual Warehouse%"],
+                    ["company", "=", row.company]
+                ]
 			};
 		};
 	}else{
