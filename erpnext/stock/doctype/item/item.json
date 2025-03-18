@@ -112,7 +112,6 @@
   "manufacturing",
   "default_bom",
   "is_sub_contracted_item",
-  "column_break_74",
   "customer_code",
   "default_item_manufacturer",
   "default_manufacturer_part_no",
@@ -159,7 +158,6 @@
    "bold": 1,
    "fieldname": "item_code",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Code",
    "oldfieldname": "item_code",
    "oldfieldtype": "Data",
@@ -183,7 +181,6 @@
    "bold": 1,
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Name",
    "oldfieldname": "item_name",
    "oldfieldtype": "Data",
@@ -850,10 +847,6 @@
    "oldfieldtype": "Select"
   },
   {
-   "fieldname": "column_break_74",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "customer_code",
    "fieldtype": "Data",
    "hidden": 1,
@@ -1072,7 +1065,7 @@
  "idx": 2,
  "image_field": "image",
  "max_attachments": 1,
- "modified": "2022-05-31 14:56:34.982569",
+ "modified": "2025-03-18 15:24:50.355135",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Item",
