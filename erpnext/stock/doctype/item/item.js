@@ -136,6 +136,10 @@ frappe.ui.form.on("Item", {
 		});
 
 		frm.toggle_reqd('customer', frm.doc.is_customer_provided_item ? 1:0);
+
+		// Code by Moeiz
+		// Subcontracting configurations
+		subcontracting_configuration(frm);
 	},
 
 	validate: function(frm){
@@ -230,6 +234,12 @@ frappe.ui.form.on("Item", {
 
 	set_meta_tags(frm) {
 		frappe.utils.set_meta_tag(frm.doc.route);
+	},
+
+	// Code by Moeiz
+	// Subcontracting
+	is_sub_contracted_item: function(frm) {
+		subcontracting_configuration(frm);
 	}
 });
 
@@ -791,3 +801,43 @@ frappe.ui.form.on("UOM Conversion Detail", {
 		}
 	}
 })
+
+
+
+
+// Code by Moeiz
+// Subcontracted configurations
+function subcontracting_configuration(frm){
+	if (frm.doc.is_sub_contracted_item == 1){
+		frm.toggle_display("subcontracting_configuration", true)
+		frm.fields_dict['subcontracting_configuration'].grid.get_field('bom').get_query = function(doc, cdt, cdn) {
+			let row = locals[cdt][cdn]; 
+			return {
+				"filters": {
+					"is_subcontract": 1,
+					"company": row.company
+				}
+			};
+		};
+		frm.fields_dict['subcontracting_configuration'].grid.get_field('rm_warehouse').get_query = function(doc, cdt, cdn) {
+			let row = locals[cdt][cdn];
+			return {
+				"filters": {
+					"parent": "Supplier Virtual Warehouse",
+					"company": row.company
+				}
+			};
+		};
+		frm.fields_dict['subcontracting_configuration'].grid.get_field('wip_warehouse').get_query = function(doc, cdt, cdn) {
+			let row = locals[cdt][cdn];
+			return {
+				"filters": {
+					"parent": "Supplier Virtual Warehouse",
+					"company": row.company
+				}
+			};
+		};
+	}else{
+		frm.toggle_display("subcontracting_configuration", false)
+	}
+}
