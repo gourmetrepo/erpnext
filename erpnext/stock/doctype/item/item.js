@@ -815,7 +815,8 @@ function subcontracting_configuration(frm){
 			return {
 				"filters": {
 					"is_subcontract": 1,
-					"company": row.company
+					"company": row.company,
+					"item": frm.doc.name
 				}
 			};
 		};
