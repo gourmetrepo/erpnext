@@ -249,6 +249,11 @@ class PurchaseOrder(BuyingController):
 
 		if self.is_subcontracted == "Yes":
 			self.update_reserved_qty_for_subcontract()
+			
+		# Code by Moeiz
+		# Subcontract process stock entry
+		if self.subcontracted:
+			create_subcontract_stock_entry(self)
 
 		frappe.get_doc('Authorization Control').validate_approving_authority(self.doctype,
 			self.company, self.base_grand_total)
@@ -713,3 +718,83 @@ def validate_subcontract_configurations(doc):
 			frappe.throw(f"Subcontracting configurations of warehouses are missing in Item Master Data for the following items: {', '.join(item_codes)}")
 
 		doc.supplier_warehouse = wip_warehouse		
+
+
+def create_subcontract_stock_entry(doc):
+
+	if doc.subcontracted:
+		item_configs = {}
+		for item in doc.items:
+			if item.item_code not in item_configs:
+				item_configs[item.item_code] = {'qty': item.qty}
+			else:
+				item_configs[item.item_code]['qty'] += item.qty
+		
+		item_tuple = tuple(item_configs.keys())
+
+		rm_warehouse = None
+		if item_tuple:
+			formatted_item_tuple = f"""({', '.join([f"'{name}'" for name in item_tuple])})"""
+			subcontracting_configurations = frappe.db.sql(
+				f"""
+				SELECT subcontract.parent as item, 
+				subcontract.bom as bom,
+				subcontract.rm_warehouse as rm_warehouse
+				FROM `tabItem Subcontracting Details` subcontract
+				WHERE subcontract.parent IN {formatted_item_tuple}
+				AND subcontract.supplier='{doc.supplier}'
+				AND subcontract.company='{doc.company}';
+				""", as_dict=True
+			)
+			
+			for config in subcontracting_configurations:
+				item_configs[config.get('item')]["bom"] = config.get('bom')
+				rm_warehouse = config.get('rm_warehouse')
+		
+		if not rm_warehouse:
+			frappe.throw(f"Raw material warehouse is missing in subcontracting configuration for supplier {doc.supplier} in company {doc.company}")
+		
+		if not doc.supplier_warehouse:
+			frappe.throw(f"WIP warehouse is missing in subcontracting configuration for supplier {doc.supplier} in company {doc.company}")
+
+		stock_entry_items = accumulate_bom_materials(item_configs, rm_warehouse, doc.supplier_warehouse)
+
+		stock_entry = frappe.new_doc("Stock Entry")
+		stock_entry.stock_entry_type = "Send to Subcontractor"
+		stock_entry.company = doc.company
+		stock_entry.purchase_order = doc.name
+		stock_entry.supplier = doc.supplier
+		stock_entry.request_from = "Manual"
+		stock_entry.extend("items", stock_entry_items)
+		stock_entry.to_warehouse = doc.supplier_warehouse
+		stock_entry.save()
+
+		stock_entry.submit()
+
+
+def accumulate_bom_materials(item_configs, source_warehouse, target_warehouse):
+	accumulate_items = {}
+	for item_code, config in item_configs.items():
+		bom = frappe.get_doc("BOM", config.get('bom'))
+		qty_required = config.get('qty') / bom.quantity
+		for item in bom.items:
+			if item.item_code not in accumulate_items:
+				accumulate_items[item.item_code] = {'qty': (item.qty * qty_required)}
+				accumulate_items[item.item_code]['uom'] = item.uom
+			else:
+				accumulate_items[item.item_code]['qty'] += (item.qty * qty_required)
+	
+	stock_entry_items = []
+	for item, details in accumulate_items.items():
+		stock_entry_item = frappe.new_doc("Stock Entry Detail")
+		stock_entry_item.update({
+			"item_code": item,
+			"qty": details.get('qty'),
+			"uom": details.get('uom'),
+			"s_warehouse": source_warehouse,
+			"t_warehouse": target_warehouse
+		})
+		stock_entry_items.append(stock_entry_item)
+	
+	return stock_entry_items
+
