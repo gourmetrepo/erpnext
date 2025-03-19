@@ -189,6 +189,12 @@ class Item(WebsiteGenerator):
 			self.old_website_item_groups = frappe.db.sql_list("""select item_group
 					from `tabWebsite Item Group`
 					where parentfield='website_item_groups' and parenttype='Item' and parent=%s""", self.name)
+		
+
+		# Code by Moeiz
+		# Sub contracting Process
+		if self.is_sub_contracted_item:
+			self.validate_sub_contracting_process()
 
 	def on_update(self):
 		invalidate_cache_for_item(self)
@@ -1047,6 +1053,27 @@ class Item(WebsiteGenerator):
 			enabled = frappe.db.get_single_value('Stock Settings', 'auto_indent')
 			if not enabled:
 				frappe.msgprint(msg=_("You have to enable auto re-order in Stock Settings to maintain re-order levels."), title=_("Enable Auto Re-Order"), indicator="orange")
+	
+
+	# Code by Moeiz
+	# Sub contracting process validation
+	def validate_sub_contracting_process(self):
+
+		company_wise_dict = {}
+
+		for config in self.subcontracting_configuration:
+			if config.company in company_wise_dict:
+				company_wise_dict[config.company].append({"supplier": config.supplier, "bom": config.bom, "rm_warehouse": config.rm_warehouse, "wip_warehouse": config.wip_warehouse})
+			else:
+				company_wise_dict[config.company] = [{"supplier": config.supplier, "bom": config.bom, "rm_warehouse": config.rm_warehouse, "wip_warehouse": config.wip_warehouse}]
+		# Validate boms
+		validate_sub_contracting_boms(company_wise_dict)
+
+		# Validate warehouses
+		validate_sub_contracting_warehouses(company_wise_dict)
+
+		# Validate suppliers
+		validate_sub_contracting_suppliers(company_wise_dict)
 
 def get_timeline_data(doctype, name):
 	'''returns timeline data based on stock ledger entry'''
@@ -1303,12 +1330,100 @@ def get_subcontracting_suppliers(doctype, txt, searchfield, start, page_len, fil
 	if company is None:
 		frappe.throw(_("Company is required to fetch subcontracting suppliers"))
 	suppliers = frappe.db.sql("""
-		SELECT name FROM `tabSupplier` 
+		SELECT `name`, `supplier_name` FROM `tabSupplier` 
 		WHERE name IN (
 			SELECT DISTINCT(parent) FROM `tabParty Account`
 			WHERE parenttype = 'Supplier' AND company = %s
 		) 
 		AND disabled = 0
-	""", (company,), as_dict=True)
+	""", (company,))
 	
-	return [(supplier["name"],) for supplier in suppliers]  # Return tuple format required for Frappe queries
+	return suppliers  # Return tuple format required for Frappe queries
+
+
+def validate_sub_contracting_boms(company_wise_dict=None):
+	if not company_wise_dict:
+		return
+
+	# Build query (One query for one company)
+	companies_list = list(company_wise_dict.keys())
+
+	for company in companies_list:
+		boms_list = []
+		for config in company_wise_dict[company]:
+			boms_list.append(config.get("bom"))
+		
+		bom_tuple = tuple(boms_list)
+		if bom_tuple:
+			formatted_bom_names = f"""({', '.join([f"'{name}'" for name in bom_tuple])})"""
+			boms_details = frappe.db.sql(f"""
+			SELECT `name`, `is_subcontract` FROM `tabBOM` WHERE `name` IN {formatted_bom_names}
+			""", as_dict=True)
+
+			for bom in boms_details:
+				if not bom.get('is_subcontract'):
+					frappe.throw(_("{0} is not a subcontracting BOM").format(bom.get('name')))
+
+def validate_sub_contracting_warehouses(company_wise_dict=None):
+	if not company_wise_dict:
+		return
+
+	# Build query (One query for one company)
+	companies_list = list(company_wise_dict.keys())
+
+	for company in companies_list:
+		warehouses_list = []
+		for config in company_wise_dict[company]:
+			warehouses_list.append(config.get("rm_warehouse"))
+			warehouses_list.append(config.get("wip_warehouse"))
+
+		warehouses_tuple = tuple(warehouses_list)
+		if warehouses_tuple:
+			formatted_warehouse_names = f"""({', '.join([f"'{name}'" for name in warehouses_tuple])})"""
+
+			unconfigured_warehouses = frappe.db.sql(f"""
+				SELECT name FROM `tabWarehouse`
+				WHERE name IN {formatted_warehouse_names}
+				AND parent_warehouse NOT IN (
+					SELECT name FROM `tabWarehouse`
+					WHERE name LIKE "%Supplier Virtual Warehouse%"
+					AND company = '{company}'
+				)
+				AND company = '{company}'
+			""", as_dict=True)
+
+			if unconfigured_warehouses:
+				warehouses_names = ", ".join([warehouse["name"] for warehouse in unconfigured_warehouses])
+				frappe.throw(f"The following warehouses are not configured under the Supply Virtual Warehouse for {company}: {warehouses_names}")
+
+
+def validate_sub_contracting_suppliers(company_wise_dict=None):
+	if not company_wise_dict:
+		return
+
+	# Build query (One query for one company)
+	companies_list = list(company_wise_dict.keys())
+
+	for company in companies_list:
+		suppliers_list = []
+		for config in company_wise_dict[company]:
+			suppliers_list.append(config.get("supplier"))
+
+		supplier_tuple = tuple(suppliers_list)
+		if supplier_tuple:
+			formatted_supplier_names = f"""({', '.join([f"'{name}'" for name in supplier_tuple])})"""
+
+			# Fetch suppliers NOT configured in Party Account for the company
+			unconfigured_suppliers = frappe.db.sql(f"""
+				SELECT `name` FROM `tabSupplier` 
+				WHERE `name` NOT IN (
+					SELECT DISTINCT(parent) FROM `tabParty Account`
+					WHERE parenttype = 'Supplier' AND company = '{company}'
+				) 
+				AND disabled = 0
+				AND `name` IN {formatted_supplier_names}
+			""", as_dict=True)
+
+			if unconfigured_suppliers:
+				supplier_names = ", ".join([supplier["name"] for supplier in unconfigured_suppliers])
+				frappe.throw(f"The following suppliers are not configured in Party Account for {company}: {supplier_names}")
