@@ -215,6 +215,16 @@ frappe.ui.form.on("Purchase Order", {
 			// Show the dialog
 			dialog.show();
 		}
+	},
+
+	refresh: function(frm) {
+		subcontract_configurations(frm);
+	},
+
+	// Code by Moeiz
+	// Subcontract process configurations
+	subcontracted: function(frm) {
+		subcontract_configurations(frm);
 	}
 });
 
@@ -861,4 +871,20 @@ function showHistoryPopup(historyData) {
 		'text-align': 'center'
     });
 
+}
+
+
+// Code by Moeiz
+// Subcontract configurations
+
+function subcontract_configurations(frm){
+	if (frm.doc.subcontracted == 1){
+		frm.set_value('is_subcontracted', 'Yes');
+		frm.set_df_property('is_subcontracted', 'read_only', 1);
+		frm.set_df_property('supplier_warehouse', 'read_only', 1);
+	}else{
+		frm.set_value('is_subcontracted', 'No');
+		frm.set_df_property('is_subcontracted', 'read_only', 0);
+		frm.set_df_property('supplier_warehouse', 'read_only', 0);
+	}
 }
