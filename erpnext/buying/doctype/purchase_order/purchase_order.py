@@ -72,6 +72,10 @@ class PurchaseOrder(BuyingController):
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_order_reference)
 		
 
+		# Code by Moeiz
+		# Subcontract validations
+		if self.subcontracted:
+			validate_subcontracted_po(self)
 
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
@@ -625,3 +629,87 @@ def validate_company_cost_center_and_accounts(purchase_order):
 			frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
 		if tax.cost_center and tax.cost_center not in cost_centers:
 			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
+
+
+
+# Code by Moeiz
+# Subcontracted purpose validations
+
+def validate_subcontracted_po(doc):
+	if doc.subcontracted:
+		# Validate items mentioned in PO are subcontracted
+		validate_items_in_master_data(doc)
+
+		# Validate subcontract configurations for items in PO
+		validate_subcontract_configurations(doc)
+
+def validate_items_in_master_data(doc):
+	item_codes = set()
+	for item in doc.items:
+		item_codes.add(item.item_code)
+	
+	item_tuple = tuple(item_codes)
+	if item_tuple:
+		formatted_item_tuple = f"""({', '.join([f"'{name}'" for name in item_tuple])})"""
+		not_sub_contracted_items = frappe.db.sql(f"""
+		SELECT item.`name` FROM `tabItem` item 
+		WHERE item.`name` IN {formatted_item_tuple}
+		AND item.`is_sub_contracted_item`=0;
+		""", as_dict=True)
+
+		if not_sub_contracted_items:
+			not_sub_contracted_item_codes = ", ".join([item["name"] for item in not_sub_contracted_items])
+			frappe.throw(f"Items: {not_sub_contracted_item_codes} are not subcontracted items. Please remove them from the PO or mark them as subcontracted items in the Item master.")
+
+
+def validate_subcontract_configurations(doc):
+	if not doc.supplier:
+		frappe.throw(_("Supplier is mandatory for subcontracted Purchase Order"))
+
+	if not doc.company:
+		frappe.throw(_("Company is mandatory for subcontracted Purchase Order"))
+
+	item_codes = set()
+	for item in doc.items:
+		item_codes.add(item.item_code)
+	
+	item_tuple = tuple(item_codes)
+
+	if item_tuple:
+		formatted_item_tuple = f"""({', '.join([f"'{name}'" for name in item_tuple])})"""
+		subcontracting_configurations = frappe.db.sql(
+			f"""
+			SELECT subcontract.parent as item, 
+			subcontract.supplier as supplier, 
+			subcontract.rm_warehouse as rm_warehouse, 
+			subcontract.wip_warehouse as wip_warehouse 
+			FROM `tabItem Subcontracting Details` subcontract
+			WHERE subcontract.parent IN {formatted_item_tuple}
+			AND subcontract.supplier='{doc.supplier}'
+			AND subcontract.company='{doc.company}';
+			""", as_dict=True
+		)
+
+		for config in subcontracting_configurations:
+			# Discard the relevant item_codes whose configuration was found ensuring they have a valid configuration
+			item_codes.discard(config.get('item'))
+		
+		# Validated in configuration existed for all items
+		if item_codes:
+			frappe.throw(f"Subcontracting configurations are missing in Item Master Data for the following items: {', '.join(item_codes)}")
+		
+		# Now we validate that all subcontracting configurations are valid
+		rm_warehouse = None
+		wip_warehouse = None
+		for config in subcontracting_configurations:
+			if rm_warehouse and rm_warehouse != config.get('rm_warehouse'):
+				frappe.throw(f"Inconsistent warehouse mapping. Different raw material warehouses are configured against the same supplier {doc.supplier} in company {doc.company}")
+			if wip_warehouse and wip_warehouse != config.get('wip_warehouse'):
+				frappe.throw(f"Inconsistent warehouse mapping. Different WIP warehouses are configured against the same supplier {doc.supplier} in company {doc.company}")
+			rm_warehouse = config.get('rm_warehouse')
+			wip_warehouse = config.get('wip_warehouse')
+
+		if not rm_warehouse or not wip_warehouse:
+			frappe.throw(f"Subcontracting configurations of warehouses are missing in Item Master Data for the following items: {', '.join(item_codes)}")
+
+		doc.supplier_warehouse = wip_warehouse		
