@@ -853,6 +853,16 @@ function subcontracting_configuration(frm){
                 ]
 			};
 		};
+		frm.fields_dict['subcontracting_configuration'].grid.get_field('supplier').get_query = function(doc, cdt, cdn) {
+			let row = locals[cdt][cdn];
+			
+			return {
+				query: "erpnext.stock.doctype.item.item.get_subcontracting_suppliers",
+				filters: {
+					company: row.company
+				}
+			};
+		};
 	}else{
 		frm.toggle_display("subcontracting_configuration", false)
 	}

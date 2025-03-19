@@ -1293,3 +1293,22 @@ def update_variants(variants, template, publish_progress=True):
 def on_doctype_update():
 	# since route is a Text column, it needs a length for indexing
 	frappe.db.add_index("Item", ["route(500)"])
+
+
+
+# Code by Moeiz
+@frappe.whitelist()
+def get_subcontracting_suppliers(doctype, txt, searchfield, start, page_len, filters):
+	company = filters.get("company", None)  # Extract company from filters
+	if company is None:
+		frappe.throw(_("Company is required to fetch subcontracting suppliers"))
+	suppliers = frappe.db.sql("""
+		SELECT name FROM `tabSupplier` 
+		WHERE name IN (
+			SELECT DISTINCT(parent) FROM `tabParty Account`
+			WHERE parenttype = 'Supplier' AND company = %s
+		) 
+		AND disabled = 0
+	""", (company,), as_dict=True)
+	
+	return [(supplier["name"],) for supplier in suppliers]  # Return tuple format required for Frappe queries
