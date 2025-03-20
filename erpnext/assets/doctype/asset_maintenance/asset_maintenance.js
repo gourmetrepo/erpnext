@@ -3,18 +3,8 @@
 
 frappe.ui.form.on('Asset Maintenance', {
 	setup: (frm) => {
-		var colors = {
-			"Draft": "red",
-			"Not Started": "yellow",
-			"MR Generated": "orange",
-			"In Process": "orange",
-			"Completed": "green",
-			"Stopped": "red",
-			"Closed": "green",
-			"Cancelled": "red",
-			"Finished": "green"
-		}
-		frm.set_indicator_formatter('status', colors[frm.doc.status])
+
+		
 		frm.set_query('project', function() {
             return {
                 filters: {
@@ -32,9 +22,28 @@ frappe.ui.form.on('Asset Maintenance', {
                 }
             };
         });
+
+		frm.set_indicator_formatter('status',
+			function(doc) {
+				if (doc.status === "Completed" || doc.status === "Closed" || doc.status === "Finished") {
+					return "green";
+		
+				}else if(doc.status === "In Process"){
+					return "orange";
+				}else{
+					return "red";
+				}
+			})
+		
 	},
 
 	refresh: (frm) => {
+		frm.page.set_primary_action(__('Save'), () => {
+            frm.save();
+        });
+        frm.page.hide_action("Submit");
+
+		
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}

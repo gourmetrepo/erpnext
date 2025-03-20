@@ -1,17 +1,13 @@
 frappe.listview_settings['Asset Maintenance'] = {
+	add_fields: ['status'],
 	get_indicator: function(doc) {
-		var colors = {
-			"Draft": "red",
-			"Not Started": "yellow",
-			"MR Generated": "orange",
-			"In Process": "orange",
-			"Completed": "green",
-			"Stopped": "red",
-			"Closed": "green",
-			"Cancelled": "red",
-			"Finished": "green"
+		if (doc.status === "Completed" || doc.status === "Closed" || doc.status === "Finished") {
+			return [__(doc.status), "green", "status,=," + doc.status];
+		} else if(doc.status === "In Process"){
+			return [__(doc.status), "orange", "status,=," + doc.status];
+		}else{
+			return [__(doc.status), "red", "status,=," + doc.status];
 		}
-		return [__(doc.status), colors[doc.status], "status,=," + doc.status];
 	},
 	
 };
