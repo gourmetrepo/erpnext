@@ -4,6 +4,9 @@ from frappe import _
 def get_data():
 	return {
 		'fieldname': 'asset_maintenance',
+		'non_standard_fieldnames': {
+			'Journal Entry': 'plant_maintenance_reference',
+		},
 		'transactions': [
 			{
 				'label': _('Transactions'),
