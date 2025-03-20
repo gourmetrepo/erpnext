@@ -67,15 +67,17 @@ class PurchaseOrder(BuyingController):
 		self.validate_for_subcontracting()
 		self.validate_minimum_order_qty()
 		self.validate_bom_for_subcontracting_items()
+		
+		# Code by Moeiz
+		# Subcontract validations
+		if self.subcontracted:
+			validate_subcontracted_po(self)
+			
 		self.create_raw_materials_supplied("supplied_items")
 		self.set_received_qty_for_drop_ship_items()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_order_reference)
 		
 
-		# Code by Moeiz
-		# Subcontract validations
-		if self.subcontracted:
-			validate_subcontracted_po(self)
 
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
@@ -694,7 +696,8 @@ def validate_subcontract_configurations(doc):
 			SELECT subcontract.parent as item, 
 			subcontract.supplier as supplier, 
 			subcontract.rm_warehouse as rm_warehouse, 
-			subcontract.wip_warehouse as wip_warehouse 
+			subcontract.wip_warehouse as wip_warehouse,
+			subcontract.bom as bom
 			FROM `tabItem Subcontracting Details` subcontract
 			WHERE subcontract.parent IN {formatted_item_tuple}
 			AND subcontract.supplier='{doc.supplier}'
@@ -713,18 +716,28 @@ def validate_subcontract_configurations(doc):
 		# Now we validate that all subcontracting configurations are valid
 		rm_warehouse = None
 		wip_warehouse = None
+		bom_configs = {}
 		for config in subcontracting_configurations:
 			if rm_warehouse and rm_warehouse != config.get('rm_warehouse'):
 				frappe.throw(f"Inconsistent warehouse mapping. Different raw material warehouses are configured against the same supplier {doc.supplier} in company {doc.company}")
 			if wip_warehouse and wip_warehouse != config.get('wip_warehouse'):
 				frappe.throw(f"Inconsistent warehouse mapping. Different WIP warehouses are configured against the same supplier {doc.supplier} in company {doc.company}")
+			if config.get('bom') and config.get('item'):
+				bom_configs[config.get('item')] = config.get('bom')
+			
 			rm_warehouse = config.get('rm_warehouse')
 			wip_warehouse = config.get('wip_warehouse')
 
 		if not rm_warehouse or not wip_warehouse:
 			frappe.throw(f"Subcontracting configurations of warehouses are missing in Item Master Data for the following items: {', '.join(item_codes)}")
 
-		doc.supplier_warehouse = wip_warehouse		
+		# Updated supplier warehouse with wip warehouse
+		doc.supplier_warehouse = wip_warehouse
+
+		for item in doc.items:
+			bom = bom_configs.get(item.item_code, None)
+			if bom:
+				item.bom = bom
 
 
 def create_subcontract_stock_entry(doc):
