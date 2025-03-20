@@ -9,10 +9,10 @@
   "task_name",
   "maintenance_type",
   "maintenance_status",
-  "start_date",
-  "estimated_time_in_hrs",
   "column_break_4",
+  "start_date",
   "end_date",
+  "estimated_time_in_hrs",
   "assigned_users",
   "item_used"
  ],
@@ -101,7 +101,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-01-30 19:29:46.297097",
+ "modified": "2025-03-20 13:57:14.041663",
  "modified_by": "Administrator",
  "module": "Assets",
  "name": "Asset Maintenance Task",
