@@ -1,7 +1,7 @@
 frappe.listview_settings['Payment Entry'] = {
 
 	onload: function(listview) {
-			if (Object.values(frappe.route_options).length == 0){
+		if (listview.filter_area.filter_list.filters.length == 0){
 			frappe.route_options = {
 				"company": frappe.get_cookie('company') ,
 				"creation":["Between",[frappe.datetime.add_days(frappe.datetime.get_today(), -10),frappe.datetime.get_today()]]
