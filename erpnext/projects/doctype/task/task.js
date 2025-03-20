@@ -32,10 +32,11 @@ frappe.ui.form.on("Task", {
                 query: "erpnext.projects.doctype.task.task.get_assigned_team_users"
             };
         };
-		
+		asset_maintenance_configuration(frm);
 	},
 
 	refresh: function (frm) {
+		asset_maintenance_configuration(frm);
 		frm.fields_dict["assigned_users"].grid.get_field("assigned_users").format_input = function(value, data) {
             return data ? `${data.team_member} - ${data.full_name}` : value;
         };
@@ -109,9 +110,11 @@ frappe.ui.form.on("Task", {
 			});
 		}
 		setup_assigned_team_users(frm);
+		
 	},
 
 	onload: function (frm) {
+		asset_maintenance_configuration(frm);
 		frm.set_query("task", "depends_on", function () {
 			let filters = {
 				name: ["!=", frm.doc.name]
@@ -181,6 +184,15 @@ frappe.ui.form.on("Task", {
 });
 
 
+function asset_maintenance_configuration(frm){
+	if(frm.doc.asset_maintenance){
+		frm.set_df_property("asset_maintenance","read_only",1);
+		frm.set_df_property("asset_maintenance","hidden",0);
+	}else{
+		frm.set_df_property("asset_maintenance","read_only",0);
+		frm.set_df_property("asset_maintenance","hidden",1);
+	}
+}
 
 function setup_assigned_team_users(frm) {
     frm.fields_dict['assigned_users'].get_query = function() {
