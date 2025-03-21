@@ -448,7 +448,8 @@
    "in_standard_filter": 1,
    "label": "Supply Raw Materials",
    "options": "No\nYes",
-   "print_hide": 1
+   "print_hide": 1,
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.is_subcontracted==\"Yes\"",
@@ -1056,7 +1057,7 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2022-09-05 15:21:06.227652",
+ "modified": "2025-03-21 15:47:49.842314",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",
