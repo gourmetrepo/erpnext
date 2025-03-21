@@ -986,11 +986,11 @@ function showHistoryPopup(historyData) {
 function subcontract_configurations(frm){
 	if (frm.doc.subcontracted == 1){
 		frm.set_value('is_subcontracted', 'Yes');
-		frm.set_df_property('is_subcontracted', 'read_only', 1);
+		// frm.set_df_property('is_subcontracted', 'read_only', 1);
 		frm.set_df_property('supplier_warehouse', 'read_only', 1);
 	}else{
 		frm.set_value('is_subcontracted', 'No');
-		frm.set_df_property('is_subcontracted', 'read_only', 0);
+		// frm.set_df_property('is_subcontracted', 'read_only', 0);
 		frm.set_df_property('supplier_warehouse', 'read_only', 0);
 	}
 }
