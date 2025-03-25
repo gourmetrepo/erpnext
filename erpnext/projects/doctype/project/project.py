@@ -211,12 +211,15 @@ class Project(Document):
 
 	def validate_account_mapping(self):
 		if self.project_type:
-			if self.project_type == "ADP":
+			if self.project_type not in ("AOP", "Annual General"):
 				if not self.cwip_account:
-					frappe.throw(_("Please select CWIP Account for project type ADP"))
-			else:
-				if not self.cogs_account and self.project_type != "Import":
+					frappe.throw(_("Please select CWIP Account"))
+			elif self.project_type == "AOP":
+				if not self.cogs_account:
 					frappe.throw(_("Please select COGS Account"))
+			elif self.project_type == "Annual General":
+				if not self.clearing_account:
+					frappe.throw(_("Please select Clearing Account"))
 	
 	def validate_if_previous_project_exists(self):
 		project_names = frappe.db.sql(f"""

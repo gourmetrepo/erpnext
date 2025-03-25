@@ -60,9 +60,9 @@ frappe.ui.form.on("Project", {
 	},
 
 	refresh: function (frm) {
-		if(frm.doc.project_type == 'ADP'){
-			frm.set_df_property('cogs_account', 'reqd', 0);
-			frm.set_df_property('cwip_acccount', 'reqd', 1);
+		if(frm.doc.project_type == 'AOP'){
+			frm.set_df_property('cogs_account', 'reqd', 1);
+			frm.set_df_property('cwip_acccount', 'reqd', 0);
 			frm.set_df_property('clearing_account', 'reqd', 0);
 			frm.set_df_property('clearing_account', 'hidden', 1);
 		}else if (frm.doc.project_type == 'Annual General'){
@@ -71,12 +71,13 @@ frappe.ui.form.on("Project", {
 			frm.set_df_property('clearing_account', 'reqd', 1);
 			frm.set_df_property('clearing_account', 'hidden', 0);
 		}
-		else if (frm.doc.project_type){
-			frm.set_df_property('cogs_account', 'reqd', 1);
-			frm.set_df_property('cwip_acccount', 'reqd', 0);
+		else if (frm.doc.project_type != "AOP"){
+			frm.set_df_property('cogs_account', 'reqd', 0);
+			frm.set_df_property('cwip_acccount', 'reqd', 1);
 			frm.set_df_property('clearing_account', 'reqd', 0);
 			frm.set_df_property('clearing_account', 'hidden', 1);
 		}
+	
 
 		if (frm.doc.__islocal) {
 			frm.web_link && frm.web_link.remove();
@@ -156,6 +157,26 @@ frappe.ui.form.on("Project", {
 
 	collect_progress: function(frm) {
 		frm.set_df_property("message", "reqd", frm.doc.collect_progress);
+	},
+
+	project_type: function(frm) {
+		if(frm.doc.project_type == 'AOP'){
+			frm.set_df_property('cogs_account', 'reqd', 1);
+			frm.set_df_property('cwip_acccount', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'hidden', 1);
+		}else if (frm.doc.project_type == 'Annual General'){
+			frm.set_df_property('cogs_account', 'reqd', 0);
+			frm.set_df_property('cwip_acccount', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'reqd', 1);
+			frm.set_df_property('clearing_account', 'hidden', 0);
+		}
+		else if (frm.doc.project_type != "AOP"){
+			frm.set_df_property('cogs_account', 'reqd', 0);
+			frm.set_df_property('cwip_acccount', 'reqd', 1);
+			frm.set_df_property('clearing_account', 'reqd', 0);
+			frm.set_df_property('clearing_account', 'hidden', 1);
+		}
 	}
 });
 
