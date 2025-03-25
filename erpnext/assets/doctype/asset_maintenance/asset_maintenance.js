@@ -41,9 +41,7 @@ frappe.ui.form.on('Asset Maintenance', {
 		frm.page.set_primary_action(__('Save'), () => {
             frm.save();
         });
-        frm.page.hide_action("Submit");
-
-		
+      	
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
@@ -108,6 +106,18 @@ frappe.ui.form.on('Asset Maintenance', {
 
 	project_based: function(frm){
 		project_frm_configuration(frm)
+	},
+
+	project: function(frm){
+		if(frm.doc.project_based === "Yes"){
+			if(frm.doc.project){
+				frm.set_df_property('project', 'read_only', 1);
+				frm.set_df_property('project_based', 'read_only', 1);
+			}else{
+				frm.set_df_property('project', 'read_only', 0);
+				frm.set_df_property('project_based', 'read_only', 0);
+			}
+		}
 	},
 	
 	company: (frm) => {
