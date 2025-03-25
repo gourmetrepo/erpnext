@@ -13,7 +13,8 @@ def get_data():
 			'Auto Repeat': 'reference_document',
 		},
 		'internal_links': {
-			'Sales Order': ['items', 'sales_order']
+			'Sales Order': ['items', 'sales_order'],
+			'Asset': ['items', 'asset']
 		},
 		'transactions': [
 			{
@@ -32,5 +33,9 @@ def get_data():
 				'label': _('Subscription'),
 				'items': ['Auto Repeat']
 			},
+			{
+				'label': _('Assets'),
+				'items': ['Asset']
+    }
 		]
 	}
