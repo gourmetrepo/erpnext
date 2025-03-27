@@ -51,7 +51,6 @@
   {
    "fieldname": "employee",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "in_standard_filter": 1,
    "label": "Employee",
    "options": "Employee",
@@ -61,7 +60,6 @@
   {
    "fieldname": "employee_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Employee Name",
    "read_only": 1
   },
@@ -73,6 +71,7 @@
    "fieldname": "leave_type",
    "fieldtype": "Link",
    "ignore_user_permissions": 1,
+   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Leave Type",
    "options": "Leave Type",
@@ -244,10 +243,9 @@
  ],
  "icon": "fa fa-calendar",
  "idx": 1,
- "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "max_attachments": 3,
- "modified": "2020-09-23 19:11:58.806837",
+ "modified": "2025-03-07 17:02:33.777382",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Leave Application",

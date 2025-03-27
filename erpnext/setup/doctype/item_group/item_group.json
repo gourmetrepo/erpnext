@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
  "autoname": "field:item_group_name",
@@ -13,6 +12,7 @@
   "item_group_name",
   "parent_item_group",
   "is_group",
+  "reporting_variant",
   "image",
   "column_break_5",
   "defaults",
@@ -180,15 +180,20 @@
    "options": "Item Group",
    "print_hide": 1,
    "report_hide": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "reporting_variant",
+   "fieldtype": "Check",
+   "label": "Reporting Variant"
   }
  ],
  "icon": "fa fa-sitemap",
  "idx": 1,
  "image_field": "image",
  "is_tree": 1,
- "links": [],
  "max_attachments": 3,
- "modified": "2020-03-18 18:25:59.979083",
+ "modified": "2025-03-27 16:52:24.498571",
  "modified_by": "Administrator",
  "module": "Setup",
  "name": "Item Group",
