@@ -785,6 +785,39 @@ def make_scrap_stock_entry(doc):
 
 
 @frappe.whitelist()
+def get_tasks(doctype, txt, searchfield, start, page_len, filters):
+	company = filters.get("company", None)
+	if company is None:
+		frappe.throw(_("Please select a company before fetching tasks"))
+
+	project_based = filters.get("project_based", None)
+	if project_based is None:
+		frappe.throw(_("Please selected if asset maintenance is project based or not"))
+	
+	if project_based == "Yes":
+		project = filters.get("project", None)
+		if project is None:
+			frappe.throw(_("Please select a project before fetching tasks"))
+					
+		tasks = frappe.db.sql(f"""
+			SELECT `name`, `subject` FROM `tabTask` 
+			WHERE project="{project}"
+			AND asset_maintenance IS NULL
+		""")
+	else:
+		tasks = frappe.db.sql(f"""
+			SELECT `name`, `subject` FROM `tabTask` 
+			WHERE project=(SELECT `name` FROM `tabProject` 
+			WHERE `project_type`="Annual General" 
+			AND `company`="{company}"
+			AND `status`="Open"
+			ORDER BY creation DESC LIMIT 1)
+			AND asset_maintenance IS NULL
+		""")
+
+	
+	return tasks
+@frappe.whitelist()
 def create_jv_for_asset_maintenance(asset_maintenance_name):
 	asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_name)
 	asset_maintenance_doc.create_project_based_journal_entry()

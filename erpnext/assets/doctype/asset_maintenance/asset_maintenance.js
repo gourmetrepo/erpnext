@@ -631,6 +631,18 @@ function project_frm_configuration(frm) {
 		frm.set_df_property('plant_maintenance_assets', 'cannot_add_rows', false);
 	}
 
+	frm.fields_dict['asset_maintenance_tasks'].grid.get_field('maintenance_task').get_query = function(doc, cdt, cdn) {
+		
+		return {
+			query: "erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_tasks",
+			filters: {
+				project_based: doc.project_based,
+				project: doc.project,
+				company: doc.company
+			}
+		};
+	};
+
 }
 
 
