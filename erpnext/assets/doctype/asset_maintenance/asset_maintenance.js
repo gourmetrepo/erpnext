@@ -154,12 +154,12 @@ frappe.ui.form.on('Asset Maintenance', {
 			frappe.throw("Select company first")
 		}
 
-		if (!frm.doc.wip_warehouse){
-			frappe.throw("WIP Warehouse is missing. Please fetch it for this section, as it may not be assigned in the section master data")
-		}
-
 		if (frm.is_dirty()) {
 			frappe.throw(__(`Save document before issuing Material Request`));
+		}
+
+		if (!frm.doc.wip_warehouse){
+			frappe.throw("WIP Warehouse is missing. Please fetch it for this section, as it may not be assigned in the section master data")
 		}
 		
 		frm.doc.bill_of_material_and_services.forEach(function(bill, index) {

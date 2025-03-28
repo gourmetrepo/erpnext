@@ -65,7 +65,7 @@ class AssetMaintenance(Document):
 		self.create_damage_and_scrap_stock_entries()
 
 		# Logging closing time in the document
-		self.close_time = frappe.utils.now_datetime()
+		self.closed_time = frappe.utils.now_datetime()
 	
 	def on_submit(self):
 		"""
