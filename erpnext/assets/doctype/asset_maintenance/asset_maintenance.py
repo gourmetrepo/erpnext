@@ -75,6 +75,8 @@ class AssetMaintenance(Document):
 			# Create a project based journal entry if the document is not project based
 			self.create_project_based_journal_entry()
 		
+		# Update repair count at assets
+		self.update_repair_count()
 
 		
 	def sync_maintenance_tasks(self):
@@ -333,6 +335,21 @@ class AssetMaintenance(Document):
 			else:
 				# Delete the journal entry document if no cost was retrieved
 				del jv_doc
+	
+	def update_repair_count(self):
+		"""
+		Update the repair count for each asset in the asset maintenance document.
+		"""
+
+		asset_names = [asset.get('asset') for asset in self.get('plant_maintenance_assets')]
+		
+		if asset_names:
+			asset_names_referenece = f"({', '.join(frappe.db.escape(name) for name in asset_names)})"
+			frappe.db.sql(f"""
+				Update `tabAsset` set `repair_count`=(`repair_count` + 1) where `name` in {asset_names_referenece};
+			""", as_dict=True)
+		
+
 
 
 @frappe.whitelist()
