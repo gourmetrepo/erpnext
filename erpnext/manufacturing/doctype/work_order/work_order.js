@@ -120,6 +120,31 @@ frappe.ui.form.on("Work Order", {
 			});
 			erpnext.work_order.set_default_warehouse(frm);
 		}
+
+		if (frm.doc.company) {
+			const csd_companies = ['Unit 5', 'Unit 8', 'Unit 11'];
+			if (csd_companies.includes(frm.doc.company)) {
+				if (frm.doc.company) {
+					frappe.call({
+						method: "frappe.client.get_list",
+						args: {
+							doctype: "Cost Center",
+							filters: {
+								is_parent_asset: 1,
+								company: frm.doc.company
+							},
+							fields: ["name"]
+						},
+						callback: function(r) {
+							if (r.message) {
+								let options = r.message.map(row => row.name);
+								frm.set_df_property("production_line", "options", options.join("\n"));
+							}
+						}
+					});
+				}
+			}
+		}
 	},
 
 	source_warehouse: function(frm) {
