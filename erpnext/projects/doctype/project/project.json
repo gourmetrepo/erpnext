@@ -93,7 +93,8 @@
    "label": "Project Type",
    "oldfieldname": "project_type",
    "oldfieldtype": "Data",
-   "options": "Project Type"
+   "options": "Project Type",
+   "reqd": 1
   },
   {
    "fieldname": "is_active",
@@ -444,7 +445,7 @@
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
  "max_attachments": 4,
- "modified": "2024-12-27 16:53:01.356977",
+ "modified": "2025-03-25 13:24:23.027477",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",

@@ -1,385 +1,543 @@
 {
- "allow_copy": 0, 
- "allow_guest_to_view": 0, 
- "allow_import": 0, 
- "allow_rename": 1, 
- "autoname": "HR-APP-.YYYY.-.#####", 
- "beta": 0, 
- "creation": "2013-01-29 19:25:37", 
- "custom": 0, 
- "description": "Applicant for a Job", 
- "docstatus": 0, 
- "doctype": "DocType", 
- "document_type": "Document", 
- "editable_grid": 0, 
- "engine": "InnoDB", 
+ "allow_rename": 1,
+ "autoname": "HR-APP-.YYYY.-.#####",
+ "creation": "2013-01-29 19:25:37",
+ "description": "Applicant for a Job",
+ "doctype": "DocType",
+ "document_type": "Document",
+ "engine": "InnoDB",
+ "field_order": [
+  "applicant_name",
+  "application_details_section",
+  "job_applicant_status",
+  "job_application_date",
+  "applied_on",
+  "professional_portfolio_section",
+  "cover_letter",
+  "resume",
+  "linkedin_profile",
+  "website",
+  "personal_details_section",
+  "first_name",
+  "middle_name",
+  "last_name",
+  "full_name",
+  "gender",
+  "date_of_birth",
+  "religion",
+  "blood_group",
+  "marital_status",
+  "identity_details_section",
+  "nationality",
+  "place_of_birth",
+  "cnic",
+  "passport",
+  "place_of_issue",
+  "issue_date",
+  "valid_upto",
+  "contact_details_section",
+  "email",
+  "contact",
+  "current_address",
+  "permanent_address",
+  "education_details_section",
+  "education_title",
+  "type",
+  "specialization",
+  "institution",
+  "start_date",
+  "currently_enrolled",
+  "completion_date",
+  "is_highest_education",
+  "is_relevent_to_job",
+  "work_experience_section",
+  "job_title",
+  "company_name",
+  "location",
+  "joining_date",
+  "currently_employed",
+  "end_date_if_not_currently_employed",
+  "responsibilities_and_achievements",
+  "total_experience_years",
+  "last_drawn_salary",
+  "perks_and_benifits",
+  "competency_framework_section",
+  "core_skills",
+  "behavioral_competencies",
+  "references_section",
+  "reference_full_name",
+  "designation",
+  "company",
+  "relationship",
+  "reference_contact",
+  "reference_email",
+  "applicant_preferences_section",
+  "open_to_work_in_shifts",
+  "willing_to_travel",
+  "consent_to_check_background",
+  "availability_to_join_in_days",
+  "open_to_relocate",
+  "preferred_interview_mode_section",
+  "expected_compensation_section",
+  "expected_minimum_salary",
+  "expected_maximum_salary",
+  "expected_perks_and_benifits",
+  "recruitment_details_section",
+  "how_did_you_hear_about_this_job",
+  "job_source_rating",
+  "motivation_for_applying",
+  "reason_for_job_switch",
+  "applicant_consent_regarding_information_provided"
+ ],
  "fields": [
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 1, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "applicant_name", 
-   "fieldtype": "Data", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 1, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Applicant Name", 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 1, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "bold": 1,
+   "fieldname": "applicant_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Applicant Name"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 1, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "email_id", 
-   "fieldtype": "Data", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Email Address", 
-   "length": 0, 
-   "no_copy": 0, 
-   "options": "Email", 
-   "permlevel": 0, 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 1, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "application_details_section",
+   "fieldtype": "Section Break",
+   "label": "Application Details"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "status", 
-   "fieldtype": "Select", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 1, 
-   "in_standard_filter": 1, 
-   "label": "Status", 
-   "length": 0, 
-   "no_copy": 0, 
-   "options": "Open\nReplied\nRejected\nHold\nAccepted", 
-   "permlevel": 0, 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 1, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "job_applicant_status",
+   "fieldtype": "Select",
+   "label": "Job Applicant Status",
+   "options": "\nOpen\nShortlisted\nAccepted\nOffered\nOn Hold\nRejected"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "column_break_3", 
-   "fieldtype": "Column Break", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0, 
-   "width": "50%"
-  }, 
+   "fieldname": "job_application_date",
+   "fieldtype": "Date",
+   "label": "Job Application Date"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "job_title", 
-   "fieldtype": "Link", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 1, 
-   "in_standard_filter": 0, 
-   "label": "Job Opening", 
-   "length": 0, 
-   "no_copy": 0, 
-   "options": "Job Opening", 
-   "permlevel": 0, 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "applied_on",
+   "fieldtype": "Link",
+   "label": "Applied On",
+   "options": "Job Opening"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "source", 
-   "fieldtype": "Link", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Source", 
-   "length": 0, 
-   "no_copy": 0, 
-   "options": "Job Applicant Source", 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "professional_portfolio_section",
+   "fieldtype": "Section Break",
+   "label": "Professional Portfolio"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "depends_on": "eval: doc.source==\"Employee Referral\" ", 
-   "fieldname": "source_name", 
-   "fieldtype": "Link", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Source Name", 
-   "length": 0, 
-   "no_copy": 0, 
-   "options": "Employee", 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "cover_letter",
+   "fieldtype": "Text Editor",
+   "label": "Cover Letter"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "section_break_6", 
-   "fieldtype": "Section Break", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "resume",
+   "fieldtype": "Attach",
+   "label": "Resume"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "cover_letter", 
-   "fieldtype": "Text", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Cover Letter", 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
-  }, 
+   "fieldname": "linkedin_profile",
+   "fieldtype": "Data",
+   "label": "LinkedIn Profile"
+  },
   {
-   "allow_bulk_edit": 0, 
-   "allow_in_quick_entry": 0, 
-   "allow_on_submit": 0, 
-   "bold": 0, 
-   "collapsible": 0, 
-   "columns": 0, 
-   "fieldname": "resume_attachment", 
-   "fieldtype": "Attach", 
-   "hidden": 0, 
-   "ignore_user_permissions": 0, 
-   "ignore_xss_filter": 0, 
-   "in_filter": 0, 
-   "in_global_search": 0, 
-   "in_list_view": 0, 
-   "in_standard_filter": 0, 
-   "label": "Resume Attachment", 
-   "length": 0, 
-   "no_copy": 0, 
-   "permlevel": 0, 
-   "precision": "", 
-   "print_hide": 0, 
-   "print_hide_if_no_value": 0, 
-   "read_only": 0, 
-   "remember_last_selected_value": 0, 
-   "report_hide": 0, 
-   "reqd": 0, 
-   "search_index": 0, 
-   "set_only_once": 0, 
-   "translatable": 0, 
-   "unique": 0
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "fieldname": "personal_details_section",
+   "fieldtype": "Section Break",
+   "label": "Personal Details"
+  },
+  {
+   "fieldname": "first_name",
+   "fieldtype": "Data",
+   "label": "First Name"
+  },
+  {
+   "fieldname": "middle_name",
+   "fieldtype": "Data",
+   "label": "Middle Name"
+  },
+  {
+   "fieldname": "last_name",
+   "fieldtype": "Data",
+   "label": "Last Name"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "fieldname": "gender",
+   "fieldtype": "Select",
+   "label": "Gender",
+   "options": "\nMale\nFemale\nOther"
+  },
+  {
+   "fieldname": "date_of_birth",
+   "fieldtype": "Date",
+   "label": "Date Of Birth"
+  },
+  {
+   "fieldname": "religion",
+   "fieldtype": "Select",
+   "label": "Religion",
+   "options": "\nIslam\nChristianity\nOther"
+  },
+  {
+   "fieldname": "blood_group",
+   "fieldtype": "Select",
+   "label": "Blood Group",
+   "options": "\nA+\nA-\nB+\nB-\nAB+\nAB-\nO+\nO-"
+  },
+  {
+   "fieldname": "marital_status",
+   "fieldtype": "Select",
+   "label": "Marital Status",
+   "options": "\nSingle\nMarried\nOther"
+  },
+  {
+   "fieldname": "identity_details_section",
+   "fieldtype": "Section Break",
+   "label": "Identity Details"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Data",
+   "label": "Nationality"
+  },
+  {
+   "fieldname": "place_of_birth",
+   "fieldtype": "Data",
+   "label": "Place of Birth"
+  },
+  {
+   "fieldname": "cnic",
+   "fieldtype": "Data",
+   "label": "CNIC"
+  },
+  {
+   "fieldname": "passport",
+   "fieldtype": "Data",
+   "label": "Passport"
+  },
+  {
+   "fieldname": "place_of_issue",
+   "fieldtype": "Data",
+   "label": "Place of Issue"
+  },
+  {
+   "fieldname": "issue_date",
+   "fieldtype": "Date",
+   "label": "Issue Date"
+  },
+  {
+   "fieldname": "valid_upto",
+   "fieldtype": "Date",
+   "label": "Valid Upto"
+  },
+  {
+   "fieldname": "contact_details_section",
+   "fieldtype": "Section Break",
+   "label": "Contact Details"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Data",
+   "label": "Contact"
+  },
+  {
+   "fieldname": "current_address",
+   "fieldtype": "Data",
+   "label": "Current Address"
+  },
+  {
+   "fieldname": "permanent_address",
+   "fieldtype": "Data",
+   "label": "Permanent Address"
+  },
+  {
+   "fieldname": "education_details_section",
+   "fieldtype": "Section Break",
+   "label": "Education Details"
+  },
+  {
+   "fieldname": "education_title",
+   "fieldtype": "Data",
+   "label": "Education Title"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "\nDegree\nCertification"
+  },
+  {
+   "fieldname": "specialization",
+   "fieldtype": "Data",
+   "label": "Specialization"
+  },
+  {
+   "fieldname": "institution",
+   "fieldtype": "Data",
+   "label": "Institution"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "currently_enrolled",
+   "fieldtype": "Check",
+   "label": "Currently Enrolled"
+  },
+  {
+   "fieldname": "completion_date",
+   "fieldtype": "Date",
+   "label": "Completion Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_highest_education",
+   "fieldtype": "Check",
+   "label": "Is Highest Education"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_relevent_to_job",
+   "fieldtype": "Check",
+   "label": "Is relevent to Job"
+  },
+  {
+   "fieldname": "work_experience_section",
+   "fieldtype": "Section Break",
+   "label": "Work Experience"
+  },
+  {
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Company Name"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "fieldname": "joining_date",
+   "fieldtype": "Date",
+   "label": "Joining Date"
+  },
+  {
+   "default": "0",
+   "fieldname": "currently_employed",
+   "fieldtype": "Check",
+   "label": "Currently Employed"
+  },
+  {
+   "fieldname": "end_date_if_not_currently_employed",
+   "fieldtype": "Date",
+   "label": "End Date (If not currently Employed)"
+  },
+  {
+   "fieldname": "responsibilities_and_achievements",
+   "fieldtype": "Data",
+   "label": "Responsibilities and Achievements"
+  },
+  {
+   "fieldname": "total_experience_years",
+   "fieldtype": "Float",
+   "label": "Total Experience (Years)"
+  },
+  {
+   "fieldname": "last_drawn_salary",
+   "fieldtype": "Currency",
+   "label": "Last Drawn Salary"
+  },
+  {
+   "fieldname": "perks_and_benifits",
+   "fieldtype": "Data",
+   "label": "Perks and Benifits"
+  },
+  {
+   "fieldname": "competency_framework_section",
+   "fieldtype": "Section Break",
+   "label": "Competency Framework"
+  },
+  {
+   "fieldname": "core_skills",
+   "fieldtype": "Data",
+   "label": "Core Skills"
+  },
+  {
+   "fieldname": "behavioral_competencies",
+   "fieldtype": "Data",
+   "label": "Behavioral Competencies"
+  },
+  {
+   "fieldname": "references_section",
+   "fieldtype": "Section Break",
+   "label": "References"
+  },
+  {
+   "fieldname": "reference_full_name",
+   "fieldtype": "Data",
+   "label": "Reference Full Name"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "relationship",
+   "fieldtype": "Select",
+   "label": "Relationship",
+   "options": "\nPersonal\nProfessional"
+  },
+  {
+   "fieldname": "reference_contact",
+   "fieldtype": "Data",
+   "label": "Reference Contact"
+  },
+  {
+   "fieldname": "reference_email",
+   "fieldtype": "Data",
+   "label": "Reference Email "
+  },
+  {
+   "fieldname": "applicant_preferences_section",
+   "fieldtype": "Section Break",
+   "label": "Applicant Preferences"
+  },
+  {
+   "default": "0",
+   "fieldname": "open_to_work_in_shifts",
+   "fieldtype": "Check",
+   "label": "Open to work in Shifts"
+  },
+  {
+   "default": "0",
+   "fieldname": "willing_to_travel",
+   "fieldtype": "Check",
+   "label": "Willing to Travel"
+  },
+  {
+   "default": "0",
+   "fieldname": "consent_to_check_background",
+   "fieldtype": "Check",
+   "label": "Consent to check background"
+  },
+  {
+   "fieldname": "availability_to_join_in_days",
+   "fieldtype": "Int",
+   "label": "Availability to join in Days"
+  },
+  {
+   "default": "0",
+   "fieldname": "open_to_relocate",
+   "fieldtype": "Check",
+   "label": "Open to relocate"
+  },
+  {
+   "fieldname": "preferred_interview_mode_section",
+   "fieldtype": "Section Break",
+   "label": "Preferred Interview Mode",
+   "options": "\nOn-Site\nOnline"
+  },
+  {
+   "fieldname": "expected_compensation_section",
+   "fieldtype": "Section Break",
+   "label": "Expected Compensation"
+  },
+  {
+   "fieldname": "expected_minimum_salary",
+   "fieldtype": "Currency",
+   "label": "Expected Minimum Salary"
+  },
+  {
+   "fieldname": "expected_maximum_salary",
+   "fieldtype": "Currency",
+   "label": "Expected Maximum Salary"
+  },
+  {
+   "fieldname": "expected_perks_and_benifits",
+   "fieldtype": "Data",
+   "label": "Expected Perks and Benifits"
+  },
+  {
+   "fieldname": "recruitment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Recruitment Details"
+  },
+  {
+   "fieldname": "how_did_you_hear_about_this_job",
+   "fieldtype": "Text",
+   "label": "How did you hear about this job"
+  },
+  {
+   "fieldname": "job_source_rating",
+   "fieldtype": "Select",
+   "label": "Job Source Rating",
+   "options": "\n1\n2\n3\n4\n5"
+  },
+  {
+   "fieldname": "motivation_for_applying",
+   "fieldtype": "Text",
+   "label": "Motivation for Applying"
+  },
+  {
+   "fieldname": "reason_for_job_switch",
+   "fieldtype": "Text",
+   "label": "Reason for Job Switch"
+  },
+  {
+   "fieldname": "applicant_consent_regarding_information_provided",
+   "fieldtype": "Text",
+   "label": "Applicant Consent Regarding Information Provided"
   }
- ], 
- "has_web_view": 0, 
- "hide_heading": 0, 
- "hide_toolbar": 0, 
- "icon": "fa fa-user", 
- "idx": 1, 
- "image_view": 0, 
- "in_create": 0, 
- "is_submittable": 0, 
- "issingle": 0, 
- "istable": 0, 
- "max_attachments": 0, 
- "modified": "2019-07-21 16:15:43.552049", 
- "modified_by": "Administrator", 
- "module": "HR", 
- "name": "Job Applicant", 
- "owner": "Administrator", 
+ ],
+ "icon": "fa fa-user",
+ "idx": 1,
+ "modified": "2025-04-08 16:47:06.469925",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Job Applicant",
+ "owner": "Administrator",
  "permissions": [
   {
-   "amend": 0, 
-   "cancel": 0, 
-   "create": 1, 
-   "delete": 1, 
-   "email": 1, 
-   "export": 0, 
-   "if_owner": 0, 
-   "import": 0, 
-   "permlevel": 0, 
-   "print": 1, 
-   "read": 1, 
-   "report": 1, 
-   "role": "HR User", 
-   "set_user_permissions": 0, 
-   "share": 1, 
-   "submit": 0, 
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "HR User",
+   "share": 1,
    "write": 1
   }
- ], 
- "quick_entry": 0, 
- "read_only": 0, 
- "read_only_onload": 0, 
- "search_fields": "applicant_name", 
- "show_name_in_global_search": 0, 
- "sort_order": "ASC", 
- "title_field": "applicant_name", 
- "track_changes": 0, 
- "track_seen": 0, 
- "track_views": 0
+ ],
+ "search_fields": "applicant_name",
+ "sort_field": "modified",
+ "sort_order": "ASC",
+ "title_field": "applicant_name"
 }

@@ -15,6 +15,7 @@
   "description",
   "brand",
   "item_group",
+  "item_section",
   "image_section",
   "image",
   "image_view",
@@ -99,7 +100,6 @@
   {
    "fieldname": "item_code",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "in_list_view": 1,
    "label": "Item Code",
    "oldfieldname": "item_code",
@@ -113,7 +113,6 @@
   {
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Name",
    "oldfieldname": "item_name",
    "oldfieldtype": "Data",
@@ -746,11 +745,19 @@
    "fieldname": "is_returnable",
    "fieldtype": "Check",
    "label": "IS Returnable"
+  },
+  {
+   "fetch_from": "item_code.item_section",
+   "fetch_if_empty": 1,
+   "fieldname": "item_section",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Item Section"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2022-08-15 17:17:44.553998",
+ "modified": "2025-04-04 19:28:14.298157",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Delivery Note Item",
