@@ -16,152 +16,7 @@ def execute(filters=None):
 	else:
 		return [], []
 
-	columns = (
-		{
-			"label": "Packs",
-			"fieldname": "packs",
-			"fieldtype": "Data",
-			"width": 200,
-		},
-		{
-			"label": "Flavors",
-			"fieldname": "flavors",
-			"fieldtype": "Data",
-			"width": 200,
-		},
-		{
-			"label": "Item Code",
-			"fieldname": "item_code",
-			"fieldtype": "Data",
-			"width": 150,
-		},
-		{
-			"label": "Item Name",
-			"fieldname": "item_name",
-			"fieldtype": "Data",
-			"width": 150,
-		},
-		{
-			"label": "Stock Unit 5",
-			"fieldname": "stock_unit_5",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Pending Unit 5",
-			"fieldname": "pending_unit_5",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Net Stock Unit 5",
-			"fieldname": "net_stock_unit_5",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Stock Unit 8",
-			"fieldname": "stock_unit_8",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Pending Unit 8",
-			"fieldname": "pending_unit_8",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Net Stock Unit 8",
-			"fieldname": "net_stock_unit_8",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Stock Unit 11",
-			"fieldname": "stock_unit_11",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Pending Unit 11",
-			"fieldname": "pending_unit_11",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Net Stock Unit 11",
-			"fieldname": "net_stock_unit_11",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Stock Total",
-			"fieldname": "stock_total",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Pending Total",
-			"fieldname": "pending_total",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "Net Stock Total",
-			"fieldname": "net_stock_total",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "DN Unit 5",
-			"fieldname": "dn_unit_5",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "DN Unit 8",
-			"fieldname": "dn_unit_8",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "DN Unit 11",
-			"fieldname": "dn_unit_11",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "DN Total",
-			"fieldname": "dn_total",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "SOR Unit 5",
-			"fieldname": "sor_unit_5",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "SOR Unit 8",
-			"fieldname": "sor_unit_8",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "SOR Unit 11",
-			"fieldname": "sor_unit_11",
-			"fieldtype": "Float",
-			"width": 100,
-		},
-		{
-			"label": "SOR Total",
-			"fieldname": "sor_total",
-			"fieldtype": "Float",
-			"width": 100,
-		}
-	)
+	columns = get_columns(filters)
 	
 	data = frappe.db.sql(
 		f"""SELECT 
@@ -441,3 +296,187 @@ def collapsable_data(data):
             final_data.extend(flavors_rows)
 
     return final_data
+
+
+def get_columns(filters):
+	columns = [
+		{
+			"label": "Packs",
+			"fieldname": "packs",
+			"fieldtype": "Data",
+			"width": 200,
+		},
+		{
+			"label": "Flavors",
+			"fieldname": "flavors",
+			"fieldtype": "Data",
+			"width": 200,
+		},
+		{
+			"label": "Item Code",
+			"fieldname": "item_code",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": "Item Name",
+			"fieldname": "item_name",
+			"fieldtype": "Data",
+			"width": 150,
+		},
+		{
+			"label": "Stock Unit 5",
+			"fieldname": "stock_unit_5",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Pending Unit 5",
+			"fieldname": "pending_unit_5",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Net Stock Unit 5",
+			"fieldname": "net_stock_unit_5",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Stock Unit 8",
+			"fieldname": "stock_unit_8",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Pending Unit 8",
+			"fieldname": "pending_unit_8",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Net Stock Unit 8",
+			"fieldname": "net_stock_unit_8",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Stock Unit 11",
+			"fieldname": "stock_unit_11",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Pending Unit 11",
+			"fieldname": "pending_unit_11",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Net Stock Unit 11",
+			"fieldname": "net_stock_unit_11",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Stock Total",
+			"fieldname": "stock_total",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Pending Total",
+			"fieldname": "pending_total",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "Net Stock Total",
+			"fieldname": "net_stock_total",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "DN Unit 5",
+			"fieldname": "dn_unit_5",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "DN Unit 8",
+			"fieldname": "dn_unit_8",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "DN Unit 11",
+			"fieldname": "dn_unit_11",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "DN Total",
+			"fieldname": "dn_total",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "SOR Unit 5",
+			"fieldname": "sor_unit_5",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "SOR Unit 8",
+			"fieldname": "sor_unit_8",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "SOR Unit 11",
+			"fieldname": "sor_unit_11",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		},
+		{
+			"label": "SOR Total",
+			"fieldname": "sor_total",
+			"fieldtype": "Float",
+			"precision": "0",
+			"width": 100,
+		}
+	]
+
+	company = filters.get('company')
+	if company == "ALL":
+		return columns
+	else:
+		cols = []
+		company_number = company.split(' ')[1]
+
+		for col in columns:
+			if 'stock_unit_' in col['fieldname'] or 'pending_unit_' in col['fieldname'] or 'net_stock_unit_' in col['fieldname'] or 'dn_unit_' in col['fieldname'] or 'sor_unit_' in col['fieldname']:
+				if col['fieldname'] in [f'stock_unit_{company_number}', f'pending_unit_{company_number}', f'net_stock_unit_{company_number}', f'dn_unit_{company_number}', f'sor_unit_{company_number}']:
+					cols.append(col)
+			else:
+				cols.append(col)
+		return cols
