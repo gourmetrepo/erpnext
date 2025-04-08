@@ -46,23 +46,17 @@ frappe.query_reports["National Stock and Pendency CSD"] = {
 	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 
-		if (column.fieldname == "stock_unit_5" || column.fieldname == "pending_unit_5" || column.fieldname == "net_stock_unit_5") {
-			value = "<span style='color:#3366cc'>" + value + "</span>";
+		if (column.fieldname == "stock_unit_5" || column.fieldname == "pending_unit_5" || column.fieldname == "net_stock_unit_5" || column.fieldname == "dn_unit_5" || column.fieldname == "sor_unit_5") {
+			let $value = $(value).css("background-color", "#ccffdd");
+			value = $value.wrap("<p></p>").parent().html();
 		}
-		else if (column.fieldname == "stock_unit_8" || column.fieldname == "pending_unit_8" || column.fieldname == "net_stock_unit_8") {
-			value = "<span style='color:#00b3b3'>" + value + "</span>";
+		else if (column.fieldname == "stock_unit_8" || column.fieldname == "pending_unit_8" || column.fieldname == "net_stock_unit_8" || column.fieldname == "dn_unit_8" || column.fieldname == "sor_unit_8") {
+			let $value = $(value).css("background-color", "#ffffb3");
+			value = $value.wrap("<p></p>").parent().html();
 		}
-		else if (column.fieldname == "stock_unit_11" || column.fieldname == "pending_unit_11" || column.fieldname == "net_stock_unit_11") {
-			value = "<span style='color:#cc00ff'>" + value + "</span>";
-		}
-		else if (column.fieldname == "stock_total" || column.fieldname == "pending_total" || column.fieldname == "net_stock_total") {
-			value = "<span style='color:#00cc44'>" + value + "</span>";
-		}
-		else if (column.fieldname == "dn_unit_5" || column.fieldname == "dn_unit_8" || column.fieldname == "dn_unit_11" || column.fieldname == "dn_total") {
-			value = "<span style='color:#cccc00'>" + value + "</span>";
-		}
-		else if (column.fieldname == "sor_unit_5" || column.fieldname == "sor_unit_8" || column.fieldname == "sor_unit_11" || column.fieldname == "sor_total") {
-			value = "<span style='color:#e68a00'>" + value + "</span>";
+		else if (column.fieldname == "stock_unit_11" || column.fieldname == "pending_unit_11" || column.fieldname == "net_stock_unit_11" || column.fieldname == "dn_unit_11" || column.fieldname == "sor_unit_11") {
+			let $value = $(value).css("background-color", "#d9b3ff");
+			value = $value.wrap("<p></p>").parent().html();
 		}
 
 		return value;

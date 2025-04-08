@@ -14,7 +14,7 @@ def execute(filters=None):
 	if filters.get("warehouse"):
 		warehouse = 'IN (' + ', '.join(f'"{w}"' for w in filters.get('warehouse')) + ')'
 	else:
-		warehouse = f"= '{filters.get('warehouse')}'"
+		return [], []
 
 	columns = (
 		{
