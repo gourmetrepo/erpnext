@@ -23,14 +23,27 @@ frappe.query_reports["National Stock and Pendency CSD"] = {
 			"label": __("Company"),
 			"fieldtype": "Select",
 			"options": "ALL\nUnit 5\nUnit 8\nUnit 11",
-			"reqd": 1
+			"reqd": 1,
+			"on_change" : function(){
+				frappe.query_report.get_filter("warehouse").value = "";
+				frappe.query_report.get_filter('warehouse').refresh();
+				frappe.query_report.refresh();
+			}
 		},
 		{
 			"fieldname": "warehouse",
 			"label": __("Warehouse"),
 			"fieldtype": "MultiSelectList",
 			"get_data": function(txt) {
-				return frappe.db.get_link_options('Warehouse', txt);
+				if (frappe.query_report.get_filter_value("company") != "ALL") {
+					return frappe.db.get_link_options('Warehouse', txt, {
+							"company" : frappe.query_report.get_filter_value("company")
+						});
+				}else{
+					return frappe.db.get_link_options('Warehouse', txt, {
+						"company" : ["in", ["Unit 5", "Unit 8", "Unit 11"]]
+					});
+				}
 			},
 			"reqd": 1
 		}
