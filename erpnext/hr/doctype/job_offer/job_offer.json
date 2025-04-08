@@ -43,7 +43,7 @@
    "fieldname": "applicant_id",
    "fieldtype": "Link",
    "label": "Applicant ID",
-   "options": "Job Candidate"
+   "options": "Job Applicant"
   },
   {
    "fieldname": "compensation_details",
@@ -72,7 +72,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-08 16:48:45.942042",
+ "modified": "2025-04-08 17:09:34.525985",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
