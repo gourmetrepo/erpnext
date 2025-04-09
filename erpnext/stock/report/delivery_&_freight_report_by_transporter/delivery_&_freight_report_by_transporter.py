@@ -72,7 +72,7 @@ def execute(filters=None):
 		GPOUT.net_weight - DN.total_net_weight as differnce,
 		SII.parent as sale_invoice,
 		CASE 
-					  WHEN ST.frieght_amount > 0 
+					  WHEN SI.frieght_amount > 0 
 					  THEN 
 					  SI.frieght_amount 
 					  ELSE
