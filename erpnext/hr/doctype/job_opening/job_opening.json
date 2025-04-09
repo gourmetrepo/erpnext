@@ -5,11 +5,12 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
-  "job_title",
   "job_opening_details_section",
+  "job_title",
   "job_opening_status",
   "posting_date",
   "job_requisition_id",
+  "position",
   "position_title",
   "department",
   "branch",
@@ -54,6 +55,7 @@
    "label": "Job Opening Details"
   },
   {
+   "default": "Open",
    "fieldname": "job_opening_status",
    "fieldtype": "Select",
    "label": "Job Opening Status",
@@ -62,7 +64,8 @@
   {
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "Posting Date",
+   "read_only": 1
   },
   {
    "fieldname": "job_requisition_id",
@@ -73,13 +76,12 @@
   {
    "fetch_from": "position.position_title",
    "fieldname": "position_title",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Position Title",
-   "options": "Position",
    "read_only": 1
   },
   {
-   "fetch_from": "position.department",
+   "fetch_from": "job_requisition_id.department",
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
@@ -87,7 +89,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "position.branch",
+   "fetch_from": "job_requisition_id.branch",
    "fieldname": "branch",
    "fieldtype": "Link",
    "label": "Branch",
@@ -95,7 +97,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "position.sub_branch",
+   "fetch_from": "job_requisition_id.sub_branch",
    "fieldname": "sub_branch",
    "fieldtype": "Link",
    "label": "Sub Branch",
@@ -123,7 +125,7 @@
    "fieldname": "location",
    "fieldtype": "Link",
    "label": "Location",
-   "options": "Location",
+   "options": "Physical Location",
    "read_only": 1
   },
   {
@@ -163,7 +165,7 @@
    "label": "Required Experience"
   },
   {
-   "fetch_from": "position.required_experience",
+   "fetch_from": "position.required_experience_years",
    "fieldname": "required_experience",
    "fieldtype": "Float",
    "label": "Required Experience",
@@ -175,12 +177,10 @@
    "label": "Competency Framework"
   },
   {
-   "fetch_from": "position.required_core_skills",
    "fieldname": "required_core_skills",
    "fieldtype": "Table",
    "label": "Required Core Skills ",
-   "options": "Core Skills",
-   "read_only": 1
+   "options": "Core Skills"
   },
   {
    "fetch_from": "position.required_behavioral_competencies",
@@ -219,11 +219,10 @@
    "read_only": 1
   },
   {
-   "fetch_from": "requisition.should_be_able_to_join_in_days",
+   "fetch_from": "job_requisition_id.should_be_able_to_join_in_days",
    "fieldname": "should_be_able_to_join_in_days",
    "fieldtype": "Int",
-   "label": "Should be able to join in days",
-   "read_only": 1
+   "label": "Should be able to join in days"
   },
   {
    "fieldname": "preferred_interview_mode",
@@ -268,11 +267,17 @@
    "fieldtype": "Text Editor",
    "label": "Main Responsibilities",
    "read_only": 1
+  },
+  {
+   "fieldname": "position",
+   "fieldtype": "Link",
+   "label": "Position",
+   "options": "Position"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-08 16:32:39.242803",
+ "modified": "2025-04-09 17:03:44.154108",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
