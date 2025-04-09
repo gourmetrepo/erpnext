@@ -78,7 +78,7 @@ def execute(filters=None):
 					  ELSE
 					  IF(STC.tax_amount < 0, -1 * STC.tax_amount, 0)
 					  END as freight_amount,
-					  CASE 
+		CASE 
 					  WHEN ST.frieght_amount > 0 
 					  THEN 
 					  ST.frieght_amount/DN.total_qty 
@@ -102,6 +102,6 @@ def execute(filters=None):
 		and DN.is_return = 'No'
 		and DN.posting_date between '{from_date}'  and '{to_date}' {condition} group by DN.name
 	
-	""".format(from_date=from_date, to_date=to_date,condition=condition), as_dict=True)
+	""".format(from_date=from_date, to_date=to_date,condition=condition), as_dict=True,debug=True)
 	
 	return columns, data
