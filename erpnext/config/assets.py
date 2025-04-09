@@ -178,5 +178,59 @@ def get_data():
                     "onboard": 1
                 }
             ]
+        },
+		{
+            "label": _("AOP Production Plan"),
+            "items": [
+                 {
+                    "type": "doctype",
+                    "name": "Cost Center Setup",
+                    "description": _("Setup for Cost Center"),
+                    "label": _("Cost Center Setup"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "High Low Movement Item Setup",
+                    "description": _("Setup for High/Low Movement of Items"),
+                    "label": _("High Low Movement Item Setup"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Storage Capacity",
+                    "description": _("Warehouse Storage Capacity"),
+                    "label": _("Storage Capacity"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Sales Planning",
+                    "description": _("Sales Planning"),
+                    "label": _("Sales Planning"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "MRP",
+                    "description": _("Material Request Planning"),
+                    "label": _("MRP"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "Detailed Scheduling",
+                    "description": _("Detailed Scheduling"),
+                    "label": _("Detailed Scheduling"),
+                    "onboard": 1
+                },
+				{
+                    "type": "doctype",
+                    "name": "AOP Production Plan",
+                    "description": _("AOP Production Plan"),
+                    "label": _("AOP Production Plan"),
+                    "onboard": 1
+                }
+            ]
         }
 	]

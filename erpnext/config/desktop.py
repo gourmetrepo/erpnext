@@ -116,6 +116,15 @@ def get_data():
 			"type": "module",
 			"description": "Plant Maintenance of the Unit"
 		},
+		{
+			"module_name": "AOP Production Plan",
+			"category": "Modules",
+			"label": _("AOP Production Plan"),
+			"color": "#1abc9c",
+			"icon": "fa fa-file",
+			"type": "module",
+			"description": "AOP Production Plan"
+		},
 		
 
 		# Category: "Domains"
