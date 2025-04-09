@@ -24,6 +24,7 @@ def execute(filters=None):
 	columns = [
 		("Company") + "::120",
 		("DN Number") + ":Link/Delivery Note:100",
+		("Shipping Type") + "::100",
 		("Customer") + ":Link/Delivery Note:120",
 		("Customer Name") + "::120",
 		("DN Qty") + "::120",
@@ -51,6 +52,7 @@ def execute(filters=None):
 	Select 
 		DN.company as company,
 		DN.name as dn_number,
+		DN.shipping_type as shipping_type
 		DN.customer as customer,
 		DN.customer_name as customer_name,
 		DN.total_qty as dn_qty,
@@ -69,8 +71,21 @@ def execute(filters=None):
 		DN.total_net_weight as dn_total_net_weight,
 		GPOUT.net_weight - DN.total_net_weight as differnce,
 		SII.parent as sale_invoice,
-		IF(STC.tax_amount < 0, -1 * STC.tax_amount, 0) as freight_amount,
-		IF(STC.tax_amount < 0, -1 * STC.tax_amount/DN.total_qty,0) as freight_per_pet
+		CASE 
+					  WHEN ST.frieght_amount > 0 
+					  THEN 
+					  ST.frieght_amount 
+					  ELSE
+					  IF(STC.tax_amount < 0, -1 * STC.tax_amount, 0)
+					  END as freight_amount,
+					  CASE 
+					  WHEN ST.frieght_amount > 0 
+					  THEN 
+					  ST.frieght_amount/DN.total_qty 
+					  ELSE
+					  IF(STC.tax_amount < 0, -1 * STC.tax_amount/DN.total_qty, 0)
+					  END
+		 as freight_per_pet
 		from `tabDelivery Note` DN
 		LEFT JOIN `tabGate Pass` GPIN ON 
 			DN.reference_gate_pass = GPIN.name
@@ -82,6 +97,7 @@ def execute(filters=None):
 			DN.name = SII.delivery_note
 		LEFT JOIN `tabSales Taxes and Charges` as STC ON 
 			STC.parent = SII.parent and charge_type ='Actual'
+		
 		where  DN.docstatus = 1
 		and DN.is_return = 'No'
 		and DN.posting_date between '{from_date}'  and '{to_date}' {condition} group by DN.name
