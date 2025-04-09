@@ -74,14 +74,14 @@ def execute(filters=None):
 		CASE 
 					  WHEN ST.frieght_amount > 0 
 					  THEN 
-					  ST.frieght_amount 
+					  SI.frieght_amount 
 					  ELSE
 					  IF(STC.tax_amount < 0, -1 * STC.tax_amount, 0)
 					  END as freight_amount,
 		CASE 
 					  WHEN ST.frieght_amount > 0 
 					  THEN 
-					  ST.frieght_amount/DN.total_qty 
+					  SI.frieght_amount/DN.total_qty 
 					  ELSE
 					  IF(STC.tax_amount < 0, -1 * STC.tax_amount/DN.total_qty, 0)
 					  END as freight_per_pet
@@ -92,8 +92,11 @@ def execute(filters=None):
 			GPIN.name = GPOUT.reference_gate_pass and GPOUT.type = 'OUT'
 		LEFT JOIN `tabSupplier` SU ON 
 			SU.name = GPIN.supplier
+					 
 		LEFT OUTER JOIN `tabSales Invoice Item` as SII ON 
 			DN.name = SII.delivery_note
+		LEFT OUTER JOIN `tabSales Invoice` as SI ON 
+			DN.name = SI.delivery_note_reference
 		LEFT JOIN `tabSales Taxes and Charges` as STC ON 
 			STC.parent = SII.parent and charge_type ='Actual'
 		
