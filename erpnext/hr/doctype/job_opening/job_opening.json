@@ -5,8 +5,8 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
-  "job_title",
   "job_opening_details_section",
+  "job_title",
   "job_opening_status",
   "posting_date",
   "job_requisition_id",
@@ -64,7 +64,8 @@
   {
    "fieldname": "posting_date",
    "fieldtype": "Date",
-   "label": "Posting Date"
+   "label": "Posting Date",
+   "read_only": 1
   },
   {
    "fieldname": "job_requisition_id",
@@ -276,7 +277,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-09 16:15:22.209952",
+ "modified": "2025-04-09 17:03:44.154108",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
