@@ -52,7 +52,7 @@ def execute(filters=None):
 	Select 
 		DN.company as company,
 		DN.name as dn_number,
-		DN.shipping_type as shipping_type
+		DN.shipping_type as shipping_type,
 		DN.customer as customer,
 		DN.customer_name as customer_name,
 		DN.total_qty as dn_qty,
@@ -84,8 +84,7 @@ def execute(filters=None):
 					  ST.frieght_amount/DN.total_qty 
 					  ELSE
 					  IF(STC.tax_amount < 0, -1 * STC.tax_amount/DN.total_qty, 0)
-					  END
-		 as freight_per_pet
+					  END as freight_per_pet
 		from `tabDelivery Note` DN
 		LEFT JOIN `tabGate Pass` GPIN ON 
 			DN.reference_gate_pass = GPIN.name
