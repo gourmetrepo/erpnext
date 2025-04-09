@@ -79,7 +79,7 @@ def execute(filters=None):
 					  IF(STC.tax_amount < 0, -1 * STC.tax_amount, 0)
 					  END as freight_amount,
 		CASE 
-					  WHEN ST.frieght_amount > 0 
+					  WHEN SI.frieght_amount > 0 
 					  THEN 
 					  SI.frieght_amount/DN.total_qty 
 					  ELSE
