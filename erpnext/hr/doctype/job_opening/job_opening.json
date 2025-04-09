@@ -113,7 +113,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "employee.grade",
+   "fetch_from": "position.grade",
    "fieldname": "grade",
    "fieldtype": "Link",
    "label": "Grade",
@@ -129,6 +129,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "job_requisition_id.required_headcount",
    "fieldname": "no_of_openings",
    "fieldtype": "Int",
    "label": "No. of Openings"
@@ -277,7 +278,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-09 17:03:44.154108",
+ "modified": "2025-04-09 19:35:14.522528",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
