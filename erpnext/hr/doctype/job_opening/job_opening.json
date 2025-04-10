@@ -1,4 +1,5 @@
 {
+ "autoname": "JOP-.######",
  "creation": "2013-01-15 16:13:36",
  "description": "Description of a Job Opening",
  "doctype": "DocType",
@@ -6,7 +7,6 @@
  "engine": "InnoDB",
  "field_order": [
   "job_opening_details_section",
-  "job_title",
   "job_opening_status",
   "posting_date",
   "job_requisition_id",
@@ -42,13 +42,6 @@
   "main_responsibilities"
  ],
  "fields": [
-  {
-   "fieldname": "job_title",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Job Title",
-   "reqd": 1
-  },
   {
    "fieldname": "job_opening_details_section",
    "fieldtype": "Section Break",
@@ -278,7 +271,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-09 19:35:14.522528",
+ "modified": "2025-04-10 11:42:03.307511",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
