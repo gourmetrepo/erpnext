@@ -91,15 +91,13 @@ def execute(filters=None):
 		LEFT JOIN `tabGate Pass` GPOUT ON 
 			GPIN.name = GPOUT.reference_gate_pass and GPOUT.type = 'OUT'
 		LEFT JOIN `tabSupplier` SU ON 
-			SU.name = GPIN.supplier
-					 
-		LEFT OUTER JOIN `tabSales Invoice Item` as SII ON 
+			SU.name = GPIN.supplier		 
+		LEFT JOIN `tabSales Invoice Item` as SII ON 
 			DN.name = SII.delivery_note
-		LEFT OUTER JOIN `tabSales Invoice` as SI ON 
+		LEFT JOIN `tabSales Invoice` as SI ON 
 			DN.name = SI.delivery_note_reference
 		LEFT JOIN `tabSales Taxes and Charges` as STC ON 
 			STC.parent = SII.parent and charge_type ='Actual'
-		
 		where  DN.docstatus = 1
 		and DN.is_return = 'No'
 		and DN.posting_date between '{from_date}'  and '{to_date}' {condition} group by DN.name
