@@ -1,0 +1,111 @@
+{
+ "add_total_row": 0,
+ "creation": "2025-04-11 00:09:15.059406",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2025-04-11 00:09:18.841180",
+ "modified_by": "Administrator",
+ "module": "Selling",
+ "name": "Sales Order Section Repetition",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Sales Order",
+ "report_name": "Sales Order Section Repetition",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Sales User"
+  },
+  {
+   "role": "Maintenance User"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Sales Manager"
+  },
+  {
+   "role": "SSAM User"
+  },
+  {
+   "role": "SSAM Manager"
+  },
+  {
+   "role": "System Auditor"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Shipping Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Shipping User"
+  },
+  {
+   "role": "CEO"
+  },
+  {
+   "role": "CFO"
+  },
+  {
+   "role": "Director Sales & Marketing"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Store User"
+  },
+  {
+   "role": "Store Manager"
+  },
+  {
+   "role": "Auditor"
+  },
+  {
+   "role": "Head of Procurement"
+  },
+  {
+   "role": "Manager Retail Operations"
+  },
+  {
+   "role": "Configuration Manager"
+  },
+  {
+   "role": "Director IT"
+  },
+  {
+   "role": "Purchase User"
+  },
+  {
+   "role": "Director Finance"
+  },
+  {
+   "role": "Non Gourmet User"
+  },
+  {
+   "role": "Manufacturing Manager"
+  },
+  {
+   "role": "Scrap Manager"
+  },
+  {
+   "role": "Head of SSAM"
+  },
+  {
+   "role": "Director A-2"
+  }
+ ]
+}
