@@ -13,6 +13,7 @@
   "position",
   "position_title",
   "department",
+  "company",
   "branch",
   "sub_branch",
   "cadre",
@@ -67,10 +68,11 @@
    "options": "Job Requisition"
   },
   {
-   "fetch_from": "position.position_title",
+   "fetch_from": "job_requisition_id.designation",
    "fieldname": "position_title",
-   "fieldtype": "Data",
-   "label": "Position Title",
+   "fieldtype": "Link",
+   "label": "Job Title",
+   "options": "Designation",
    "read_only": 1
   },
   {
@@ -114,7 +116,7 @@
    "read_only": 1
   },
   {
-   "fetch_from": "position.physical_location",
+   "fetch_from": "job_requisition_id.location",
    "fieldname": "location",
    "fieldtype": "Link",
    "label": "Location",
@@ -190,7 +192,7 @@
   },
   {
    "default": "0",
-   "fetch_from": "position.required_to_work_in_shifts",
+   "fetch_from": "job_requisition_id.required_to_work_in_shifts",
    "fieldname": "required_to_work_in_shifts",
    "fieldtype": "Check",
    "label": "Required to work in shifts",
@@ -198,7 +200,7 @@
   },
   {
    "default": "0",
-   "fetch_from": "position.required_to_travel",
+   "fetch_from": "job_requisition_id.required_to_travel",
    "fieldname": "required_to_travel",
    "fieldtype": "Check",
    "label": "Required to travel",
@@ -267,11 +269,18 @@
    "fieldtype": "Link",
    "label": "Position",
    "options": "Position"
+  },
+  {
+   "fetch_from": "job_requisition_id.comapany",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-10 11:42:03.307511",
+ "modified": "2025-04-10 14:07:26.868218",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
