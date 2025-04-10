@@ -40,7 +40,7 @@ HAVING
     COUNT(DISTINCT soi.parent) > 1
 ORDER BY 
     soi.customer_name, soi.item_section;
-""".format(from_date=from_date, company=company), as_dict=True)
+""".format(from_date=from_date, company=company), as_dict=True,debug=True)
 	data = []
 	columns, data = [], []
 	return columns, data
