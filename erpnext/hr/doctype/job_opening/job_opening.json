@@ -181,8 +181,9 @@
   {
    "fetch_from": "position.required_behavioral_competencies",
    "fieldname": "required_behavioral_competencies",
-   "fieldtype": "Data",
+   "fieldtype": "Table",
    "label": "Required Behavioral Competencies",
+   "options": "Behavioral Skills",
    "read_only": 1
   },
   {
@@ -280,7 +281,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-10 14:07:26.868218",
+ "modified": "2025-04-10 15:36:00.748963",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
