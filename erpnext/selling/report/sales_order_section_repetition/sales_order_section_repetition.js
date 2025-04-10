@@ -4,6 +4,21 @@
 
 frappe.query_reports["Sales Order Section Repetition"] = {
 	"filters": [
-
+		{
+			"fieldname":"from_date",
+			"label": __("From Date"),
+			"fieldtype": "Date",
+			"width": "80",
+			"default": moment().format('YYYY-MM-DD'),
+			"reqd": 1,
+		},
+		{
+			"fieldname": "Company",
+			"fieldtype": "Link",
+			"label": "Company",
+			"options": "Company",
+			"default": "Unit 6",
+			"reqd": 1,
+		}
 	]
 };
