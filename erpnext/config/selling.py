@@ -281,6 +281,14 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
+					"name": "Sales Order Section Repetition",
+					"label": _("RMS Sales Order Section Repetition"),
+					"doctype": "Sales Order"
+					
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
 					"name": "Gate Sales Report",
 					"label": _("Gate Sales Report"),
 					"doctype": "Gate Pass"
