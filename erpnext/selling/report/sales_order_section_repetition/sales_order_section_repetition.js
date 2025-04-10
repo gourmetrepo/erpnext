@@ -6,7 +6,7 @@ frappe.query_reports["Sales Order Section Repetition"] = {
 	"filters": [
 		
 		{
-			"fieldname": "Company",
+			"fieldname": "company",
 			"fieldtype": "Link",
 			"label": "Company",
 			"options": "Company",
