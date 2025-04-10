@@ -1,5 +1,6 @@
 {
  "allow_rename": 1,
+ "autoname": "format: APP-{email}-{####}",
  "creation": "2013-01-29 19:25:37",
  "description": "Applicant for a Job",
  "doctype": "DocType",
@@ -519,7 +520,7 @@
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-10 12:21:02.655708",
+ "modified": "2025-04-10 12:48:48.135862",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
