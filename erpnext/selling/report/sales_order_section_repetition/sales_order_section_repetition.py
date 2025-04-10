@@ -16,10 +16,10 @@ def execute(filters=None):
 		
     ]
 	data = frappe.db.sql(f"""SELECT 
-    soi.customer_name,
-    soi.item_section,
+    soi.customer_name as `shop_name`,
+    soi.item_section as `section`,
     COUNT(DISTINCT soi.parent) AS order_count,
-    GROUP_CONCAT(DISTINCT soi.parent) AS sales_orders
+    GROUP_CONCAT(DISTINCT soi.parent) AS sales_order
 FROM (
     SELECT 
         so.name AS parent,
