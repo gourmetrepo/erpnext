@@ -15,6 +15,7 @@ def execute(filters=None):
 		("Sales Order") + "::500",
 		
     ]
+	data = []
 	data = frappe.db.sql(f"""SELECT 
     soi.customer_name as `shop_name`,
     soi.item_section as `section`,
@@ -41,6 +42,5 @@ HAVING
 ORDER BY 
     soi.customer_name, soi.item_section;
 """.format(from_date=from_date, company=company), as_dict=True,debug=True)
-	data = []
-	columns, data = [], []
+
 	return columns, data
