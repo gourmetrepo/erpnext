@@ -12,3 +12,27 @@ class JobOpening(Document):
 	def before_save(self):
 		if not self.posting_date:
 			self.posting_date = frappe.utils.nowdate()
+		
+		self.load_competencies()
+		
+
+	def load_competencies(self):
+		"""Load competencies from the selected position"""
+		if self.position:
+			position_doc = frappe.get_doc("Position", self.position)
+
+			self.required_core_skills = []
+			for core_skill in position_doc.required_core_skills:
+				core_doc = frappe.new_doc("Core Skills")
+				core_doc.update({
+					"skill": core_skill.get("skill"),
+				})
+				self.append("required_core_skills", core_doc)
+			
+			self.required_behavioral_competencies = []
+			for behavioral_competency in position_doc.required_behavioral_competencies:
+				behavioral_doc = frappe.new_doc("Behavioral Skills")
+				behavioral_doc.update({
+					"skill": behavioral_competency.get("skill"),
+				})
+				self.append("required_behavioral_competencies", behavioral_doc)
