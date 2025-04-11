@@ -53,12 +53,7 @@
   "core_skills",
   "behavioral_competencies",
   "references_section",
-  "reference_full_name",
-  "designation",
-  "company",
-  "relationship",
-  "reference_contact",
-  "reference_email",
+  "references",
   "applicant_preferences_section",
   "open_to_work_in_shifts",
   "willing_to_travel",
@@ -295,37 +290,6 @@
    "label": "References"
   },
   {
-   "fieldname": "reference_full_name",
-   "fieldtype": "Data",
-   "label": "Reference Full Name"
-  },
-  {
-   "fieldname": "designation",
-   "fieldtype": "Data",
-   "label": "Designation"
-  },
-  {
-   "fieldname": "company",
-   "fieldtype": "Data",
-   "label": "Company"
-  },
-  {
-   "fieldname": "relationship",
-   "fieldtype": "Select",
-   "label": "Relationship",
-   "options": "\nPersonal\nProfessional"
-  },
-  {
-   "fieldname": "reference_contact",
-   "fieldtype": "Data",
-   "label": "Reference Contact"
-  },
-  {
-   "fieldname": "reference_email",
-   "fieldtype": "Data",
-   "label": "Reference Email "
-  },
-  {
    "fieldname": "applicant_preferences_section",
    "fieldtype": "Section Break",
    "label": "Applicant Preferences"
@@ -473,11 +437,17 @@
   {
    "fieldname": "column_break_29",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "references",
+   "fieldtype": "Table",
+   "label": "References",
+   "options": "Job Applicant References"
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-11 14:54:58.378558",
+ "modified": "2025-04-11 15:13:31.876251",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
