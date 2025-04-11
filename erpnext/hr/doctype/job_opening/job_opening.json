@@ -71,7 +71,7 @@
    "fetch_from": "job_requisition_id.designation",
    "fieldname": "position_title",
    "fieldtype": "Link",
-   "label": "Job Title",
+   "label": "Position Title",
    "options": "Designation",
    "read_only": 1
   },
@@ -282,7 +282,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-10 16:02:10.980658",
+ "modified": "2025-04-10 16:32:47.398803",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",

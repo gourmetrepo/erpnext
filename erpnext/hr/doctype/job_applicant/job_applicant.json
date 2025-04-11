@@ -1,6 +1,6 @@
 {
  "allow_rename": 1,
- "autoname": "format: APP-{email}-{####}",
+ "autoname": "format: APP-{email}-{position_title}",
  "creation": "2013-01-29 19:25:37",
  "description": "Applicant for a Job",
  "doctype": "DocType",
@@ -12,6 +12,7 @@
   "job_applicant_status",
   "job_application_date",
   "applied_on",
+  "position_title",
   "professional_portfolio_section",
   "cover_letter",
   "resume",
@@ -32,6 +33,9 @@
   "place_of_birth",
   "cnic",
   "passport",
+  "passport_place_of_issue",
+  "passport_issue_date",
+  "passport_valid_upto",
   "place_of_issue",
   "issue_date",
   "valid_upto",
@@ -41,26 +45,9 @@
   "current_address",
   "permanent_address",
   "education_details_section",
-  "education_title",
-  "type",
-  "specialization",
-  "institution",
-  "start_date",
-  "currently_enrolled",
-  "completion_date",
-  "is_highest_education",
-  "is_relevent_to_job",
+  "education",
   "work_experience_section",
-  "job_title",
-  "company_name",
-  "location",
-  "joining_date",
-  "currently_employed",
-  "end_date_if_not_currently_employed",
-  "responsibilities_and_achievements",
-  "total_experience_years",
-  "last_drawn_salary",
-  "perks_and_benifits",
+  "work_experience",
   "competency_framework_section",
   "core_skills",
   "behavioral_competencies",
@@ -87,7 +74,10 @@
   "job_source_rating",
   "motivation_for_applying",
   "reason_for_job_switch",
-  "applicant_consent_regarding_information_provided"
+  "applicant_consent_regarding_information_provided",
+  "applicant_declaration",
+  "truthful_information",
+  "personal_data_consent"
  ],
  "fields": [
   {
@@ -103,6 +93,7 @@
    "label": "Application Details"
   },
   {
+   "default": "Open",
    "fieldname": "job_applicant_status",
    "fieldtype": "Select",
    "label": "Job Applicant Status",
@@ -152,7 +143,8 @@
   {
    "fieldname": "first_name",
    "fieldtype": "Data",
-   "label": "First Name"
+   "label": "First Name",
+   "reqd": 1
   },
   {
    "fieldname": "middle_name",
@@ -167,13 +159,14 @@
   {
    "fieldname": "full_name",
    "fieldtype": "Data",
-   "label": "Full Name"
+   "label": "Full Name",
+   "read_only": 1
   },
   {
    "fieldname": "gender",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Gender",
-   "options": "\nMale\nFemale\nOther"
+   "options": "Gender"
   },
   {
    "fieldname": "date_of_birth",
@@ -184,7 +177,7 @@
    "fieldname": "religion",
    "fieldtype": "Select",
    "label": "Religion",
-   "options": "\nIslam\nChristianity\nOther"
+   "options": "\nIslam\nChristianity\nHinduism\nBuddhism\nJudaism\nSikhism\nOther"
   },
   {
    "fieldname": "blood_group",
@@ -196,7 +189,7 @@
    "fieldname": "marital_status",
    "fieldtype": "Select",
    "label": "Marital Status",
-   "options": "\nSingle\nMarried\nOther"
+   "options": "\nSingle\nMarried\nDivorced\nWindowed"
   },
   {
    "fieldname": "identity_details_section",
@@ -205,8 +198,9 @@
   },
   {
    "fieldname": "nationality",
-   "fieldtype": "Data",
-   "label": "Nationality"
+   "fieldtype": "Link",
+   "label": "Nationality",
+   "options": "Country"
   },
   {
    "fieldname": "place_of_birth",
@@ -257,12 +251,12 @@
   },
   {
    "fieldname": "current_address",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Current Address"
   },
   {
    "fieldname": "permanent_address",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Permanent Address"
   },
   {
@@ -271,109 +265,9 @@
    "label": "Education Details"
   },
   {
-   "fieldname": "education_title",
-   "fieldtype": "Data",
-   "label": "Education Title"
-  },
-  {
-   "fieldname": "type",
-   "fieldtype": "Select",
-   "label": "Type",
-   "options": "\nDegree\nCertification"
-  },
-  {
-   "fieldname": "specialization",
-   "fieldtype": "Data",
-   "label": "Specialization"
-  },
-  {
-   "fieldname": "institution",
-   "fieldtype": "Data",
-   "label": "Institution"
-  },
-  {
-   "fieldname": "start_date",
-   "fieldtype": "Date",
-   "label": "Start Date"
-  },
-  {
-   "default": "0",
-   "fieldname": "currently_enrolled",
-   "fieldtype": "Check",
-   "label": "Currently Enrolled"
-  },
-  {
-   "fieldname": "completion_date",
-   "fieldtype": "Date",
-   "label": "Completion Date"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_highest_education",
-   "fieldtype": "Check",
-   "label": "Is Highest Education"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_relevent_to_job",
-   "fieldtype": "Check",
-   "label": "Is relevent to Job"
-  },
-  {
    "fieldname": "work_experience_section",
    "fieldtype": "Section Break",
    "label": "Work Experience"
-  },
-  {
-   "fieldname": "job_title",
-   "fieldtype": "Data",
-   "label": "Job Title"
-  },
-  {
-   "fieldname": "company_name",
-   "fieldtype": "Data",
-   "label": "Company Name"
-  },
-  {
-   "fieldname": "location",
-   "fieldtype": "Data",
-   "label": "Location"
-  },
-  {
-   "fieldname": "joining_date",
-   "fieldtype": "Date",
-   "label": "Joining Date"
-  },
-  {
-   "default": "0",
-   "fieldname": "currently_employed",
-   "fieldtype": "Check",
-   "label": "Currently Employed"
-  },
-  {
-   "fieldname": "end_date_if_not_currently_employed",
-   "fieldtype": "Date",
-   "label": "End Date (If not currently Employed)"
-  },
-  {
-   "fieldname": "responsibilities_and_achievements",
-   "fieldtype": "Data",
-   "label": "Responsibilities and Achievements"
-  },
-  {
-   "fieldname": "total_experience_years",
-   "fieldtype": "Float",
-   "label": "Total Experience (Years)"
-  },
-  {
-   "fieldname": "last_drawn_salary",
-   "fieldtype": "Currency",
-   "label": "Last Drawn Salary"
-  },
-  {
-   "fieldname": "perks_and_benifits",
-   "fieldtype": "Data",
-   "label": "Perks and Benifits"
   },
   {
    "fieldname": "competency_framework_section",
@@ -382,13 +276,15 @@
   },
   {
    "fieldname": "core_skills",
-   "fieldtype": "Data",
-   "label": "Core Skills"
+   "fieldtype": "Table",
+   "label": "Core Skills",
+   "options": "Core Skills"
   },
   {
    "fieldname": "behavioral_competencies",
-   "fieldtype": "Data",
-   "label": "Behavioral Competencies"
+   "fieldtype": "Table",
+   "label": "Behavioral Competencies",
+   "options": "Behavioral Skills"
   },
   {
    "fieldname": "references_section",
@@ -483,8 +379,8 @@
   },
   {
    "fieldname": "expected_perks_and_benifits",
-   "fieldtype": "Data",
-   "label": "Expected Perks and Benifits"
+   "fieldtype": "Small Text",
+   "label": "Expected Perks and Benefits"
   },
   {
    "fieldname": "recruitment_details_section",
@@ -504,23 +400,77 @@
   },
   {
    "fieldname": "motivation_for_applying",
-   "fieldtype": "Text",
+   "fieldtype": "Small Text",
    "label": "Motivation for Applying"
   },
   {
    "fieldname": "reason_for_job_switch",
-   "fieldtype": "Text",
+   "fieldtype": "Small Text",
    "label": "Reason for Job Switch"
   },
   {
    "fieldname": "applicant_consent_regarding_information_provided",
-   "fieldtype": "Text",
+   "fieldtype": "Section Break",
    "label": "Applicant Consent Regarding Information Provided"
+  },
+  {
+   "fetch_from": "applied_on.position_title",
+   "fieldname": "position_title",
+   "fieldtype": "Link",
+   "label": "Position Title",
+   "options": "Designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "education",
+   "fieldtype": "Table",
+   "label": "Education",
+   "options": "Job Applicant Education"
+  },
+  {
+   "fieldname": "work_experience",
+   "fieldtype": "Table",
+   "label": "Work Experience",
+   "options": "Job Applicant Work Experience"
+  },
+  {
+   "default": "Applicant Declaration & Consent\n\nI hereby declare that the information provided in this application is true and complete to the best of my knowledge. I understand that any false information or omission may disqualify me from further consideration for employment and may result in my dismissal if discovered at a later date.\n",
+   "fieldname": "applicant_declaration",
+   "fieldtype": "Markdown Editor",
+   "label": "Applicant Declaration",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "truthful_information",
+   "fieldtype": "Check",
+   "label": "I confirm that the information provided is accurate and truthful."
+  },
+  {
+   "default": "0",
+   "fieldname": "personal_data_consent",
+   "fieldtype": "Check",
+   "label": "I consent to the processing of my personal data for recruitment purposes in accordance with applicable data protection laws."
+  },
+  {
+   "fieldname": "passport_place_of_issue",
+   "fieldtype": "Data",
+   "label": "Passport Place of Issue"
+  },
+  {
+   "fieldname": "passport_issue_date",
+   "fieldtype": "Date",
+   "label": "Passport Issue Date"
+  },
+  {
+   "fieldname": "passport_valid_upto",
+   "fieldtype": "Date",
+   "label": "Passport Valid Upto"
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-10 12:48:48.135862",
+ "modified": "2025-04-11 11:35:43.633907",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
