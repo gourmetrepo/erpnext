@@ -18,9 +18,12 @@
  ],
  "fields": [
   {
+   "default": "Today",
    "fieldname": "offer_date",
    "fieldtype": "Date",
-   "label": "Offer Date"
+   "in_list_view": 1,
+   "label": "Offer Date",
+   "reqd": 1
   },
   {
    "fieldname": "letter_head",
@@ -29,10 +32,13 @@
    "options": "Letter Head"
   },
   {
+   "default": "Offered",
    "fieldname": "offer_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Offer Status",
-   "options": "\nOffered\nAccepted\nDeclined"
+   "options": "\nOffered\nAccepted\nDeclined",
+   "reqd": 1
   },
   {
    "fieldname": "valid_till",
@@ -43,7 +49,8 @@
    "fieldname": "applicant_id",
    "fieldtype": "Link",
    "label": "Applicant ID",
-   "options": "Job Applicant"
+   "options": "Job Applicant",
+   "reqd": 1
   },
   {
    "fieldname": "compensation_details",
@@ -72,7 +79,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-10 12:51:48.097718",
+ "modified": "2025-04-11 14:03:48.059065",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
