@@ -32,13 +32,14 @@
   "nationality",
   "place_of_birth",
   "cnic",
+  "place_of_issue",
+  "issue_date",
+  "valid_upto",
+  "column_break_29",
   "passport",
   "passport_place_of_issue",
   "passport_issue_date",
   "passport_valid_upto",
-  "place_of_issue",
-  "issue_date",
-  "valid_upto",
   "contact_details_section",
   "email",
   "contact",
@@ -102,13 +103,15 @@
   {
    "fieldname": "job_application_date",
    "fieldtype": "Date",
-   "label": "Job Application Date"
+   "label": "Job Application Date",
+   "read_only": 1
   },
   {
    "fieldname": "applied_on",
    "fieldtype": "Link",
    "label": "Applied On",
-   "options": "Job Opening"
+   "options": "Job Opening",
+   "reqd": 1
   },
   {
    "fieldname": "professional_portfolio_section",
@@ -389,14 +392,14 @@
   },
   {
    "fieldname": "how_did_you_hear_about_this_job",
-   "fieldtype": "Text",
-   "label": "How did you hear about this job"
+   "fieldtype": "Link",
+   "label": "How did you hear about this job",
+   "options": "Job Applicant Source"
   },
   {
    "fieldname": "job_source_rating",
-   "fieldtype": "Select",
-   "label": "Job Source Rating",
-   "options": "\n1\n2\n3\n4\n5"
+   "fieldtype": "Rating",
+   "label": "Job Source Rating"
   },
   {
    "fieldname": "motivation_for_applying",
@@ -466,11 +469,15 @@
    "fieldname": "passport_valid_upto",
    "fieldtype": "Date",
    "label": "Passport Valid Upto"
+  },
+  {
+   "fieldname": "column_break_29",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-11 11:35:43.633907",
+ "modified": "2025-04-11 14:54:58.378558",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
