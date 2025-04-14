@@ -115,6 +115,8 @@ frappe.ui.form.on('Material Request', {
 		refresh_field("sub_branch");
 		
 		frm.trigger("sub_branch");
+		
+		project_based_configurations(frm);
 	},
 
 	onload_post_render: function(frm) {
@@ -175,6 +177,8 @@ frappe.ui.form.on('Material Request', {
 				show_project_selection_modal(frm);
 			});
 		}
+
+		project_based_configurations(frm);
 
 	},
 
@@ -538,6 +542,9 @@ frappe.ui.form.on('Material Request', {
           })
         
     },	
+	project_based: function(frm) {
+		project_based_configurations(frm);
+	}
 
 });
 
@@ -745,4 +752,36 @@ function show_project_selection_modal(frm) {
     });
 
     dialog.show();
+}
+
+
+// Code by Moeiz
+function project_based_configurations(frm){
+	const project_based_applicable_companies = ["Unit 5", "Unit 5B", "Unit 5C", "Unit 5D", "Unit 8", "Unit 11", "Unit 17", "Unit 17B", "Unit 17C", "QuinTech Centre of Applied Sciences (Pvt.) Ltd."]
+	if (project_based_applicable_companies.includes(frm.doc.company)){
+		frm.set_df_property('project_based', 'hidden', 0);
+	}else{
+		frm.set_df_property('project_based', 'hidden', 1);
+		frm.set_value('project_based', 0);
+	}
+
+	if(frm.doc.project_based){
+		frm.set_df_property('project', 'reqd', 1);
+		frm.set_df_property('project', 'hidden', 0);
+		frm.set_df_property('project', 'read_only', 0);
+	}else{
+		frm.set_df_property('project', 'reqd', 0);
+		frm.set_df_property('project', 'hidden', 1);
+		frm.set_df_property('project', 'read_only', 1);
+	}
+
+	frm.set_query("project", function() {
+		return {
+			filters: {
+				"is_parent_project": 0,
+				"company": frm.doc.company
+			}
+		};
+	});
+
 }

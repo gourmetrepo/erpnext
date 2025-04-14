@@ -26,6 +26,14 @@ frappe.ui.form.on("Project", {
 				}
 			}
 		});
+
+		frm.set_query('parent_project', function () {
+			return {
+				filters: {
+					"is_parent_project": true
+				}
+			};
+		});
 		var so = frappe.meta.get_docfield("Project", "sales_order");
 		so.get_route_options_for_new_doc = function (field) {
 			if (frm.is_new()) return;
@@ -85,6 +93,7 @@ frappe.ui.form.on("Project", {
 			frm.trigger('show_dashboard');
 		}
 		frm.events.set_buttons(frm);
+		parent_project_configuration(frm);
 	},
 
 	set_buttons: function(frm) {
@@ -175,6 +184,11 @@ frappe.ui.form.on("Project", {
 			frm.set_df_property('clearing_account', 'hidden', 1);
 		}
 	},
+	
+
+	is_parent_project: function(frm) {
+		parent_project_configuration(frm);
+	}
 });
 
 function open_form(frm, doctype, child_doctype, parentfield) {
@@ -192,4 +206,18 @@ function open_form(frm, doctype, child_doctype, parentfield) {
 		frappe.ui.form.make_quick_entry(doctype, null, null, new_doc);
 	});
 
+}
+
+// Code by Moeiz
+// Confguration for parent and child project
+function parent_project_configuration(frm){
+	if (frm.doc.is_parent_project){
+		frm.set_df_property('parent_project', 'hidden', 0);
+		frm.set_df_property('parent_project', 'reqd', 1);
+	}else{
+		frm.set_df_property('parent_project', 'hidden', 1);
+		frm.set_df_property('parent_project', 'reqd', 0);
+		frm.set_value('parent_project', '');
+		frm.refresh_field('parent_project');
+	}
 }
