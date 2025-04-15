@@ -1,0 +1,114 @@
+{
+ "add_total_row": 0,
+ "creation": "2025-04-15 19:45:17.930283",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2025-04-15 19:45:17.930283",
+ "modified_by": "Administrator",
+ "module": "Selling",
+ "name": "CDS Distributors GL",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Customer",
+ "report_name": "CDS Distributors GL",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Sales Master Manager"
+  },
+  {
+   "role": "Sales Manager"
+  },
+  {
+   "role": "Sales User"
+  },
+  {
+   "role": "Shipping Manager"
+  },
+  {
+   "role": "Shipping User"
+  },
+  {
+   "role": "System Auditor"
+  },
+  {
+   "role": "SSAM User"
+  },
+  {
+   "role": "Store Manager"
+  },
+  {
+   "role": "Gate Pass"
+  },
+  {
+   "role": "SSAM Manager"
+  },
+  {
+   "role": "CEO"
+  },
+  {
+   "role": "CFO"
+  },
+  {
+   "role": "Director Sales & Marketing"
+  },
+  {
+   "role": "Store User"
+  },
+  {
+   "role": "Auditor"
+  },
+  {
+   "role": "Head of Procurement"
+  },
+  {
+   "role": "Manager Retail Operations"
+  },
+  {
+   "role": "Configuration Manager"
+  },
+  {
+   "role": "Director IT"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Head of SSAM"
+  },
+  {
+   "role": "Director Finance"
+  },
+  {
+   "role": "Gate Manager"
+  },
+  {
+   "role": "Gate User"
+  },
+  {
+   "role": "Employee"
+  },
+  {
+   "role": "Director A-2"
+  },
+  {
+   "role": "Gate User COP"
+  }
+ ]
+}
