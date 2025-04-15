@@ -211,6 +211,25 @@ class SalesOrder(SellingController):
 		# Check for palletize
 		from nrp_manufacturing.utils import returnable_items
 
+		# Add check for Inter Unit Sales to avoid multi category items SO
+		if self.order_type=="Inter Unit Sales":
+			inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
+        	inter_units_overhead_companies = []
+			item_cats = []
+
+			if inter_units_overhead:
+				for k,v in inter_units_overhead.items():
+					inter_units_overhead_companies.append(k)
+
+			if self.company in inter_units_overhead_companies and self.customer_name in inter_units_overhead_companies:
+				for item in self.items:
+					if item.item_category not in item_cats:
+						item_cats.append(item.item_category)
+
+				if len(item_cats) > 1:
+					frappe.throw(_("Cannot create Sales Order for multiple item categories"))
+
+
 		if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
 			if self.palletized:
 				returnables = returnable_items(self.items,self.company, "CSD")
