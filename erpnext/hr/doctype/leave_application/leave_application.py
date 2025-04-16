@@ -899,4 +899,4 @@ def push_leave_application_to_rms(docname):
 		return {"status": "error", "message": error_message}
 
 def enqueue_leave_application(self):
-    frappe.enqueue('erpnext.hr.doctype.leave_application.leave_application.push_leave_application_to_rms', docname=self.name, queue="rms_push_queue")
+    frappe.enqueue('erpnext.hr.doctype.leave_application.leave_application.push_leave_application_to_rms', docname=self.name, queue="hr_sync")
