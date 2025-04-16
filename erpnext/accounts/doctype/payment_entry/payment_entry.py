@@ -74,6 +74,9 @@ class PaymentEntry(AccountsController):
 		self.update_expense_claim()
 		self.update_payment_schedule()
 		self.set_status()
+		# Code by Moeiz
+		# Updating payment order amount
+		self.update_payment_order_amount()
 
 	def on_cancel(self):
 		self.setup_party_account_field()
@@ -85,6 +88,9 @@ class PaymentEntry(AccountsController):
 		self.update_payment_schedule(cancel=1)
 		self.set_payment_req_status()
 		self.set_status(update=True)
+		# Code by Moeiz
+		# Updating payment order amount
+		self.update_payment_order_amount()
 
 	def set_payment_req_status(self):
 		from erpnext.accounts.doctype.payment_request.payment_request import update_payment_req_status
@@ -628,6 +634,15 @@ class PaymentEntry(AccountsController):
 
 		self.append('deductions', row)
 		self.set_unallocated_amount()
+
+	def update_payment_order_amount(self):
+		# update amount in payment order
+		if self.docstatus == 1:
+			if self.payment_order:
+				frappe.db.sql(f"""UPDATE `tabPayment Order Detail` set amount_paid = (amount_paid + {self.paid_amount}) WHERE parent = '{self.payment_order}' and supplier = '{self.party}' """)
+		if self.docstatus == 2:
+			if self.payment_order:
+				frappe.db.sql(f"""UPDATE `tabPayment Order Detail` set amount_paid = (amount_paid - {self.paid_amount}) WHERE parent = '{self.payment_order}' and supplier = '{self.party}' """)
 
 @frappe.whitelist()
 def get_outstanding_reference_documents(args):
