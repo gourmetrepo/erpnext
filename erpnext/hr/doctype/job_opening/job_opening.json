@@ -8,14 +8,15 @@
  "field_order": [
   "job_opening_details_section",
   "job_opening_status",
-  "posting_date",
   "job_requisition_id",
-  "position",
+  "company",
   "position_title",
   "department",
-  "company",
   "branch",
   "sub_branch",
+  "column_break_5",
+  "posting_date",
+  "position",
   "cadre",
   "grade",
   "location",
@@ -52,8 +53,10 @@
    "default": "Open",
    "fieldname": "job_opening_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Job Opening Status",
-   "options": "\nOpen\nClose"
+   "options": "\nOpen\nClose",
+   "reqd": 1
   },
   {
    "fieldname": "posting_date",
@@ -65,7 +68,8 @@
    "fieldname": "job_requisition_id",
    "fieldtype": "Link",
    "label": "Job Requisition ID",
-   "options": "Job Requisition"
+   "options": "Job Requisition",
+   "reqd": 1
   },
   {
    "fetch_from": "job_requisition_id.designation",
@@ -127,7 +131,8 @@
    "fetch_from": "job_requisition_id.required_headcount",
    "fieldname": "no_of_openings",
    "fieldtype": "Int",
-   "label": "No. of Openings"
+   "label": "No. of Openings",
+   "reqd": 1
   },
   {
    "fieldname": "required_education_section",
@@ -197,24 +202,21 @@
    "fetch_from": "job_requisition_id.required_to_work_in_shifts",
    "fieldname": "required_to_work_in_shifts",
    "fieldtype": "Check",
-   "label": "Required to work in shifts",
-   "read_only": 1
+   "label": "Required to work in shifts"
   },
   {
    "default": "0",
    "fetch_from": "job_requisition_id.required_to_travel",
    "fieldname": "required_to_travel",
    "fieldtype": "Check",
-   "label": "Required to travel",
-   "read_only": 1
+   "label": "Required to travel"
   },
   {
    "default": "0",
    "fetch_from": "position.required_background_check",
    "fieldname": "required_background_check",
    "fieldtype": "Check",
-   "label": "Required Background Check",
-   "read_only": 1
+   "label": "Required Background Check"
   },
   {
    "fetch_from": "job_requisition_id.should_be_able_to_join_in_days",
@@ -223,6 +225,7 @@
    "label": "Should be able to join in days"
   },
   {
+   "default": "On-Site",
    "fieldname": "preferred_interview_mode",
    "fieldtype": "Select",
    "label": "Preferred Interview Mode",
@@ -237,15 +240,13 @@
    "fetch_from": "position.minimum_salary",
    "fieldname": "minimum_salary",
    "fieldtype": "Currency",
-   "label": "Minimum Salary",
-   "read_only": 1
+   "label": "Minimum Salary"
   },
   {
    "fetch_from": "position.maximum_salary",
    "fieldname": "maximum_salary",
    "fieldtype": "Currency",
-   "label": "Maximum Salary",
-   "read_only": 1
+   "label": "Maximum Salary"
   },
   {
    "fieldname": "job_role_clarification_section",
@@ -256,34 +257,38 @@
    "fetch_from": "position.brief_summary",
    "fieldname": "brief_summary",
    "fieldtype": "Small Text",
-   "label": "Brief Summary",
-   "read_only": 1
+   "label": "Brief Summary"
   },
   {
    "fetch_from": "position.main_responsibilities",
    "fieldname": "main_responsibilities",
    "fieldtype": "Text Editor",
-   "label": "Main Responsibilities",
-   "read_only": 1
+   "label": "Main Responsibilities"
   },
   {
    "fieldname": "position",
    "fieldtype": "Link",
    "label": "Position",
-   "options": "Position"
+   "options": "Position",
+   "reqd": 1
   },
   {
    "fetch_from": "job_requisition_id.comapany",
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-10 16:32:47.398803",
- "modified_by": "Administrator",
+ "modified": "2025-04-15 15:24:50.999784",
+ "modified_by": "rizwan.ali@gourmetpakistan.com",
  "module": "HR",
  "name": "Job Opening",
  "owner": "Administrator",
