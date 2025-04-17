@@ -21,6 +21,11 @@ def get_columns():
             "fieldname": "customer",
             "fieldtype": "Link",
             "options": "Customer",
+            "width": 140,
+        },
+        {
+            "label": "Territory",
+            "fieldname": "territory",
             "width": 150,
         },
         {
@@ -30,11 +35,16 @@ def get_columns():
             "width": 150,
         },
         {
-            "label": "CSD Distributors",
-            "fieldname": "csd_distributors",
-            "fieldtype": "Link",
-            "options": "Customer",
-            "width": 150,
+            "label": "CSD Distributor Amount",
+            "fieldname": "csd_distributor_amount",
+            "fieldtype": "Currency",
+            "width": 180,
+        },
+        {
+            "label": "VSP Distributors Amount",
+            "fieldname": "vsp_distributor_amount",
+            "fieldtype": "Currency",
+            "width": 170,
         },
         {
             "label": "CSD Distributor Security",
@@ -43,22 +53,10 @@ def get_columns():
             "width": 170,
         },
         {
-            "label": "VSP Distributors Amount",
-            "fieldname": "vsp_distributor_amount",
-            "fieldtype": "Currency",
-            "width": 180,
-        },
-        {
             "label": "VSP Supplier Amount",
             "fieldname": "vsp_supplier_amount",
             "fieldtype": "Currency",
-            "width": 190,
-        },
-        {
-            "label": "CSD Distributor Amount",
-            "fieldname": "csd_distributor_amount",
-            "fieldtype": "Currency",
-            "width": 180,
+            "width": 160,
         },
         {
             "label": "Total Amount",
@@ -82,25 +80,25 @@ def get_data(filters):
     if customer_filter:
         primary_customers = frappe.db.sql(
             """
-			SELECT name, customer_name, cnic
-			FROM `tabCustomer`
-			WHERE primary_company = %s 
-			AND customer_group = 'CSD Distributors' 
-			AND name = %s 
-			AND disabled = %s
-		""",
+            SELECT name, customer_name, cnic, territory
+            FROM `tabCustomer`
+            WHERE primary_company = %s 
+            AND customer_group = 'CSD Distributors' 
+            AND name = %s 
+            AND disabled = %s
+        """,
             (company, customer_filter, disabled_status),
             as_dict=True,
         )
     else:
         primary_customers = frappe.db.sql(
             """
-			SELECT name, customer_name, cnic
-			FROM `tabCustomer`
-			WHERE primary_company = %s 
-			AND customer_group = 'CSD Distributors' 
-			AND disabled = %s
-		""",
+            SELECT name, customer_name, cnic, territory
+            FROM `tabCustomer`
+            WHERE primary_company = %s 
+            AND customer_group = 'CSD Distributors' 
+            AND disabled = %s
+        """,
             (company, disabled_status),
             as_dict=True,
         )
@@ -114,10 +112,10 @@ def get_data(filters):
 
     secondary_customers = frappe.db.sql(
         """
-		SELECT name, customer_name, cnic, primary_customer, customer_group
-		FROM `tabCustomer`
-		WHERE primary_customer IN %s
-	""",
+        SELECT name, customer_name, cnic, primary_customer, customer_group
+        FROM `tabCustomer`
+        WHERE primary_customer IN %s
+    """,
         (tuple(primary_customer_names),),
         as_dict=True,
     )
@@ -128,12 +126,15 @@ def get_data(filters):
 
     financials = frappe.db.sql(
         """
-		SELECT party, SUM(debit) AS total_debit, SUM(credit) AS total_credit
-		FROM `tabGL Entry`
-		WHERE party_type = 'Customer' AND party IN %s
-		GROUP BY party
-	""",
-        (tuple(all_customers.keys()),),
+        SELECT party, SUM(debit) AS total_debit, SUM(credit) AS total_credit
+        FROM `tabGL Entry`
+        WHERE party_type = 'Customer' AND party IN %(customers)s AND company = %(company)s
+        GROUP BY party
+        """,
+        {
+            "customers": tuple(all_customers.keys()),
+            "company": company
+        },
         as_dict=True,
     )
     fin_map = {f["party"]: f for f in financials}
@@ -152,7 +153,7 @@ def get_data(filters):
 
         parent_debit = fin_map.get(cust_name, {}).get("total_debit", 0)
         parent_credit = fin_map.get(cust_name, {}).get("total_credit", 0)
-        parent_total = parent_credit - parent_debit
+        parent_total =  parent_debit - parent_credit
         csd_distributor_total += parent_total
 
         for child in children:
@@ -182,12 +183,12 @@ def get_data(filters):
             {
                 "customer_name": parent.get("customer_name"),
                 "customer": cust_name,
+                "territory": parent.get("territory"),
                 "customer_cnic": parent.get("cnic"),
-                "csd_distributors": cust_name,
-                "csd_distributors_security": csd_distributor_security,
-                "vsp_distributor_amount": vsp_distributor_total,
-                "vsp_supplier_amount": vsp_supplier_total,
                 "csd_distributor_amount": csd_distributor_total,
+                "vsp_distributor_amount": vsp_distributor_total,
+                "csd_distributors_security": csd_distributor_security,
+                "vsp_supplier_amount": vsp_supplier_total,
                 "total_amount": overall_total,
             }
         )
