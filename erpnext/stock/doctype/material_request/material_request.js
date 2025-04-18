@@ -366,7 +366,11 @@ frappe.ui.form.on('Material Request', {
 
 	project_based: function(frm) {
 		project_based_configurations(frm);
-	}
+	},
+
+	project: function(frm) {
+		project_based_configurations(frm);
+	},
 
 });
 
@@ -596,4 +600,18 @@ function project_based_configurations(frm){
 		};
 	});
 
+
+	if (frm.doc.project_based){
+		if(!frm.doc.project || frm.doc.project == "") {
+			frm.set_df_property('items', 'cannot_add_rows', true);
+			frm.set_df_property('items', 'cannot_delete_rows', true);
+			frm.set_df_property('items', 'cannot_delete_all_rows', true);
+			frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').hide();
+		}else{
+			frm.set_df_property('items', 'cannot_add_rows', false);
+			frm.set_df_property('items', 'cannot_delete_rows', false);
+			frm.set_df_property('items', 'cannot_delete_all_rows', false);
+			frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').show();
+		}
+	}
 }
