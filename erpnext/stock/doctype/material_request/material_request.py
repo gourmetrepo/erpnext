@@ -76,6 +76,11 @@ class MaterialRequest(BuyingController):
 		validate_for_items(self)
 
 		self.set_title()
+		
+		# Code by Moeiz to validate project based material requests
+		if self.project_based:
+			validate_project_based_material_request(self)
+		
 		validate_company_cost_center_and_accounts(self)
 		# self.validate_qty_against_so()
 		# NOTE: Since Item BOM and FG quantities are combined, using current data, it cannot be validated
@@ -617,3 +622,15 @@ def update_project_reference(project_id, docname):
     except Exception as e:
         frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
         return {"status": "error", "message": str(e)}
+
+
+# Code by Moeiz to validate project based material requests
+def validate_project_based_material_request(mr):
+	"""Validate project based material requests"""
+	if not mr.project:
+		frappe.throw(_("Project is required for project based material request."))
+
+	for item in mr.items:
+		if not item.project or item.project != mr.project:
+			item.project = mr.project
+			
