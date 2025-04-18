@@ -34,6 +34,7 @@ FROM (
         so.transaction_date = '{from_date}'
         AND so.company = '{company}'
 		AND so.request_from ='RMS'
+		GROUP BY order_id,soi.item_section
 ) AS soi
 GROUP BY 
     soi.customer_name, soi.item_section
