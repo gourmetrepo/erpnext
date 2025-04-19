@@ -93,7 +93,6 @@
    "columns": 3,
    "fieldname": "item_code",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "in_list_view": 1,
    "label": "Item Code",
    "oldfieldname": "item_code",
@@ -124,7 +123,6 @@
   {
    "fieldname": "item_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Item Name",
    "oldfieldname": "item_name",
    "oldfieldtype": "Data",
@@ -210,7 +208,6 @@
    "fieldtype": "Link",
    "label": "UOM",
    "options": "UOM",
-   "print_hide": 0,
    "reqd": 1
   },
   {
@@ -334,6 +331,7 @@
    "oldfieldtype": "Currency",
    "options": "currency",
    "print_width": "100px",
+   "read_only": 1,
    "width": "100px"
   },
   {
@@ -759,7 +757,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2020-05-22 12:40:01.696076",
+ "modified": "2025-04-17 16:51:06.900002",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order Item",
