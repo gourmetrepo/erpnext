@@ -410,7 +410,7 @@ class ProductionPlan(Document):
 			if self.get('submit_material_request'):
 				material_request.submit()
 			else:
-				material_request.save()
+				material_request.save(ingore_permissions=True,ignore_workflow=True)
 
 		frappe.flags.mute_messages = False
 
