@@ -23,7 +23,7 @@ class EmployeeTransfer(Document):
 				frappe.DocstatusTransitionError)
 	def submit(self, *args, **kwargs):
 		ignore_workflow = kwargs.get('ignore_workflow', False)
-		self.queue_action('submit',queue_name="hr_secondary",ignore_workflow=ignore_workflow, enqueue_after_commit=True)
+		self.queue_action('submit',queue_name="hr_secondary",ignore_workflow=ignore_workflow)
   
 	def on_submit(self):
 		employee = frappe.get_doc("Employee", self.employee)

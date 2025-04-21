@@ -17,7 +17,7 @@ class AdditionalSalary(Document):
 	
 	def submit(self, *args, **kwargs):
 		ignore_workflow = kwargs.get('ignore_workflow', False)
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+		self.queue_action('submit',queue_name="hr_secondary", ignore_workflow=ignore_workflow)
 
 	def validate(self):
 		self.validate_dates()

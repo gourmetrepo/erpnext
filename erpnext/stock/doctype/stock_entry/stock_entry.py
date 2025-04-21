@@ -126,10 +126,11 @@ class StockEntry(StockController):
 				break
 			else:
 				queue="primary"
+		
 		if self.request_from=='RMS':
-			self.queue_action('submit',queue_name=queue,ignore_workflow=ignore_workflow, enqueue_after_commit=True)
+			self.queue_action('submit',queue_name=queue,ignore_workflow=ignore_workflow)
 		else:
-			self.queue_action('submit',queue_name="se_"+queue,ignore_workflow=ignore_workflow, enqueue_after_commit=True)
+			self.queue_action('submit',queue_name="se_"+queue,ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
 

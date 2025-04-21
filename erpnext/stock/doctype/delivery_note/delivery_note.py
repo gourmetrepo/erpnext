@@ -196,15 +196,15 @@ class DeliveryNote(SellingController):
 			self.queue_action('submit',queue_name="return")
 		elif(self.company=='Unit 6'):
 			if self.section and self.section in ("FG Mithae","FG Seasonal Halwa"):
-				self.queue_action('submit',queue_name="fg_mithae",enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+				self.queue_action('submit',queue_name="fg_mithae",ignore_workflow=ignore_workflow)
 			elif not self.section and self.set_warehouse!='Bakery Shipping - U6':
-				self.queue_action('submit',queue_name="return",enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+				self.queue_action('submit',queue_name="return",ignore_workflow=ignore_workflow)
 			elif self.section and (self.section in get_config_by_name('dn_queue_section',[])):
-				self.queue_action('submit',queue_name="dn_primary",enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+				self.queue_action('submit',queue_name="dn_primary",ignore_workflow=ignore_workflow)
 			else:
-				self.queue_action('submit',queue_name="dn_secondary",enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+				self.queue_action('submit',queue_name="dn_secondary",ignore_workflow=ignore_workflow)
 		else:
-			self.queue_action('submit',queue_name="dn_tertiary",enqueue_after_commit=True,ignore_workflow=ignore_workflow)
+			self.queue_action('submit',queue_name="dn_tertiary",ignore_workflow=ignore_workflow)
 	def before_save(self):
 		for item in self.items:
 			_cost_center = None
