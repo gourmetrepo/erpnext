@@ -236,7 +236,8 @@ class SalesOrder(SellingController):
 			temp_item.qty = qty
 			temp_item.is_allways_return = returnable.is_allways_return
 
-	def submit(self):
+
+	def submit(self, *args, **kwargs):
 		# if self.request_from == 'RMS':
 		# 	if(self.section in get_config_by_name('dn_queue_section',[])):
 		# 		self.queue_action('submit',queue_name="dn_tertiary")
@@ -244,13 +245,16 @@ class SalesOrder(SellingController):
 		# 		self.queue_action('submit',queue_name="return")	
 		# else:
 		# 	self._submit()
+
+		ignore_workflow_state = kwargs.get("ignore_workflow", False)
+
 		if self.request_from == 'RMS':
 			if(self.section in get_config_by_name('dn_queue_section',[])):
-				self.queue_action('submit',queue_name="so_secondary")
+				self.queue_action('submit',queue_name="so_secondary", ignore_workflow=ignore_workflow_state)
 			else:
-				self.queue_action('submit',queue_name="so_primary")	
+				self.queue_action('submit',queue_name="so_primary", ignore_workflow=ignore_workflow_state)	
 		else:
-			self._submit()
+			self.queue_action('submit',queue_name="so_secondary", ignore_workflow=ignore_workflow_state)
 
 	def on_submit(self):
 		self.check_credit_limit()

@@ -108,7 +108,8 @@ class StockEntry(StockController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
-	def submit(self):
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
 		import time
 		from nrp_manufacturing.utils import get_config_by_name
 		time.sleep(1)
@@ -126,9 +127,9 @@ class StockEntry(StockController):
 			else:
 				queue="primary"
 		if self.request_from=='RMS':
-			self.queue_action('submit',queue_name=queue)
+			self.queue_action('submit',queue_name=queue,ignore_workflow=ignore_workflow, enqueue_after_commit=True)
 		else:
-			self.queue_action('submit',queue_name="se_"+queue)
+			self.queue_action('submit',queue_name="se_"+queue,ignore_workflow=ignore_workflow, enqueue_after_commit=True)
 
 	def on_submit(self):
 
