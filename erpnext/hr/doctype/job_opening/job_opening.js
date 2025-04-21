@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Job Opening', {
 	job_requisition_id: (frm) => {
+		debugger;
 		frappe.call({
 			"method": "frappe.client.get",
 			args: {
@@ -19,6 +20,7 @@ frappe.ui.form.on('Job Opening', {
 	},
 
 	position: (frm) => {
+		debugger;
 		frappe.call({
 			"method": "frappe.client.get",
 			args: {
@@ -26,8 +28,36 @@ frappe.ui.form.on('Job Opening', {
 				name: frm.doc.position
 			},
 			callback: function (r) {
+					debugger;
 				frm.set_value("required_background_check", r.message.required_background_check);
 				frm.refresh_field("required_background_check");
+
+				frm.clear_table("required_core_skills");
+				frm.clear_table("required_behavioral_competencies");
+
+				r.message.required_core_skills.forEach(element => {
+					debugger;
+					let temp_skill = element.skill;
+					let temp_proficiency = element.required_proficiency_level;
+
+					frm.add_child('required_core_skills', {
+						skill: temp_skill,
+						required_proficiency_level: temp_proficiency,
+					})
+				})
+
+				r.message.required_behavioral_competencies.forEach(element => {
+					let temp_skill = element.skill;
+					let temp_proficiency = element.required_proficiency_level;
+
+					frm.add_child('required_behavioral_competencies', {
+						skill: temp_skill,
+						required_proficiency_level: temp_proficiency,
+					})
+				});
+
+				frm.refresh_field('required_core_skills');
+				frm.refresh_field('required_behavioral_competencies');
 			}
 		});
 	}

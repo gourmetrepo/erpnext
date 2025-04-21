@@ -13,7 +13,7 @@ class JobOpening(Document):
 		if not self.creation_date:
 			self.creation_date = frappe.utils.nowdate()
 		
-		self.load_competencies()
+		# self.load_competencies()
 		
 
 	def load_competencies(self):
