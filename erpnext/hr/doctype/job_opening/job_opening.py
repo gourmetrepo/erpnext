@@ -10,8 +10,8 @@ from frappe import _
 
 class JobOpening(Document):
 	def before_save(self):
-		if not self.posting_date:
-			self.posting_date = frappe.utils.nowdate()
+		if not self.creation_date:
+			self.creation_date = frappe.utils.nowdate()
 		
 		self.load_competencies()
 		
