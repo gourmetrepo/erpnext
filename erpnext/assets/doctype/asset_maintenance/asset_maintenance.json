@@ -8,7 +8,6 @@
   "company",
   "asset_name",
   "section_break_6",
-  "column_break_3",
   "section_break_8",
   "asset_maintenance_tasks",
   "amended_from"
@@ -17,14 +16,10 @@
   {
    "fieldname": "asset_name",
    "fieldtype": "Link",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Asset Name",
-   "options": "Asset",
-   "unique": 1
-  },
-  {
-   "fieldname": "column_break_3",
-   "fieldtype": "Column Break"
+   "options": "Asset"
   },
   {
    "fieldname": "company",
@@ -60,7 +55,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-18 19:29:27.824507",
+ "modified": "2025-04-21 17:44:49.008095",
  "modified_by": "moeiz.shahzad@gourmetpakistan.com",
  "module": "Assets",
  "name": "Asset Maintenance",
