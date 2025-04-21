@@ -21,8 +21,9 @@ class EmployeeTransfer(Document):
 		if getdate(self.transfer_date) > getdate():
 			frappe.throw(_("Employee Transfer cannot be submitted before Transfer Date "),
 				frappe.DocstatusTransitionError)
-	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary")
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
+		self.queue_action('submit',queue_name="hr_secondary",ignore_workflow=ignore_workflow, enqueue_after_commit=True)
   
 	def on_submit(self):
 		employee = frappe.get_doc("Employee", self.employee)

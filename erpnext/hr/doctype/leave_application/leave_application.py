@@ -45,10 +45,11 @@ class LeaveApplication(Document):
 			# notify leave approver about creation
 			self.notify_leave_approver()
    
-	def submit(self):
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
 		frappe.db.sql(f"update `tabLeave Application` set status = 'Approved' where name = '{self.name}'",auto_commit=True)
 		enqueue_leave_application(self)
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
 		if self.status == "Open":

@@ -15,8 +15,9 @@ class ShiftRequest(Document):
 	def validate(self):
 		self.validate_dates()
 		self.validate_shift_request_overlap_dates()
-	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
+	def submit(self , *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
 	def on_submit(self):
 		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.create_shift_assignment", queue='hr_secondary', doc=self, enqueue_after_commit=True)
 

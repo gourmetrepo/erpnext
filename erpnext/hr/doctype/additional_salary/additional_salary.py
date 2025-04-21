@@ -15,8 +15,9 @@ class AdditionalSalary(Document):
 
 			frappe.throw(_("Additional Salary Component Exists."))
 	
-	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
 
 	def validate(self):
 		self.validate_dates()
@@ -26,7 +27,7 @@ class AdditionalSalary(Document):
 	def validate_dates(self):
  		date_of_joining, relieving_date = frappe.db.get_value("Employee", self.employee,
 			["date_of_joining", "relieving_date"])
- 		if date_of_joining and getdate(self.payroll_date) < getdate(date_of_joining):
+		if date_of_joining and getdate(self.payroll_date) < getdate(date_of_joining):
  			frappe.throw(_("Payroll date can not be less than employee's joining date"))
 
 	def get_amount(self, sal_start_date, sal_end_date):

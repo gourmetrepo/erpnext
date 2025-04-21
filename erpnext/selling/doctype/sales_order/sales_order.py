@@ -254,7 +254,7 @@ class SalesOrder(SellingController):
 			else:
 				self.queue_action('submit',queue_name="so_primary", ignore_workflow=ignore_workflow_state)	
 		else:
-			self._submit(ignore_workflow=ignore_workflow_state)
+			self.queue_action('submit',queue_name="so_secondary", ignore_workflow=ignore_workflow_state)
 
 	def on_submit(self):
 		self.check_credit_limit()

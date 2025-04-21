@@ -494,12 +494,13 @@ class StockReconciliation(StockController):
 		for item in get_items(warehouse, self.posting_date, self.posting_time, self.company):
 			self.append("items", item)
 
-	def submit(self):
+	def submit(self,*args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
 		if len(self.items) > 100:
 			msgprint(_("The task has been enqueued as a background job. In case there is any issue on processing in background, the system will add a comment about the error on this Stock Reconciliation and revert to the Draft stage"))
-			self.queue_action('submit')
+			self.queue_action('submit',ignore_workflow=ignore_workflow)
 		else:
-			self._submit()
+			self._submit(ignore_workflow=ignore_workflow)
 
 	def cancel(self):
 		if len(self.items) > 100:

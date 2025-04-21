@@ -16,8 +16,9 @@ class AttendanceRequest(Document):
 		if self.half_day:
 			if not getdate(self.from_date)<=getdate(self.half_day_date)<=getdate(self.to_date):
 				frappe.throw(_("Half day date should be in between from date and to date"))
-	def submit(self):
-		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True)
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
+		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
 		self.create_attendance()
