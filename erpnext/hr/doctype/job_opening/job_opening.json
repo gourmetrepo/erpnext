@@ -175,16 +175,14 @@
    "fieldname": "required_core_skills",
    "fieldtype": "Table",
    "label": "Required Core Skills ",
-   "options": "Core Skills",
-   "read_only": 1
+   "options": "Core Skills"
   },
   {
    "fetch_from": "position.required_behavioral_competencies",
    "fieldname": "required_behavioral_competencies",
    "fieldtype": "Table",
    "label": "Required Behavioral Competencies",
-   "options": "Behavioral Skills",
-   "read_only": 1
+   "options": "Behavioral Skills"
   },
   {
    "fieldname": "job_preferences_section",
@@ -288,7 +286,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-21 16:43:30.311489",
+ "modified": "2025-04-21 18:09:33.160049",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
