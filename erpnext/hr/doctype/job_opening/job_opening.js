@@ -3,7 +3,6 @@
 
 frappe.ui.form.on('Job Opening', {
 	job_requisition_id: (frm) => {
-		debugger;
 		frappe.call({
 			"method": "frappe.client.get",
 			args: {
@@ -20,7 +19,6 @@ frappe.ui.form.on('Job Opening', {
 	},
 
 	position: (frm) => {
-		debugger;
 		frappe.call({
 			"method": "frappe.client.get",
 			args: {
@@ -28,7 +26,6 @@ frappe.ui.form.on('Job Opening', {
 				name: frm.doc.position
 			},
 			callback: function (r) {
-					debugger;
 				frm.set_value("required_background_check", r.message.required_background_check);
 				frm.refresh_field("required_background_check");
 
