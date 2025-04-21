@@ -26,6 +26,7 @@ class JobOpening(Document):
 				core_doc = frappe.new_doc("Core Skills")
 				core_doc.update({
 					"skill": core_skill.get("skill"),
+					"required_proficiency_level": core_skill.get("required_proficiency_level"),
 				})
 				self.append("required_core_skills", core_doc)
 			
@@ -34,5 +35,7 @@ class JobOpening(Document):
 				behavioral_doc = frappe.new_doc("Behavioral Skills")
 				behavioral_doc.update({
 					"skill": behavioral_competency.get("skill"),
+					"required_proficiency_level": behavioral_competency.get("required_proficiency_level"),
+					
 				})
 				self.append("required_behavioral_competencies", behavioral_doc)
