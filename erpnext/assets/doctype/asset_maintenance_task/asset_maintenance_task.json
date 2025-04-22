@@ -19,7 +19,7 @@
  "fields": [
   {
    "fieldname": "maintenance_task",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_filter": 1,
    "in_list_view": 1,
    "in_standard_filter": 1,
@@ -30,8 +30,10 @@
   {
    "fieldname": "maintenance_type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Maintenance Type",
-   "options": "Preventive Maintenance\nCorrective Maintenance"
+   "options": "Preventive Maintenance\nCorrective Maintenance",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_2",
@@ -50,38 +52,49 @@
    "default": "Today",
    "fieldname": "start_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Start Date",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "end_date",
    "fieldtype": "Date",
-   "label": "End Date"
+   "in_list_view": 1,
+   "label": "End Date",
+   "read_only": 1
   },
   {
+   "fetch_from": "maintenance_task.subject",
    "fieldname": "task_name",
    "fieldtype": "Data",
-   "label": "Task Name"
+   "in_list_view": 1,
+   "label": "Task Name",
+   "read_only": 1
   },
   {
    "fieldname": "estimated_time_in_hrs",
    "fieldtype": "Float",
-   "label": "Estimated Time"
+   "in_list_view": 1,
+   "label": "Estimated Time",
+   "read_only": 1
   },
   {
    "fieldname": "assigned_users",
    "fieldtype": "Data",
-   "label": "Assigned Users"
+   "in_list_view": 1,
+   "label": "Assigned Users",
+   "read_only": 1
   },
   {
    "fieldname": "item_used",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Item Used",
    "options": "Item"
   }
  ],
  "istable": 1,
- "modified": "2025-04-18 18:56:38.571520",
+ "modified": "2025-04-22 13:02:32.418517",
  "modified_by": "moeiz.shahzad@gourmetpakistan.com",
  "module": "Assets",
  "name": "Asset Maintenance Task",
