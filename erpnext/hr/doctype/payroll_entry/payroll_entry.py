@@ -145,7 +145,7 @@ class PayrollEntry(Document):
 	def submit_salary_slips(self):
 		self.check_permission('write')
 		ss_list = self.get_sal_slip_list(ss_status=0)
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry=self, salary_slips=ss_list)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slips_for_employees", queue='hr_tertiary', timeout=13600, payroll_entry_name=self.name, salary_slips=ss_list)
 		change_queue_status(self.doctype, self.name, "Queued")
 		self.reload()
 
@@ -578,10 +578,11 @@ def after_salary_slips_creation(payroll_entry):
 
 
 @frappe.whitelist()
-def submit_salary_slips_for_employees(payroll_entry, salary_slips, publish_progress=True):
+def submit_salary_slips_for_employees(payroll_entry_name, salary_slips, publish_progress=True):
 	try:
 		frappe.flags.via_payroll_entry = True
 
+		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 		count = 0
 		for ss in salary_slips:
 			count+=1
