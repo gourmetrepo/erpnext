@@ -105,6 +105,13 @@ class StockEntry(StockController):
 				i.basic_amount = i.basic_rate * i.qty
 				i.amount = i.valuation_rate * i.qty
 		
+		# Changes by Moeiz for FS-Plant Maintenance 2.0
+		if self.stock_entry_type == 'Material Issue':
+			validate_plant_maintenance_consumption_stock_entry(self)
+		
+		if self.stock_entry_type == 'Material Transfer':
+			validate_plant_maintenance_material_transfer_stock_entry(self)
+		
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
@@ -162,6 +169,13 @@ class StockEntry(StockController):
 		# #enqueue(StockEntry.make_gl_entries, self=self, queue='short')
 		# self.make_gl_entries()
 		frappe.db.sql("UPDATE `tabStock Entry` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
+
+		# Changes by Moeiz for FS-Plant Maintenance 2.0
+		if self.purpose == "Material Transfer":
+			update_plant_asset_maintenance_document_on_transfer(self)
+		
+		if self.purpose == "Material Issue":
+			update_plant_asset_maintenance_document_on_consumption(self)
 
 
 	def on_cancel(self):
@@ -1834,3 +1848,172 @@ def validate_company_cost_center_and_accounts(stock_entry):
 			
 			if item.cost_center and item.cost_center not in cost_centers:
 				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(item.idx, item.cost_center, company))
+
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will reflect the changes of Material Transfer stock entry to Plant Maintenance Document (Asset Maintenance)
+def update_plant_asset_maintenance_document_on_transfer(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		submit_doc = True
+		if asset_maintenance_doc:
+		
+			# This means user is adding stock entry Material Transfer to return stock back to the warehouse
+			# This stock entry will be initiated on action of Close button on asset maintenance 
+			if asset_maintenance_doc.status == "Completed" or asset_maintenance_doc.status == "Stopped":
+				
+				# Update returned items
+				for item in doc.items:
+					item_exists = False
+					for consumed_item in asset_maintenance_doc.consumed_items:
+						if consumed_item.get('item') == item.get('item_code'):
+							# Check if return qty is less than issued qty then we won't submit asset maintenance doc (Partial Return)
+							if item.get('qty') < (consumed_item.issued_qty - consumed_item.consumed_qty - consumed_item.return_qty):
+								submit_doc = False
+							consumed_item.return_qty += item.get('qty')
+							item_exists = True
+							
+
+					if not item_exists:
+						child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+						child_doc.item = item.get('item_code')
+						child_doc.item_name = item.get('item_name')
+						child_doc.return_qty = item.get('qty')
+						child_doc.uom = item.get('uom')
+						asset_maintenance_doc.append('consumed_items', child_doc)
+				
+				asset_maintenance_doc.save()
+				# Update status only if all items (complete stock) are returned
+				if submit_doc:
+					if asset_maintenance_doc.status == "Completed":
+						asset_maintenance_doc.status = "Finished"
+					elif asset_maintenance_doc.status == "Stopped":
+						asset_maintenance_doc.status = "Closed"
+
+					asset_maintenance_doc.submit()
+						
+			# This means user is adding stock entry Material Transfer to transfer stock to wip warehouse
+			else:
+				if asset_maintenance_doc.status == "Draft" or asset_maintenance_doc.status == "MR Generated":
+					# Update status of document to Not Started if document status is Draft or MR Generated
+					asset_maintenance_doc.status = "Not Started"
+				
+				# Update issued items
+				for item in doc.items:
+					item_exists = False
+					for consumed_item in asset_maintenance_doc.consumed_items:
+						if consumed_item.get('item') == item.get('item_code'):
+							consumed_item.issued_qty += item.get('qty')
+							item_exists = True
+
+					if not item_exists:
+						child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+						child_doc.item = item.get('item_code')
+						child_doc.item_name = item.get('item_name')
+						child_doc.issued_qty = item.get('qty')
+						child_doc.uom = item.get('uom')
+						asset_maintenance_doc.append('consumed_items', child_doc)
+			
+				asset_maintenance_doc.save()
+			frappe.db.commit()
+		else:
+			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
+
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will reflect the changes of Material Consumption stock entry to Plant Maintenance Document (Asset Maintenance)
+def update_plant_asset_maintenance_document_on_consumption(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		if asset_maintenance_doc:
+			# Update consumed items
+			for item in doc.items:
+				item_exists = False
+				for consumed_item in asset_maintenance_doc.consumed_items:
+					if consumed_item.get('item') == item.get('item_code'):
+						consumed_item.consumed_qty += item.get('qty')
+						item_exists = True
+
+				if not item_exists:
+					child_doc = frappe.new_doc("Plant Maintenance Consumed Items")
+					child_doc.item = item.get('item_code')
+					child_doc.item_name = item.get('item_name')
+					child_doc.consumed_qty = item.get('qty')
+					child_doc.uom = item.get('uom')
+					asset_maintenance_doc.append('consumed_items', child_doc)
+			
+			asset_maintenance_doc.save()
+			frappe.db.commit()
+		else:
+			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will validate the material consumption (material issue) stock entry for Plant Maintenance
+# This will check that the consumed qty is not greater than the available qty in the corresponding warehouse (issued_qty - previous consumed qty)
+def validate_plant_maintenance_consumption_stock_entry(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		if asset_maintenance_doc:
+			stock_entry_items = {}
+			for item in doc.items:
+				if item.get('item_code') not in stock_entry_items:
+					stock_entry_items[item.get('item_code')] = item.get('qty')
+				else:
+					stock_entry_items[item.get('item_code')] += item.get('qty')
+			
+			
+
+			for item in asset_maintenance_doc.consumed_items:
+				if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > (item.get('issued_qty') - item.get('consumed_qty')):
+					frappe.throw(f"Consumed quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
+		else:
+			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
+
+
+# Changes by Moeiz for FS-Plant Maintenance 2.0
+# This code will validate the material transfer (return) stock entry for Plant Maintenance
+# This will check that the return qty is not greater than the available qty in the corresponding warehouse (issued_qty - previous consumed qty)
+def validate_plant_maintenance_material_transfer_stock_entry(doc):
+	asset_maintenance_doc_ref = None
+	for item in doc.items:
+		if item.asset_maintenance:
+			asset_maintenance_doc_ref = item.asset_maintenance
+			break
+	
+	if asset_maintenance_doc_ref:
+		asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_doc_ref)
+		
+		if asset_maintenance_doc:
+			if asset_maintenance_doc.status == "Completed" or asset_maintenance_doc.status == "Stopped":
+				stock_entry_items = {}
+				for item in doc.items:
+					if item.get('item_code') not in stock_entry_items:
+						stock_entry_items[item.get('item_code')] = item.get('qty')
+					else:
+						stock_entry_items[item.get('item_code')] += item.get('qty')
+
+				for item in asset_maintenance_doc.consumed_items:
+					if stock_entry_items.get(item.get('item')) and stock_entry_items.get(item.get('item')) > ((item.get('issued_qty') - item.get('consumed_qty'))- item.get('return_qty')):
+						frappe.throw(f"Returned quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
+		else:
+			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
