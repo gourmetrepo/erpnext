@@ -621,6 +621,7 @@ def make_material_consumption_stock_entry(asset_maintenance_doc_ref):
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = asset_maintenance_doc.get('name')
 			i.expense_account = difference_account
+			i.project = asset_maintenance_doc.get('project', None)
 			stock_entry.append('items',i)
 		
 		# Return the stock entry
@@ -669,6 +670,7 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 				i.uom = item.get('uom')
 				i.stock_uom = item.get('uom')
 				i.asset_maintenance = asset_maintenance_doc.get('name')
+				i.project = asset_maintenance_doc.get('project', None)
 				stock_entry.append('items',i)
 
 				# Set the return stock entry flag to True
@@ -751,6 +753,7 @@ def make_damage_stock_entry(doc):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = doc.get('name')
+			i.project = asset_maintenance_doc.get('project', None)
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
@@ -778,6 +781,7 @@ def make_scrap_stock_entry(doc):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = doc.get('name')
+			i.project = asset_maintenance_doc.get('project', None)
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
