@@ -2109,29 +2109,6 @@
    "property": "label",
    "property_type": "Data",
    "value": "Asset"
-  },
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2025-04-18 19:41:12.881338",
-   "default_value": null,
-   "doc_type": "Asset Maintenance",
-   "docstatus": 0,
-   "doctype_or_field": "DocField",
-   "field_name": "section_break_6",
-   "idx": 0,
-   "modified": "2025-04-18 19:41:12.881338",
-   "modified_by": "moeiz.shahzad@gourmetpakistan.com",
-   "name": "Asset Maintenance-section_break_6-hidden",
-   "owner": "moeiz.shahzad@gourmetpakistan.com",
-   "parent": null,
-   "parentfield": null,
-   "parenttype": null,
-   "property": "hidden",
-   "property_type": "Check",
-   "value": "1"
   }
  ],
  "sync_on_migrate": 1
