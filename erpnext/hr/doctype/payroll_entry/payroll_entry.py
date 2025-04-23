@@ -589,7 +589,7 @@ def submit_salary_slips_for_employees(payroll_entry_name, salary_slips, publish_
 			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
 			salary_slips=salary_slips, enqueue_after_commit=True)
 
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry=payroll_entry, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry_name=payroll_entry.name, enqueue_after_commit=True)
 	except Exception as error:
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip submission from payroll")
@@ -613,9 +613,10 @@ def submit_salary_slip_for_employee(ss, count, publish_progress, salary_slips):
 
 
 @frappe.whitelist()
-def after_salary_slip_submission(payroll_entry):
+def after_salary_slip_submission(payroll_entry_name):
 	from nerp.modules.gourmet.payroll_entry.payroll_entry import make_accrual_jv_entry
 	try:
+		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 		ss_count = frappe.db.sql(f"Select count(*) as submitted_ss_count From `tabSalary Slip` where payroll_entry='{payroll_entry.name}' and docstatus=1;", as_dict=True)
 		if ss_count and ss_count[0].submitted_ss_count > 0:
 			make_accrual_jv_entry(payroll_entry)
