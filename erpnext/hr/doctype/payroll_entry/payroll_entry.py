@@ -582,14 +582,13 @@ def submit_salary_slips_for_employees(payroll_entry_name, salary_slips, publish_
 	try:
 		frappe.flags.via_payroll_entry = True
 
-		payroll_entry = frappe.get_doc("Payroll Entry", payroll_entry_name)
 		count = 0
 		for ss in salary_slips:
 			count+=1
 			frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.submit_salary_slip_for_employee", queue='hr_tertiary', ss=ss, count=count, publish_progress=publish_progress, 
 			salary_slips=salary_slips, enqueue_after_commit=True)
 
-		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry_name=payroll_entry.name, enqueue_after_commit=True)
+		frappe.enqueue("erpnext.hr.doctype.payroll_entry.payroll_entry.after_salary_slip_submission", queue='hr_tertiary', payroll_entry_name=payroll_entry_name, enqueue_after_commit=True)
 	except Exception as error:
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Enqueue Salary Slip submission from payroll")
