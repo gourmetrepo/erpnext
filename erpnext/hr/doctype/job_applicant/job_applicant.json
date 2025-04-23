@@ -47,9 +47,11 @@
   "contact_details_section",
   "email",
   "current_address",
+  "residing_city",
   "column_break_39",
   "contact",
   "permanent_address",
+  "permanent_city",
   "education_details_section",
   "education",
   "work_experience_section",
@@ -480,12 +482,23 @@
   {
    "fieldname": "column_break_9",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "residing_city",
+   "fieldtype": "Data",
+   "label": "Residing City",
+   "reqd": 1
+  },
+  {
+   "fieldname": "permanent_city",
+   "fieldtype": "Data",
+   "label": "Permanent City"
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-15 18:07:16.692393",
- "modified_by": "rizwan.ali@gourmetpakistan.com",
+ "modified": "2025-04-23 15:55:48.969302",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
  "owner": "Administrator",
