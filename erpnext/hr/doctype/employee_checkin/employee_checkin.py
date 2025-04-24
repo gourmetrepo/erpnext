@@ -16,14 +16,15 @@ class EmployeeCheckin(Document):
 		self.fetch_shift()
 
 	def validate_duplicate_log(self):
-		doc = frappe.db.exists('Employee Checkin', {
-			'employee': self.employee,
-			'time': self.time,
-			'name': ['!=', self.name]})
-		if doc:
-			doc_link = frappe.get_desk_link('Employee Checkin', doc)
-			frappe.throw(_('This employee already has a log with the same timestamp.{0}')
-				.format("<Br>" + doc_link))
+		doc = frappe.db.sql("""
+			select name from `tabEmployee Checkin` 
+			where employee = %s and time = %s and name != %s
+		""", (self.employee, self.time, self.name), as_dict=True, debug=True)
+
+		if len(doc) > 0:
+			doc_link = [frappe.utils.get_link_to_form("Employee Checkin", d.name) for d in doc]
+			links = "<br>".join(doc_link)
+			frappe.throw(_('This employee already has a log with the same timestamp.<br>{0}').format(links))
 
 	def fetch_shift(self):
 		shift_actual_timings = get_actual_start_end_datetime_of_shift(self.employee, get_datetime(self.time), True)
@@ -67,7 +68,8 @@ def add_log_based_on_employee_field(employee_field_value, timestamp, device_id=N
 	doc.device_id = device_id
 	doc.log_type = log_type
 	if cint(skip_auto_attendance) == 1: doc.skip_auto_attendance = '1'
-	doc.insert()
+	doc.save(ignore_permissions=True)
+	frappe.db.commit()
 
 	return doc
 
