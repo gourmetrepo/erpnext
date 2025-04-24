@@ -19,7 +19,7 @@ class EmployeeCheckin(Document):
 		doc = frappe.db.sql("""
 			select name from `tabEmployee Checkin` 
 			where employee = %s and time = %s and name != %s
-		""", (self.employee, self.time, self.name), as_dict=True, debug=True)
+		""", (self.employee, self.time, self.name), as_dict=True)
 
 		if len(doc) > 0:
 			doc_link = [frappe.utils.get_link_to_form("Employee Checkin", d.name) for d in doc]
@@ -68,7 +68,7 @@ def add_log_based_on_employee_field(employee_field_value, timestamp, device_id=N
 	doc.device_id = device_id
 	doc.log_type = log_type
 	if cint(skip_auto_attendance) == 1: doc.skip_auto_attendance = '1'
-	doc.save(ignore_permissions=True)
+	doc.insert()
 	frappe.db.commit()
 
 	return doc
