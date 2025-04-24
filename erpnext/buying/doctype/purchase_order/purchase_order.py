@@ -51,6 +51,11 @@ class PurchaseOrder(BuyingController):
 			self.check_on_hold_or_closed_status()
 			return
 		
+		# Code by Moeiz
+		# Project Based MR -> PO Validation
+		if self.project_based:
+			validate_project_based_po(self)
+		
 		super(PurchaseOrder, self).validate()
 
 		self.set_status()
@@ -72,6 +77,7 @@ class PurchaseOrder(BuyingController):
 		# Subcontract validations
 		if self.subcontracted:
 			validate_subcontracted_po(self)
+
 			
 		self.create_raw_materials_supplied("supplied_items")
 		self.set_received_qty_for_drop_ship_items()
@@ -811,3 +817,24 @@ def get_subcontracted_bom_material(bom_ref, subcontracted_item, qty, source_ware
 	
 	return stock_entry_items
 
+
+def validate_project_based_po(doc):
+	po_project = set()
+	mr_reference = None
+	mr_project = None
+
+	for item in doc.items:
+		if item.project:
+			po_project.add(item.project)
+		else:
+			frappe.throw(_("Project is mandatory for all items in Project based Purchase Order."))
+
+		if not mr_reference:
+			mr_reference = item.material_request	
+	
+	if mr_reference:
+		mr_project = frappe.db.get_value("Material Request", mr_reference, "project")
+
+	if mr_project and mr_project not in po_project:
+		frappe.throw(_("Project in Material Request and Purchase Order should be same. Kindly update the project in Purchase Order items or at the Material Request"))
+	
