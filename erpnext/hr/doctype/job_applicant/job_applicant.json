@@ -56,6 +56,7 @@
   "education",
   "work_experience_section",
   "work_experience",
+  "total_work_experience_years",
   "competency_framework_section",
   "core_skills",
   "behavioral_competencies",
@@ -493,11 +494,17 @@
    "fieldname": "permanent_city",
    "fieldtype": "Data",
    "label": "Permanent City"
+  },
+  {
+   "fieldname": "total_work_experience_years",
+   "fieldtype": "Data",
+   "label": "Total Work Experience (Years)",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-23 15:55:48.969302",
+ "modified": "2025-04-24 16:14:29.246643",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
