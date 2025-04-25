@@ -7,7 +7,7 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import frappe
 from frappe import _
-from frappe.utils import comma_and, flt, validate_email_address
+from frappe.utils import nowdate, date_diff, comma_and, flt, validate_email_address
 
 
 class JobApplicant(Document):
@@ -24,13 +24,19 @@ class JobApplicant(Document):
 
 	def calculate_total_work_experience(self):
 		total_experience = 0
+		
 		if self.work_experience:
 			for we in self.work_experience:
 				diff = 0
-				if we.joining_date and we.end_date:
-					diff = frappe.utils.date_diff(we.end_date, we.joining_date)
-					if diff > 0:
-						total_experience += diff
-		self.total_work_experience_years = flt(total_experience / 365, 2)
+				if we.end_date:
+					diff = date_diff(we.end_date, we.joining_date)
+				elif we.currently_employed:
+					diff = date_diff(nowdate(), we.joining_date)
+
+				if diff > 0:
+					total_experience += diff
+		
+		if total_experience:
+			self.total_work_experience_years = flt(total_experience / 365, 2)
 
 
