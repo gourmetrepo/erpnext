@@ -37,6 +37,6 @@ class JobApplicant(Document):
 					total_experience += diff
 		
 		if total_experience:
-			self.total_work_experience_years = flt(total_experience / 365, 2)
+			self.total_work_experience_years = total_experience // 365
 
 
