@@ -496,6 +496,7 @@
    "label": "Permanent City"
   },
   {
+   "default": "0",
    "fieldname": "total_work_experience_years",
    "fieldtype": "Data",
    "label": "Total Work Experience (Years)",
@@ -504,7 +505,7 @@
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-24 16:14:29.246643",
+ "modified": "2025-04-25 12:32:04.207977",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
