@@ -185,7 +185,8 @@ class SalesOrder(SellingController):
 				frappe.throw(_("Row #{0}: Set Supplier for item {1}").format(d.idx, d.item_code))
     
 	def before_submit(self):
-		if self.customer_group=='Key-Account Customer' and self.company != 'Unit 6':
+		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer','Key-Account Utility Store']
+		if self.customer_group in key_account_groups and self.company != 'Unit 6':
 			existing_sales_inv_against_customer = frappe.db.sql("""SELECT name FROM  `tabSales Invoice` WHERE customer= %s AND STATUS='Overdue'""", (self.customer), as_dict=True)
 			if existing_sales_inv_against_customer:
 				existing_sales_inv_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_sales_inv_against_customer]
@@ -193,6 +194,13 @@ class SalesOrder(SellingController):
 
 
 	def before_save(self):
+		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer','Key-Account Utility Store']
+		if self.customer_group in key_account_groups and self.company != 'Unit 6':
+			existing_sales_inv_against_customer = frappe.db.sql("""SELECT name FROM  `tabSales Invoice` WHERE customer= %s AND STATUS='Overdue'""", (self.customer), as_dict=True)
+			if existing_sales_inv_against_customer:
+				existing_sales_inv_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_sales_inv_against_customer]
+				frappe.throw(_("Cannot create Sales Order. Kindly Paid the following Sales Invoice first: {0}").format(", ".join(existing_sales_inv_links)))
+			self.check_credit_limit()
 		# Code by Moeiz
 		# Ticket # 120338 (Validate no existing Sales Order is already created for this customer at draft level. If yes, those sales order should be closed)
 		# Only for CSD
