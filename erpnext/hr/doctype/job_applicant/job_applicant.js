@@ -28,6 +28,7 @@ frappe.ui.form.on("Job Applicant", {
 
     before_save: function(frm){
 		validate_email(frm.doc.email);
+		validate_contact_number(frm.doc.contact);
 
 		if (!frm.doc.truthful_information) {
 			frappe.throw(__("Mandatory fields required - I confirm that the information provided is accurate and truthful."));
@@ -100,6 +101,15 @@ function validate_email(email_address) {
     if (!validEmail) {
         frappe.throw(__("Please enter a valid email address"));
     }
+}
+
+function validate_contact_number(contact_number) {
+	debugger
+	const phoneRegex = /^03[0-9]{2}-[0-9]{7}$/;
+    const isValid = phoneRegex.test(contact_number);
+	if (!isValid) {
+		frappe.throw(__("Please enter a valid contact number"));
+	}
 }
 
 frappe.ui.form.on('Job Applicant Education', {
