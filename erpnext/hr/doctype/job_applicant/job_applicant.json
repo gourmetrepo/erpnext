@@ -486,14 +486,16 @@
   },
   {
    "fieldname": "residing_city",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "label": "Residing City",
+   "options": "City",
    "reqd": 1
   },
   {
    "fieldname": "permanent_city",
-   "fieldtype": "Data",
-   "label": "Permanent City"
+   "fieldtype": "Link",
+   "label": "Permanent City",
+   "options": "City"
   },
   {
    "default": "0",
@@ -505,7 +507,7 @@
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-25 12:32:04.207977",
+ "modified": "2025-04-25 13:21:44.392927",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
