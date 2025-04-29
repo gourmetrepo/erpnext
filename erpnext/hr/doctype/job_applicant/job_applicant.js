@@ -30,6 +30,11 @@ frappe.ui.form.on("Job Applicant", {
 		validate_email(frm.doc.email);
 		validate_contact_number(frm.doc.contact);
 
+		frm.doc.references.forEach(reference => {
+			validate_email(reference.reference_email, "References");
+			validate_contact_number(reference.reference_contact, "References");
+		});
+
 		if (!frm.doc.truthful_information) {
 			frappe.throw(__("Mandatory fields required - I confirm that the information provided is accurate and truthful."));
 		}
@@ -96,19 +101,20 @@ function update_full_name(frm){
 	frm.set_value("full_name", fullName);
 }
 
-function validate_email(email_address) {
+function validate_email(email_address, formPart="") {
     const validEmail = frappe.utils.validate_type(email_address, "email");
     if (!validEmail) {
-        frappe.throw(__("Please enter a valid email address"));
+		const msg = `in ${formPart}`;
+        frappe.throw(__(`Please enter valid email address ${msg}`));
     }
 }
 
-function validate_contact_number(contact_number) {
-	debugger
+function validate_contact_number(contact_number, formPart="") {
 	const phoneRegex = /^03[0-9]{2}-[0-9]{7}$/;
     const isValid = phoneRegex.test(contact_number);
 	if (!isValid) {
-		frappe.throw(__("Please enter a valid contact number"));
+		const msg = `in ${formPart}`;
+		frappe.throw(__(`Please enter valid contact number ${msg}`));
 	}
 }
 
@@ -182,12 +188,5 @@ frappe.ui.form.on('Job Applicant References', {
 		}
 
 		frm.refresh_field("references");
-	},
-
-	reference_email: function(frm, cdt, cdn) {
-		debugger;
-		if (frm.doc.reference_email) {
-			validate_email(frm.doc.reference_email);
-		}
 	}
 });
