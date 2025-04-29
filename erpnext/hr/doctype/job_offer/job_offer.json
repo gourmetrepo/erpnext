@@ -36,6 +36,7 @@
    "options": "Letter Head"
   },
   {
+   "allow_on_submit": 1,
    "default": "Offered",
    "fieldname": "offer_status",
    "fieldtype": "Select",
@@ -82,6 +83,7 @@
    "read_only": 1
   },
   {
+   "fetch_from": "applicant_id.applied_on",
    "fieldname": "job_opening_id",
    "fieldtype": "Link",
    "label": "Job Opening ID",
@@ -104,8 +106,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-16 12:34:25.235806",
- "modified_by": "rizwan.ali@gourmetpakistan.com",
+ "modified": "2025-04-29 18:00:54.281869",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
  "owner": "Administrator",
