@@ -263,29 +263,6 @@ class SalesOrder(SellingController):
 					frappe.throw(_("Cannot create Sales Order for multiple item categories"))
 
 
-		if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
-			if self.palletized:
-				returnables = returnable_items(self.items,self.company, "CSD")
-				self.returnable_items = {} # reset
-				clubbed_returnable_items = {}
-				for returnable in returnables:
-					ordered_qty = 0
-					for item in self.items:
-						if item.item_group == returnable.item_group:
-							ordered_qty = item.qty
-							break
-					if ordered_qty == 0:
-						frappe.throw(f"Item Group {returnable.item_group} qty must be greater then zero")
-					qty = (ordered_qty / returnable.item_qty) * returnable.returnable_qty
-					qty = math.ceil(qty)
-					# check if item is ordered then please adjust the RI quantity
-					# minus_qty = 0
-					# for i in self.items:
-					# 	if i.item_group == returnable.item_group:
-					# 		minus_qty = i.qty
-					# 		break
-					# qty -= minus_qty
-
 	def submit(self, *args, **kwargs):
 		# if self.request_from == 'RMS':
 		# 	if(self.section in get_config_by_name('dn_queue_section',[])):
