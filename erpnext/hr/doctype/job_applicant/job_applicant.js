@@ -36,6 +36,12 @@ frappe.ui.form.on("Job Applicant", {
 		if (!frm.doc.personal_data_consent){
 			frappe.throw(__("Mandatory fields required - I consent to the processing of my personal data for recruitment purposes in accordance with applicable data protection laws."));
 		}
+
+		var age = frappe.utils.get_age(frm.doc.date_of_birth);
+        var allowed_age = frappe.utils.get_config_by_name("EMPLOYEE_ALLOWED_AGE", 18);
+        if( age < allowed_age ) {
+            frappe.throw("Applicant is underage.");
+        }
 	},
 
 	first_name: function(frm){
