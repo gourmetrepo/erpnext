@@ -12,12 +12,14 @@
   "column_break_3",
   "offer_date",
   "valid_till",
+  "job_offer_terms_section",
+  "offer_terms",
   "section_break_7",
   "compensation_details",
   "terms_and_conditions",
+  "terms_and_conditions_text",
   "notes",
   "letter_head",
-  "temp_applied_on",
   "amended_from"
  ],
  "fields": [
@@ -60,12 +62,13 @@
   {
    "fieldname": "compensation_details",
    "fieldtype": "Text Editor",
+   "hidden": 1,
    "label": "Compensation Details"
   },
   {
    "fieldname": "terms_and_conditions",
    "fieldtype": "Link",
-   "label": "Terms and Conditions",
+   "label": "Select Terms and Conditions",
    "options": "Terms and Conditions"
   },
   {
@@ -91,22 +94,34 @@
    "reqd": 1
   },
   {
-   "fetch_from": "applicant_id.applied_on",
-   "fieldname": "temp_applied_on",
-   "fieldtype": "Data",
-   "label": "Temp Applied On"
-  },
-  {
    "fieldname": "column_break_3",
    "fieldtype": "Column Break"
   },
   {
    "fieldname": "section_break_7",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "job_offer_terms_section",
+   "fieldtype": "Section Break",
+   "label": "Job Offer Terms"
+  },
+  {
+   "fieldname": "offer_terms",
+   "fieldtype": "Table",
+   "label": "Offer Terms",
+   "options": "Offer Terms"
+  },
+  {
+   "fetch_from": "terms_and_conditions.terms",
+   "fieldname": "terms_and_conditions_text",
+   "fieldtype": "Text Editor",
+   "label": "Terms and Conditions",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-29 18:00:54.281869",
+ "modified": "2025-04-29 18:35:12.640882",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
