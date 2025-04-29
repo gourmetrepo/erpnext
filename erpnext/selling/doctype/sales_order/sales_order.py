@@ -183,7 +183,7 @@ class SalesOrder(SellingController):
 		for d in self.get('items'):
 			if d.delivered_by_supplier and not d.supplier:
 				frappe.throw(_("Row #{0}: Set Supplier for item {1}").format(d.idx, d.item_code))
-    
+	
 	def before_submit(self):
 		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer','Key-Account Utility Store']
 		if self.customer_group in key_account_groups and self.company != 'Unit 6':
@@ -229,7 +229,7 @@ class SalesOrder(SellingController):
 				res = returnable.item_qty / returnable.returnable_qty
 				qty = ordered_qty * res
 			qty = math.ceil(qty)
-            # check if item is ordered then please adjust the RI quantity
+			# check if item is ordered then please adjust the RI quantity
 			minus_qty = 0
 			for i in self.items:
 				if i.item_code == returnable.returnable_item:
@@ -247,7 +247,7 @@ class SalesOrder(SellingController):
 		# Add check for Inter Unit Sales to avoid multi category items SO
 		if self.order_type=="Inter Unit Sales":
 			inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
-        	inter_units_overhead_companies = []
+			inter_units_overhead_companies = []
 			item_cats = []
 
 			if inter_units_overhead:
@@ -1320,19 +1320,19 @@ def update_produced_qty_in_so_item(sales_order, sales_order_item):
 
 # Moeiz Code to validate company cost center and accounts
 def validate_company_cost_center_and_accounts(sales_order):
-    """Validate that the company's accounts and cost centers are used."""
-    company = sales_order.company
+	"""Validate that the company's accounts and cost centers are used."""
+	company = sales_order.company
 
-    # Fetch the company's accounts and cost centers
-    accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
-    cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
+	# Fetch the company's accounts and cost centers
+	accounts_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabAccount` WHERE company = %s", (company))
+	cost_centers_data = frappe.db.sql("SELECT GROUP_CONCAT(name) FROM `tabCost Center` WHERE company = %s", (company))
 
-    accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
-    cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
+	accounts = set(accounts_data[0][0].split(',')) if accounts_data and accounts_data[0][0] else set()
+	cost_centers = set(cost_centers_data[0][0].split(',')) if cost_centers_data and cost_centers_data[0][0] else set()
 
-    for tax in sales_order.taxes: 
-        if tax.account_head and tax.account_head not in accounts:
-            frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
-        if tax.cost_center and tax.cost_center not in cost_centers:
-            frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
+	for tax in sales_order.taxes: 
+		if tax.account_head and tax.account_head not in accounts:
+			frappe.throw(_("Row {0}: Account {1} does not belong to company {2}").format(tax.idx, tax.account_head, company))
+		if tax.cost_center and tax.cost_center not in cost_centers:
+			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
 
