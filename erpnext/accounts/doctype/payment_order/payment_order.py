@@ -27,6 +27,7 @@ class PaymentOrder(Document):
 		if suppliers:
 			self.suppliers = suppliers[0][0]
 	def on_submit(self):
+		self.posting_date = nowdate()
 		self.update_payment_status()
 
 	def on_cancel(self):
