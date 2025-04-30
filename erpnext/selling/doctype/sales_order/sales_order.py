@@ -185,7 +185,7 @@ class SalesOrder(SellingController):
 				frappe.throw(_("Row #{0}: Set Supplier for item {1}").format(d.idx, d.item_code))
 	
 	def before_submit(self):
-		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer','Key-Account Utility Store']
+		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer']
 		if self.customer_group in key_account_groups and self.company != 'Unit 6':
 			existing_sales_inv_against_customer = frappe.db.sql("""SELECT name FROM  `tabSales Invoice` WHERE customer= %s AND STATUS='Overdue'""", (self.customer), as_dict=True)
 			if existing_sales_inv_against_customer:
@@ -194,7 +194,7 @@ class SalesOrder(SellingController):
 
 
 	def before_save(self):
-		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer','Key-Account Utility Store']
+		key_account_groups = ['Key-Acc. Distributor Customer','Key-Account Customer']
 		if self.customer_group in key_account_groups and self.company != 'Unit 6':
 			existing_sales_inv_against_customer = frappe.db.sql("""SELECT name FROM  `tabSales Invoice` WHERE customer= %s AND STATUS='Overdue'""", (self.customer), as_dict=True)
 			if existing_sales_inv_against_customer:
