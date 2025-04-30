@@ -93,7 +93,7 @@ frappe.ui.form.on("Delivery Note", {
 	},
 	validate: function (frm) {
 		console.log("return type", frm.doc.return_type)
-        if (!frm.doc.is_return && frm.doc.return_type !== "Shop Return") {
+        if (!frm.doc.is_return) {
             (frm.doc.items || []).forEach(function (row) {
                 if (!row.against_sales_order) {
                     frappe.throw(`Against Sales Order is mandatory for item ${row.item_code}`);
