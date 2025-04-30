@@ -91,6 +91,15 @@ frappe.ui.form.on("Delivery Note", {
 
 
 	},
+	validate: function (frm) {
+        if (!frm.doc.is_return) {
+            (frm.doc.items || []).forEach(function (row) {
+                if (!row.against_sales_order) {
+                    frappe.throw(`Against Sales Order is mandatory for item ${row.item_code}`);
+                }
+            });
+        }
+    },
 
 	print_without_amount: function(frm) {
 		erpnext.stock.delivery_note.set_print_hide(frm.doc);
