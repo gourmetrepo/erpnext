@@ -113,15 +113,13 @@
    "options": "Offer Terms"
   },
   {
-   "fetch_from": "terms_and_conditions.terms",
    "fieldname": "terms_and_conditions_text",
    "fieldtype": "Text Editor",
-   "label": "Terms and Conditions",
-   "read_only": 1
+   "label": "Terms and Conditions"
   }
  ],
  "is_submittable": 1,
- "modified": "2025-04-29 18:35:12.640882",
+ "modified": "2025-05-02 13:08:17.996963",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
