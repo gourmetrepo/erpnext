@@ -20,5 +20,15 @@ frappe.ui.form.on("Job Offer", {
                     };
             });
         }
+    },
+
+    terms_and_conditions: function(frm) {
+        if (frm.doc.terms_and_conditions) {
+            frappe.db.get_value('Terms and Conditions', {'name': frm.doc.terms_and_conditions}, 'terms', (r) => {
+                if (r && r.terms) {
+                    frm.set_value('terms_and_conditions_text', r.terms);
+                }
+            });
+        }
     }
 });
