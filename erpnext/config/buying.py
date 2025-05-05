@@ -136,6 +136,11 @@ def get_data():
 					"name": "Address",
 					"description": _("All Addresses."),
 				},
+				{
+					"type": "doctype",
+					"name": "Management Approved Payment Pending",
+					"description": _("Management Approved Payment Pending"),
+				},
 
 			]
 		},
