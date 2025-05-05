@@ -793,13 +793,14 @@
    "fieldname": "payment_mode",
    "fieldtype": "Select",
    "label": "Payment Mode",
-   "options": "Thumb Impression\nFacial Recognition\nManual"
+   "options": "Thumb Impression\nFacial Recognition\nManual",
+   "reqd": 1
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-05-02 18:43:44.037504",
+ "modified": "2025-05-05 15:30:17.153543",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",
