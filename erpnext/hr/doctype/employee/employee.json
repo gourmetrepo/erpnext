@@ -60,6 +60,8 @@
   "salary_mode",
   "bank_name",
   "bank_ac_no",
+  "column_break_52",
+  "payment_mode",
   "health_insurance_section",
   "health_insurance_provider",
   "health_insurance_no",
@@ -781,12 +783,23 @@
    "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Reporting Dict"
+  },
+  {
+   "fieldname": "column_break_52",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Thumb Impression",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "Thumb Impression\nFacial Recognition\nManual"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-02-07 14:38:23.387619",
+ "modified": "2025-05-02 18:43:44.037504",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",
