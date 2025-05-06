@@ -338,6 +338,9 @@ class DeliveryNote(SellingController):
 			self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
 		#self.make_gl_entries()
 		frappe.db.sql("UPDATE `tabDelivery Note` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
+		sale_order_type = frappe.db.get_value("Sales Order",self.sale_order_refrence,"order_type")
+		if sale_order_type == "Inter Unit Sales":
+			make_purchase_order_interunit(self.name)
 			
 
 	def on_cancel(self):
@@ -754,3 +757,30 @@ def update_delivery_note_status(docname, status):
 @frappe.whitelist()
 def delete_returnable(self,arg):
 	print('test')
+ 
+@frappe.whitelist()
+def make_purchase_order_interunit(delivery_note_name):
+	delivery_note = frappe.get_doc("Delivery Note",delivery_note_name)
+	po = frappe.new_doc("Purchase Order")
+	po.supplier = frappe.db.get_value('Supplier',{'supplier_name':delivery_note.company},'name')
+	for item in delivery_note.items:
+		rate = frappe.db.get_value('Batch',item.batch_no,'valuation_rate')
+		if item.against_sales_order:
+			po.append("items",{
+				"item_code": item.item_code,
+				"qty": item.qty,
+				"rate": rate,
+				"price_list_rate": rate,
+				"amount": item.qty * rate,
+				"conversion_factor": item.conversion_factor,
+				"uom": item.uom,
+				"conversion_rate":1,
+				"sales_order": delivery_note.sale_order_refrence
+			})
+	po.schedule_date = delivery_note.posting_date
+	po.transaction_date = delivery_note.posting_date
+	po.company = delivery_note.customer_name
+	po.purchase_order_type = "Inter Unit Purchase"
+	po.ignore_pricing_rule = 1
+	po.save(ignore_permissions=True)
+	po.submit()
