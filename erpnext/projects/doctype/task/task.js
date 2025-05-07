@@ -5,12 +5,14 @@ frappe.provide("erpnext.projects");
 
 frappe.ui.form.on("Task", {
 	setup: function (frm) {
-		frm.set_query("project", function () {
+		frm.fields_dict['project'].get_query = function() {
 			return {
-				query: "erpnext.projects.doctype.task.task.get_project"
-			}
-		});
-
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 		frm.make_methods = {
 			'Timesheet': () => frappe.model.open_mapped_doc({
 				method: 'erpnext.projects.doctype.task.task.make_timesheet',

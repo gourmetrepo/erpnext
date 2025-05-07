@@ -92,7 +92,18 @@ frappe.ui.form.on('Asset', {
 				query: "erpnext.controllers.queries.get_purchase_invoices",
 				filters: { item_code: doc.item_code }
 			}
-		});
+		});	
+
+		// Code by Moeiz
+		// Only show non group project LOVs
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 
 	refresh: function(frm) {
