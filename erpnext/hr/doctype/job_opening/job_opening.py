@@ -10,12 +10,14 @@ from frappe import _
 
 class JobOpening(Document):
 	def before_save(self):
+		if self.is_new():
+			self.job_opening_status = "Open"
+
 		if not self.creation_date:
 			self.creation_date = frappe.utils.nowdate()
 		
 		# self.load_competencies()
 		
-
 	def load_competencies(self):
 		"""Load competencies from the selected position"""
 		if self.position:

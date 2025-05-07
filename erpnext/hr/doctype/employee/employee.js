@@ -237,6 +237,14 @@ frappe.ui.form.on('Employee',{
 			};
 		});
 
+		frm.set_query('job_applicant', () => {
+			return {
+				filters: {
+					job_applicant_status: "Offer Accepted"	
+				}
+			};
+		});
+
 		setTimeout(function() {
             if (!($("#collapseThree3").find("[data-fieldname='education']").length) || !($("#collapseThree3").find("[data-fieldname='external_work_history']").length) || !($("#collapseThree3").find("[data-fieldname='internal_work_history']").length)){
                 frm.trigger("make_missing_field_dashboard");

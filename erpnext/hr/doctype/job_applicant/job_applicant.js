@@ -16,6 +16,16 @@ frappe.ui.form.on("Job Applicant", {
                 }
             };
         };
+	},
+
+	onload: (frm) => {
+		frm.set_query('applied_on', () => {
+			return {
+				filters: {
+					job_opening_status: "Open"
+				}
+			};
+		});
 	},	
 
 	refresh: function(frm) {
@@ -26,14 +36,16 @@ frappe.ui.form.on("Job Applicant", {
         });	
 	},
 
-    before_save: function(frm){
+    before_save: function(frm){	
 		validate_email(frm.doc.email);
 		validate_contact_number(frm.doc.contact);
 
-		frm.doc.references.forEach(reference => {
-			validate_email(reference.reference_email, "References");
-			validate_contact_number(reference.reference_contact, "References");
-		});
+		if (frm.doc.references) {
+			frm.doc.references.forEach(reference => {
+				validate_email(reference.reference_email, "References");
+				validate_contact_number(reference.reference_contact, "References");
+			});
+		}
 
 		if (!frm.doc.truthful_information) {
 			frappe.throw(__("Mandatory fields required - I confirm that the information provided is accurate and truthful."));
