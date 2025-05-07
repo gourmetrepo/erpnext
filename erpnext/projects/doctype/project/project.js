@@ -127,6 +127,15 @@ frappe.ui.form.on("Project", {
 				});
 			}
 		}
+
+        frm.add_custom_button('Project Executive Summary', function() {
+            frappe.after_ajax(() => {
+                frappe.set_route('query-report', 'Project Executive Summary');
+                setTimeout(() => {
+                    frappe.query_report.set_filter_value('project', frm.doc.name);
+                }, 500);
+            });
+        });
 	},
 	import_type: function(frm){
 		if (frm.doc.import_type == 'Letter of Credit'){
