@@ -28,8 +28,16 @@ class Asset(AccountsController):
 
 		self.status = self.get_status()
 
+		# Code by Moeiz to validate project is non group
+		validate_project(self)
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
+
+	def before_save(self):
+		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amount
+
+		# Update project master data with assets
+		update_assets_in_project(self)
 
 	def on_submit(self):
 		self.validate_in_use_date()
@@ -797,3 +805,15 @@ def validate_company_cost_center_and_accounts(asset):
 
 	if asset.cost_center and asset.cost_center not in cost_centers:
 		frappe.throw(_("Cost Center {0} does not belong to company {1}").format(asset.cost_center, company))
+
+
+def validate_project(doc):
+	if doc.project:
+		is_group_project = frappe.db.get_value("Project", doc.project, "is_group")
+		if is_group_project:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(doc.project))
+
+def update_assets_in_project(asset):
+	if asset.project:
+		# Check if the project exists
+		pass

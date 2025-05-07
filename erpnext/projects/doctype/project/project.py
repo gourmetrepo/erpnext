@@ -502,3 +502,18 @@ def set_project_status(project, status):
 
 	project.status = status
 	project.save()
+
+
+@frappe.whitelist()
+def get_projects(doctype, txt, searchfield, start, page_len, filters):
+	if filters and filters.get('company'):
+		company = frappe.db.escape(filters.get('company'))
+	else:
+		frappe.throw(_("Please select a company to fetch projects"))
+	
+	query = f"""
+		select `name`, `project_name` 
+		from `tabProject`
+		where is_group = 0 and company = {company}"""
+
+	return frappe.db.sql(query)

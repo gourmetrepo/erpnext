@@ -779,14 +779,14 @@ function project_based_configurations(frm){
 		frm.set_df_property('project', 'read_only', 1);
 	}
 
-	frm.set_query("project", function() {
-		return {
+	frm.fields_dict['project'].get_query = function() {
+        return {
+            query: "erpnext.projects.doctype.project.project.get_projects",
 			filters: {
-				"is_group": 0,
-				"company": frm.doc.company
+				company: frm.doc.company
 			}
-		};
-	});
+        };
+    };
 
 
 	if (frm.doc.project_based){
