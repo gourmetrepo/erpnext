@@ -15,6 +15,8 @@ from erpnext.hr.doctype.holiday_list.holiday_list import is_holiday
 from frappe.model.document import Document
 
 class Project(Document):
+	nsm_parent_field = 'parent_project'
+
 	def get_feed(self):
 		return '{0}: {1}'.format(_(self.status), frappe.safe_decode(self.project_name))
 
@@ -37,6 +39,16 @@ class Project(Document):
 		self.update_costing()
 		self.update_percent_complete()
 
+	
+	def on_update(self):
+		self.update_nsm_model()
+	
+	def on_trash(self):
+		self.update_nsm_model()
+
+	def update_nsm_model(self):
+		frappe.utils.nestedset.update_nsm(self)
+	
 	def copy_from_template(self):
 		'''
 		Copy tasks from template

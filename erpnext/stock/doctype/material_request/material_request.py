@@ -77,9 +77,13 @@ class MaterialRequest(BuyingController):
 
 		self.set_title()
 		
+		# Code by Moeiz to validate non group projects
+		if self.project:
+			validate_project(self)
 		# Code by Moeiz to validate project based material requests
 		if self.project_based:
 			validate_project_based_material_request(self)
+		
 		
 		validate_company_cost_center_and_accounts(self)
 		# self.validate_qty_against_so()
@@ -633,4 +637,11 @@ def validate_project_based_material_request(mr):
 	for item in mr.items:
 		if not item.project or item.project != mr.project:
 			item.project = mr.project
-			
+
+
+
+def validate_project(mr):
+	if mr.project:
+		is_project = frappe.db.get_value("Project", mr.project, "is_group")
+		if is_project:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(mr.project))

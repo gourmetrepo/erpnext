@@ -36,6 +36,10 @@ class Task(NestedSet):
 		self.validate_status()
 		self.update_depends_on()
 
+		# Code by Moeiz
+		# Validate if project attached is not a group
+		self.validate_project()
+
 	def before_save(self):
 		# Update asset maintenance doc if taks is linked to the asset
 		if self.asset_maintenance and self.status:
@@ -211,9 +215,12 @@ class Task(NestedSet):
 		""")
 		frappe.db.commit()
 	
-	
+	def validate_project(self):
+		is_group_check = frappe.db.get_value("Project", self.project, "is_group")
+		if is_group_check:
+			frappe.throw(_("You cannot attach a project to a task that is a group. Please select a non-group project"))
 
-@frappe.whitelist()
+@frappe.whitelist()	
 def check_if_child_exists(name):
 	child_tasks = frappe.get_all("Task", filters={"parent_task": name})
 	child_tasks = [get_link_to_form("Task", task.name) for task in child_tasks]
@@ -224,9 +231,13 @@ def check_if_child_exists(name):
 @frappe.validate_and_sanitize_search_inputs
 def get_project(doctype, txt, searchfield, start, page_len, filters):
 	from erpnext.controllers.queries import get_match_cond
+
+	# Code by Moeiz
+	# Check added by Moeiz to only show those projects which are not group
 	return frappe.db.sql(""" select name from `tabProject`
 			where %(key)s like %(txt)s
 				%(mcond)s
+			AND is_group=0
 			order by name
 			limit %(start)s, %(page_len)s""" % {
 				'key': searchfield,
@@ -344,3 +355,6 @@ def get_assigned_team_users(doctype, txt, searchfield, start, page_len, filters)
 	
 	users = frappe.db.sql(query)
 	return users
+
+
+

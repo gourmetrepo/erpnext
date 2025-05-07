@@ -101,6 +101,17 @@ frappe.ui.form.on('Stock Entry', {
 			};
 		});
 
+		// Code by Moeiz
+		// Only allow non group projects in project LOV
+		frm.set_query('project', function() {
+			return {
+				filters:{
+					"is_group":0,
+					"company": frm.doc.company
+				}
+			}
+		});
+
 		frm.add_fetch("bom_no", "inspection_required", "inspection_required");
 	},
 

@@ -782,7 +782,7 @@ function project_based_configurations(frm){
 	frm.set_query("project", function() {
 		return {
 			filters: {
-				"is_parent_project": 0,
+				"is_group": 0,
 				"company": frm.doc.company
 			}
 		};
