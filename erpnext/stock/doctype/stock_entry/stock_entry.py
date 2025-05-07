@@ -113,6 +113,9 @@ class StockEntry(StockController):
 		if self.stock_entry_type == 'Material Transfer':
 			validate_plant_maintenance_material_transfer_stock_entry(self)
 
+		# Validate project is non group
+		if self.project:
+			validate_project(self)
 
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
@@ -2028,3 +2031,12 @@ def validate_plant_maintenance_material_transfer_stock_entry(doc):
 						frappe.throw(f"Returned quantity is greater than the available quantity in {asset_maintenance_doc.get('wip_warehouse')}")
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
+
+
+
+
+def validate_project(doc):
+	if doc.project:
+		is_group_check = frappe.db.get_value("Project", doc.project, "is_group")
+		if is_group_check:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(doc.project))
