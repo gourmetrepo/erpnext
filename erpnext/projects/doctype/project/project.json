@@ -7,6 +7,9 @@
  "document_type": "Setup",
  "engine": "InnoDB",
  "field_order": [
+  "is_group",
+  "old_parent",
+  "parent_project",
   "expected_start_date",
   "project_name",
   "company",
@@ -61,7 +64,9 @@
   "day_to_send",
   "weekly_time_to_send",
   "column_break_45",
-  "message"
+  "message",
+  "lft",
+  "rgt"
  ],
  "fields": [
   {
@@ -440,15 +445,51 @@
    "fieldname": "message",
    "fieldtype": "Text",
    "label": "Message"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "label": "Old Parent",
+   "options": "Project"
+  },
+  {
+   "fieldname": "parent_project",
+   "fieldtype": "Link",
+   "label": "Parent Project",
+   "options": "Project"
   }
  ],
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
+ "is_tree": 1,
  "max_attachments": 4,
- "modified": "2025-03-25 13:24:23.027477",
+ "modified": "2025-05-07 13:51:07.512209",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",
+ "nsm_parent_field": "parent_project",
  "owner": "Administrator",
  "permissions": [
   {
@@ -481,7 +522,6 @@
    "write": 1
   }
  ],
- "quick_entry": 1,
  "search_fields": "customer, status, priority, is_active",
  "show_name_in_global_search": 1,
  "sort_field": "modified",

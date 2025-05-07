@@ -101,7 +101,7 @@
    "fieldname": "job_applicant_status",
    "fieldtype": "Select",
    "label": "Job Applicant Status",
-   "options": "\nOpen\nShortlisted\nAccepted\nOffered\nOn Hold\nRejected",
+   "options": "\nOpen\nShortlisted\nAccepted\nRejected\nOn Hold\nOffered\nOffer Accepted\nOffer Rejected\nHired",
    "reqd": 1
   },
   {
@@ -419,7 +419,7 @@
    "options": "Job Applicant Work Experience"
   },
   {
-   "default": "Applicant Declaration & Consent\n\nI hereby declare that the information provided in this application is true and complete to the best of my knowledge. I understand that any false information or omission may disqualify me from further consideration for employment and may result in my dismissal if discovered at a later date.\n",
+   "default": "I hereby declare that the information provided in this application is true and complete to the best of my knowledge. I understand that any false information or omission may disqualify me from further consideration for employment and may result in my dismissal if discovered at a later date.\n",
    "fieldname": "applicant_declaration",
    "fieldtype": "Markdown Editor",
    "label": "Applicant Declaration",
@@ -507,8 +507,8 @@
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-04-25 13:21:44.392927",
- "modified_by": "Administrator",
+ "modified": "2025-05-06 18:34:18.733957",
+ "modified_by": "rizwan.ali@gourmetpakistan.com",
  "module": "HR",
  "name": "Job Applicant",
  "owner": "Administrator",
