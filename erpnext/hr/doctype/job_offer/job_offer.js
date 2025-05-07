@@ -10,6 +10,17 @@ frappe.ui.form.on("Job Offer", {
         });
     },
 
+    onload: (frm) => {
+        frm.set_query('applicant_id', () => {
+			return {
+				filters: {
+					job_applicant_status: "Accepted"
+				}
+			};
+		});
+
+    },
+
 	applicant_id: function(frm) {
         if (frm.doc.temp_applied_on) {
             frm.set_query('job_opening_id', function(doc) {

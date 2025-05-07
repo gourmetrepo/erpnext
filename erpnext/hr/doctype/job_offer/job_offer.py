@@ -10,7 +10,24 @@ from frappe import _
 from frappe.utils.data import get_link_to_form
 
 class JobOffer(Document):
-	pass
+	def on_update_after_submit(self):
+		if self.applicant_id:
+			if self.offer_status == "Accepted":
+				frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offer Accepted")
+			elif self.offer_status == "Declined":
+				frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offer Rejected")
+
+	def before_save(self):
+		if self.is_new():
+			self.offer_status = "Offered"
+
+	def on_submit(self):
+		if self.applicant_id:
+			frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offered")
+
+	def on_cancel(self):
+		self.offer_status = "Cancelled"
+
 
 def update_job_applicant(status, job_applicant):
 	if status in ("Accepted", "Rejected"):

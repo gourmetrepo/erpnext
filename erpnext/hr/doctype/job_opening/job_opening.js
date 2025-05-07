@@ -2,6 +2,16 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Job Opening', {
+	onload: (frm) => {
+		frm.set_query('job_requisition_id', () => {
+			return {
+				filters: {
+					job_requisition_status: "Open & Approved"
+				}
+			};
+		});
+	},
+
 	job_requisition_id: (frm) => {
 		frappe.call({
 			"method": "frappe.client.get",

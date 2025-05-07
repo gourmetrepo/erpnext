@@ -18,6 +18,9 @@ class JobApplicant(Document):
 			frappe.throw("CNIC '{0}' format is invalid".format(self.cnic))
 
 	def before_save(self):
+		if self.is_new():
+			self.job_applicant_status = "Open"
+
 		if not self.job_application_date:
 			self.job_application_date = frappe.utils.nowdate()
 		self.calculate_total_work_experience()
