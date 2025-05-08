@@ -18,8 +18,8 @@ class JobOffer(Document):
 				frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offer Rejected")
 
 	def before_save(self):
-		if self.is_new():
-			self.offer_status = "Offered"
+		if self.is_new() and self.offer_status != "Offered":
+			frappe.throw(_("Job Offer can only be created with status <b>Offered<b>"))
 
 	def on_submit(self):
 		if self.applicant_id:

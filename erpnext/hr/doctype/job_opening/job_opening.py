@@ -10,8 +10,8 @@ from frappe import _
 
 class JobOpening(Document):
 	def before_save(self):
-		if self.is_new():
-			self.job_opening_status = "Open"
+		if self.is_new() and self.job_opening_status != "Open":
+			frappe.throw(_("Job Opening can only be created with status <b>Open<b>."))
 
 		if not self.creation_date:
 			self.creation_date = frappe.utils.nowdate()
