@@ -339,7 +339,7 @@ class DeliveryNote(SellingController):
 		#self.make_gl_entries()
 		frappe.db.sql("UPDATE `tabDelivery Note` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		sale_order_type = frappe.db.get_value("Sales Order",self.sale_order_refrence,"order_type")
-		if sale_order_type == "Inter Unit Sales":
+		if sale_order_type == "Inter Unit Sales" and self.customer_name in ['Unit 5','Unit 8','Unit 11','Unit 17']:
 			make_purchase_order_interunit(self.name)
 			
 
