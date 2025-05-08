@@ -36,9 +36,6 @@ class Asset(AccountsController):
 	def before_save(self):
 		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amount
 
-		# Update project master data with assets
-		update_assets_in_project(self)
-
 	def on_submit(self):
 		self.validate_in_use_date()
 		self.set_status()
@@ -51,6 +48,9 @@ class Asset(AccountsController):
 				traceback = frappe.get_traceback()
 				frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
 				self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+		
+		# Update project master data with assets
+		update_assets_in_project(self)
 
 	def before_cancel(self):
 		self.cancel_auto_gen_movement()
@@ -816,4 +816,27 @@ def validate_project(doc):
 def update_assets_in_project(asset):
 	if asset.project:
 		# Check if the project exists
-		pass
+		project = frappe.get_doc("Project", asset.project)
+		if not project:
+			frappe.throw(_("Project {0} does not exist.").format(asset.project))
+
+		project_assets = project.project_assets
+		found = False
+		for project_asset in project_assets:
+			if project_asset.asset_id == asset.name:
+				project_asset.asset_name =  asset.asset_name
+				project_asset.gross_value = asset.asset_gross_value
+				found = True
+				break
+		
+		if not found:
+			project_asset_doc = frappe.new_doc("Project Assets")
+			project_asset_doc.update({
+				"asset_id": asset.name,
+				"asset_name": asset.asset_name,
+				"gross_value": asset.asset_gross_value
+			})
+			project.append("project_assets", project_asset_doc)
+			project.save()
+
+		
