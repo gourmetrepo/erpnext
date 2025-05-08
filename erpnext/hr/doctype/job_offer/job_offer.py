@@ -27,6 +27,8 @@ class JobOffer(Document):
 
 	def on_cancel(self):
 		self.offer_status = "Cancelled"
+		if self.applicant_id:
+			frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Accepted")
 
 
 def update_job_applicant(status, job_applicant):
