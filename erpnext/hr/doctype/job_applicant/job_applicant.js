@@ -115,8 +115,11 @@ function update_full_name(frm){
 
 function validate_email(email_address, formPart="") {
     const validEmail = frappe.utils.validate_type(email_address, "email");
+	let msg = "";
     if (!validEmail) {
-		const msg = `in ${formPart}`;
+		if (formPart) {
+			msg = `in ${formPart}`;
+		}
         frappe.throw(__(`Please enter valid email address ${msg}`));
     }
 }
@@ -124,8 +127,12 @@ function validate_email(email_address, formPart="") {
 function validate_contact_number(contact_number, formPart="") {
 	const phoneRegex = /^03[0-9]{2}-[0-9]{7}$/;
     const isValid = phoneRegex.test(contact_number);
+	let msg = "";
 	if (!isValid) {
-		const msg = `in ${formPart}`;
+		if (formPart) {
+			msg = `in ${formPart}`;
+		}
+
 		frappe.throw(__(`Please enter valid contact number ${msg}`));
 	}
 }
@@ -200,5 +207,11 @@ frappe.ui.form.on('Job Applicant References', {
 		}
 
 		frm.refresh_field("references");
+	},
+
+	reference_contact: function(frm, cdt, cdn) {
+		frappe.require("assets/nerp/js/jquery.maskedinput.min.js", () => {
+			$('input[data-fieldname="reference_contact"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
+		});
 	}
 });
