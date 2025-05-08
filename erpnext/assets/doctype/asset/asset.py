@@ -822,19 +822,34 @@ def update_assets_in_project(asset):
 
 		project_assets = project.project_assets
 		found = False
+		sum_of_asset_gross_values = 0
 		for project_asset in project_assets:
 			if project_asset.asset_id == asset.name:
 				project_asset.asset_name =  asset.asset_name
 				project_asset.gross_value = asset.asset_gross_value
 				found = True
-				break
+			
+			sum_of_asset_gross_values += project_asset.gross_value
+		
 		
 		if not found:
 			project_asset_doc = frappe.new_doc("Project Assets")
+			estimated_cost = 0
+			actual_cost = 0
+			if sum_of_asset_gross_values > 0:
+				estimated_cost = project.estimated_costing / sum_of_asset_gross_values * asset.asset_gross_value
+				actual_cost = asset.asset_gross_value + estimated_cost
+			else:
+				estimated_cost = project.estimated_costing / asset.asset_gross_value * asset.asset_gross_value
+				actual_cost = asset.asset_gross_value + estimated_cost
+			
 			project_asset_doc.update({
 				"asset_id": asset.name,
 				"asset_name": asset.asset_name,
-				"gross_value": asset.asset_gross_value
+				"gross_value": asset.asset_gross_value,
+				"estimated_cost": estimated_cost,
+				"actual_cost": actual_cost
+
 			})
 			project.append("project_assets", project_asset_doc)
 			project.save()
