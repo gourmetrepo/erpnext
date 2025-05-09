@@ -100,7 +100,8 @@
    "label": "Payment Type",
    "options": "Receive\nPay\nInternal Transfer",
    "print_hide": 1,
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "column_break_5",
@@ -151,7 +152,8 @@
    "label": "Party Type",
    "options": "DocType",
    "print_hide": 1,
-   "search_index": 1
+   "search_index": 1,
+   "set_only_once": 1
   },
   {
    "bold": 1,
@@ -573,8 +575,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2023-12-21 16:58:00.112701",
- "modified_by": "jawad.hanif@gourmetpakistan.com",
+ "modified": "2025-05-09 15:19:00.748916",
+ "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry",
  "owner": "Administrator",
