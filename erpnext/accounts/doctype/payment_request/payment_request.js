@@ -65,33 +65,38 @@ frappe.ui.form.on("Payment Request", {
 			 frm.toggle_reqd("cash_account", 1);
 			 frm.toggle_reqd("bank_account", 0);
 		}
-		 else {
-			 frm.toggle_reqd("bank_account", 1);
-			 frm.toggle_reqd("cash_account", 0);
-		 }
-	 },
+		else {
+			frm.toggle_reqd("bank_account", 1);
+			frm.toggle_reqd("cash_account", 0);
+		}
+	},
 	 
-	 onload: function(frm) {
-		 frm.set_query("cash_account", function() {
-			 return {
-				 filters: {
-					 company: frm.doc.company,
-					 account_type: 'Cash',
-					 is_group: 0,
-				 }
-			 }
-		 })
-	 },
+	onload: function(frm) {
+		if (frm.doc.company) {
+            frm.set_df_property('company', 'read_only', 1);
+            frm.refresh_field('company');
+        }
+
+		frm.set_query("cash_account", function() {
+			return {
+				filters: {
+					company: frm.doc.company,
+					account_type: 'Cash',
+					is_group: 0,
+				}
+			}
+		})
+	},
 	 
-	 party: function(frm) {
-		 if (frm.doc.party_type == "Supplier"){
-			 frappe.db.get_value(frm.doc.party_type, {"name": frm.doc.party}, "supplier_name", 
-				 (r) => {
-				 frm.set_value("party_name", r.supplier_name);
-				 frm.refresh_field("party_name");
-			 });
-		 }
-	 }
+	party: function(frm) {
+		if (frm.doc.party_type == "Supplier"){
+			frappe.db.get_value(frm.doc.party_type, {"name": frm.doc.party}, "supplier_name", 
+				(r) => {
+				frm.set_value("party_name", r.supplier_name);
+				frm.refresh_field("party_name");
+			});
+		}
+	}
 });
 
 frappe.ui.form.on("Payment Request", "is_a_subscription", function(frm) {
