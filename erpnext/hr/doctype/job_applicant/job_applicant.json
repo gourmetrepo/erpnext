@@ -97,11 +97,11 @@
    "label": "Application Details"
   },
   {
-   "default": "Open",
+   "default": "Applied",
    "fieldname": "job_applicant_status",
    "fieldtype": "Select",
    "label": "Job Applicant Status",
-   "options": "\nOpen\nShortlisted\nAccepted\nRejected\nOn Hold\nOffered\nOffer Accepted\nOffer Rejected\nHired",
+   "options": "\nApplied\nLonglisted\nShortlisted\nInterview\nAccepted\nRejected\nOn Hold\nOffered\nOffer Accepted\nOffer Rejected\nHired",
    "reqd": 1
   },
   {
@@ -507,8 +507,8 @@
  ],
  "icon": "fa fa-user",
  "idx": 1,
- "modified": "2025-05-06 18:34:18.733957",
- "modified_by": "rizwan.ali@gourmetpakistan.com",
+ "modified": "2025-05-12 12:39:39.322347",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
  "owner": "Administrator",
