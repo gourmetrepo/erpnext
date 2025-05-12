@@ -1247,34 +1247,53 @@ def make_inter_company_purchase_order(source_name, target_doc=None):
 	return make_inter_company_transaction("Sales Order", source_name, target_doc)
 
 @frappe.whitelist()
-def create_pick_list(source_name, target_doc=None):
+def create_stock_reservation(source_name, target_doc=None):
 	def update_item_quantity(source, target, source_parent):
-		target.qty = flt(source.qty) - flt(source.delivered_qty)
-		target.stock_qty = (flt(source.qty) - flt(source.delivered_qty)) * flt(source.conversion_factor)
+		target.available_qty = frappe.db.get_value("Stock Ledger Entry", filters={"item_code": target.item, "warehouse":source_parent.set_warehouse},fieldname="sum(actual_qty)")
+		qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
+					  FROM `tabStock Reservation` AS sr
+					  JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
+					  WHERE sr.docstatus = 1 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+		if qty:
+			qty = qty[0].total
+		else:
+			qty = 0
+		target.reserved_qty = flt(source.qty) - flt(source.delivered_qty) - flt(qty)
+		target.stock_reserved_qty = (flt(source.qty) - flt(source.delivered_qty) - flt(qty)) * flt(source.conversion_factor)
+		if target.reserved_qty < 0:
+			target.flags.skip_row = True
 
-	doc = get_mapped_doc('Sales Order', source_name, {
+	doclist = get_mapped_doc('Sales Order', source_name, {
 		'Sales Order': {
-			'doctype': 'Pick List',
+			'doctype': 'Stock Reservation',
+			'field_map': {
+				'Sales Order': 'document_type',
+				'company': 'company',
+				'set_warehouse': 'warehouse',
+				'name': 'ref_document'
+			},
 			'validation': {
 				'docstatus': ['=', 1]
 			}
 		},
 		'Sales Order Item': {
-			'doctype': 'Pick List Item',
+			'doctype': 'Stock Reservation Item',
 			'field_map': {
-				'parent': 'sales_order',
-				'name': 'sales_order_item'
+				'item_code': 'item',
+				'qty': 'so_qty',
+				'stock_qty' : 'stock_reserved_qty',
+				'conversion_factor' : 'uom_conversion_factor',
 			},
 			'postprocess': update_item_quantity,
-			'condition': lambda doc: abs(doc.delivered_qty) < abs(doc.qty) and doc.delivered_by_supplier!=1
 		},
 	}, target_doc)
 
-	doc.purpose = 'Delivery'
+	# doc.purpose = 'Delivery'
 
-	doc.set_item_locations()
+	# doc.set_item_locations()
+	doclist.items = [d for d in doclist.items if not getattr(d.flags, 'skip_row', False)]
 
-	return doc
+	return doclist
 
 def update_produced_qty_in_so_item(sales_order, sales_order_item):
 	#for multiple work orders against same sales order item

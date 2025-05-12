@@ -7,7 +7,7 @@ frappe.ui.form.on("Sales Order", {
 	setup: function(frm) {
 		frm.custom_make_buttons = {
 			'Delivery Note': 'Delivery Note',
-			'Pick List': 'Pick List',
+			'Stock Reservation': 'Stock Reservation',
 			'Sales Invoice': 'Sales Invoice',
 			'Material Request': 'Material Request',
 			'Purchase Order': 'Purchase Order',
@@ -137,7 +137,7 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 						}
 					}
 
-					this.frm.add_custom_button(__('Pick List'), () => this.create_pick_list(), __('Create'));
+					this.frm.add_custom_button(__('Stock Reservation'), () => this.create_stock_reservation(), __('Create'));
 
 					// delivery note
 					if(flt(doc.per_delivered, 6) < 100 && ["Sales","Depletion", "Shopping Cart"].indexOf(doc.order_type)!==-1 && allow_delivery) {
@@ -229,9 +229,9 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 		this.order_type(doc);
 	},
 
-	create_pick_list() {
+	create_stock_reservation() {
 		frappe.model.open_mapped_doc({
-			method: "erpnext.selling.doctype.sales_order.sales_order.create_pick_list",
+			method: "erpnext.selling.doctype.sales_order.sales_order.create_stock_reservation",
 			frm: this.frm
 		})
 	},
