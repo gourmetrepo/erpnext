@@ -885,23 +885,38 @@ def validate_palletized_items(doc):
 			frappe.throw("Returnable Item qty must be a whole number for Row {0}".format(item.get("idx")))
 @frappe.whitelist()
 def make_purchase_order_interunit(delivery_note_name):
+	from collections import defaultdict
 	delivery_note = frappe.get_doc("Delivery Note",delivery_note_name)
 	po = frappe.new_doc("Purchase Order")
 	po.supplier = frappe.db.get_value('Supplier',{'supplier_name':delivery_note.company},'name')
+	item_map = defaultdict(lambda: {"qty": 0, "rate": 0, "conversion_factor": None, "uom": None, "count": 0 })
+
 	for item in delivery_note.items:
-		rate = frappe.db.get_value('Batch',item.batch_no,'valuation_rate')
 		if item.against_sales_order:
-			po.append("items",{
-				"item_code": item.item_code,
-				"qty": item.qty,
-				"rate": rate,
-				"price_list_rate": rate,
-				"amount": item.qty * rate,
-				"conversion_factor": item.conversion_factor,
-				"uom": item.uom,
-				"conversion_rate":1,
-				"sales_order": delivery_note.sale_order_refrence
-			})
+			rate = frappe.db.get_value('Batch', item.batch_no, 'valuation_rate') or 0
+			item_map[item.item_code]["qty"] += item.qty
+			item_map[item.item_code]["rate"] += item.rate
+			item_map[item.item_code]["conversion_factor"] = item.conversion_factor
+			item_map[item.item_code]["uom"] = item.uom
+			item_map[item.item_code]["count"] += 1 
+
+	for item_code, data in item_map.items():
+		total_qty = data.get("qty")
+		rate = data.get("rate") / data.get("count") if  data.get("count", 0) else 0
+
+		po.append("items", {
+			"item_code": item_code,
+			"qty": total_qty,
+			"rate": rate,
+			"amount": total_qty * rate,
+			"price_list_rate": rate,
+			"conversion_factor": data.get("conversion_factor"),
+			"uom": data.get("uom"),
+			"conversion_rate": 1,
+			"delivery_note": delivery_note.name,
+			"sales_order": delivery_note.sale_order_refrence
+		})
+
 	po.schedule_date = delivery_note.posting_date
 	po.transaction_date = delivery_note.posting_date
 	po.company = delivery_note.customer_name
