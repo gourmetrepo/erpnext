@@ -169,6 +169,17 @@ frappe.ui.form.on('Payment Entry', {
 				filters: filters
 			};
 		});
+
+
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+		
 	},
 
 	refresh: function(frm) {
