@@ -17,21 +17,21 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 		}
 
 
-		frm.fields_dict['project'].get_query = function() {
+		this.frm.fields_dict['project'].get_query = function() {
 			return {
 				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					company: frm.doc.company
+					company: this.frm.doc.company
 				}
 			};
 		};
 
-		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		this.frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
 		
 			return {
 				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					company: frm.doc.company
+					company: this.frm.doc.company
 				}
 			};
 		};
