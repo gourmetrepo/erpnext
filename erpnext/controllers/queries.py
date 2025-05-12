@@ -291,7 +291,9 @@ def get_project_name(doctype, txt, searchfield, start, page_len, filters):
 
 	return frappe.db.sql("""select {fields} from `tabProject`
 		where `tabProject`.status not in ("Completed", "Cancelled")
-			and {cond} `tabProject`.name like %(txt)s {match_cond}
+			and {cond} `tabProject`.name like %(txt)s 
+			and `tabProject`.is_group = 0
+			{match_cond}
 		order by
 			if(locate(%(_txt)s, name), locate(%(_txt)s, name), 99999),
 			idx desc,
@@ -304,7 +306,7 @@ def get_project_name(doctype, txt, searchfield, start, page_len, filters):
 			page_len=page_len), {
 				"txt": "%{0}%".format(txt),
 				"_txt": txt.replace('%', '')
-			})
+			}, debug=True)
 
 
 @frappe.whitelist()

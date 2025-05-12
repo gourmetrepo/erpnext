@@ -34,6 +34,7 @@ frappe.ui.form.on("Sales Order", {
 				}
 			};
 		})
+
 	},
 	refresh: function(frm) {
 		if(frm.doc.docstatus === 1 && frm.doc.status !== 'Closed'
@@ -56,6 +57,12 @@ frappe.ui.form.on("Sales Order", {
 			return erpnext.queries.warehouse(frm.doc);
 		});
 
+		/*
+		Code by Moeiz
+		Project Module updated
+		Updated this query at the controllers for Sales order, delivery note and sales invoice as it is core code and a check is added in core query
+		where it should pick only non group projects
+		*/
 		frm.set_query('project', function(doc, cdt, cdn) {
 			return {
 				query: "erpnext.controllers.queries.get_project_name",

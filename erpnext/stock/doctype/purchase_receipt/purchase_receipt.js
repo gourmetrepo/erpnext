@@ -35,6 +35,25 @@ frappe.ui.form.on("Purchase Receipt", {
 			}
 		});
 		
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+
+		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+		
 	},
 	onload: function(frm) {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {

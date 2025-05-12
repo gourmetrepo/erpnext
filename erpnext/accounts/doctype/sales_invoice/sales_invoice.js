@@ -516,6 +516,12 @@ cur_frm.fields_dict.write_off_cost_center.get_query = function(doc) {
 
 // project name
 //--------------------------
+/*
+Code by Moeiz
+Project Module updated
+Updated this query at the controllers for Sales order, delivery note and sales invoice as it is core code and a check is added in core query
+where it should pick only non group projects
+*/
 cur_frm.fields_dict['project'].get_query = function(doc, cdt, cdn) {
 	return{
 		query: "erpnext.controllers.queries.get_project_name",

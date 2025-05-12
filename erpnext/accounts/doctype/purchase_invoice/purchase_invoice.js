@@ -15,6 +15,26 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 				return (doc.qty<=doc.received_qty) ? "green" : "orange";
 			});
 		}
+
+
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+
+		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 	onload: function() {
 		this._super();
