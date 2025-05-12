@@ -30,6 +30,13 @@ class PaymentOrder(Document):
 		self.posting_date = nowdate()
 		self.update_payment_status()
 
+		# Create auto payment entries for 'Cash' mode of payment
+		bank_account = frappe.get_value('Bank Account', self.company_bank_account, 'account')
+		if bank_account:
+			account_type = frappe.get_value('Account', bank_account, 'account_type')
+			if account_type == 'Cash':
+				frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.create_payment_entries", name=self.name, queue="long", enqueue_after_commit=True)
+
 	def on_cancel(self):
 		self.update_payment_status(cancel=True)
 
@@ -375,3 +382,19 @@ def validate_company_cost_center_and_accounts(payment_order):
 			
 			if reference.bank_account and reference.bank_account not in bank_accounts:
 				frappe.throw(_("Row {0} Bank Account: {1} does not belong to company {2}").format(reference.idx, reference.bank_account, company))
+
+@frappe.whitelist()
+def create_payment_entries(name):
+	try:
+		doc = frappe.get_doc('Payment Order', name)
+		for vd in doc.vendor_details:
+			try:
+				frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.make_journal_entry", doc=doc, supplier=vd.supplier, queue="long", enqueue_after_commit=True)
+			except Exception as e:
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback,title=f"Error while creating payment entry for supplier: {vd.supplier} from payment order {name}")
+				doc.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+	except Exception as e:
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while creating payment entry for payment order {doc.name}")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
