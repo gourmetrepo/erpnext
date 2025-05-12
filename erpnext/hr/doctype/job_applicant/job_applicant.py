@@ -17,8 +17,8 @@ class JobApplicant(Document):
 			frappe.throw("CNIC '{0}' format is invalid".format(self.cnic))
 
 	def before_save(self):
-		if self.is_new() and self.job_applicant_status != "Open":
-			frappe.throw(_("Job Applicant can only be created with status <b>Open<b>."))
+		if self.is_new() and self.job_applicant_status != "Applied":
+			frappe.throw(_("Job Applicant can only be created with status <b>Applied</b>."))
 
 		if not self.job_application_date:
 			self.job_application_date = frappe.utils.nowdate()
