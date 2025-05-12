@@ -57,7 +57,8 @@
    "fieldtype": "Select",
    "label": "Payment Request Type",
    "options": "Outward\nInward",
-   "reqd": 1
+   "reqd": 1,
+   "set_only_once": 1
   },
   {
    "fieldname": "transaction_date",
@@ -94,13 +95,15 @@
    "fieldname": "party_type",
    "fieldtype": "Link",
    "label": "Party Type",
-   "options": "DocType"
+   "options": "DocType",
+   "set_only_once": 1
   },
   {
    "fieldname": "party",
    "fieldtype": "Dynamic Link",
    "label": "Party",
-   "options": "party_type"
+   "options": "party_type",
+   "set_only_once": 1
   },
   {
    "fieldname": "column_break_4",
@@ -348,7 +351,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-03-28 16:07:31.960798",
+ "modified": "2025-05-09 17:00:54.281863",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Request",
