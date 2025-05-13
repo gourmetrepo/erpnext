@@ -67,6 +67,8 @@ class PaymentEntry(AccountsController):
 		# Moeiz Check to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 		
+		# Check to validate payment_order on payment_type: pay
+		validate_payment_order_on_new_document(self)
 
 	def on_submit(self):
 		# frappe.db.get_value("", {"represents_company": doc.company}, "name")
@@ -1245,3 +1247,10 @@ def validate_company_cost_center_and_accounts(payment_entry):
 			if deduction.cost_center and deduction.cost_center not in cost_centers:
 				frappe.throw(_("Row {0} Deduction Cost Center: {1} does not belong to company {2}").format(deduction.idx,deduction.cost_center, company))
 	
+
+def validate_payment_order_on_new_document(payment_entry):
+	"""Validate that payment_order is referenced before saving a Eayment Entry new document."""
+
+	if payment_entry.is_new():
+		if payment_entry.payment_type == "Pay" and not payment_entry.payment_order:
+			frappe.throw("<strong>Payment Order<strong> is required to create a Payment Entry.")

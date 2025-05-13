@@ -50,6 +50,10 @@ frappe.ui.form.on("Payment Request", "onload", function(frm, dt, dn){
 			}
 		}
 	})
+	if (frm.doc.company) {
+		frm.set_df_property('company', 'read_only', 1);
+		frm.refresh_field('company');
+	}
 })
 
 frappe.ui.form.on("Payment Request", "refresh", function(frm) {

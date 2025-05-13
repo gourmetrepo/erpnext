@@ -327,6 +327,7 @@ def make_payment_request(**args):
 			"reference_name": args.dn,
 			"party_type": args.get("party_type") or "Customer",
 			"party": args.get("party") or ref_doc.get("customer"),
+			"company": ref_doc.company,
 			"bank_account": bank_account
 		})
 
