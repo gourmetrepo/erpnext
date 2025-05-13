@@ -896,7 +896,7 @@ def make_purchase_order_interunit(delivery_note_name):
 		if item.against_sales_order:
 			rate = frappe.db.get_value('Batch', item.batch_no, 'valuation_rate') or 0
 			item_map[item.item_code]["qty"] += item.qty
-			item_map[item.item_code]["rate"] += item.rate
+			item_map[item.item_code]["rate"] += rate
 			item_map[item.item_code]["conversion_factor"] = item.conversion_factor
 			item_map[item.item_code]["uom"] = item.uom
 			item_map[item.item_code]["count"] += 1 
