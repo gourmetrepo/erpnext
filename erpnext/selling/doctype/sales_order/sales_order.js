@@ -144,12 +144,19 @@ erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend(
 							this.frm.add_custom_button(__('Close'), () => this.close_sales_order(), __("Status"))
 						}
 					}
-
-					this.frm.add_custom_button(__('Stock Reservation'), () => this.create_stock_reservation(), __('Create'));
+					if (doc.docstatus == 1){
+						this.frm.add_custom_button(__('Stock Reservation'), () => this.create_stock_reservation(), __('Create'));
+					}
 
 					// delivery note
 					if(flt(doc.per_delivered, 6) < 100 && ["Sales","Depletion", "Shopping Cart"].indexOf(doc.order_type)!==-1 && allow_delivery) {
-						this.frm.add_custom_button(__('Delivery Note'), () => this.make_delivery_note_based_on_delivery_date(), __('Create'));
+						frappe.db.count('Stock Reservation', {
+							filters: {'ref_document': doc.name}
+						}).then(total_count => {
+							if (total_count == 0){
+								this.frm.add_custom_button(__('Delivery Note'), () => this.make_delivery_note_based_on_delivery_date(), __('Create'));
+							}
+						});
 						this.frm.add_custom_button(__('Work Order'), () => this.make_work_order(), __('Create'));
 					}
 
