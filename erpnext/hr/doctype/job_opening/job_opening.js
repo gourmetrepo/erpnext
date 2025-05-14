@@ -1,72 +1,71 @@
-// Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2025, Shahzad Naser and contributors
 // For license information, please see license.txt
 
 frappe.ui.form.on('Job Opening', {
-	onload: function(frm) {
-		frm.set_query("department", function() {
+	onload: (frm) => {
+		frm.set_query('job_requisition_id', () => {
 			return {
-				"filters": {
-					"company": frm.doc.company,
+				filters: {
+					job_requisition_status: "Open & Approved"
 				}
 			};
 		});
+	},
 
-		frm.set_query("branch", function() {
-            if(!frm.doc.department){
-                frappe.msgprint("Please select Department first");
-            }
-            return {
-                "filters": {
-                    "department": frm.doc.department,
-                    "parent":["<","0"]
-                }
-            };
-        });
-        
-        frm.set_query("sub_branch", function() {
-            if(!frm.doc.branch){
-                frappe.msgprint("Please select Branch first");
-            }
-            return {
-                "filters": {
-                    "branch": frm.doc.branch
-                }
-            };
-        });
+	job_requisition_id: (frm) => {
+		frappe.call({
+			"method": "frappe.client.get",
+			args: {
+				doctype: "Job Requisition",
+				name: frm.doc.job_requisition_id
+			},
+			callback: function (r) {
+				frm.set_value("required_to_work_in_shifts", r.message.required_to_work_in_shifts);
+				frm.refresh_field("required_to_work_in_shifts");
+				frm.set_value("required_to_travel", r.message.required_to_travel);
+				frm.refresh_field("required_to_travel");
+			}
+		});
 	},
-	designation: function(frm){
-	    if(frm.doc.designation && frm.doc.company && frm.doc.department && frm.doc.branch && frm.doc.sub_branch){
-			frappe.call({
-				"method": "erpnext.hr.doctype.staffing_plan.staffing_plan.get_active_staffing_plan_details",
-				args: {
-					company: frm.doc.company,
-					designation: frm.doc.designation,
-					date: frappe.datetime.now_date(), // ToDo - Date in Job Opening?
-					department: frm.doc.department,
-					branch: frm.doc.branch,
-					sub_branch: frm.doc.sub_branch
-				},
-				callback: function (data) {
-					if(data.message){
-						frm.set_value('staffing_plan', data.message[0].name);
-						frm.set_value('planned_vacancies', data.message[0].vacancies);
-					} else {
-						frm.set_value('staffing_plan', "");
-						frm.set_value('planned_vacancies', 0);
-						frappe.show_alert({
-							indicator: 'orange',
-							message: __('No Staffing Plans found for this Designation')
-						});
-					}
-				}
-			});
-		}
-		else{
-			frm.set_value('staffing_plan', "");
-			frm.set_value('planned_vacancies', 0);
-		}
-	},
-	company: function(frm) {
-		frm.set_value('designation', "");
+
+	position: (frm) => {
+		frappe.call({
+			"method": "frappe.client.get",
+			args: {
+				doctype: "Position",
+				name: frm.doc.position
+			},
+			callback: function (r) {
+				frm.set_value("required_background_check", r.message.required_background_check);
+				frm.refresh_field("required_background_check");
+
+				frm.clear_table("required_core_skills");
+				frm.clear_table("required_behavioral_competencies");
+
+				r.message.required_core_skills.forEach(element => {
+					debugger;
+					let temp_skill = element.skill;
+					let temp_proficiency = element.required_proficiency_level;
+
+					frm.add_child('required_core_skills', {
+						skill: temp_skill,
+						required_proficiency_level: temp_proficiency,
+					})
+				})
+
+				r.message.required_behavioral_competencies.forEach(element => {
+					let temp_skill = element.skill;
+					let temp_proficiency = element.required_proficiency_level;
+
+					frm.add_child('required_behavioral_competencies', {
+						skill: temp_skill,
+						required_proficiency_level: temp_proficiency,
+					})
+				});
+
+				frm.refresh_field('required_core_skills');
+				frm.refresh_field('required_behavioral_competencies');
+			}
+		});
 	}
 });

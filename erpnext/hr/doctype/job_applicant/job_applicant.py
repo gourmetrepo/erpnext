@@ -7,38 +7,38 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import frappe
 from frappe import _
-from frappe.utils import comma_and, validate_email_address
+from frappe.utils import nowdate, date_diff, comma_and, flt, validate_email_address
 
-sender_field = "email_id"
-
-class DuplicationError(frappe.ValidationError): pass
 
 class JobApplicant(Document):
-	def onload(self):
-		job_offer = frappe.get_all("Job Offer", filters={"job_applicant": self.name})
-		if job_offer:
-			self.get("__onload").job_offer = job_offer[0].name
-
-	def autoname(self):
-		keys = filter(None, (self.applicant_name, self.email_id, self.job_title))
-		if not keys:
-			frappe.throw(_("Name or Email is mandatory"), frappe.NameError)
-		self.name = " - ".join(keys)
-
 	def validate(self):
-		self.check_email_id_is_unique()
-		if self.email_id:
-			validate_email_address(self.email_id, True)
+		from nerp.utils import validate_cnic_mask
+		if self.cnic and not validate_cnic_mask(self.cnic):
+			frappe.throw("CNIC '{0}' format is invalid".format(self.cnic))
 
-		if not self.applicant_name and self.email_id:
-			guess = self.email_id.split('@')[0]
-			self.applicant_name = ' '.join([p.capitalize() for p in guess.split('.')])
+	def before_save(self):
+		if self.is_new() and self.job_applicant_status != "Applied":
+			frappe.throw(_("Job Applicant can only be created with status <b>Applied</b>."))
 
-	def check_email_id_is_unique(self):
-		if self.email_id:
-			names = frappe.db.sql_list("""select name from `tabJob Applicant`
-				where email_id=%s and name!=%s and job_title=%s""", (self.email_id, self.name, self.job_title))
+		if not self.job_application_date:
+			self.job_application_date = frappe.utils.nowdate()
+		self.calculate_total_work_experience()
 
-			if names:
-				frappe.throw(_("Email Address must be unique, already exists for {0}").format(comma_and(names)), frappe.DuplicateEntryError)
+	def calculate_total_work_experience(self):
+		total_experience = 0
+		
+		if self.work_experience:
+			for we in self.work_experience:
+				diff = 0
+				if we.end_date:
+					diff = date_diff(we.end_date, we.joining_date)
+				elif we.currently_employed:
+					diff = date_diff(nowdate(), we.joining_date)
+
+				if diff > 0:
+					total_experience += diff
+		
+		if total_experience:
+			self.total_work_experience_years = flt(total_experience / 365, 1)
+
 
