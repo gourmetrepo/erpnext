@@ -1297,10 +1297,17 @@ def make_inter_company_purchase_order(source_name, target_doc=None):
 def create_stock_reservation(source_name, target_doc=None):
 	def update_item_quantity(source, target, source_parent):
 		target.available_qty = frappe.db.get_value("Stock Ledger Entry", filters={"item_code": target.item, "warehouse":source_parent.set_warehouse},fieldname="sum(actual_qty)")
-		qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
-					  FROM `tabStock Reservation` AS sr
-					  JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
-					  WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+		if source_parent.set_warehouse:
+			qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
+						FROM `tabStock Reservation` AS sr
+						JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
+						WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+		else:
+			qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
+						FROM `tabStock Reservation` AS sr
+						JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
+						WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+
 		if qty:
 			qty = qty[0].total
 		else:
