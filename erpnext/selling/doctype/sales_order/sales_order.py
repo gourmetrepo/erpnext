@@ -1253,14 +1253,14 @@ def create_stock_reservation(source_name, target_doc=None):
 		qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
 					  FROM `tabStock Reservation` AS sr
 					  JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
-					  WHERE sr.docstatus = 1 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+					  WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
 		if qty:
 			qty = qty[0].total
 		else:
 			qty = 0
 		target.reserved_qty = flt(source.qty) - flt(source.delivered_qty) - flt(qty)
 		target.stock_reserved_qty = (flt(source.qty) - flt(source.delivered_qty) - flt(qty)) * flt(source.conversion_factor)
-		if target.reserved_qty < 0:
+		if target.reserved_qty <= 0:
 			target.flags.skip_row = True
 
 	doclist = get_mapped_doc('Sales Order', source_name, {
@@ -1292,6 +1292,8 @@ def create_stock_reservation(source_name, target_doc=None):
 
 	# doc.set_item_locations()
 	doclist.items = [d for d in doclist.items if not getattr(d.flags, 'skip_row', False)]
+	if len(doclist.items) == 0:
+		frappe.throw(_("No items to reserve stock for."))
 
 	return doclist
 

@@ -12,6 +12,7 @@
   "naming_series",
   "customer",
   "customer_name",
+  "stock_reservation",
   "column_break1",
   "amended_from",
   "company",
@@ -1264,13 +1265,19 @@
    "label": "Customer Type",
    "options": "\nEmployee\nSupplier",
    "reqd": 1
+  },
+  {
+   "fieldname": "stock_reservation",
+   "fieldtype": "Link",
+   "label": "Stock Reservation",
+   "options": "Stock Reservation"
   }
  ],
  "icon": "fa fa-truck",
  "idx": 146,
  "in_create": 1,
  "is_submittable": 1,
- "modified": "2023-02-14 08:31:28.124447",
+ "modified": "2025-05-14 11:29:19.125916",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Delivery Note",
