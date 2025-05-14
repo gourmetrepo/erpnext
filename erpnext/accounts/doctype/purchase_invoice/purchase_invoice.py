@@ -58,8 +58,14 @@ class PurchaseInvoice(BuyingController):
 
 		# Code by Moeiz
 		# FS_Advanced_Payment_Update _v1.0
-		if self.purchase_order_type and self.purchase_order_type == "Import":
-			self.set_advances()		
+		# if self.purchase_order_type and self.purchase_order_type == "Import":
+		# 	self.set_advances()		
+		
+
+		# Code by Nabeel
+		# Special Yasir Bhai k liyay..
+		if self.purchase_order_type and self.is_new():
+				self.set_advances()	
 
 	def invoice_is_blocked(self):
 		return self.on_hold and (not self.release_date or self.release_date > getdate(nowdate()))
