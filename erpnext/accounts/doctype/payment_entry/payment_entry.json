@@ -281,8 +281,7 @@
    "fieldtype": "Currency",
    "label": "Paid Amount",
    "options": "paid_from_account_currency",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "source_exchange_rate",
@@ -580,8 +579,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-05-13 12:19:46.826198",
- "modified_by": "attiqur.rehman@gourmetpakistan.com",
+ "modified": "2025-05-13 13:44:54.349623",
+ "modified_by": "moeiz.shahzad@gourmetpakistan.com",
  "module": "Accounts",
  "name": "Payment Entry",
  "owner": "Administrator",

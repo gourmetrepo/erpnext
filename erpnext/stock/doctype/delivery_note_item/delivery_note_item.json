@@ -15,6 +15,7 @@
   "description",
   "brand",
   "item_group",
+  "item_section",
   "image_section",
   "image",
   "image_view",
@@ -87,8 +88,7 @@
   "reason_for_return",
   "section_break_72",
   "page_break",
-  "is_returnable",
-  "item_section"
+  "is_returnable"
  ],
  "fields": [
   {
@@ -758,8 +758,8 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-04-10 22:15:11.097463",
- "modified_by": "shoaib.rehmat@gourmetpakistan.com",
+ "modified": "2025-04-23 16:03:12.876123",
+ "modified_by": "Administrator",
  "module": "Stock",
  "name": "Delivery Note Item",
  "owner": "Administrator",
