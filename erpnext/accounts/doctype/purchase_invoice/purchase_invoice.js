@@ -31,6 +31,13 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 		const me = this;
 		this._super();
 
+		this.frm.set_query("expense_account", "items", function(doc) {
+			return {
+				query: "erpnext.controllers.queries.get_expense_account",
+				filters: {'company': doc.company, 'is_group':0 }
+			}
+		});
+
 		hide_fields(this.frm.doc);
 		// Show / Hide button
 		this.show_general_ledger();
@@ -424,13 +431,6 @@ cur_frm.fields_dict['select_print_heading'].get_query = function(doc, cdt, cdn) 
 		]
 	}
 }
-
-cur_frm.set_query("expense_account", "items", function(doc) {
-	return {
-		query: "erpnext.controllers.queries.get_expense_account",
-		filters: {'company': doc.company }
-	}
-});
 
 cur_frm.cscript.expense_account = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn];
