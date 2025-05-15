@@ -1304,16 +1304,10 @@ def create_stock_reservation(source_name, target_doc=None):
 		if already_reserved:
 			target.available_qty -= already_reserved[0]['total']
 
-		if source_parent.set_warehouse:
-			qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
-						FROM `tabStock Reservation` AS sr
-						JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
-						WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
-		else:
-			qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
-						FROM `tabStock Reservation` AS sr
-						JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
-						WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+		qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
+					FROM `tabStock Reservation` AS sr
+					JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
+					WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
 		if qty:
 			qty = qty[0].total
 		else:
