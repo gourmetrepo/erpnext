@@ -12,6 +12,7 @@ frappe.ui.form.on("Delivery Note", {
 	onload: function(frm) {
 		if (frm.doc.set_warehouse_once == 1){
 			frm.set_df_property('set_warehouse','read_only', 1);
+			frm.get_field('items').grid.toggle_enable('warehouse',0);
 		}
 	},
 	setup: function(frm) {
