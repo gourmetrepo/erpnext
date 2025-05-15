@@ -1,5 +1,4 @@
 {
- "actions": [],
  "allow_events_in_timeline": 1,
  "allow_import": 1,
  "allow_rename": 1,
@@ -16,6 +15,7 @@
   "customer_name",
   "gender",
   "customer_type",
+  "category_type",
   "default_bank_account",
   "lead_name",
   "image",
@@ -97,7 +97,6 @@
    "bold": 1,
    "fieldname": "customer_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Full Name",
    "no_copy": 1,
    "oldfieldname": "customer_name",
@@ -480,13 +479,18 @@
    "fieldname": "dn_required",
    "fieldtype": "Check",
    "label": "Allow Sales Invoice Creation Without Delivery Note"
+  },
+  {
+   "fieldname": "category_type",
+   "fieldtype": "Link",
+   "label": "Category Type",
+   "options": "Category Type"
   }
  ],
  "icon": "fa fa-user",
  "idx": 363,
  "image_field": "image",
- "links": [],
- "modified": "2020-03-17 11:03:42.706907",
+ "modified": "2025-05-15 15:51:26.622447",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Customer",
