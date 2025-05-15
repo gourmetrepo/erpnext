@@ -1352,6 +1352,8 @@ def create_stock_reservation(source_name, target_doc=None):
 	# if not doclist.warehouse:
 	# 	frappe.throw(_("Please set warehouse in Sales Order {0}").format(source_name))
 	# doc.set_item_locations()
+	if not doclist.customer_category_type:
+		doclist.customer_category_type = frappe.get_value("Customer", doclist.customer, "category_type")
 	doclist.items = [d for d in doclist.items if not getattr(d.flags, 'skip_row', False)]
 	if len(doclist.items) == 0:
 		frappe.throw(_("No items to reserve stock for."))
