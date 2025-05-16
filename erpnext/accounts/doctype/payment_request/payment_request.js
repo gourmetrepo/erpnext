@@ -43,6 +43,22 @@ frappe.ui.form.on("Payment Request", {
 			});
 		}
 
+		// Filter: If PR is made from JV, only show the suppliers that are in that specific JV.
+		if (frm.doc.reference_doctype === 'Journal Entry' && frm.doc.reference_name) {
+			debugger;
+            frappe.db.get_doc('Journal Entry', frm.doc.reference_name).then(journal_entry => {
+                const allowed_parties = journal_entry.accounts.filter(row => row.party)
+                    .map(row => row.party);
+                if (allowed_parties.length > 0) {
+                    frm.set_query('party', () => ({
+                        filters: {
+                            name: ['in', allowed_parties]
+                        }
+                    }));
+                }
+            });
+        }
+
 		if(!frm.doc.payment_gateway_account && frm.doc.status == "Initiated") {
 			frm.add_custom_button(__('Create Payment Entry'), function(){
 				frappe.call({
