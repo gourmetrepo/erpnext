@@ -91,6 +91,15 @@ def execute(filters=None):
 			data.append(report_data)
 
 	add_additional_uom_columns(columns, data, include_uom, conversion_factors)
+	for row in data:
+		already_reserved = frappe.db.sql(f""" SELECT ifnull(sum(sri.reserved_qty),0) as total
+								FROM `tabStock Reservation Item` as sri
+								JOIN `tabStock Reservation` AS sr ON sr.name = sri.parent
+								WHERE sri.item = {frappe.db.escape(row['item_code'])} and sr.warehouse = {frappe.db.escape(row['warehouse'])} and sr.fulfilled = 0""", as_dict=True)
+		if already_reserved:
+			row['reserved_qty'] = already_reserved[0]['total']
+		else:
+			row['reserved_qty'] = 0
 	return columns, data
 
 def get_columns(filters):
@@ -102,6 +111,7 @@ def get_columns(filters):
 		{"label": _("Warehouse"), "fieldname": "warehouse", "fieldtype": "Link", "options": "Warehouse", "width": 100},
 		{"label": _("Stock UOM"), "fieldname": "stock_uom", "fieldtype": "Link", "options": "UOM", "width": 90},
 		{"label": _("Balance Qty"), "fieldname": "bal_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
+		{"label": _("Reserved Qty"), "fieldname": "reserved_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
 		{"label": _("Balance Value"), "fieldname": "bal_val", "fieldtype": "Currency", "width": 100, "options": "currency"},
 		{"label": _("Opening Qty"), "fieldname": "opening_qty", "fieldtype": "Float", "width": 100, "convertible": "qty"},
 		{"label": _("Opening Value"), "fieldname": "opening_val", "fieldtype": "Currency", "width": 110, "options": "currency"},
