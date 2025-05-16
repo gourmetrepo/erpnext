@@ -7,10 +7,18 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import frappe
 from frappe import _
+from frappe.model.naming import make_autoname
 from frappe.utils import nowdate, date_diff, comma_and, flt, validate_email_address
 
 
 class JobApplicant(Document):
+	def autoname(self):
+		full_name = self.full_name or ""
+		position_title = self.position_title or ""
+		self.series = f"{self.email}-.#####"
+		self.title = f"{full_name}-{position_title}"
+		self.name = make_autoname(self.series)
+
 	def validate(self):
 		from nerp.utils import validate_cnic_mask
 		if self.cnic and not validate_cnic_mask(self.cnic):
