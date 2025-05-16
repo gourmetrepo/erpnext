@@ -15,9 +15,9 @@ frappe.ui.form.on("Journal Entry", {
 
 	refresh: function(frm) {
 		// Overriding the original '+' button next to Payment Request to call custom mapper.
-		var pr_button = $('[data-doctype="Payment Request"]').closest('.document-link').find('.btn-new');
-		if (pr_button.length) {
-			pr_button.off('click').on('click', function() {
+		var $pr_button = $('[data-doctype="Payment Request"]').closest('.document-link').find('.btn-new');
+		if ($pr_button.length) {
+			$pr_button.off('click').on('click', function() {
 				frappe.call({
 					method: 'erpnext.accounts.doctype.journal_entry.journal_entry.make_payment_request_from_journal_entry',
 					args: { source_name: frm.doc.name },
