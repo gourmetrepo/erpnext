@@ -1,6 +1,5 @@
 {
  "allow_rename": 1,
- "autoname": "format: APP-{email}-{position_title}",
  "creation": "2013-01-29 19:25:37",
  "description": "Applicant for a Job",
  "doctype": "DocType",
@@ -81,7 +80,8 @@
   "applicant_consent_regarding_information_provided",
   "applicant_declaration",
   "truthful_information",
-  "personal_data_consent"
+  "personal_data_consent",
+  "title"
  ],
  "fields": [
   {
@@ -503,11 +503,20 @@
    "fieldtype": "Data",
    "label": "Total Work Experience (Years)",
    "read_only": 1
+  },
+  {
+   "bold": 1,
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
   }
  ],
- "icon": "fa fa-user",
+ "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-05-12 12:39:39.322347",
+ "modified": "2025-05-16 20:01:35.303616",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
@@ -525,8 +534,9 @@
    "write": 1
   }
  ],
- "search_fields": "applicant_name",
+ "search_fields": "full_name,position_title, job_applicant_status",
+ "show_name_in_global_search": 1,
  "sort_field": "modified",
- "sort_order": "ASC",
- "title_field": "applicant_name"
+ "sort_order": "DESC",
+ "title_field": "title"
 }
