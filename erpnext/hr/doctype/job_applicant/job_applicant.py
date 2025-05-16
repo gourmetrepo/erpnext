@@ -7,6 +7,8 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 import frappe
 from frappe import _
+from frappe.model.naming import make_autoname
+from frappe.utils import nowdate, date_diff, comma_and, flt, validate_email_address
 from frappe.utils import comma_and, validate_email_address
 
 sender_field = "email_id"
@@ -14,16 +16,12 @@ sender_field = "email_id"
 class DuplicationError(frappe.ValidationError): pass
 
 class JobApplicant(Document):
-	def onload(self):
-		job_offer = frappe.get_all("Job Offer", filters={"job_applicant": self.name})
-		if job_offer:
-			self.get("__onload").job_offer = job_offer[0].name
-
 	def autoname(self):
-		keys = filter(None, (self.applicant_name, self.email_id, self.job_title))
-		if not keys:
-			frappe.throw(_("Name or Email is mandatory"), frappe.NameError)
-		self.name = " - ".join(keys)
+		full_name = self.full_name or ""
+		position_title = self.position_title or ""
+		self.series = f"{self.email}-.#####"
+		self.title = f"{full_name}-{position_title}"
+		self.name = make_autoname(self.series)
 
 	def validate(self):
 		self.check_email_id_is_unique()
