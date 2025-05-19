@@ -21,6 +21,7 @@ class BankTransaction(StatusUpdater):
 		self.update_allocations()
 		self.clear_linked_payment_entries()
 		self.set_status(update=True)
+		self.set_br_amount()
 
 	def update_allocations(self):
 		if self.payment_entries:
@@ -63,6 +64,13 @@ class BankTransaction(StatusUpdater):
 	def clear_sales_invoice(self, payment_entry):
 		frappe.db.set_value("Sales Invoice Payment", dict(parenttype=payment_entry.payment_document,
 			parent=payment_entry.payment_entry), "clearance_date", self.date)
+	
+	def set_br_amount(self):
+		if self.payment_entries:
+			for pe in self.payment_entries:
+				if pe.allocated_amount > 0:
+					frappe.db.set_value("GL Entry", pe.payment_entry, "br_amount", flt(pe.allocated_amount))
+
 
 def get_total_allocated_amount(payment_entry):
 	return frappe.db.sql("""
@@ -97,7 +105,13 @@ def get_paid_amount(payment_entry, currency):
 
 	elif payment_entry.payment_document == "Expense Claim":
 		return frappe.db.get_value(payment_entry.payment_document, payment_entry.payment_entry, "total_amount_reimbursed")
-
+	elif payment_entry.payment_document == "GL Entry":
+		gl_value = frappe.db.get_value(payment_entry.payment_document, payment_entry.payment_entry, ["credit", "debit"], as_dict=True)
+		if gl_value:
+			if gl_value.get("credit", 0) > 0:
+				return gl_value.get("credit")
+			else:
+				return gl_value.get("debit")
 	else:
 		frappe.throw("Please reconcile {0}: {1} manually".format(payment_entry.payment_document, payment_entry.payment_entry))
 
@@ -112,3 +126,34 @@ def unclear_reference_payment(doctype, docname):
 			frappe.db.set_value(doc.payment_document, doc.payment_entry, "clearance_date", None)
 
 		return doc.payment_entry
+
+
+@frappe.whitelist()
+def get_payment_documents(doctype, txt, searchfield, start, page_len, filters):
+	select_condition = f"name, voucher_no"
+	condition = ""
+	if not filters.get("account"):
+		return []
+	else:
+		condition = f"AND account = '{filters.get('account')}'"
+
+
+	if not filters.get("type"):
+		return []
+	elif filters.get("type") == "Pay":
+		condition = f"{condition} AND credit > 0"
+		select_condition = f"{select_condition}, credit"
+	elif filters.get("type") == "Receive":
+		condition = f"{condition} AND debit > 0"
+		select_condition = f"{select_condition}, debit"
+
+	return frappe.db.sql(f"""
+		SELECT
+			{select_condition}
+		FROM
+			`tab{doctype}`
+		WHERE
+			voucher_type IN ('Payment Entry', 'Journal Entry')
+		AND br_amount = 0
+		{condition}
+		ORDER BY name DESC;""")
