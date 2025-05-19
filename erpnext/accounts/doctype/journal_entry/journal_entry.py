@@ -3,6 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe, erpnext, json
+from frappe.model.mapper import get_mapped_doc
 from frappe.utils import cstr, flt, fmt_money, formatdate, getdate, nowdate, cint, get_link_to_form
 from frappe import msgprint, _, scrub
 from erpnext.controllers.accounts_controller import AccountsController
@@ -1097,3 +1098,34 @@ def validate_company_cost_center_and_accounts(journal_entry):
 				frappe.throw(_("Row {0} Account: {1} does not belong to company {2}").format(account.idx, account.account, company))
 			if account.cost_center and account.cost_center not in cost_centers:
 				frappe.throw(_("Row {0} Cost Center: {1} does not belong to company {2}").format(account.idx, account.cost_center, company))
+
+
+@frappe.whitelist()
+def make_payment_request_from_journal_entry(source_name):
+	def set_missing_values(source, target):
+		target.reference_doctype = "Journal Entry"
+		target.reference_name = source.name
+		target.payment_request_type = "Outward"
+		
+		party = None
+		party_type = None
+		for account in source.accounts:
+			if account.party_type == "Supplier":
+				party = account.party
+				party_type = account.party_type
+				break
+		if party_type:
+			target.party_type = party_type
+			target.party = party
+
+	return get_mapped_doc(
+        "Journal Entry",
+        source_name,
+        {
+            "Journal Entry": {
+                "doctype": "Payment Request",
+            }
+        },
+        target_doc=None,
+        postprocess=set_missing_values
+    )

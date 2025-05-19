@@ -56,13 +56,14 @@ frappe.query_reports["Stock Balance"] = {
 			"reqd": 1,
 			get_query: () => {
 				var warehouse_type = frappe.query_report.get_filter_value('warehouse_type');
+				var fil = {'company': frappe.query_report.get_filter_value('company')};
 				if(warehouse_type){
-					return {
-						filters: {
-							'warehouse_type': warehouse_type
-						}
-					};
+					fil['warehouse_type'] = warehouse_type;
 				}
+				return {
+					filters: fil
+				};
+
 			}
 		},
 		{

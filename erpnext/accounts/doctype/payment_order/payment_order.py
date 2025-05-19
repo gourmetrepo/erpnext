@@ -27,6 +27,7 @@ class PaymentOrder(Document):
 		if suppliers:
 			self.suppliers = suppliers[0][0]
 	def on_submit(self):
+		self.db_set('posting_date', nowdate())
 		self.update_payment_status()
 
 		# Create auto payment entries for 'Cash' mode of payment

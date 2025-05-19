@@ -477,8 +477,8 @@ class DeliveryNote(SellingController):
 		if self.stock_reservation:
 			from nrp_manufacturing.utils import update_bin_qty_with_condition
 			items = frappe.get_all("Stock Reservation Item", filters={"parent": self.stock_reservation}, fields=["item","reserved_qty","name"])
-			for item in items:
-				for d in self.items:
+			for d in self.items:
+				for item in items:
 					if d.item_code == item.item:
 						frappe.db.sql(f"""UPDATE `tabStock Reservation Item` SET delivered_qty = (delivered_qty + {flt(d.qty)}) WHERE name = '{item.name}'""",auto_commit=True)						
 						break
