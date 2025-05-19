@@ -45,7 +45,8 @@ class PurchaseOrder(BuyingController):
 				if d.discount_percentage != 0.0:
 					frappe.throw(_("{0} Item rate is not according to buying & daily rate. Please contact to support team.")
 						.format(d.item_code))
-	 
+		if self.purchase_order_type == 'Inter Unit Purchase' and self.company in ("Unit 5", "Unit 8", "Unit 11") and self.supplier_name in ("Unit 5", "Unit 8", "Unit 11"):
+			frappe.msgprint(_("Inter Unit Purchase cannot be allowed between these company and supplier."))
 		if self.docstatus == 1 :
 			self.set_status()
 			self.check_on_hold_or_closed_status()
