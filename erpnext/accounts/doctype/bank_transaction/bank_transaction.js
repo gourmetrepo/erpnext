@@ -22,11 +22,11 @@ frappe.ui.form.on('Bank Transaction', {
 	},
 	company: function (frm) {
 		if (!frm.doc.company){
-			frm.set_value("account", "");
-			frm.refresh_field("account");
+			frm.set_value("bank_account", "");
+			frm.refresh_field("bank_account");
 		}
 		else{
-			frm.set_query("account", function () {
+			frm.set_query("bank_account", function () {
 				return {
 					"filters": {
 						"is_group": 0,
@@ -37,11 +37,11 @@ frappe.ui.form.on('Bank Transaction', {
 			});
 		}
 	},
-	account: function (frm) {
+	bank_account: function (frm) {
 		if (!frm.doc.company){
 			frappe.msgprint(__('Please select company first.'));
-			frm.set_value("account", "");
-			frm.refresh_field("account");
+			frm.set_value("bank_account", "");
+			frm.refresh_field("bank_account");
 		}
 	}
 });
