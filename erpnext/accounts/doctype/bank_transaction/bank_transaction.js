@@ -2,6 +2,15 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Bank Transaction', {
+	refresh: function(frm) {
+		frm.set_query("company", function () {
+			return {
+				"filters": {
+					"is_group": 0
+				}
+			};
+		});
+	},
 	onload(frm) {
 		frm.set_query('payment_document', 'payment_entries', function() {
 			return {
@@ -10,6 +19,30 @@ frappe.ui.form.on('Bank Transaction', {
 				}
 			};
 		});
+	},
+	company: function (frm) {
+		if (!frm.doc.company){
+			frm.set_value("account", "");
+			frm.refresh_field("account");
+		}
+		else{
+			frm.set_query("account", function () {
+				return {
+					"filters": {
+						"is_group": 0,
+						"company": frm.doc.company,
+						"account_type": 'Bank'
+					}
+				};
+			});
+		}
+	},
+	account: function (frm) {
+		if (!frm.doc.company){
+			frappe.msgprint(__('Please select company first.'));
+			frm.set_value("account", "");
+			frm.refresh_field("account");
+		}
 	}
 });
 
