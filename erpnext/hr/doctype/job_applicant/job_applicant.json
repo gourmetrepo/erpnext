@@ -6,6 +6,7 @@
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "title",
   "applicant_name",
   "application_details_section",
   "job_applicant_status",
@@ -80,8 +81,7 @@
   "applicant_consent_regarding_information_provided",
   "applicant_declaration",
   "truthful_information",
-  "personal_data_consent",
-  "title"
+  "personal_data_consent"
  ],
  "fields": [
   {
@@ -516,7 +516,7 @@
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-05-16 20:01:35.303616",
+ "modified": "2025-05-19 19:26:09.101900",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
