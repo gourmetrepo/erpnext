@@ -109,6 +109,7 @@ class DeliveryNote(SellingController):
 					frappe.throw(_("Sales Order required for Item {0}").format(d.item_code))
 
 	def validate(self):
+		self.validate_stock_reservation()
 		self.validate_posting_time()
 		super(DeliveryNote, self).validate()
 		self.set_status()
@@ -129,6 +130,16 @@ class DeliveryNote(SellingController):
 		self.update_current_stock()
 
 		if not self.installation_status: self.installation_status = 'Not Installed'
+
+	
+	def validate_stock_reservation(self):
+		if self.stock_reservation:
+			items = frappe.get_all("Stock Reservation Item", filters={"parent": self.stock_reservation}, fields=["item","reserved_qty","delivered_qty"])
+			for item in items:
+				for d in self.items:
+					if d.item_code == item.item:
+						if d.qty > (flt(item.reserved_qty) - flt(item.delivered_qty)):
+							frappe.throw(_("Item {0} qty {1} is greater than reserved qty {2}").format(d.item_code, d.qty, (item.reserved_qty - item.delivered_qty)))
 
 	def validate_with_previous_doc(self):
 		super(DeliveryNote, self).validate_with_previous_doc({
@@ -206,6 +217,7 @@ class DeliveryNote(SellingController):
 		else:
 			self.queue_action('submit',queue_name="dn_tertiary",ignore_workflow=ignore_workflow)
 	def before_save(self):
+		self.validate_stock_reservation()
 		for item in self.items:
 			_cost_center = None
 			if self.section !=None:
@@ -326,6 +338,7 @@ class DeliveryNote(SellingController):
 		from nrp_manufacturing.modules.gourmet.delivery_note.delivery_note import update_stock_ledger
 		DeliveryNote.update_stock_ledger = update_stock_ledger
 		self.update_stock_ledger()
+		self.update_stock_reservation()
 		# stock_gl = frappe.new_doc('Stock GL Queue')
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
@@ -342,6 +355,18 @@ class DeliveryNote(SellingController):
 		if sale_order_type == "Inter Unit Sales" and self.customer_name in ['Unit 5','Unit 8','Unit 11','Unit 17']:
 			make_purchase_order_interunit(self.name)
 			
+	def update_stock_reservation(self):
+		if self.stock_reservation:
+			from nrp_manufacturing.utils import update_bin_qty_with_condition
+			items = frappe.get_all("Stock Reservation Item", filters={"parent": self.stock_reservation}, fields=["item","reserved_qty","name"])
+			for d in self.items:
+				for item in items:
+					if d.item_code == item.item:
+						frappe.db.sql(f"""UPDATE `tabStock Reservation Item` SET delivered_qty = (delivered_qty + {flt(d.qty)}) WHERE name = '{item.name}'""",auto_commit=True)						
+						break
+			fulfilled = frappe.db.sql(f"""SELECT sum(reserved_qty - delivered_qty) AS total FROM `tabStock Reservation Item` WHERE parent = '{self.stock_reservation}'""",as_dict=True)
+			if fulfilled and fulfilled[0]['total'] == 0:
+				frappe.db.sql(f"""UPDATE `tabStock Reservation` SET fulfilled = 1 WHERE name = '{self.stock_reservation}'""",auto_commit=True)
 
 	def on_cancel(self):
 		super(DeliveryNote, self).on_cancel()

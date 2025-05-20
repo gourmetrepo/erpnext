@@ -13,6 +13,7 @@
   "naming_series",
   "customer",
   "customer_name",
+  "customer_category",
   "order_type",
   "skip_delivery_note",
   "column_break1",
@@ -1199,12 +1200,20 @@
    "fieldtype": "Table",
    "label": "Returnable Items",
    "options": "Sale Order Returnable Item"
+  },
+  {
+   "fetch_from": "customer.category_type",
+   "fetch_if_empty": 1,
+   "fieldname": "customer_category",
+   "fieldtype": "Data",
+   "label": "Customer Category",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-04-27 17:30:31.530547",
+ "modified": "2025-05-17 16:52:08.769600",
  "modified_by": "muhammadyasir@gourmetpakistan.com",
  "module": "Selling",
  "name": "Sales Order",

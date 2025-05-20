@@ -1247,34 +1247,65 @@ def make_inter_company_purchase_order(source_name, target_doc=None):
 	return make_inter_company_transaction("Sales Order", source_name, target_doc)
 
 @frappe.whitelist()
-def create_pick_list(source_name, target_doc=None):
+def create_stock_reservation(source_name, target_doc=None):
 	def update_item_quantity(source, target, source_parent):
-		target.qty = flt(source.qty) - flt(source.delivered_qty)
-		target.stock_qty = (flt(source.qty) - flt(source.delivered_qty)) * flt(source.conversion_factor)
+		target.available_qty = frappe.db.get_value("Stock Ledger Entry", filters={"item_code": target.item, "warehouse":source_parent.set_warehouse},fieldname="ifnull(sum(actual_qty),0)")
+		already_reserved = frappe.db.sql(f""" SELECT ifnull(sum(sri.reserved_qty),0) as total
+								   FROM `tabStock Reservation Item` as sri
+								   JOIN `tabStock Reservation` AS sr ON sr.name = sri.parent
+								   WHERE sri.item = '{target.item}' and sr.warehouse = '{source_parent.set_warehouse}'""", as_dict=True)		
+		if already_reserved:
+			target.available_qty -= already_reserved[0]['total']
 
-	doc = get_mapped_doc('Sales Order', source_name, {
+		qty = frappe.db.sql(f"""SELECT sum(sri.reserved_qty) AS total 
+					FROM `tabStock Reservation` AS sr
+					JOIN `tabStock Reservation Item` AS sri ON sri.parent = sr.name
+					WHERE sr.docstatus = 1 and sr.fulfilled = 0 and sri.item = '{target.item}' and sr.ref_document = '{source_parent.name}'""",as_dict=True)
+		if qty:
+			qty = qty[0].total
+		else:
+			qty = 0
+		target.reserved_qty = flt(source.qty) - flt(source.delivered_qty) - flt(qty)
+		target.stock_reserved_qty = (flt(source.qty) - flt(source.delivered_qty) - flt(qty)) * flt(source.conversion_factor)
+		if target.reserved_qty <= 0:
+			target.flags.skip_row = True
+
+	doclist = get_mapped_doc('Sales Order', source_name, {
 		'Sales Order': {
-			'doctype': 'Pick List',
+			'doctype': 'Stock Reservation',
+			'field_map': {
+				'Sales Order': 'document_type',
+				'company': 'company',
+				'set_warehouse': 'warehouse',
+				'name': 'ref_document'
+			},
 			'validation': {
 				'docstatus': ['=', 1]
 			}
 		},
 		'Sales Order Item': {
-			'doctype': 'Pick List Item',
+			'doctype': 'Stock Reservation Item',
 			'field_map': {
-				'parent': 'sales_order',
-				'name': 'sales_order_item'
+				'item_code': 'item',
+				'qty': 'so_qty',
+				'stock_qty' : 'stock_reserved_qty',
+				'conversion_factor' : 'uom_conversion_factor',
 			},
 			'postprocess': update_item_quantity,
-			'condition': lambda doc: abs(doc.delivered_qty) < abs(doc.qty) and doc.delivered_by_supplier!=1
 		},
 	}, target_doc)
 
-	doc.purpose = 'Delivery'
+	# doc.purpose = 'Delivery'
+	# if not doclist.warehouse:
+	# 	frappe.throw(_("Please set warehouse in Sales Order {0}").format(source_name))
+	# doc.set_item_locations()
+	if not doclist.customer_category_type:
+		doclist.customer_category_type = frappe.get_value("Customer", doclist.customer, "category_type")
+	doclist.items = [d for d in doclist.items if not getattr(d.flags, 'skip_row', False)]
+	if len(doclist.items) == 0:
+		frappe.throw(_("No items to reserve stock for."))
 
-	doc.set_item_locations()
-
-	return doc
+	return doclist
 
 def update_produced_qty_in_so_item(sales_order, sales_order_item):
 	#for multiple work orders against same sales order item
