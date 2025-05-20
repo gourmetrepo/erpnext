@@ -483,6 +483,7 @@
   {
    "fieldname": "category_type",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Category Type",
    "options": "Category Type"
   }
@@ -490,7 +491,7 @@
  "icon": "fa fa-user",
  "idx": 363,
  "image_field": "image",
- "modified": "2025-05-15 15:51:26.622447",
+ "modified": "2025-05-15 15:48:54.907846",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Customer",

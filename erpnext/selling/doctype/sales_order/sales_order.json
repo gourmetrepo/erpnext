@@ -1206,8 +1206,6 @@
    "fetch_if_empty": 1,
    "fieldname": "customer_category",
    "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
    "label": "Customer Category",
    "read_only": 1
   }
@@ -1215,8 +1213,8 @@
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-05-15 16:25:44.744189",
- "modified_by": "Administrator",
+ "modified": "2025-05-17 16:52:08.769600",
+ "modified_by": "muhammadyasir@gourmetpakistan.com",
  "module": "Selling",
  "name": "Sales Order",
  "owner": "Administrator",
