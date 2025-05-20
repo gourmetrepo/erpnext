@@ -1,4 +1,3 @@
-
 frappe.ui.form.on("Job Applicant", {
 	setup: function(frm) {
 		frm.fields_dict['core_skills'].grid.get_field('skill').get_query = function(doc, cdt, cdn) {
@@ -36,7 +35,10 @@ frappe.ui.form.on("Job Applicant", {
         });	
 	},
 
-    before_save: function(frm){	
+    before_save: function(frm){
+		// to update title of document on save.
+		frm.set_value("title", `${frm.doc.full_name}-${frm.doc.position_title}`)
+
 		validate_email(frm.doc.email);
 		validate_contact_number(frm.doc.contact);
 
