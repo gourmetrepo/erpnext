@@ -66,17 +66,23 @@ frappe.ui.form.on('Bank Transaction Payments', {
 		let row = locals[cdt][cdn];
 		if (!row.payment_entry) return;
 
-		frappe.db.get_value('GL Entry', row.payment_entry, ['credit', 'debit'])
+		frappe.db.get_value('GL Entry', row.payment_entry, ['credit', 'debit', 'br_amount'])
 			.then(r => {
 				let data = r.message;
 				if (!data) return;
 
 				if (data.credit > 0) {
-					row.allocated_amount = data.credit;
+					row.allocated_amount = data.credit - data.br_amount;
+					row.gl_amount = data.credit;
+					row.gl_br_amount = data.br_amount;
 				} else if (data.debit > 0) {
-					row.allocated_amount = data.debit;
+					row.allocated_amount = data.debit - data.br_amount;
+					row.gl_amount = data.debit;
+					row.gl_br_amount = data.br_amount;
 				} else {
 					row.allocated_amount = 0;
+					row.gl_amount = 0;
+					row.gl_br_amount = 0;
 				}
 				frm.refresh_field('payment_entries');
 			});

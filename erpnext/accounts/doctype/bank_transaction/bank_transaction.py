@@ -67,9 +67,28 @@ class BankTransaction(StatusUpdater):
 	
 	def set_br_amount(self):
 		if self.payment_entries:
-			for pe in self.payment_entries:
-				if pe.allocated_amount > 0:
-					frappe.db.set_value("GL Entry", pe.payment_entry, "br_amount", flt(pe.allocated_amount))
+			if self.docstatus == 2:
+				for pe in self.payment_entries:
+					frappe.db.set_value("GL Entry", pe.payment_entry, "br_amount", 0)
+			else:
+				self.validate_amount()
+				for pe in self.payment_entries:
+					if pe.allocated_amount > 0:
+						br_amount = flt(pe.allocated_amount) + flt(pe.gl_br_amount)
+						frappe.db.set_value("GL Entry", pe.payment_entry, "br_amount", br_amount)
+
+	def validate_amount(self):
+		total_amount = 0
+		for pe in self.payment_entries:
+			total_amount += pe.allocated_amount
+			if pe.allocated_amount + pe.gl_br_amount > pe.gl_amount:
+				frappe.throw(_(f"BR amount not matching against {pe.voucher_no}"))
+
+		if total_amount > self.unallocated_amount:
+			frappe.throw(_(f"Total BR amount {total_amount} is greater than unallocated amount {self.unallocated_amount}"))
+
+	def on_cancel(self):
+		self.set_br_amount()
 
 
 def get_total_allocated_amount(payment_entry):
@@ -122,6 +141,8 @@ def unclear_reference_payment(doctype, docname):
 		if doctype == "Sales Invoice":
 			frappe.db.set_value("Sales Invoice Payment", dict(parenttype=doc.payment_document,
 				parent=doc.payment_entry), "clearance_date", None)
+		elif doctype == "GL Entry":
+			frappe.db.set_value(doc.payment_document, doc.payment_entry, "br_amount", 0)
 		else:
 			frappe.db.set_value(doc.payment_document, doc.payment_entry, "clearance_date", None)
 
@@ -154,6 +175,6 @@ def get_payment_documents(doctype, txt, searchfield, start, page_len, filters):
 			`tab{doctype}`
 		WHERE
 			voucher_type IN ('Payment Entry', 'Journal Entry')
-		AND br_amount = 0
+		AND br_amount < debit + credit
 		{condition}
 		ORDER BY name DESC;""")
