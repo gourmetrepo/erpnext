@@ -4,10 +4,12 @@
 
 from __future__ import unicode_literals
 import frappe
+import csv
 from erpnext.controllers.status_updater import StatusUpdater
 from frappe.utils import flt
 from six.moves import reduce
-from frappe import _
+from frappe import throw, _
+from datetime import datetime
 
 class BankTransaction(StatusUpdater):
 	def after_insert(self):
@@ -18,6 +20,7 @@ class BankTransaction(StatusUpdater):
 		self.set_status()
 
 	def on_update_after_submit(self):
+		self.validate_amount()
 		self.update_allocations()
 		self.clear_linked_payment_entries()
 		self.set_status(update=True)
@@ -71,7 +74,6 @@ class BankTransaction(StatusUpdater):
 				for pe in self.payment_entries:
 					frappe.db.set_value("GL Entry", pe.payment_entry, "br_amount", 0)
 			else:
-				self.validate_amount()
 				for pe in self.payment_entries:
 					if pe.allocated_amount > 0:
 						br_amount = flt(pe.allocated_amount) + flt(pe.gl_br_amount)
@@ -178,3 +180,109 @@ def get_payment_documents(doctype, txt, searchfield, start, page_len, filters):
 		AND br_amount < debit + credit
 		{condition}
 		ORDER BY name DESC;""")
+
+
+@frappe.whitelist()
+def create_doc_from_import(file_url):
+	try:
+		companies = []
+		accounts = []
+		file_doc = frappe.get_doc("File", {"file_url": file_url})
+		filename = file_doc.get_full_path()
+
+		# Check for mandatory columns
+		mandatory_columns = ['Company', 'Account', 'Credit', 'Debit', 'Date', 'Description', 'Reference Number']
+		file_data = csv_to_dict(filename, mandatory_columns)
+		
+		# Check for empty values
+		for counter, fd in enumerate(file_data):
+			for k, v in fd.items():
+				if k == 'Company':
+					companies.append(v)
+				elif k == 'Account':
+					accounts.append(v)
+				elif k == 'Credit' or k == 'Debit':
+					if float(v) < 0.0:
+						frappe.throw(f"Value for '{k}' at row: {counter} must be greater than 0")	
+				if not v:
+					frappe.throw(f"No value found in: {k} at row: {counter}")
+
+		# Check given Companies exists
+		companies = list(set(companies))
+		comps = frappe.db.get_list('Company',
+			{"name": ["in", companies]}, ['name'])
+
+		res_comps = []    
+		for c in comps:
+			if c.get("name"):
+				res_comps.append(c.get("name"))
+		
+		res_company = list(set(companies) - set(res_comps))
+
+		if res_company:
+			frappe.throw(f"Company do not exist: {', '.join(res_company)}")
+
+		# Check given Accounts exists
+		accounts = list(set(accounts))
+		accs = frappe.db.get_list('Account',
+			{"name": ["in", accounts]}, ['name'])
+
+		accts = []    
+		for a in accs:
+			if a.get("name"):
+				accts.append(a.get("name"))
+
+		res_accs = list(set(accounts) - set(accts))
+
+		if res_accs:
+			frappe.throw(f"Accounts do not exist: {', '.join(res_accs)}")
+
+		for data in file_data:
+			date_object = datetime.strptime(data.get("Date", ""), '%d/%m/%Y')
+
+			# Convert to desired date format
+			date = date_object.strftime('%Y-%m-%d')
+
+			as_payload = {
+				"doctype": "Bank Transaction",
+				"company": data.get("Company", ""),
+				"bank_account": data.get("Account", ""),
+				"credit": float(data.get("Credit", "")),
+				"debit": float(data.get("Debit", "")),
+				"date": date
+			}
+
+			frappe.enqueue("erpnext.accounts.doctype.bank_transaction.bank_transaction.create_bank_transaction", queue='long', payload=as_payload)
+		
+		return {"success": "File uploaded successfully. Data is queued."}
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Bank Transaction from Import Data Button")
+		return {"error": f"Error while uploading files. {error}"}
+
+
+def csv_to_dict(csv_file_path, mandatory_columns):
+	with open(csv_file_path, 'r', encoding='utf-8-sig') as file:
+		csv_reader = csv.DictReader(file)
+		
+		# Check for mandatory cols
+		missing_columns = [col for col in mandatory_columns if col not in csv_reader.fieldnames]
+		if missing_columns:
+			frappe.throw(f"Missing mandatory columns: {', '.join(missing_columns)}")
+
+		# Convert data to dict
+		dict_list = [row for row in csv_reader]
+		dict_data = [dict(dl) for dl in dict_list]
+
+	return dict_data
+
+
+@frappe.whitelist()
+def create_bank_transaction(payload):
+	try:
+		bank_transaction = frappe.get_doc(payload)
+		bank_transaction.save(ignore_permissions=True)
+	except Exception as error:
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=f"Error: {error} \n Traceback: {traceback}", title="Create Bank Transaction from queue")
