@@ -55,7 +55,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Job Opening Status",
-   "options": "\nOpen\nClose",
+   "options": "\nOpen\nClosed",
    "reqd": 1
   },
   {
@@ -286,7 +286,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-04-21 18:09:33.160049",
+ "modified": "2025-05-22 21:20:09.191804",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
