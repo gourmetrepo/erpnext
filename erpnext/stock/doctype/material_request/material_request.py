@@ -75,6 +75,14 @@ class MaterialRequest(BuyingController):
 
 		validate_for_items(self)
 
+		# Code by Moeiz to validate non group projects
+		if self.project:
+			validate_project(self)
+		# Code by Moeiz to validate project based material requests
+		if self.project_based:
+			validate_project_based_material_request(self)
+
+		
 		self.set_title()
 		validate_company_cost_center_and_accounts(self)
 		# self.validate_qty_against_so()
@@ -617,3 +625,21 @@ def update_project_reference(project_id, docname):
     except Exception as e:
         frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
         return {"status": "error", "message": str(e)}
+
+# Code by Moeiz to validate project based material requests
+def validate_project_based_material_request(mr):
+	"""Validate project based material requests"""
+	if not mr.project:
+		frappe.throw(_("Project is required for project based material request."))
+
+	for item in mr.items:
+		if not item.project or item.project != mr.project:
+			item.project = mr.project
+
+
+
+def validate_project(mr):
+	if mr.project:
+		is_project = frappe.db.get_value("Project", mr.project, "is_group")
+		if is_project:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(mr.project))
