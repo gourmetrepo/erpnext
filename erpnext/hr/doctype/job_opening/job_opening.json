@@ -26,7 +26,8 @@
   "required_specialization",
   "required_certification",
   "required_experience_section",
-  "required_experience",
+  "minimum_required_experience",
+  "maximum_required_experience",
   "competency_framework_section",
   "required_core_skills",
   "required_behavioral_competencies",
@@ -160,13 +161,6 @@
    "label": "Required Experience"
   },
   {
-   "fetch_from": "position.required_experience_years",
-   "fieldname": "required_experience",
-   "fieldtype": "Float",
-   "label": "Required Experience",
-   "read_only": 1
-  },
-  {
    "fieldname": "competency_framework_section",
    "fieldtype": "Section Break",
    "label": "Competency Framework"
@@ -282,11 +276,23 @@
    "fieldtype": "Date",
    "label": "Creation Date",
    "read_only": 1
+  },
+  {
+   "fetch_from": "position.required_experience_years",
+   "fieldname": "minimum_required_experience",
+   "fieldtype": "Float",
+   "label": "Minimum Required Experience",
+   "read_only": 1
+  },
+  {
+   "fieldname": "maximum_required_experience",
+   "fieldtype": "Data",
+   "label": "Maximum Required Experience"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-05-22 21:20:09.191804",
+ "modified": "2025-05-22 21:51:42.713192",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
