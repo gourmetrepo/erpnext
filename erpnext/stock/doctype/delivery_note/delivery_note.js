@@ -35,17 +35,16 @@ frappe.ui.form.on("Delivery Note", {
 		/*
 		Code by Moeiz
 		Project Module updated
-		Updated this query at the controllers for Sales order, delivery note and sales invoice as it is core code and a check is added in core query
-		where it should pick only non group projects
 		*/
-		frm.set_query('project', function(doc) {
+		frm.fields_dict['project'].get_query = function() {
 			return {
-				query: "erpnext.controllers.queries.get_project_name",
+				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					'customer': doc.customer
+					company: frm.doc.company,
+					customer: frm.doc.customer
 				}
 			}
-		})
+		}
 		frm.set_query('vehicle',function(doc){
 			return {
 				filters: {
@@ -101,7 +100,16 @@ frappe.ui.form.on("Delivery Note", {
 			}
 		});
 
-
+		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company,
+					customer: frm.doc.customer
+				}
+			};
+		};
 	},
 	validate: function (frm) {
         if (!frm.doc.is_return) {

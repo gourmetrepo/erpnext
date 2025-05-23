@@ -120,6 +120,17 @@ frappe.ui.form.on("BOM", {
 				});
 			}
 		}
+
+		// Code by Moeiz
+		// Only show non group project LOVs
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 
 	make_work_order: function(frm) {
