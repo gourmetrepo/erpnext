@@ -546,9 +546,21 @@ def get_projects(doctype, txt, searchfield, start, page_len, filters):
 	else:
 		frappe.throw(_("Please select a company to fetch projects"))
 	
+	cond = ""
+	if filters and filters.get('customer'):
+		cond += f"""AND `customer` = {frappe.db.escape(filters.get('customer'))} """
+	
 	query = f"""
 		select `name`, `project_name` 
 		from `tabProject`
-		where is_group = 0 and company = {company}"""
+		where is_group = 0 and company = {company} {cond}"""
 
+	if txt:
+		query = f"""
+		select `name`, `project_name` 
+		from `tabProject`
+		where is_group = 0 and company = {company} {cond}
+		and `project_name` LIKE '%{txt}%';
+		"""
+	
 	return frappe.db.sql(query)

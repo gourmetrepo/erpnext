@@ -54,7 +54,6 @@ frappe.ui.form.on("Purchase Order", {
 				filters: {'company': frm.doc.company}
 			}
 		});
-		
 
 	},
 
@@ -219,6 +218,7 @@ frappe.ui.form.on("Purchase Order", {
 
 	refresh: function(frm) {
 		subcontract_configurations(frm);
+		
 	},
 
 	// Code by Moeiz
@@ -788,11 +788,12 @@ cur_frm.cscript.update_status= function(label, status){
 
 cur_frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
 	return {
-		filters:[
-			['Project', 'status', 'not in', 'Completed, Cancelled']
-		]
-	}
-}
+		query: "erpnext.projects.doctype.project.project.get_projects",
+		filters: {
+			company: cur_frm.doc.company
+		}
+	};
+};
 
 cur_frm.fields_dict['items'].grid.get_field('bom').get_query = function(doc, cdt, cdn) {
 	var d = locals[cdt][cdn]

@@ -171,6 +171,11 @@ frappe.ui.form.on('Payment Entry', {
 		});
 
 
+		
+		/*
+		Code by Moeiz
+		Project Module updated
+		*/
 		frm.fields_dict['project'].get_query = function() {
 			return {
 				query: "erpnext.projects.doctype.project.project.get_projects",

@@ -83,14 +83,6 @@ frappe.ui.form.on("Work Order", {
 			};
 		});
 
-		// Set query for FG Item
-		frm.set_query("project", function() {
-			return{
-				filters:[
-					['Project', 'status', 'not in', 'Completed, Cancelled']
-				]
-			};
-		});
 
 		frm.set_query("operation", "required_items", function() {
 			return {
@@ -254,8 +246,18 @@ frappe.ui.form.on("Work Order", {
 						}
 					}
 				}
+				
 			});
         }
+
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 
 	make_job_card: function(frm) {
@@ -506,6 +508,14 @@ frappe.ui.form.on("Work Order", {
 				});
 			}
 		}
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 
 	before_save: function(frm) {

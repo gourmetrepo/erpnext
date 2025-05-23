@@ -93,17 +93,6 @@ frappe.ui.form.on('Asset', {
 				filters: { item_code: doc.item_code }
 			}
 		});	
-
-		// Code by Moeiz
-		// Only show non group project LOVs
-		frm.fields_dict['project'].get_query = function() {
-			return {
-				query: "erpnext.projects.doctype.project.project.get_projects",
-				filters: {
-					company: frm.doc.company
-				}
-			};
-		};
 	},
 
 	refresh: function(frm) {
@@ -171,6 +160,18 @@ frappe.ui.form.on('Asset', {
 			frm.set_df_property('depreciation_start_date', 'reqd', 1, frm.doc.name, 'finance_books');
 			frm.refresh_field('finance_books');
 		}
+
+
+		// Code by Moeiz
+		// Only show non group project LOVs
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
 	},
 
 	toggle_reference_doc: function(frm) {
