@@ -153,22 +153,28 @@ def unclear_reference_payment(doctype, docname):
 
 @frappe.whitelist()
 def get_payment_documents(doctype, txt, searchfield, start, page_len, filters):
-	select_condition = f"name, voucher_no"
-	condition = ""
-	if not filters.get("account"):
-		return []
-	else:
-		condition = f"AND account = '{filters.get('account')}'"
+	select_condition = "name, voucher_no"
+	conditions = []
 
+	if not filters.get("account") or not filters.get("type"):
+		return []
+
+	conditions.append(f"account = {frappe.db.escape(filters.get('account'))}")
 
 	if not filters.get("type"):
 		return []
 	elif filters.get("type") == "Pay":
-		condition = f"{condition} AND credit > 0"
-		select_condition = f"{select_condition}, credit"
+		conditions.append("credit > 0")
+		select_condition += ", credit"
 	elif filters.get("type") == "Receive":
-		condition = f"{condition} AND debit > 0"
-		select_condition = f"{select_condition}, debit"
+		conditions.append("debit > 0")
+		select_condition += ", debit"
+
+	# Required for search to work
+	if txt:
+		conditions.append(f"(name LIKE {frappe.db.escape('%' + txt + '%')} OR voucher_no LIKE {frappe.db.escape('%' + txt + '%')} OR credit LIKE {frappe.db.escape('%' + txt + '%')} OR debit LIKE {frappe.db.escape('%' + txt + '%')})")
+
+	where_clause = " AND ".join(conditions)
 
 	return frappe.db.sql(f"""
 		SELECT
@@ -177,8 +183,8 @@ def get_payment_documents(doctype, txt, searchfield, start, page_len, filters):
 			`tab{doctype}`
 		WHERE
 			voucher_type IN ('Payment Entry', 'Journal Entry')
-		AND br_amount < debit + credit
-		{condition}
+			AND br_amount < debit + credit
+			AND {where_clause}
 		ORDER BY name DESC;""")
 
 
