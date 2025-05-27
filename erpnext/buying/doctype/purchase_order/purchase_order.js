@@ -105,7 +105,7 @@ frappe.ui.form.on("Purchase Order", {
 				}
 			}
 		});
-
+		project_based_configurations(frm);
 	},
 	cost_association: function(frm) {
 	    if (frm.doc.purchase_order_type=='Service' && frm.doc.cost_association){
@@ -295,7 +295,12 @@ frappe.ui.form.on("Purchase Order", {
 
 	refresh: function(frm) {
 		subcontract_configurations(frm);
+		project_based_configurations(frm);
 		
+	},
+
+	project_based: function(frm){
+		project_based_configurations(frm);
 	},
 
 	// Code by Moeiz
@@ -993,5 +998,23 @@ function subcontract_configurations(frm){
 		frm.set_value('is_subcontracted', 'No');
 		// frm.set_df_property('is_subcontracted', 'read_only', 0);
 		frm.set_df_property('supplier_warehouse', 'read_only', 0);
+	}
+}
+
+function project_based_configurations(frm){
+	if (frm.doc.purchase_order_type === "Service" || frm.doc.purchase_order_type === "Asset Maintenance Services"){
+		frm.set_df_property('project_based', 'read_only', 0);
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'reqd', 1);
+	}else{
+		frm.set_df_property('project_based', 'read_only', 1);
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'reqd', 0);
+	}
+
+	if (frm.doc.project_based){
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'read_only', 0);
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'reqd', 1);
+	}else{
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'read_only', 1);
+		frm.fields_dict['items'].grid.update_docfield_property('project', 'reqd', 0);
 	}
 }
