@@ -110,6 +110,10 @@ class PurchaseInvoice(BuyingController):
 		self.validate_purchase_receipt_if_update_stock()
 		validate_inter_company_party(self.doctype, self.supplier, self.company, self.inter_company_invoice_reference)
 		
+		# Code by Moeiz
+		# Project based Development
+		validate_project_reference(self)
+		
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 	def validate_release_date(self):
@@ -1116,7 +1120,18 @@ def on_doctype_update():
 	frappe.db.add_index("Purchase Invoice", ["supplier", "is_return", "return_against"])
 
 
+def validate_project_reference(doc):
+	if not doc.project:
+		project_reference = None
 
+		if doc.items:
+			for item in doc.items:
+				if item.project:
+					project_reference = item.project
+					break
+
+		if project_reference:
+			doc.project = project_reference
 
 
 # Moeiz Code to validate company cost center
