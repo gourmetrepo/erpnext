@@ -146,13 +146,25 @@ frappe.ui.form.on("Customer", {
 		var grid = cur_frm.get_field("sales_team").grid;
 		grid.set_column_disp("allocated_amount", false);
 		grid.set_column_disp("incentives", false);
+
+		frm.set_df_property('bank_guarantee', 'cannot_add_rows', true);
+        frm.set_df_property('bank_guarantee', 'cannot_delete_rows', true);
+        frm.set_df_property('bank_guarantee', 'cannot_delete_all_rows', true);
+		frm.set_df_property('bank_guarantee', 'grid-move-row ', true);
+		frm.fields_dict.bank_guarantee.grid.wrapper.find('.grid-move-row').hide();
+		frm.fields_dict['bank_guarantee'].grid.wrapper.find('.grid-move-row').hide();
+
+        if (frm.fields_dict['bank_guarantee'] && frm.fields_dict['bank_guarantee'].grid) {
+            frm.fields_dict['bank_guarantee'].grid.wrapper
+                .find('.grid-remove-rows')
+                .hide();
+        }
 	},
 	validate: function(frm) {
 		if(frm.doc.lead_name) frappe.model.clear_doc("Lead", frm.doc.lead_name);
 
 	},
 });
-
 frappe.ui.form.on('Customer Bank Guarantee', {
 	form_render(frm, cdt, cdn){
 		frm.fields_dict.bank_guarantee.grid.wrapper.find('.grid-delete-row').hide();
