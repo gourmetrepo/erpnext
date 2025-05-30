@@ -289,14 +289,6 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
-					"name": "Sales Order Region and Section Wise",
-					"label": _("RMS Sales Order Region & Section"),
-					"doctype": "Sales Order"
-					
-				},
-				{
-					"type": "report",
-					"is_query_report": True,
 					"name": "Gate Sales Report",
 					"label": _("Gate Sales Report"),
 					"doctype": "Gate Pass"
