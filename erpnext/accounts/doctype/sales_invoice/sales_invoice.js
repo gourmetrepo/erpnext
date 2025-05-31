@@ -102,6 +102,22 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 				cur_frm.add_custom_button(__('Maintenance Schedule'), function () {
 					cur_frm.cscript.make_maintenance_schedule();
 				}, __('Create'));
+
+				if (!doc.fbr_invoice_no) {
+					cur_frm.add_custom_button(__('Push To FBR'), function() {
+					frappe.call({
+						method: "nrp_manufacturing.apis.sales_invoice.digital_invoicing",
+						args: {
+							"inv_no": doc.name
+						},
+						callback: function(r) {
+							if (r.message) {
+								frappe.msgprint(r.message);
+							}
+						}
+					})
+				}, __('Digital Invoice'));					
+				}
 			}
 
 			if(!doc.auto_repeat) {
