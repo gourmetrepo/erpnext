@@ -112,7 +112,20 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 						},
 						callback: function(r) {
 							if (r.message) {
-								frappe.msgprint(r.message);
+								if (r.message.error) {
+									frappe.msgprint({
+										title: __('Notification'),
+										indicator: 'red',
+										message: r.message.error
+									});
+								}
+								else{
+									frappe.msgprint({
+										title: __('Notification'),
+										indicator: 'green',
+										message: r.message.success
+									});
+								}
 							}
 						}
 					})
