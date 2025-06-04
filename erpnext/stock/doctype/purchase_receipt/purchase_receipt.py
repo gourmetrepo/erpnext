@@ -752,3 +752,4 @@ def update_valuation_rate_for_subcontracting(doc):
 	for supplied_item in doc.supplied_items:
 		if supplied_item.rm_item_code in valuation_batchwise_data and supplied_item.batch_no in valuation_batchwise_data[supplied_item.rm_item_code]:
 			supplied_item.rate = valuation_batchwise_data[supplied_item.rm_item_code][supplied_item.batch_no]
+			supplied_item.amount = supplied_item.rate * supplied_item.consumed_qty
