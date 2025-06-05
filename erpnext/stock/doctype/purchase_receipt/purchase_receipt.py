@@ -105,10 +105,10 @@ class PurchaseReceipt(BuyingController):
 		if getdate(self.posting_date) > getdate(nowdate()):
 			throw(_("Posting Date cannot be future date"))
 
-	def before_save(self):
 		# Subcontracting valuation rate configurations
 		if self.subcontracted:
 			update_valuation_rate_for_subcontracting(self)
+
 
 	def validate_cwip_accounts(self):
 		for item in self.get('items'):
@@ -727,8 +727,8 @@ def get_item_account_wise_additional_cost(purchase_document):
 
 @frappe.whitelist()
 def delete_items(data):
-    frappe.db.sql("""DELETE FROM `tabPurchase Receipt Item` WHERE parent ='{name}';""".format(name =data))
-    frappe.db.commit()
+	frappe.db.sql("""DELETE FROM `tabPurchase Receipt Item` WHERE parent ='{name}';""".format(name =data))
+	frappe.db.commit()
 
 
 def update_valuation_rate_for_subcontracting(doc):
