@@ -747,7 +747,7 @@ def update_valuation_rate_for_subcontracting(doc):
 		SELECT sed.`batch_no` as `batch_no`, sed.`item_code` as `item_code`, sed.`valuation_rate` as `valuation_rate` FROM `tabStock Entry` se
 		INNER JOIN `tabStock Entry Detail` sed
 		ON sed.`parent`=se.`name`
-		WHERE se.`purchase_order`="PMO-92662"
+		WHERE se.`purchase_order`={frappe.db.escape(purchase_order_reference)}
 		AND se.`stock_entry_type`="Send to Subcontractor";
 		""", as_dict=True
 	)
