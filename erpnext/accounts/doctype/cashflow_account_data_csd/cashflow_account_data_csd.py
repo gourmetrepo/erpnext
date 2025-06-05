@@ -10,6 +10,8 @@ import json
 from datetime import datetime,timedelta
 #site confige import
 from nrp_manufacturing.utils import  get_config_by_name
+import ast
+
 class Cashflowaccountdatacsd(Document):
 	pass
 
@@ -39,7 +41,7 @@ def insertDataQueue(from_date=None,to_date=None,companies=None):
 			AND `date` <= %(to_date)s
 			AND company IN %(companies)s
 		"""
-		frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': companies_tuple},debug=1)
+		frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': companies_tuple})
 		frappe.db.commit()
 		from_date = from_date.strip()  
 		to_date = to_date.strip() 
@@ -69,54 +71,55 @@ def insertDataQueue(from_date=None,to_date=None,companies=None):
 		title = "CSD Cash Flow Data"
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=traceback, title=title)
+
 @frappe.whitelist()
-def insertDataQueueAccountConfig(from_date=None,to_date=None,companies=None):
+def insertDataQueueAccountConfig(starting_date=None,ending_date=None,companies=None):
 	try:
 		condition = ""
-		if not from_date:
-			from_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-		if not to_date:
-			to_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+		if not starting_date:
+			starting_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+		if not ending_date:
+			ending_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+		
+		
+			
 		if companies:
 			if not isinstance(companies, list):
 				j_companies = json.loads(companies)
 			else:
 				j_companies = companies
-
-		companies_tuple = tuple(j_companies)
-			
-		if companies_tuple:
-			condition = f"AND company IN {companies_tuple}"
+			companies_tuple = ', '.join(frappe.db.escape(v) for v in j_companies)
+			condition = f"AND company IN ({companies_tuple})"
 		else:
 			condition = ""
 
-		cashflow_config = frappe.db.sql("""SELECT 
-    company,
-    cash_flow_head,
-    cash_flow_title,
-    GROUP_CONCAT(CONCAT("'", NAME, "'") SEPARATOR ',') AS account_names
-FROM 
-    `tabAccount`
-WHERE 
-    cash_flow_head IS NOT NULL 
-    AND cash_flow_title IS NOT NULL {condition}
-GROUP BY  
-    company, cash_flow_head, cash_flow_title order by company ASC""", as_dict=True)
+		cashflow_config = frappe.db.sql(f"""SELECT 
+			company,
+			cash_flow_head,
+			cash_flow_title,
+			CONCAT('(', GROUP_CONCAT(CONCAT("'", NAME, "'") SEPARATOR ','), ')') AS account_names
+		FROM 
+			`tabAccount`
+		WHERE 
+			cash_flow_head IS NOT NULL 
+			AND cash_flow_title IS NOT NULL {condition}
+		GROUP BY  
+			company, cash_flow_head, cash_flow_title order by company ASC""", as_dict=True)
 
-	
+		query = f"""
+			DELETE FROM `tabCashflow account data csd`
+			WHERE `date` >= {frappe.db.escape(starting_date.strip())}
+			AND `date` <= {frappe.db.escape(ending_date.strip())}
+			{condition}
+			"""
+		frappe.db.sql(query)
+		frappe.db.commit()
 
 	
 		for cfc in cashflow_config:
-			query = """
-			DELETE FROM `tabCashflow account data csd`
-			WHERE `date` >= %(from_date)s
-			AND `date` <= %(to_date)s
-			AND company IN %(companies)s
-		"""
-			frappe.db.sql(query, {'from_date': from_date.strip(), 'to_date': to_date.strip(), 'companies': cfc.company},debug=1)
-			frappe.db.commit()
-			from_date = from_date.strip()  
-			to_date = to_date.strip() 
+			
+			from_date = starting_date.strip()  
+			to_date = ending_date.strip() 
 			from_date = datetime.strptime(from_date, '%Y-%m-%d')
 			to_date = datetime.strptime(to_date, '%Y-%m-%d')
 			start_date = from_date
@@ -124,6 +127,12 @@ GROUP BY
 			while start_date <= end_date:
 				# insertData(from_date=start_date.strftime('%Y-%m-%d'), to_date=start_date.strftime('%Y-%m-%d'), company=company, cashflow_config=cashflow_config)
 				frappe.db.commit()
+				# insertDataAccountConfig(from_date=start_date.strftime('%Y-%m-%d'), 
+				# 	to_date=start_date.strftime('%Y-%m-%d'), 
+				# 	company=cfc.company, 
+				# 	cash_flow_head=cfc.cash_flow_head,
+				# 	cash_flow_title=cfc.cash_flow_title,
+				# 	account_names=cfc.account_names)
 				frappe.enqueue(
 					"erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertDataAccountConfig",
 					from_date=start_date.strftime('%Y-%m-%d'), 
@@ -213,62 +222,64 @@ def insertData(from_date,to_date, company, cashflow_config):
 
 
 @frappe.whitelist()
-def insertDataAccountConfig(from_date,to_date, company, cash_flow_head, cash_flow_title, account_names):
+def insertDataAccountConfig(from_date, to_date, company, cash_flow_head, cash_flow_title, account_names):
 	from erpnext.accounts.report.general_ledger.general_ledger import get_data_with_opening_closing, get_gl_entries, initialize_gle_map,get_accountwise_gle
 
 	from datetime import datetime, timedelta
 	from_date = datetime.strptime(from_date, "%Y-%m-%d").date()	
 	to_date = datetime.strptime(to_date, "%Y-%m-%d").date()	
 	current_date = from_date
-	account_head_total = {}
-	
-
+	account_total = 0
+	account_closing = 0
+	account_opening = 0
+	account_names = ast.literal_eval(account_names)
 	while current_date <= to_date:
-				data = frappe.db.sql(
-						f""" SELECT 
-								(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
-								WHERE ACCOUNT = "{account_names}" AND company = '{company}' AND posting_date < '{current_date}') AS opening,
-								(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
-								WHERE voucher_type!='Period Closing Voucher' and ACCOUNT = "{account_names}" AND company = '{company}' AND posting_date = '{current_date}') AS value """
-								,as_dict=True
-					)
-				if data:
-					opening_balance = data[0].opening if data[0].opening != None else 0
-					value = data[0].value if data[0].value != None else 0
-					closing_balance = opening_balance + value
-					#save doc
-					save_doc = {
-						'doctype':'Cashflow account data csd',
-						'head':cash_flow_head,
-						'company':company,
-						'account': str(account_names),
-						'date':current_date,
-						'opening': opening_balance,
-						'closing' : closing_balance,
-						'value' : value
-					}
-					frappe.get_doc(save_doc).save(ignore_permissions=True)
-					account_total += value
-					account_opening += opening_balance
-					account_closing += closing_balance
-				if cash_flow_title == 'GAIN/LOSS ON SALE OF ASSETS':
-					account_total = account_total * -1
-				
-
+		for account_name in account_names:
+			data = frappe.db.sql(
+					f""" SELECT 
+							(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
+							WHERE ACCOUNT = "{account_name}" AND company = '{company}' AND posting_date < '{current_date}') AS opening,
+							(SELECT SUM(debit)-SUM(credit) FROM `tabGL Entry` 
+							WHERE voucher_type!='Period Closing Voucher' and ACCOUNT = "{account_name}" AND company = '{company}' AND posting_date = '{current_date}') AS value """
+							,as_dict=True
+				)
+			if data:
+				opening_balance = data[0].opening if data[0].opening != None else 0
+				value = data[0].value if data[0].value != None else 0
+				closing_balance = opening_balance + value
 				#save doc
 				save_doc = {
 					'doctype':'Cashflow account data csd',
 					'head':cash_flow_head,
 					'company':company,
-					'account': str(cash_flow_title),
+					'account': str(account_name),
 					'date':current_date,
-					'opening': account_opening,
-					'closing' : account_closing,
-					'value' : account_total
+					'opening': opening_balance,
+					'closing' : closing_balance,
+					'value' : value
 				}
 				frappe.get_doc(save_doc).save(ignore_permissions=True)
-				frappe.db.commit()
-				current_date += timedelta(days=1)
+				account_total += value
+				account_opening += opening_balance
+				account_closing += closing_balance
+			if cash_flow_title == 'GAIN/LOSS ON SALE OF ASSETS':
+				account_total = account_total * -1
+			
+
+			#save doc
+			save_doc = {
+				'doctype':'Cashflow account data csd',
+				'head':cash_flow_head,
+				'company':company,
+				'account': str(cash_flow_title),
+				'date':current_date,
+				'opening': account_opening,
+				'closing' : account_closing,
+				'value' : account_total
+			}
+			frappe.get_doc(save_doc).save(ignore_permissions=True)
+			frappe.db.commit()
+			current_date += timedelta(days=1)
 
 
 @frappe.whitelist()
@@ -285,5 +296,5 @@ def updateCashBankData():
 # Cron job for daily update of cashflow data
 @frappe.whitelist()
 def csd_cashflow_data_job():
-	frappe.enqueue("erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertDataQueue", queue="sync")
+	frappe.enqueue("erpnext.accounts.doctype.cashflow_account_data_csd.cashflow_account_data_csd.insertDataQueueAccountConfig", queue="sync")
 	frappe.db.commit()
