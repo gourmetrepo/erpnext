@@ -22,6 +22,22 @@ frappe.query_reports["Work Order Tracking"] = {
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"reqd": 1
-		}
+		},
+		{
+			"fieldname": "item_category",
+			"label": __("Item Category"),
+			"fieldtype": "Select",
+			"options": "ALL\nFinished Good\nSemi Finished Good",
+			"default": "Finished Good",
+			"reqd": 1
+		},
+		{
+			"fieldname": "work_order_status",
+			"label": __("Work Order Status"),
+			"fieldtype": "Select",
+			"options": "ALL\nOpen\nClosed",
+			"default": "ALL",
+			"reqd": 1
+		},
 	]
 };

@@ -18,8 +18,23 @@ def execute(filters=None):
 		company = f"IN ('Unit 5', 'Unit 8', 'Unit 11')"
 	else:
 		company = f"""= '{filters.get('company')}'"""
+
+	if filters.get("item_category") == "ALL":
+		item_category = f"IN ('Finished Good', 'Semi Finished Good')"
+	else:
+		item_category = f"""= '{filters.get('item_category')}'"""
+
+	if filters.get("work_order_status") == "ALL":
+		work_order_status = "IN ('0', '1')"
+	elif filters.get("work_order_status") == "Open":
+		work_order_status = "= '0'"
+	elif filters.get("work_order_status") == "Closed":
+		work_order_status = "= '1'"
+
 	
-	data = get_work_order_data(company, from_date, to_date)
+	
+	
+	data = get_work_order_data(company, from_date, to_date, item_category, work_order_status)
 	
 	work_order_names = [wo.work_order for wo in data]
 	
@@ -53,16 +68,18 @@ def execute(filters=None):
 	return columns, data, None, None, None, None, html
 
 
-def get_work_order_data(company, from_date, to_date):
+def get_work_order_data(company, from_date, to_date, item_category, work_order_status):
 	wo_data = frappe.db.sql(f"""
 		SELECT 
 			wo.name AS work_order, 
+			wo.company AS company,
 			wo.item_name AS item_name, 
 			wo.qty AS qty_to_manufacture, 
 			wo.produced_qty AS manufactured_qty, 
 			wo.creation, 
 			wo.closing_date,
 			wo.closed, 
+			wo.production_line AS production_line,
 			se.posting_date, 
 			se.posting_time
 		FROM 
@@ -92,10 +109,14 @@ def get_work_order_data(company, from_date, to_date):
 				se1.stock_entry_type = 'Material Transfer for Manufacture'
 		) se ON 
 			se.work_order = wo.name
+		INNER JOIN 
+			`tabItem` i ON i.name = wo.production_item
 		WHERE 
 			wo.company {company}
 			AND wo.creation >= "{from_date}"
 			AND wo.creation <= "{to_date}"
+			AND i.item_category {item_category}
+			AND wo.closed {work_order_status}
 		ORDER BY 
 			wo.item_name;
 	""", as_dict=True)
