@@ -113,13 +113,12 @@ def get_work_order_data(company, from_date, to_date, item_category, work_order_s
 			`tabItem` i ON i.name = wo.production_item
 		WHERE 
 			wo.company {company}
-			AND wo.creation >= "{from_date}"
-			AND wo.creation <= "{to_date}"
+			AND DATE(wo.creation) >= "{from_date}"
+			AND DATE(wo.creation) <= "{to_date}"
 			AND i.item_category {item_category}
 			AND wo.closed {work_order_status}
 		ORDER BY 
-			wo.item_name;
-	""", as_dict=True)
+			wo.item_name;""", as_dict=True)
 
 	return wo_data
 
