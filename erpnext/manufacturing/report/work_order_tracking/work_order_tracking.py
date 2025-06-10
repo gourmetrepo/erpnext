@@ -118,7 +118,7 @@ def get_work_order_data(company, from_date, to_date, item_category, work_order_s
 			AND i.item_category {item_category}
 			AND wo.closed {work_order_status}
 		ORDER BY 
-			wo.item_name;""", as_dict=True)
+			wo.item_name, se.posting_date;""", as_dict=True)
 
 	return wo_data
 
