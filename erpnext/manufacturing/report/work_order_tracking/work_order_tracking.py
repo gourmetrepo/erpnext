@@ -30,9 +30,6 @@ def execute(filters=None):
 		work_order_status = "= '0'"
 	elif filters.get("work_order_status") == "Closed":
 		work_order_status = "= '1'"
-
-	
-	
 	
 	data = get_work_order_data(company, from_date, to_date, item_category, work_order_status)
 	
@@ -45,23 +42,12 @@ def execute(filters=None):
 
 	se_data = get_stock_entry_data(company, work_order_names, from_date, to_date)
 
-	for se in se_data:
-		if se.work_order in wo_data_dict:
-			if se.name not in wo_data_dict[se.work_order]['se_details']:
-				wo_data_dict[se.work_order]['se_details'][se.name] = {
-					'manufactured_qty': se.manufactured_qty,
-					'posting_date': se.posting_date,
-					'posting_time': se.posting_time
-				}
-	
-	for wo_key, wo_val in wo_data_dict.items():
-		if wo_key not in work_order_data:
-			work_order_data[wo_key] = wo_val
+	final_wo_data = get_combined_data(se_data, wo_data_dict)
 
 	html = frappe.render_template(
 		"nrp_manufacturing/templates/reports/work_order_tracking.html", 
 		{
-			"work_orders_data": work_order_data
+			"work_orders_data": final_wo_data
 			}
 		)
 	
@@ -143,3 +129,25 @@ def get_stock_entry_data(company, work_orders, from_date, to_date):
 		return se_data
 	else:
 		return {}
+
+
+def get_combined_data(se_data, wo_data_dict):
+	work_order_data = {}
+	for se in se_data:
+			if se.work_order in wo_data_dict:
+				if se.name not in wo_data_dict[se.work_order]['se_details']:
+					wo_data_dict[se.work_order]['se_details'][se.name] = {
+						'manufactured_qty': se.manufactured_qty,
+						'posting_date': se.posting_date,
+						'posting_time': se.posting_time
+					}
+		
+	for wo_key, wo_val in wo_data_dict.items():
+		if wo_key not in work_order_data:
+			work_order_data[wo_key] = wo_val
+
+	# Sort data as per item name and posting date
+	sorted_items = sorted(work_order_data.items(), key=lambda x: (x[1]["item_name"], x[1]["posting_date"]))
+	sorted_wo_data = dict(sorted_items)
+
+	return sorted_wo_data
