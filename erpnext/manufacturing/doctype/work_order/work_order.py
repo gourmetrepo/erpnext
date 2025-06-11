@@ -158,6 +158,8 @@ class WorkOrder(Document):
 		'''Update status of work order if unknown'''
 		if status != "Stopped":
 			status = self.get_status(status)
+		elif self.status == 'Stopped' and self.closed == 1:
+			status = self.get_status(status)
 
 		if status != self.status:
 			self.db_set("status", status)
@@ -170,21 +172,25 @@ class WorkOrder(Document):
 		'''Return the status based on stock entries against this work order'''
 		if not status:
 			status = self.status
-
+		is_closed = frappe.db.get_value("Work Order", self.name, "closed")
 		if self.docstatus==0:
 			status = 'Draft'
 		elif self.docstatus==1:
-			if status != 'Stopped':
+			if status != 'Stopped' and self.status != 'Completed':
 				stock_entries = frappe._dict(frappe.db.sql("""select purpose, sum(fg_completed_qty)
 					from `tabStock Entry` where work_order=%s and docstatus=1
 					group by purpose""", self.name))
 
 				status = "Not Started"
-				if stock_entries:
+				if stock_entries and is_closed == 0:
 					status = "In Process"
 					produced_qty = stock_entries.get("Manufacture")
 					if flt(produced_qty) >= flt(self.qty):
 						status = "Completed"
+				elif is_closed == 1:
+					status = 'Completed'
+			elif status == 'Stopped' and self.closed == 1:
+				status = 'Completed'
 		else:
 			status = 'Cancelled'
 
@@ -698,7 +704,9 @@ def make_stock_entry(work_order_id, purpose, qty=None):
 		wip_warehouse = work_order.wip_warehouse
 	else:
 		wip_warehouse = None
-
+	if not work_order.actual_start_time:
+		work_order.actual_start_time = nowdate()
+		frappe.db.set_value("Work Order", work_order.name, "actual_start_time", work_order.actual_start_time)
 	stock_entry = frappe.new_doc("Stock Entry")
 	stock_entry.purpose = purpose
 	stock_entry.work_order = work_order_id

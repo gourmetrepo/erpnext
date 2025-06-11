@@ -810,7 +810,7 @@ erpnext.work_order = {
 
 			if (show_start_btn) {
 				if ((flt(doc.material_transferred_for_manufacturing) < flt(doc.qty))
-					&& frm.doc.status != 'Stopped') {
+					&& frm.doc.status != 'Stopped' && frm.doc.status != 'Completed') {
 					frm.has_start_btn = true;
 					frm.add_custom_button(__('Create Pick List'), function() {
 						erpnext.work_order.create_pick_list(frm);
@@ -847,7 +847,7 @@ erpnext.work_order = {
 			if(!frm.doc.skip_transfer){
 				// If "Material Consumption is check in Manufacturing Settings, allow Material Consumption
 				if ((flt(doc.produced_qty) < flt(doc.material_transferred_for_manufacturing))
-				&& frm.doc.status != 'Stopped') {
+				&& frm.doc.status != 'Stopped' && frm.doc.status != 'Completed') {
 					frm.has_finish_btn = true;
 
 					if (frm.doc.__onload && frm.doc.__onload.material_consumption == 1) {
