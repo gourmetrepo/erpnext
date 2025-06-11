@@ -4,6 +4,10 @@ frappe.provide("erpnext.stock");
 
 frappe.ui.form.on('Stock Entry', {
 	setup: function(frm) {
+		if (frm.doc.mr_sub_type == "Handing Over"){
+			frm.set_df_property("handing_over_date", "reqd", 1);
+			refresh_field("handing_over_date");
+		}
 		frm.set_query('work_order', function() {
 			return {
 				filters: [
@@ -143,6 +147,10 @@ frappe.ui.form.on('Stock Entry', {
 	},
 
 	refresh: function(frm) {
+		if (frm.doc.mr_sub_type == "Handing Over"){
+			frm.set_df_property("handing_over_date", "reqd", 1);
+			refresh_field("handing_over_date");
+		}
         if (frm.doc.queue_status == 'Queued'){
             $('.primary-action').hide();
         }
