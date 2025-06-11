@@ -309,22 +309,23 @@ def insertDataAccountConfig(from_date, to_date, company, cash_flow_head, cash_fl
 					value = data[0].value if data[0].value != None else 0
 					closing_balance = opening_balance + value
 					#save doc
-					save_doc = {
-						'doctype':'Cashflow account data csd',
-						'head':cash_flow_head,
-						'company':company,
-						'account': str(acc.account_names),
-						'date':current_date,
-						'opening': opening_balance,
-						'closing' : closing_balance,
-						'value' : value
-					}
-					frappe.get_doc(save_doc).save(ignore_permissions=True)
-					account_total += value
-					account_opening += opening_balance
-					account_closing += closing_balance
-				if cash_flow_title == 'GAIN/LOSS ON SALE OF ASSETS':
-					account_total = account_total * -1
+					if opening_balance!=0 and closing_balance!=0:
+						save_doc = {
+							'doctype':'Cashflow account data csd',
+							'head':cash_flow_head,
+							'company':company,
+							'account': str(acc.account_names),
+							'date':current_date,
+							'opening': opening_balance,
+							'closing' : closing_balance,
+							'value' : value
+						}
+						frappe.get_doc(save_doc).save(ignore_permissions=True)
+						account_total += value
+						account_opening += opening_balance
+						account_closing += closing_balance
+						if cash_flow_title == 'GAIN/LOSS ON SALE OF ASSETS':
+							account_total = account_total * -1
 				
 
 			#save doc
