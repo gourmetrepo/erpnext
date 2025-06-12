@@ -68,7 +68,10 @@ def sync_job_opening_to_career_portal(doc, method=None):
 			value = getattr(doc, field, None)
 			if isinstance(value, list):
 				child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
-				payload[field] = child_list
+				if field in ["required_core_skills", "required_behavioral_competencies"]:
+					payload[field] = "Dummy data"
+				else:
+					payload[field] = child_list
 			else:
 				payload[field] = getattr(doc, field, None)
 
@@ -105,13 +108,13 @@ def update_job_opening_status_to_career_portal(doc, method=None):
 	baseurl =  get_config_by_name("Career_PORTAL_BASE_URL")
 	if old_status != doc.job_opening_status:
 		frappe.db.set_value("Job Opening", doc.name, "job_opening_status", doc.job_opening_status)
-		url = f"{baseurl}api/user/applications/{doc.name}/status"
-		payload = {"status": doc.job_opening_status.lower()}
-		headers = {'Content-Type': 'application/json'}
+		url = f"{baseurl}api/jobs/{doc.name}/status"
+		payload = {"job_opening_status": doc.job_opening_status}
+		headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
 		try:
 			for x in range(1, 4):
 				
-				res = requests.request("POST", url, headers=headers, data= payload)
+				res = requests.request("POST", url, headers=headers, data= json.dumps(payload))
 				integeration_payload = str(json.dumps(payload))
 
 				# To maintain logs
@@ -131,7 +134,5 @@ def update_job_opening_status_to_career_portal(doc, method=None):
 					frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
 				else:
 					break
-			response = requests.post(url, json=payload, timeout=10)
-			response.raise_for_status()
 		except requests.exceptions.RequestException as e:
 			frappe.log_error(f"Failed to sync Applicant status: {str(e)}", "Job Applicant Status Sync")
