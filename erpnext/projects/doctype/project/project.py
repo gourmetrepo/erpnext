@@ -42,6 +42,7 @@ class Project(Document):
 		self.update_percent_complete()
 		# Code by Moeiz
 		self.validate_account_mapping()
+		self.update_project_assets()
 	
 	def before_save(self):
 		if self.project_type == "Annual General" and self.is_new():
@@ -232,6 +233,17 @@ class Project(Document):
 			elif self.project_type == "Annual General":
 				if not self.clearing_account:
 					frappe.throw(_("Please select Clearing Account"))
+	
+	def update_project_assets(self):
+		if self.estimated_costing and self.estimated_costing > 0:
+			total_gross_cost = 0
+			for asset in self.project_assets:
+				total_gross_cost += asset.gross_value if asset.gross_value else 0
+			
+			if total_gross_cost > 0:
+				for asset in self.project_assets:
+					asset.estimated_cost = (asset.gross_value / total_gross_cost) * self.estimated_costing
+		
 	
 	def validate_if_previous_project_exists(self):
 		project_names = frappe.db.sql(f"""
