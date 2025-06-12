@@ -301,7 +301,7 @@
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-06-12 18:19:46.016259",
+ "modified": "2025-06-12 18:44:04.838808",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
@@ -338,5 +338,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "ASC",
+ "title_field": "title",
  "track_changes": 1
 }
