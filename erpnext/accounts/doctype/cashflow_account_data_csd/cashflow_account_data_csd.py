@@ -309,7 +309,7 @@ def insertDataAccountConfig(from_date, to_date, company, cash_flow_head, cash_fl
 					value = data[0].value if data[0].value != None else 0
 					closing_balance = opening_balance + value
 					#save doc
-					if opening_balance!=0 and closing_balance!=0:
+					if opening_balance!=0 or closing_balance!=0:
 						save_doc = {
 							'doctype':'Cashflow account data csd',
 							'head':cash_flow_head,
