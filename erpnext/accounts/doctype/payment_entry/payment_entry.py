@@ -69,6 +69,11 @@ class PaymentEntry(AccountsController):
 
 		# Check to validate payment_order on payment_type: pay
 		validate_payment_order_on_new_document(self)
+	
+	# Code by Moeiz
+	# Project based Development
+	def before_save(self):
+		self.update_payment_entry_references_for_projects()
 		
 
 	def on_submit(self):
@@ -545,7 +550,8 @@ class PaymentEntry(AccountsController):
 				gle = party_gl_dict.copy()
 				gle.update({
 					"against_voucher_type": d.reference_doctype,
-					"against_voucher": d.reference_name
+					"against_voucher": d.reference_name,
+					"project": d.project if d.project else None
 				})
 
 				allocated_amount_in_company_currency = flt(flt(d.allocated_amount) * flt(d.exchange_rate),
@@ -651,7 +657,25 @@ class PaymentEntry(AccountsController):
 
 		self.append('deductions', row)
 		self.set_unallocated_amount()
+	
+	def update_payment_entry_references_for_projects(self):
+		for reference in self.references:
+			if reference.reference_doctype == "Purchase Order":
+				res_data = frappe.db.sql(f"""
+					SELECT poi.`project` as `reference_project` FROM `tabPurchase Order` po
+					INNER JOIN `tabPurchase Order Item` poi
+					ON po.`name`=poi.`parent`
+					WHERE po.`name`={frappe.db.escape(reference.reference_name)}
+					LIMIT 1;				
+				""", as_dict=True)
 
+				if len(res_data) > 0 and res_data[0].get('reference_project', None):
+					reference.project = res_data[0].reference_project
+			elif reference.reference_doctype == "Purchase Invoice":
+				project = frappe.db.get_value("Purchase Invoice", reference.reference_name, "project")
+				if project:
+					reference.project = project
+	
 @frappe.whitelist()
 def get_outstanding_reference_documents(args):
 
