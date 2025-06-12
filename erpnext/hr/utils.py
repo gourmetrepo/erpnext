@@ -5,11 +5,13 @@ import erpnext
 import frappe
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
 from frappe import _
+import requests
 from frappe.desk.form import assign_to
 from frappe.model.document import Document
 from frappe.utils import (add_days, cstr, flt, format_datetime, formatdate,
 	get_datetime, getdate, nowdate, today, unique)
-
+from nerp.utils import get_config_by_name
+import json
 
 class DuplicateDeclarationError(frappe.ValidationError): pass
 
@@ -470,3 +472,40 @@ def get_previous_claimed_amount(employee, payroll_period, non_pro_rata=False, co
 	if sum_of_claimed_amount and flt(sum_of_claimed_amount[0].total_amount) > 0:
 		total_claimed_amount = sum_of_claimed_amount[0].total_amount
 	return total_claimed_amount
+
+@frappe.whitelist()
+def on_update_job_applicant(doc, method=None):
+	old_status = frappe.db.get_value("Job Applicant", doc.name, "job_applicant_status")
+	baseurl =  get_config_by_name("Career_PORTAL_BASE_URL")
+	if old_status != doc.job_applicant_status:
+		frappe.db.set_value("Job Applicant", doc.name, "job_applicant_status", doc.job_applicant_status)
+		url = f"{baseurl}api/user/applications/{doc.name}/status"
+		payload = {"status": doc.job_applicant_status.lower()}
+		headers = {'Content-Type': 'application/json'}
+		try:
+			for x in range(1, 4):
+				
+				res = requests.request("POST", url, headers=headers, data= payload)
+				integeration_payload = str(json.dumps(payload))
+
+				# To maintain logs
+				nrp_integeration = {
+					"ref_doctype": "Job Applicant",
+					"doctype": "Nrp Integration",
+					"request": integeration_payload
+				}
+
+				nrp_integeration["title"] = "On update job applicant --- {0}".format(doc.name)
+				nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+
+				frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+				frappe.db.commit()
+
+				if res.status_code != 200:
+					frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+				else:
+					break
+			response = requests.post(url, json=payload, timeout=10)
+			response.raise_for_status()
+		except requests.exceptions.RequestException as e:
+			frappe.log_error(f"Failed to sync Applicant status: {str(e)}", "Job Applicant Status Sync")
