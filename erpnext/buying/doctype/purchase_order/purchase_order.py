@@ -831,13 +831,13 @@ def get_subcontracted_bom_material(bom_ref, subcontracted_item, qty, source_ware
 def validate_project_based_po(doc):
 	mr_reference = None
 	mr_project = None
-
+	po_project = None
 	for item in doc.items:
-		if item.project and mr_project and mr_project != item.project:
+		if item.project and po_project and po_project != item.project:
 			frappe.throw("Only one project is allowed in a Purchase Order. Kindly update the project in Purchase Order items or at the Material Request")
 
-		if not mr_project and item.project:
-			mr_project = item.project
+		if not po_project and item.project:
+			po_project = item.project
 
 		if not mr_reference:
 			mr_reference = item.material_request	
@@ -845,7 +845,7 @@ def validate_project_based_po(doc):
 	if mr_reference:
 		mr_project = frappe.db.get_value("Material Request", mr_reference, "project")
 
-	if mr_project and mr_project not in po_project:
+	if mr_project and mr_project != po_project:
 		frappe.throw("Project in Material Request and Purchase Order should be same. Kindly update the project in Purchase Order items or at the Material Request")
 	
 
