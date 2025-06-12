@@ -1,11 +1,12 @@
 {
- "autoname": "JOP-.######",
+ "autoname": "JOP-.YYYY.-.#####",
  "creation": "2013-01-15 16:13:36",
  "description": "Description of a Job Opening",
  "doctype": "DocType",
  "document_type": "Document",
  "engine": "InnoDB",
  "field_order": [
+  "title",
   "job_opening_details_section",
   "job_opening_status",
   "job_requisition_id",
@@ -168,7 +169,7 @@
   {
    "fieldname": "required_core_skills",
    "fieldtype": "Table",
-   "label": "Required Core Skills ",
+   "label": "Required Core Skills",
    "options": "Core Skills"
   },
   {
@@ -287,11 +288,20 @@
    "fieldname": "main_responsibilities",
    "fieldtype": "Text Editor",
    "label": "Main Responsibilities"
+  },
+  {
+   "bold": 1,
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Title",
+   "no_copy": 1,
+   "print_hide": 1
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-06-11 18:26:45.534779",
+ "modified": "2025-06-12 18:19:46.016259",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",

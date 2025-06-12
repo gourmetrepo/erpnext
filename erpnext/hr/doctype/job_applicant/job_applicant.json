@@ -11,6 +11,7 @@
   "application_details_section",
   "job_applicant_status",
   "applied_on",
+  "career_portal",
   "column_break_4",
   "job_application_date",
   "position_title",
@@ -289,18 +290,6 @@
    "label": "Competency Framework"
   },
   {
-   "fieldname": "core_skills",
-   "fieldtype": "Table",
-   "label": "Core Skills",
-   "options": "Core Skills"
-  },
-  {
-   "fieldname": "behavioral_competencies",
-   "fieldtype": "Table",
-   "label": "Behavioral Competencies",
-   "options": "Behavioral Skills"
-  },
-  {
    "fieldname": "references_section",
    "fieldtype": "Section Break",
    "label": "References"
@@ -512,11 +501,28 @@
    "label": "Title",
    "no_copy": 1,
    "print_hide": 1
+  },
+  {
+   "fieldname": "career_portal",
+   "fieldtype": "Data",
+   "label": "Career Portal"
+  },
+  {
+   "fieldname": "core_skills",
+   "fieldtype": "Table",
+   "label": "Current Core Skills",
+   "options": "Core Skills"
+  },
+  {
+   "fieldname": "behavioral_competencies",
+   "fieldtype": "Table",
+   "label": "Current Behavioral Skills",
+   "options": "Behavioral Skills"
   }
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-05-19 19:26:09.101900",
+ "modified": "2025-06-12 17:50:44.197517",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
