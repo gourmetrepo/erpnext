@@ -38,6 +38,13 @@ class Project(Document):
 		self.send_welcome_email()
 		self.update_costing()
 		self.update_percent_complete()
+		# Code by Moeiz
+		self.validate_account_mapping()
+		self.update_project_assets()
+	
+	def before_save(self):
+		if self.project_type == "Annual General" and self.is_new():
+			self.validate_if_previous_project_exists()
 
 	
 	def on_update(self):
@@ -212,6 +219,44 @@ class Project(Document):
 				frappe.sendmail(user.user, subject=_("Project Collaboration Invitation"),
 								content=content.format(*messages))
 				user.welcome_email_sent = 1
+
+	def validate_account_mapping(self):
+		if self.project_type:
+			if self.project_type not in ("AOP", "Annual General"):
+				if not self.cwip_account:
+					frappe.throw(_("Please select CWIP Account"))
+			elif self.project_type == "AOP":
+				if not self.cogs_account:
+					frappe.throw(_("Please select COGS Account"))
+			elif self.project_type == "Annual General":
+				if not self.clearing_account:
+					frappe.throw(_("Please select Clearing Account"))
+	
+	def update_project_assets(self):
+		if self.estimated_costing and self.estimated_costing > 0:
+			total_gross_cost = 0
+			for asset in self.project_assets:
+				total_gross_cost += asset.gross_value if asset.gross_value else 0
+			
+			if total_gross_cost > 0:
+				for asset in self.project_assets:
+					asset.estimated_cost = (asset.gross_value / total_gross_cost) * self.estimated_costing
+		
+	
+	def validate_if_previous_project_exists(self):
+		project_names = frappe.db.sql(f"""
+		SELECT `name` FROM `tabProject` 
+		WHERE `project_type`="Annual General"
+		AND `company`="{self.company}"
+		AND `status`="Open";
+		""", as_dict=True)
+		if project_names:
+			links = "<br>".join([
+				f"""<a href="#Form/Project/{project["name"]}" target="_blank">{project.get('name')}</a>"""
+				for project in project_names
+			])
+			
+			frappe.throw(f"Please complete the previous Annual General Projects for {self.company}: <br>{links}")
 
 def get_timeline_data(doctype, name):
 	'''Return timeline for attendance'''
