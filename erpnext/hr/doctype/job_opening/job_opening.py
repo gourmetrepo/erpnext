@@ -13,6 +13,10 @@ import json
 
 class JobOpening(Document):
 	def before_save(self):
+		if self.position:
+			position_title = frappe.get_value("Position", self.position, "position_title")
+			self.title = f"{position_title}"
+
 		if self.is_new() and self.job_opening_status != "Open":
 			frappe.throw(_("Job Opening can only be created with status <b>Open<b>."))
 
