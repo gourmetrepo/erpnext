@@ -11,6 +11,8 @@
   "job_opening_id",
   "column_break_3",
   "offer_date",
+  "full_name",
+  "position_title",
   "valid_till",
   "job_offer_terms_section",
   "select_job_offer_template",
@@ -123,10 +125,22 @@
    "fieldtype": "Link",
    "label": "Select Job Offer Template",
    "options": "Job Offer Term Template"
+  },
+  {
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "position_title",
+   "fieldtype": "Data",
+   "label": "Position Title",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-06-12 19:49:21.185657",
+ "modified": "2025-06-13 16:16:58.149002",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",

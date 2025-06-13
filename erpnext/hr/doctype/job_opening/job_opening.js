@@ -43,7 +43,6 @@ frappe.ui.form.on('Job Opening', {
 				frm.clear_table("required_behavioral_competencies");
 
 				r.message.required_core_skills.forEach(element => {
-					debugger;
 					let temp_skill = element.skill;
 					let temp_proficiency = element.required_proficiency_level;
 

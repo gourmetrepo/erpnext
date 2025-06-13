@@ -31,6 +31,16 @@ frappe.ui.form.on("Job Offer", {
                     };
             });
         }
+        if (frm.doc.applicant_id) {
+            frappe.db.get_value('Job Applicant', frm.doc.applicant_id, ['first_name', 'middle_name', 'last_name', 'email', 'position_title'], (r) => {
+                let full_name = [r.first_name, r.middle_name, r.last_name]
+                            .filter(Boolean).join(' ');
+                if (r) {
+                    frm.set_value('full_name', full_name);
+                    frm.set_value('position_title', r.position_title);
+                }
+            });
+        }
     },
 
     terms_and_conditions: function(frm) {
@@ -43,28 +53,23 @@ frappe.ui.form.on("Job Offer", {
         }
     },
     select_job_offer_template: function(frm) {
-        if (frm.is_new()){
-            return [];
-        }
-        if (frm.doc.select_job_offer_template) {
-            frm.clear_table(frm.doc.offer_terms);
-            frm.refresh_field(frm.doc.offer_terms);
-            
-            return frappe.call({
-                method: "erpnext.hr.doctype.job_offer.job_offer.apply_offer_term_template",
-                args: {
-                    job_offer: frm.doc.name,
-                    template_name: frm.doc.select_job_offer_template,
-                },
-                    
-                callback: function(r) {
-                    if (r.message.status === "success") {
-                        frm.reload_doc();
-                    } else {
-                        frappe.msgprint("Error: " + r.message.message);
-                    }
-                }
-            });
-        }
+        if (!frm.doc.select_job_offer_template) return;
+
+        frappe.db.get_doc("Job Offer Term Template", frm.doc.select_job_offer_template)
+            .then(template => {
+                frm.clear_table("offer_terms");
+                (template.terms || []).forEach(row => {
+
+                    let child = frm.add_child("offer_terms", {
+                        offer_term: row.offer_term,
+                        value_description: row.description
+                    });
+                });
+
+                frm.refresh_field("offer_terms");
+            })
+            .catch(err => {
+                frappe.msgprint("Could not fetch template: " + err.message);
+            });    
     },
 });

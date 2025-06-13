@@ -20,22 +20,6 @@ class JobOffer(Document):
 	def before_save(self):
 		if self.is_new() and self.offer_status != "Offered":
 			frappe.throw(_("Job Offer can only be created with status <b>Offered<b>"))
-	
-	def before_insert(self):
-		if self.select_job_offer_template:
-			self.apply_template_terms()
-
-	def apply_template_terms(self):
-		if self.select_job_offer_template:
-			template = frappe.get_doc("Job Offer Term Template", self.select_job_offer_template)
-
-			self.set("offer_terms", [])
-
-			for t in template.terms:
-				self.append("offer_terms", {
-					"offer_term": t.offer_term,
-					"value_description": t.description
-				})
 
 	def on_submit(self):
 		if self.applicant_id:
@@ -82,36 +66,3 @@ def make_employee(source_name, target_doc=None):
 				}}
 		}, target_doc, set_missing_values)
 	return doc
-
-
-@frappe.whitelist()
-def apply_offer_term_template(job_offer, template_name):   
-	try:
-		job_offer = frappe.get_doc("Job Offer", job_offer)
-		template = frappe.get_doc("Job Offer Term Template", template_name)
-
-		job_offer.set("offer_terms", [])
-
-		for t in template.terms:
-			job_offer.append("offer_terms", {
-				"offer_term": t.offer_term,
-				"value_description": t.description
-			})
-   
-		job_offer.select_job_offer_template = template_name
-
-		job_offer.save(ignore_permissions=True)
-		frappe.db.commit()
-
-		return {
-			"status": "success",
-			"message": f"Offer terms applied from template '{template_name}'",
-			"job_offer": job_offer.name
-		}
-
-	except Exception as e:
-		frappe.log_error(frappe.get_traceback(), "Apply Job Offer Template Failed")
-		return {
-			"status": "error",
-			"message": str(e)
-		}

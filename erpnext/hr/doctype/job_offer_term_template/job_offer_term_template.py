@@ -7,4 +7,8 @@ from __future__ import unicode_literals
 from frappe.model.document import Document
 
 class JobOfferTermTemplate(Document):
-	pass
+	
+    def autoname(self):
+        if not self.name:
+            self.name  = self.template_name
+            self.title = self.template_name
