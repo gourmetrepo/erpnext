@@ -90,7 +90,7 @@ def sync_job_opening_to_career_portal(doc, method=None):
 				res = requests.request("POST", url, headers=headers, data= json.dumps(payload))
 				integeration_payload = str(json.dumps(payload))
 				nrp_integeration = {
-					"ref_doctype": "Job Applicant",
+					"ref_doctype": "Job Opening",
 					"doctype": "Nrp Integration",
 					"request": integeration_payload
 				}
