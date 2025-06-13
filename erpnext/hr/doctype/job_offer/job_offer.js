@@ -43,6 +43,9 @@ frappe.ui.form.on("Job Offer", {
         }
     },
     select_job_offer_template: function(frm) {
+        if (frm.is_new()){
+            return [];
+        }
         if (frm.doc.select_job_offer_template) {
             frm.clear_table(frm.doc.offer_terms);
             frm.refresh_field(frm.doc.offer_terms);
