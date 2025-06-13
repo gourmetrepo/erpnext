@@ -18,6 +18,9 @@ from erpnext.hr.doctype.payroll_period.payroll_period import get_period_factor, 
 from erpnext.hr.doctype.employee_benefit_application.employee_benefit_application import get_benefit_component_amount
 from erpnext.hr.doctype.employee_benefit_claim.employee_benefit_claim import get_benefit_claim_amount, get_last_payroll_period_benefits
 
+from nerp.utils import str_to_date, get_config_by_name, get_date_diff_in_days
+from nerp.modules.gourmet.shift_type.shift_type import get_shift_hours_by_employee
+
 class SalarySlip(TransactionBase):
 	def __init__(self, *args, **kwargs):
 		super(SalarySlip, self).__init__(*args, **kwargs)
@@ -117,8 +120,12 @@ class SalarySlip(TransactionBase):
 			self.end_date = date_details.end_date
 
 	def get_emp_and_leave_details(self):
+		# frappe.log_error(message="We are in hooks", title="Overrided Hook")
 		'''First time, load all the components from salary structure'''
 		if self.employee:
+			if not self.fuel_rate:
+				self.fuel_rate = get_config_by_name("FUEL_RATE",0)
+
 			self.set("earnings", [])
 			self.set("deductions", [])
 
@@ -136,6 +143,55 @@ class SalarySlip(TransactionBase):
 				self.salary_slip_based_on_timesheet = self._salary_structure_doc.salary_slip_based_on_timesheet or 0
 				self.set_time_sheet()
 				self.pull_sal_struct()
+			
+			### customization ###
+			
+			self.total_short_hours = calculate_short_hours_for_dates(self.employee, self.start_date, self.end_date)
+			self.total_overtime_hours = calculate_overtime_hours_for_dates(self.employee, self.start_date, self.end_date)
+			self.short_hours_exceeding_limit = self.total_short_hours - get_config_by_name("SHORT_HOUR_RELAXATION_HOURS", 10)
+			if self.short_hours_exceeding_limit < 0:
+				self.short_hours_exceeding_limit = 0
+			
+			total_salary = get_total_salary_by_employee(self.employee)
+			self.per_day_income = 0
+			if total_salary:
+				self.per_day_income = total_salary / self.total_working_days
+
+			total_shift_hours = get_shift_hours_by_employee(self.employee)
+			shift_break_hours = get_config_by_name("BREAK_HOURS", 1)
+			net_shift_hours = total_shift_hours - shift_break_hours
+			self.per_hour_income = self.per_day_income / net_shift_hours
+			
+			# final pay identification
+			relieving_date = frappe.db.get_value("Employee", self.employee, "relieving_date")
+			if(relieving_date):
+				_start_date = str_to_date(self.start_date, '%Y-%m-%d').date()
+				_end_date = str_to_date(self.end_date, '%Y-%m-%d').date()
+				if relieving_date >= _start_date and relieving_date <= _end_date:
+					self.final_salary = 1
+			### customization ###
+			# Update Calculate Provident Fund and Gratuity
+			enable_pf, enable_gratuity = frappe.db.get_value('Payroll Entry', self.payroll_entry, ['enable_pf','enable_gratuity'])
+			self.provident_fund = enable_pf
+			self.gratuity = enable_gratuity
+
+			if self.provident_fund == 1:
+				provident_fund_account = frappe.db.get_value('Account',{'company':self.company,'is_provident_fund_account': 1},'name')
+				balance = frappe.db.sql("""SELECT abs(sum(debit) - SUM(credit)) AS balance FROM `tabJournal Entry Account` WHERE party = '{0}' AND party_type = 'Employee' AND ACCOUNT = '{1}'""".format(self.employee, provident_fund_account))
+				if balance and balance[0] and balance[0][0]:
+					balance = balance[0][0]
+				else:
+					balance = 0
+				self.provident_fund_balance = balance
+
+			if self.gratuity == 1:
+				gratuity_account = frappe.db.get_value('Account',{'company':self.company,'is_gratuity_account': 1},'name')
+				employee_gratuity_balance = frappe.db.sql("""SELECT abs(SUM(debit) - SUM(credit)) AS balance FROM `tabJournal Entry Account` WHERE party = '{0}' AND docstatus = 1  AND party_type = 'Employee' AND ACCOUNT = '{1}'""".format(self.employee, gratuity_account))
+				if employee_gratuity_balance and employee_gratuity_balance[0] and employee_gratuity_balance[0][0]:
+					employee_gratuity_balance = employee_gratuity_balance[0][0]
+				else:
+					employee_gratuity_balance = 0
+				self.gratuity_balance = employee_gratuity_balance
 
 	def set_time_sheet(self):
 		if self.salary_slip_based_on_timesheet:
@@ -199,7 +255,17 @@ class SalarySlip(TransactionBase):
 			return
 
 		holidays = self.get_holidays_for_employee(self.start_date, self.end_date)
-		actual_lwp = self.calculate_lwp(holidays, working_days)
+		### check if joining date and releiving date of employees ###
+		start_date = self.start_date
+		end_date = self.end_date
+
+		if(relieving_date and frappe.utils.getdate(self.end_date) > frappe.utils.getdate(relieving_date)):
+			end_date = relieving_date
+
+		if(frappe.utils.getdate(self.start_date) < frappe.utils.getdate(joining_date)):
+			start_date = joining_date
+
+		actual_lwp = self.calculate_lwp(holidays, working_days, start_date, end_date)
 		if not cint(frappe.db.get_value("HR Settings", None, "include_holidays_in_total_working_days")):
 			working_days -= len(holidays)
 			if working_days < 0:
@@ -212,8 +278,14 @@ class SalarySlip(TransactionBase):
 
 		self.total_working_days = working_days
 		self.leave_without_pay = lwp
+		
+		self.absent_days = calculate_absent_days(self.employee, start_date, end_date)
+		self.total_present_days = calculate_present_days(self.employee, start_date, end_date)
 
-		payment_days = flt(self.get_payment_days(joining_date, relieving_date)) - flt(lwp)
+		### customization ###
+		payment_days = flt(self.get_payment_days(joining_date, relieving_date)) - flt(lwp) - self.absent_days
+		### customization ###
+
 		self.payment_days = payment_days > 0 and payment_days or 0
 
 	def get_payment_days(self, joining_date, relieving_date):
@@ -255,27 +327,29 @@ class SalarySlip(TransactionBase):
 
 		return holidays
 
-	def calculate_lwp(self, holidays, working_days):
+	def calculate_lwp(self, holidays, working_days, start_date, end_date):
 		lwp = 0
-		holidays = "','".join(holidays)
-		for d in range(working_days):
-			dt = add_days(cstr(getdate(self.start_date)), d)
-			leave = frappe.db.sql("""
-				SELECT t1.name,
-					CASE WHEN t1.half_day_date = %(dt)s or t1.to_date = t1.from_date
-					THEN t1.half_day else 0 END
-				FROM `tabLeave Application` t1, `tabLeave Type` t2
-				WHERE t2.name = t1.leave_type
-				AND t2.is_lwp = 1
-				AND t1.docstatus = 1
-				AND t1.employee = %(employee)s
-				AND CASE WHEN t2.include_holiday != 1 THEN %(dt)s not in ('{0}') and %(dt)s between from_date and to_date and ifnull(t1.salary_slip, '') = ''
-				WHEN t2.include_holiday THEN %(dt)s between from_date and to_date and ifnull(t1.salary_slip, '') = ''
-				END
-				""".format(holidays), {"employee": self.employee, "dt": dt})
+		if(not start_date):
+			start_date = self.start_date
+		if(not end_date):
+			end_date = self.end_date
 
-			if leave:
-				lwp = cint(leave[0][1]) and (lwp + 0.5) or (lwp + 1)
+		lwp_query = frappe.db.sql("""
+			SELECT
+				count(att.name) as lwp
+			FROM
+				`tabAttendance` att
+			INNER JOIN
+				`tabLeave Type` lt
+				ON
+					att.leave_type = lt.name and lt.is_lwp = 1
+			WHERE
+				att.docstatus = 1 and att.status = 'On Leave' and att.employee = '{0}' and att.attendance_date between '{1}' and '{2}';
+		""".format(self.employee,start_date,end_date))
+
+		if(lwp_query):
+			lwp = lwp_query[0][0]
+
 		return lwp
 
 	def add_earning_for_hourly_wages(self, doc, salary_component, amount):
@@ -336,9 +410,8 @@ class SalarySlip(TransactionBase):
 	def get_data_for_eval(self):
 		'''Returns data for evaluating formula'''
 		data = frappe._dict()
-
-		data.update(frappe.get_doc("Salary Structure Assignment",
-			{"employee": self.employee, "salary_structure": self.salary_structure, "docstatus": 1, "from_date":["<=",self.end_date]}).as_dict())
+		ssa = frappe.db.get_value("Salary Structure Assignment",{"employee": self.employee, "salary_structure": self.salary_structure, "docstatus": 1, "from_date":["<=",self.end_date]},order_by="from_date desc")
+		data.update(frappe.get_doc("Salary Structure Assignment",ssa).as_dict())
 
 		data.update(frappe.get_doc("Employee", self.employee).as_dict())
 		data.update(self.as_dict())
@@ -825,6 +898,11 @@ class SalarySlip(TransactionBase):
 					amount = self.get_amount_based_on_payment_days(d, joining_date, relieving_date)[0]
 				else:
 					amount = flt(d.amount, d.precision("amount"))
+				# Ignore amount in total if its have employer_contribution
+				if d.salary_component:
+					employer_contribution = frappe.db.get_value('Salary Component',d.salary_component, 'employer_contribution')
+					if employer_contribution and employer_contribution == 1 and self.final_salary == 0:
+						amount = 0 # donot add it in the total
 				total += amount
 		return total
 
@@ -842,36 +920,82 @@ class SalarySlip(TransactionBase):
 			for d in self.get(component_type):
 				d.amount = flt(self.get_amount_based_on_payment_days(d, joining_date, relieving_date)[0], d.precision("amount"))
 
-	def set_loan_repayment(self):
+	def set_loan_repayment(self):    
 		self.set('loans', [])
 		self.total_loan_repayment = 0
 		self.total_interest_amount = 0
 		self.total_principal_amount = 0
+		self.total_loan_amount = 0
+
+		_tmp_dict = {}
+		_tmp_total_loan_amount_dict = {}
 
 		for loan in self.get_loan_details():
+      		### customizations ###
+			total_loan_amount = frappe.db.get_value('Loan', loan.name, 'loan_amount')
+			loan_type = frappe.db.get_value('Loan', loan.name, 'loan_type')
+			_tmp_dict[loan.name] = loan.principal_amount
+			_tmp_total_loan_amount_dict[loan.name] = total_loan_amount
 			self.append('loans', {
-				'loan': loan.name,
-				'total_payment': loan.total_payment,
-				'interest_amount': loan.interest_amount,
-				'principal_amount': loan.principal_amount,
-				'loan_account': loan.loan_account,
-				'interest_income_account': loan.interest_income_account
-			})
+    	        'loan': loan.name,
+    	        'total_payment': loan.total_payment,
+    	        'interest_amount': loan.interest_amount,
+    	        'principal_amount': loan.principal_amount,
+    	        'total_loan_amount': total_loan_amount,
+    	        'loan_type': loan_type,
+    	        'loan_account': loan.loan_account,
+    	        'interest_income_account': loan.interest_income_account,
+    	        'balance_loan_amount': loan.balance_loan_amount
+    	    })
+    	    ### customizations ###
 
 			self.total_loan_repayment += loan.total_payment
 			self.total_interest_amount += loan.interest_amount
-			self.total_principal_amount += loan.principal_amount
-
+    	    # self.total_principal_amount += loan.principal_amount
+    	    # self.total_loan_amount += total_loan_amount
+	
+		for key, loan_principal_amount in _tmp_dict.items():
+			self.total_principal_amount += loan_principal_amount
+   
+		for key, total_loan_amount in _tmp_total_loan_amount_dict.items():
+			self.total_loan_amount += total_loan_amount
+      
 	def get_loan_details(self):
-		return frappe.db.sql("""select rps.principal_amount,
-				rps.name as repayment_name, rps.interest_amount, l.name,
-				rps.total_payment, l.loan_account, l.interest_income_account
-			from
-				`tabRepayment Schedule` as rps, `tabLoan` as l
-			where
-				l.name = rps.parent and rps.payment_date between %s and %s and
-				l.repay_from_salary = 1 and l.docstatus = 1 and l.applicant = %s""",
-			(self.start_date, self.end_date, self.employee), as_dict=True) or []
+		emp = frappe.db.sql("""
+			SELECT 
+				name, relieving_date
+			FROM
+				tabEmployee
+			WHERE
+				name = %s
+					AND relieving_date BETWEEN %s AND %s
+			LIMIT 1""", (self.employee, self.start_date, self.end_date), as_dict=True)
+		if not len(emp):
+			return frappe.db.sql("""select rps.principal_amount,
+					rps.name as repayment_name, rps.interest_amount, l.name,
+					rps.total_payment, l.loan_account, l.interest_income_account,
+					rps.balance_loan_amount
+				from
+					`tabRepayment Schedule` as rps, `tabLoan` as l
+				where
+					l.name = rps.parent and rps.payment_date between %s and %s and
+					rps.paid = 0 and
+					l.repay_from_salary = 1 and l.docstatus = 1 and l.applicant = %s
+					order by rps.parent, rps.payment_date""",
+				(self.start_date, self.end_date, self.employee), as_dict=True) or []
+		else:
+			return frappe.db.sql("""select rps.principal_amount,
+					rps.name as repayment_name, rps.interest_amount, l.name,
+					rps.total_payment, l.loan_account, l.interest_income_account,
+					rps.balance_loan_amount
+				from
+					`tabRepayment Schedule` as rps, `tabLoan` as l
+				where
+					l.name = rps.parent and
+					rps.paid = 0 and
+					l.repay_from_salary = 1 and l.docstatus = 1 and l.applicant = %s
+					order by rps.parent, rps.payment_date""",
+				(self.employee), as_dict=True) or []
 
 	def update_salary_slip_in_additional_salary(self):
 		salary_slip = self.name if self.docstatus==1 else None
@@ -966,3 +1090,89 @@ def unlink_ref_doc_from_salary_slip(ref_no):
 def generate_password_for_pdf(policy_template, employee):
 	employee = frappe.get_doc("Employee", employee)
 	return policy_template.format(**employee.as_dict())
+
+def calculate_short_hours_for_dates(employee, start_date, end_date):
+    total_short_hours = 0
+    start_date = str_to_date(start_date, "%Y-%m-%d")
+    end_date = str_to_date(end_date, "%Y-%m-%d")
+    filters = {
+        'employee':employee,
+        'attendance_date':('between', [start_date, end_date]),
+        'status':'Present',
+        'short_hours': ('>', 0),
+        'docstatus': 1
+    }
+
+    attendance_list = frappe.db.get_list('Attendance', fields="*", filters=filters, order_by="attendance_date")
+
+    for a in attendance_list:
+        total_short_hours += a.short_hours
+    
+    return total_short_hours
+
+def calculate_overtime_hours_for_dates(employee, start_date, end_date):
+    total_overtime_hours = 0
+    start_date = str_to_date(start_date, "%Y-%m-%d")
+    end_date = str_to_date(end_date, "%Y-%m-%d")
+    filters = {
+        'employee':employee,
+        'attendance_date':('between', [start_date, end_date]),
+        'status':'Present',
+        'overtime_hours': ('>=', get_config_by_name("MIN_OVERTIME",4)),
+        'docstatus': 1
+    }
+
+    attendance_list = frappe.db.get_list('Attendance', fields="*", filters=filters, order_by="attendance_date")
+
+    for a in attendance_list:
+        if(get_config_by_name("MAX_OVERTIME",7) < a.overtime_hours):
+            a.overtime_hours = get_config_by_name("MAX_OVERTIME",7)
+        total_overtime_hours += a.overtime_hours
+    
+    return total_overtime_hours
+
+def get_total_salary_by_employee(employee):
+    # filters = {
+    #     'employee':employee,
+    #     'docstatus': 1
+    # }
+
+    # salary_structure_assignments = frappe.db.get_list('Salary Structure Assignment', fields="*", filters=filters, order_by="from_date")
+
+    query = """select * from `tabSalary Structure Assignment`
+    where employee = "{0}" and docstatus = 1
+    order by from_date;""".format(employee)
+    salary_structure_assignments = frappe.db.sql(query, as_dict=True)
+    if len(salary_structure_assignments) > 0:
+        return salary_structure_assignments[-1].base
+    
+    
+def calculate_absent_days(employee, start_date, end_date):
+
+    start_date = str_to_date(start_date, "%Y-%m-%d")
+    end_date = str_to_date(end_date, "%Y-%m-%d")
+    filters = {
+        'employee':employee,
+        'attendance_date':('between', [start_date, end_date]),
+        'status':'Absent',
+        'docstatus': 1
+    }
+
+    attendance_list = frappe.db.get_list('Attendance', fields="*", filters=filters, order_by="attendance_date")
+
+    return len(attendance_list)
+
+def calculate_present_days(employee, start_date, end_date):
+    start_date = str_to_date(start_date, "%Y-%m-%d")
+    end_date = str_to_date(end_date, "%Y-%m-%d")
+
+    # get all attendances in between interval start date and till date
+    filters = {
+        'employee': employee,
+        'attendance_date': ('between', [start_date, end_date]),
+        'status': 'Present',
+        'docstatus': 1
+    }
+    attendance_list = frappe.db.get_list('Attendance', fields="*", filters=filters, order_by="attendance_date")
+    total_present_days = len(attendance_list)
+    return total_present_days
