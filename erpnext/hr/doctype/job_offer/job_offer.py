@@ -34,7 +34,7 @@ class JobOffer(Document):
 			for t in template.terms:
 				self.append("offer_terms", {
 					"offer_term": t.offer_term,
-					"description": t.description
+					"value_description": t.description
 				})
 
 	def on_submit(self):
