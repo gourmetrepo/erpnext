@@ -41,5 +41,27 @@ frappe.ui.form.on("Job Offer", {
                 }
             });
         }
-    }
+    },
+    select_job_offer_template: function(frm) {
+        if (frm.doc.select_job_offer_template) {
+            frm.clear_table(frm.doc.offer_terms);
+            frm.refresh_field(frm.doc.offer_terms);
+            
+            return frappe.call({
+                method: "erpnext.hr.doctype.job_offer.job_offer.apply_offer_term_template",
+                args: {
+                    job_offer: frm.doc.name,
+                    template_name: frm.doc.select_job_offer_template,
+                },
+                    
+                callback: function(r) {
+                    if (r.message.status === "success") {
+                        frm.reload_doc();
+                    } else {
+                        frappe.msgprint("Error: " + r.message.message);
+                    }
+                }
+            });
+        }
+    },
 });
