@@ -129,7 +129,7 @@ def update_job_opening_status_to_career_portal(doc, method=None):
 					"request": integeration_payload
 				}
 
-				nrp_integeration["title"] = "On update job applicant --- {0}".format(doc.name)
+				nrp_integeration["title"] = "On update job opening --- {0}".format(doc.name)
 				nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
 
 				frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
@@ -140,4 +140,4 @@ def update_job_opening_status_to_career_portal(doc, method=None):
 				else:
 					break
 		except requests.exceptions.RequestException as e:
-			frappe.log_error(f"Failed to sync Applicant status: {str(e)}", "Job Applicant Status Sync")
+			frappe.log_error(f"Failed to sync Opening status: {str(e)}", "Job Opening Status Sync")

@@ -277,7 +277,7 @@ doc_events = {
 		"before_save": "erpnext.hr.doctype.job_opening.job_opening.update_job_opening_status_to_career_portal"
     },
 	"Job Applicant": {
-			"validate": "erpnext.hr.utils.on_update_job_applicant"
+			"before_save": "erpnext.hr.doctype.job_applicant.job_applicant.update_job_applicant_status_to_career_portal"
 	}
 }
 

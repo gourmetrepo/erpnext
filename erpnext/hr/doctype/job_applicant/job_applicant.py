@@ -9,6 +9,9 @@ import frappe
 from frappe import _
 from frappe.model.naming import make_autoname
 from frappe.utils import nowdate, date_diff, comma_and, flt, validate_email_address
+from nerp.utils import get_config_by_name
+import requests
+import json
 
 
 class JobApplicant(Document):
@@ -50,3 +53,36 @@ class JobApplicant(Document):
 			self.total_work_experience_years = flt(total_experience / 365, 1)
 
 
+@frappe.whitelist()
+def update_job_applicant_status_to_career_portal(doc, method=None):
+	old_status = frappe.db.get_value("Job Applicant", doc.name, "job_applicant_status")
+	baseurl =  get_config_by_name("Career_PORTAL_BASE_URL")
+	if old_status != doc.job_applicant_status:
+		frappe.db.set_value("Job Applicant", doc.name, "job_applicant_status", doc.job_applicant_status)
+		url = f"{baseurl}api/user/applications/{doc.career_portal}/status"
+		payload = {"status": doc.job_applicant_status}
+		headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
+		try:
+			for x in range(1, 4):
+				
+				res = requests.request("POST", url, headers=headers, data= json.dumps(payload))
+				integeration_payload = str(json.dumps(payload))
+
+				nrp_integeration = {
+					"ref_doctype": "Job Applicant",
+					"doctype": "Nrp Integration",
+					"request": integeration_payload
+				}
+
+				nrp_integeration["title"] = "On update job applicant --- {0}".format(doc.name)
+				nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+
+				frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+				frappe.db.commit()
+
+				if res.status_code != 200:
+					frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+				else:
+					break
+		except requests.exceptions.RequestException as e:
+			frappe.log_error(f"Failed to sync Applicant status: {str(e)}", "Job Applicant Status Sync")
