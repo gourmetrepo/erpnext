@@ -23,6 +23,8 @@ class JobOpening(Document):
 
 		if not self.creation_date:
 			self.creation_date = frappe.utils.nowdate()
+		if self.name:
+			update_job_opening_to_career_portal(self)
 		
 		# self.load_competencies()
 		
@@ -52,92 +54,126 @@ class JobOpening(Document):
 
 
 @frappe.whitelist()
-def sync_job_opening_to_career_portal(doc, method=None):
+def sync_job_openings(doc, method=None):
 	if doc:
-		field_names = [
-			"name", "creation", "modified", "modified_by", "owner", "docstatus", "parent", "parentfield",
+		for plateform in doc.social_media_platforms:
+			if plateform.get("social_media_platform") == "Career Portal":
+				sync_jobs_to_career_portal(doc, method)
+			else:
+				continue
+
+
+def sync_jobs_to_career_portal(doc, method=None):
+	payload = {}
+	
+	field_names = [
+			"name", "docstatus", "parent", "parentfield",
 			"parenttype", "idx", "job_title", "company", "status", "designation", "department",
 			"staffing_plan", "route", "_user_tags",
 			"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
-			"posting_date", "job_requisition_id", "position_title", "cadre", "grade", "location",
+			"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
 			"no_of_openings", "required_education", "required_specialization", "required_certification",
-			 "required_behavioral_competencies", "required_to_work_in_shifts",
+				"required_behavioral_competencies", "required_to_work_in_shifts",
 			"required_to_travel", "required_background_check",
 			"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
 			"maximum_salary", "brief_summary", "main_responsibilities", "position"
 		]
 
-		payload = {}
-
-		for field in field_names:
-			value = getattr(doc, field, None)
-			if isinstance(value, list):
-				child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
-				if field in ["required_core_skills", "required_behavioral_competencies"]:
-					payload[field] = "Dummy data"
-				else:
-					payload[field] = child_list
+	for field in field_names:
+		value = getattr(doc, field, None)
+		if isinstance(value, list):
+			child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
+			if field in ["required_core_skills", "required_behavioral_competencies"]:
+				payload[field] = "Dummy data"
 			else:
-				payload[field] = getattr(doc, field, None)
+				payload[field] = child_list
+		else:
+			payload[field] = getattr(doc, field, None)
 
-		base_url = get_config_by_name("Career_PORTAL_BASE_URL")
+	base_url = get_config_by_name("Career_PORTAL_BASE_URL")
 
-		url  = f"{base_url}api/jobs/create"
-		headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
-		try:
-			for x in range(1, 4):
+	url  = f"{base_url}api/jobs/create"
+	headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
+	try:
+		for x in range(1, 4):
 
-				res = requests.request("POST", url, headers=headers, data= json.dumps(payload))
-				integeration_payload = str(json.dumps(payload))
-				nrp_integeration = {
-					"ref_doctype": "Job Opening",
-					"doctype": "Nrp Integration",
-					"request": integeration_payload
-				}
+			res = requests.request("POST", url, headers=headers, data= json.dumps(payload, default=json_serial))
+			integeration_payload = str(json.dumps(payload, default=json_serial))
+			nrp_integeration = {
+				"ref_doctype": "Job Opening",
+				"doctype": "Nrp Integration",
+				"request": integeration_payload
+			}
 
-				nrp_integeration["title"] = "On job opening  --- {0}".format(doc.name)
-				nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
-				frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
-				frappe.db.commit()
-				if res.status_code != 201:
-					frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
-				else:
-					break
+			nrp_integeration["title"] = "On job opening  --- {0}".format(doc.name)
+			nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+			frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+			frappe.db.commit()
+			if res.status_code != 201:
+				frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+			else:
+				break
 
-		except requests.exceptions.RequestException as e:
-			frappe.log_error(f"Failed to sync job opening to Career Portal: {str(e)}", "Job Opening Sync")
+	except requests.exceptions.RequestException as e:
+		frappe.log_error(f"Failed to sync job opening to Career Portal: {str(e)}", "Job Opening Sync")
+
+def json_serial(obj):
+    from datetime import datetime, date
+    """JSON serializer for datetime or date objects."""
+    if isinstance(obj, (datetime, date)):
+        return obj.strftime('%Y-%m-%d')
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 @frappe.whitelist()
-def update_job_opening_status_to_career_portal(doc, method=None):
-	old_status = frappe.db.get_value("Job Opening", doc.name, "job_opening_status")
-	baseurl =  get_config_by_name("Career_PORTAL_BASE_URL")
-	if old_status != doc.job_opening_status:
-		frappe.db.set_value("Job Opening", doc.name, "job_opening_status", doc.job_opening_status)
-		url = f"{baseurl}api/jobs/{doc.name}/status"
-		payload = {"job_opening_status": doc.job_opening_status}
-		headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
-		try:
-			for x in range(1, 4):
-				
-				res = requests.request("POST", url, headers=headers, data= json.dumps(payload))
-				integeration_payload = str(json.dumps(payload))
+def update_job_opening_to_career_portal(doc, method=None):
+	payload = {}
+	
+	field_names = [
+			"name", "docstatus", "parent", "parentfield",
+			"parenttype", "idx", "job_title", "company", "status", "designation", "department",
+			"staffing_plan", "route", "_user_tags",
+			"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
+			"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
+			"no_of_openings", "required_education", "required_specialization", "required_certification",
+				"required_behavioral_competencies", "required_to_work_in_shifts",
+			"required_to_travel", "required_background_check",
+			"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
+			"maximum_salary", "brief_summary", "main_responsibilities", "position"
+		]
 
-				# To maintain logs
-				nrp_integeration = {
-					"ref_doctype": "Job Opening",
-					"doctype": "Nrp Integration",
-					"request": integeration_payload
-				}
+	for field in field_names:
+		value = getattr(doc, field, None)
+		if isinstance(value, list):
+			child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
+			if field in ["required_core_skills", "required_behavioral_competencies"]:
+				payload[field] = "Dummy data"
+			else:
+				payload[field] = child_list
+		else:
+			payload[field] = getattr(doc, field, None)
 
-				nrp_integeration["title"] = "On update job opening --- {0}".format(doc.name)
-				nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+	base_url = get_config_by_name("Career_PORTAL_BASE_URL")
 
-				frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
-				frappe.db.commit()
+	url  = f"{base_url}api/jobs/{doc.name}/update"
+	headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
+	try:
+		for x in range(1, 4):
 
-				if res.status_code != 200:
-					frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
-				else:
-					break
-		except requests.exceptions.RequestException as e:
-			frappe.log_error(f"Failed to sync Opening status: {str(e)}", "Job Opening Status Sync")
+			res = requests.request("POST", url, headers=headers, data= json.dumps(payload, default=json_serial))
+			integeration_payload = str(json.dumps(payload, default=json_serial))
+			nrp_integeration = {
+				"ref_doctype": "Job Opening",
+				"doctype": "Nrp Integration",
+				"request": integeration_payload
+			}
+
+			nrp_integeration["title"] = "On job opening  --- {0}".format(doc.name)
+			nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+			frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+			frappe.db.commit()
+			if res.status_code != 201:
+				frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+			else:
+				break
+	except requests.exceptions.RequestException as e:
+		frappe.log_error(f"Failed to update job opening to Career Portal: {str(e)}", "Job Opening Update")
