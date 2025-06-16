@@ -18,6 +18,8 @@
   "column_break_5",
   "creation_date",
   "position",
+  "social_media_platforms",
+  "multi_social_media_platform",
   "cadre",
   "grade",
   "location",
@@ -297,11 +299,23 @@
    "label": "Title",
    "no_copy": 1,
    "print_hide": 1
+  },
+  {
+   "fieldname": "social_media_platforms",
+   "fieldtype": "Table MultiSelect",
+   "label": "Social Media Platforms",
+   "options": "Select Multi Social Media Platform",
+   "reqd": 1
+  },
+  {
+   "fieldname": "multi_social_media_platform",
+   "fieldtype": "Data",
+   "label": "Multi Social Media Platform"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-06-12 18:44:04.838808",
+ "modified": "2025-06-16 12:18:52.956909",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
