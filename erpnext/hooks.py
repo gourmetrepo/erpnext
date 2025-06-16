@@ -273,7 +273,8 @@ doc_events = {
 		"after_insert": "erpnext.crm.doctype.email_campaign.email_campaign.unsubscribe_recipient"
 	},
 	"Job Opening": {
-     	"after_insert": "erpnext.hr.doctype.job_opening.job_opening.sync_job_openings"
+     	"after_insert": "erpnext.hr.doctype.job_opening.job_opening.sync_job_opening_to_career_portal",
+		"before_save": "erpnext.hr.doctype.job_opening.job_opening.update_job_opening_status_to_career_portal"
     },
 	"Job Applicant": {
 			"before_save": "erpnext.hr.doctype.job_applicant.job_applicant.update_job_applicant_status_to_career_portal"
