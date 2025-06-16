@@ -130,6 +130,8 @@ def get_conditions(filters):
 		conditions = f"se.company = {frappe.db.escape(company)}"
 	if stock_entry_type:
 		conditions = f"{conditions} AND se.stock_entry_type = {frappe.db.escape(stock_entry_type)}"
+	if sub_branch:
+		conditions = f"{conditions} AND se.sub_branch = {frappe.db.escape(sub_branch)}"
 	if filters.get("posting_date"):
 		conditions = f"{conditions} AND se.posting_date >= {frappe.db.escape(filters.get('posting_date'))} AND se.posting_date <= {frappe.db.escape(filters.get('posting_date'))}"
 	if target_warehouse:
@@ -182,6 +184,29 @@ def get_department_mapping():
 					"ODS BON RM - U6",
 					"ODS BON PM - U6",
 					"MTH ODS RM - U6",
+					"MTH ODS PM - U6",
+					"NMK ODS RM - U6",
+					"NMK ODS PM - U6",
+					"BRD ODS RM - U6",
+					"BRD ODS PM - U6",
+					"ODS FCC RM - U6",
+					"ODS FCC PM - U6",
+					"ODS Bulk Water RM - U6",
+					"ODS Bulk Water PM - U6",
+					"KCN ODS RM - U6",
+					"KCN ODS PM - U6",
+					"SNK ODS RM - U6",
+					"SNK ODS PM - U6",
+					"PUFF ODS RM - U6",
+					"PUFF ODS PM - U6",
+					"BCS ODS RM - U6",
+					"BCS ODS PM - U6",
+					"Bakery Export ODS RM - U6",
+					"Bakery Export ODS PM - U6",
+					"ODS R&D RM - U6",
+					"ODS R&D PM - U6",
+					"ODS RSK RM - U6",
+					"ODS RSK PM - U6"
 				]
 			}
 		},
