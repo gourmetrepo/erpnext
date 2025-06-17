@@ -156,6 +156,7 @@
   "customer_group",
   "campaign",
   "is_discounted",
+  "vsp_reference",
   "col_break23",
   "status",
   "source",
@@ -1564,12 +1565,20 @@
   {
    "fieldname": "dimension_col_break",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vsp_reference",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "VSP Reference ",
+   "options": "VSP Secondary Lease Contract",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2020-07-01 12:41:29.484813",
+ "modified": "2025-06-16 15:01:07.779127",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",
