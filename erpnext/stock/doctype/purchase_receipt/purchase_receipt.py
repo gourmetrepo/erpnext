@@ -102,6 +102,9 @@ class PurchaseReceipt(BuyingController):
 
 		self.check_on_hold_or_closed_status()
 
+		if self.project_based:
+			self.validate_project_based()
+
 		if getdate(self.posting_date) > getdate(nowdate()):
 			throw(_("Posting Date cannot be future date"))
 
@@ -534,6 +537,23 @@ class PurchaseReceipt(BuyingController):
 			pr_doc.update_billing_percentage(update_modified=update_modified)
 
 		self.load_from_db()
+
+	def validate_project_based(self):
+		if len(self.items) > 0:
+			projects = set()
+
+			for i in self.items:
+				if i.project:
+					projects.add(i.project)
+
+			if len(projects) > 1:
+				frappe.throw(_("Items can not be against different projects."))
+
+			if len(projects) > 0:
+				if not self.project: 
+					self.project = projects[0]
+			else:
+				frappe.throw(_("No project is mapped against this project based PR."))
 
 def update_billed_amount_based_on_po(po_detail, update_modified=True):
 	# Billed against Sales Order directly
