@@ -540,11 +540,11 @@ class PurchaseReceipt(BuyingController):
 
 	def validate_project_based(self):
 		if len(self.items) > 0:
-			projects = set()
+			projects = []
 
 			for i in self.items:
-				if i.project:
-					projects.add(i.project)
+				if i.project and i.project not in projects:
+					projects.append(i.project)
 
 			if len(projects) > 1:
 				frappe.throw(_("Items can not be against different projects."))
