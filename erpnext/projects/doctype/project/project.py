@@ -562,6 +562,12 @@ def get_projects(doctype, txt, searchfield, start, page_len, filters):
 	if filters and filters.get('customer'):
 		cond += f"""AND `customer` = {frappe.db.escape(filters.get('customer'))} """
 	
+	if filters and filters.get('start_date'):
+		cond += f"""AND `creation`>={frappe.db.escape(filters.get('start_date'))} """
+  
+	if filters and filters.get('end_date'):
+		cond += f"""AND `creation`<={frappe.db.escape(filters.get('end_date'))} """
+	
 	query = f"""
 		select `name`, `project_name` 
 		from `tabProject`
