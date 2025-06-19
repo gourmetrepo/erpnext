@@ -59,7 +59,7 @@ def update_job_applicant_status_to_career_portal(doc, method=None):
 	baseurl =  get_config_by_name("Career_PORTAL_BASE_URL")
 	if old_status != doc.job_applicant_status:
 		frappe.db.set_value("Job Applicant", doc.name, "job_applicant_status", doc.job_applicant_status)
-		url = f"{baseurl}api/user/applications/{doc.career_portal}/status"
+		url = f"{baseurl}api/user/applications/{doc.source_id}/status"
 		payload = {"status": doc.job_applicant_status}
 		headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
 		try:

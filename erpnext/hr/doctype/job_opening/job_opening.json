@@ -18,21 +18,17 @@
   "column_break_5",
   "creation_date",
   "position",
-  "social_media_platforms",
-  "multi_social_media_platform",
   "cadre",
   "grade",
   "location",
   "no_of_openings",
   "required_education_section",
   "required_education",
-  "required_specialization",
-  "required_certification",
   "required_experience_section",
   "minimum_required_experience",
   "maximum_required_experience",
   "competency_framework_section",
-  "required_core_skills",
+  "required_core_competencies",
   "required_behavioral_competencies",
   "job_preferences_section",
   "required_to_work_in_shifts",
@@ -45,7 +41,9 @@
   "maximum_salary",
   "job_role_clarification_section",
   "brief_summary",
-  "main_responsibilities"
+  "main_responsibilities",
+  "job_posting_sites_section",
+  "job_posting_sites"
  ],
  "fields": [
   {
@@ -138,25 +136,10 @@
    "label": "Required Education"
   },
   {
-   "fetch_from": "position.required_education",
    "fieldname": "required_education",
-   "fieldtype": "Data",
+   "fieldtype": "Table",
    "label": "Required Education",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "position.required_specialization",
-   "fieldname": "required_specialization",
-   "fieldtype": "Data",
-   "label": "Required Specialization",
-   "read_only": 1
-  },
-  {
-   "fetch_from": "position.required_certification",
-   "fieldname": "required_certification",
-   "fieldtype": "Data",
-   "label": "Required Certification",
-   "read_only": 1
+   "options": "Required Education"
   },
   {
    "fieldname": "required_experience_section",
@@ -167,12 +150,6 @@
    "fieldname": "competency_framework_section",
    "fieldtype": "Section Break",
    "label": "Competency Framework"
-  },
-  {
-   "fieldname": "required_core_skills",
-   "fieldtype": "Table",
-   "label": "Required Core Skills",
-   "options": "Core Skills"
   },
   {
    "fetch_from": "position.required_behavioral_competencies",
@@ -254,7 +231,7 @@
    "fieldtype": "Link",
    "label": "Position",
    "options": "Position",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fetch_from": "job_requisition_id.comapany",
@@ -301,21 +278,26 @@
    "print_hide": 1
   },
   {
-   "fieldname": "social_media_platforms",
-   "fieldtype": "Table MultiSelect",
-   "label": "Social Media Platforms",
-   "options": "Select Multi Social Media Platform",
-   "reqd": 1
+   "fieldname": "required_core_competencies",
+   "fieldtype": "Table",
+   "label": "Required Core Competencies",
+   "options": "Core Skills"
   },
   {
-   "fieldname": "multi_social_media_platform",
-   "fieldtype": "Data",
-   "label": "Multi Social Media Platform"
+   "fieldname": "job_posting_sites_section",
+   "fieldtype": "Section Break",
+   "label": "Job Posting Sites"
+  },
+  {
+   "fieldname": "job_posting_sites",
+   "fieldtype": "Table",
+   "label": "Job Posting Sites",
+   "options": "Job Posting Sites Platform"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-06-16 12:18:52.956909",
+ "modified": "2025-06-19 17:58:44.275305",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",

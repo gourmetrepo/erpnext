@@ -10,6 +10,22 @@ frappe.ui.form.on('Job Opening', {
 				}
 			};
 		});
+
+		frm.fields_dict.job_requisition_id.get_data = function(txt) {
+            return frappe.db.get_list('Job Requisition', {
+                fields: ['name', 'designation'],
+                filters: {
+                    job_requisition_status: 'Open & Approved',
+                    name: ['like', `%${txt}%`]
+                },
+                limit: 10
+            }).then(results => {
+                return results.map(d => ({
+                    value: d.name,
+                    description: d.designation || ''
+                }));
+            });
+        };
 	},
 
 	job_requisition_id: (frm) => {
@@ -39,30 +55,51 @@ frappe.ui.form.on('Job Opening', {
 				frm.set_value("required_background_check", r.message.required_background_check);
 				frm.refresh_field("required_background_check");
 
-				frm.clear_table("required_core_skills");
+				frm.clear_table("required_education");
+				frm.clear_table("required_core_competencies");
 				frm.clear_table("required_behavioral_competencies");
 
-				r.message.required_core_skills.forEach(element => {
-					let temp_skill = element.skill;
-					let temp_proficiency = element.required_proficiency_level;
+				r.message.required_education.forEach(element => {
+					let education_title = element.education_title;
+					let type = element.type;
+					let specialization = element.specialization;
 
-					frm.add_child('required_core_skills', {
-						skill: temp_skill,
-						required_proficiency_level: temp_proficiency,
+					frm.add_child('required_education', {
+						education_title: education_title,
+						type: type,
+						specialization: specialization,
+					})
+				});
+
+				r.message.required_core_competencies.forEach(element => {
+					let temp_skill = element.competencies;
+					let type = element.type;
+					let temp_proficiency = element.proficiency_level;
+
+					frm.add_child('required_core_competencies', {
+						competencies: temp_skill,
+						type: type,
+						proficiency_level: temp_proficiency,
 					})
 				})
 
 				r.message.required_behavioral_competencies.forEach(element => {
-					let temp_skill = element.skill;
-					let temp_proficiency = element.required_proficiency_level;
+					let temp_skill = element.competencies;
+					let type = element.type;
+					let temp_proficiency = element.proficiency_level;
 
 					frm.add_child('required_behavioral_competencies', {
-						skill: temp_skill,
-						required_proficiency_level: temp_proficiency,
+						competencies: temp_skill,
+						type: type,
+						proficiency_level: temp_proficiency,
 					})
 				});
 
-				frm.refresh_field('required_core_skills');
+				frm.set_value("main_responsibilities", r.message.main_responsibilities);
+				frm.refresh_field("main_responsibilities");
+
+				frm.refresh_field('required_education');
+				frm.refresh_field('required_core_competencies');
 				frm.refresh_field('required_behavioral_competencies');
 			}
 		});
