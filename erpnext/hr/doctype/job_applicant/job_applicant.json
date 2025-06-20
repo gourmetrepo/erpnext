@@ -63,7 +63,7 @@
   "total_work_experience_years",
   "competency_framework_section",
   "current_core_competencies",
-  "behavioral_competencies",
+  "current_behavioral_skills",
   "references_section",
   "references",
   "applicant_preferences_section",
@@ -506,12 +506,6 @@
    "print_hide": 1
   },
   {
-   "fieldname": "behavioral_competencies",
-   "fieldtype": "Table",
-   "label": "Current Behavioral Skills",
-   "options": "Behavioral Skills"
-  },
-  {
    "fieldname": "applicant_source_section",
    "fieldtype": "Section Break",
    "label": "Applicant Source"
@@ -538,11 +532,17 @@
    "fieldtype": "Table",
    "label": "Current Core Competencies",
    "options": "Core Skills"
+  },
+  {
+   "fieldname": "current_behavioral_skills",
+   "fieldtype": "Table",
+   "label": "Current Behavioral Skills",
+   "options": "Behavioral Skills"
   }
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-06-20 18:12:50.185417",
+ "modified": "2025-06-20 18:23:32.844497",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
