@@ -23,7 +23,7 @@ class JobOpening(Document):
 
 		if not self.creation_date:
 			self.creation_date = frappe.utils.nowdate()
-		if self.name:
+		if not self.is_new() and self.name:
 			update_job_opening_to_career_portal(self)
 		
 		# self.load_competencies()
@@ -171,7 +171,7 @@ def update_job_opening_to_career_portal(doc, method=None):
 							"request": integeration_payload
 						}
 
-						nrp_integeration["title"] = "On job opening  --- {0}".format(doc.name)
+						nrp_integeration["title"] = "On job opening update  --- {0}".format(doc.name)
 						nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
 						frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
 						frappe.db.commit()
