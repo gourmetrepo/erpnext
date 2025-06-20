@@ -1,6 +1,6 @@
 frappe.ui.form.on("Job Applicant", {
 	setup: function(frm) {
-		frm.fields_dict['core_skills'].grid.get_field('skill').get_query = function(doc, cdt, cdn) {
+		frm.fields_dict['current_core_competencies'].grid.get_field('competencies').get_query = function(doc, cdt, cdn) {
             return {
                 filters: {
                     'type': 'Functional'
@@ -8,7 +8,7 @@ frappe.ui.form.on("Job Applicant", {
             };
         };
 
-		frm.fields_dict['behavioral_competencies'].grid.get_field('skill').get_query = function(doc, cdt, cdn) {
+		frm.fields_dict['behavioral_competencies'].grid.get_field('competencies').get_query = function(doc, cdt, cdn) {
             return {
                 filters: {
                     'type': 'Behavioral'
