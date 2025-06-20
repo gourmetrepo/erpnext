@@ -8,7 +8,7 @@ frappe.ui.form.on("Job Applicant", {
             };
         };
 
-		frm.fields_dict['behavioral_competencies'].grid.get_field('competencies').get_query = function(doc, cdt, cdn) {
+		frm.fields_dict['current_behavioral_competencies'].grid.get_field('competencies').get_query = function(doc, cdt, cdn) {
             return {
                 filters: {
                     'type': 'Behavioral'
