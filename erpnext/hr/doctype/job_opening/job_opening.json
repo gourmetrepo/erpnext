@@ -18,10 +18,6 @@
   "column_break_5",
   "creation_date",
   "position",
-<<<<<<< Updated upstream
-=======
-  "social_media_platforms",
->>>>>>> Stashed changes
   "cadre",
   "grade",
   "location",
@@ -282,7 +278,6 @@
    "print_hide": 1
   },
   {
-<<<<<<< Updated upstream
    "fieldname": "required_core_competencies",
    "fieldtype": "Table",
    "label": "Required Core Competencies",
@@ -298,22 +293,11 @@
    "fieldtype": "Table",
    "label": "Job Posting Sites",
    "options": "Job Posting Sites Platform"
-=======
-   "fieldname": "social_media_platforms",
-   "fieldtype": "Table MultiSelect",
-   "label": "Social Media Platforms",
-   "options": "Select Multi Social Media Platform",
-   "reqd": 1
->>>>>>> Stashed changes
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
-<<<<<<< Updated upstream
  "modified": "2025-06-19 17:58:44.275305",
-=======
- "modified": "2025-06-16 16:57:24.798839",
->>>>>>> Stashed changes
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
