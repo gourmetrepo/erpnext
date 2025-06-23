@@ -58,12 +58,12 @@ def sync_job_openings(doc, method=None):
 	if doc:
 		for platform in doc.job_posting_sites:
 			if platform.get("site_name") == "Career Portal":
-				sync_jobs_to_career_portal(doc, method)
+				sync_jobs_to_career_portal(doc, sync_job_timming = [platform.get("start_time"), platform.get("end_time")])
 			else:
 				continue
 
 
-def sync_jobs_to_career_portal(doc, method=None):
+def sync_jobs_to_career_portal(doc, method=None, sync_job_timming=None):
 	payload = {}
 	
 	field_names = [
@@ -72,20 +72,23 @@ def sync_jobs_to_career_portal(doc, method=None):
 			"staffing_plan", "route", "_user_tags",
 			"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
 			"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
-			"no_of_openings", "required_education", "required_specialization", "required_certification",
+			"no_of_openings", "required_education", "required_core_competencies",
 				"required_behavioral_competencies", "required_to_work_in_shifts",
 			"required_to_travel", "required_background_check",
 			"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
 			"maximum_salary", "brief_summary", "main_responsibilities", "position"
 		]
+	if isinstance(sync_job_timming, list):
+		if sync_job_timming[0]:
+			payload["start_date"] = sync_job_timming[0]
+		if sync_job_timming[1]:
+			payload["end_date"] = sync_job_timming[1]
 
 	for field in field_names:
 		value = getattr(doc, field, None)
 		if isinstance(value, list):
 			child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
-			if field in ["required_core_skills", "required_behavioral_competencies"]:
-				payload[field] = "Dummy data"
-			else:
+			if field in [ "required_education", "required_core_competencies", "required_behavioral_competencies"]:
 				payload[field] = child_list
 		else:
 			payload[field] = getattr(doc, field, None)
@@ -125,7 +128,7 @@ def json_serial(obj):
 	raise TypeError(f"Type {type(obj)} not serializable")
 
 @frappe.whitelist()
-def update_job_opening_to_career_portal(doc, method=None):
+def update_job_opening_to_career_portal(doc, method=None, sync_job_timming=None):
 	if doc:
 		for platform in doc.job_posting_sites:
 			if platform.get("site_name") == "Career Portal":
@@ -138,20 +141,23 @@ def update_job_opening_to_career_portal(doc, method=None):
 						"staffing_plan", "route", "_user_tags",
 						"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
 						"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
-						"no_of_openings", "required_education", "required_specialization", "required_certification",
+						"no_of_openings", "required_education", "required_core_competencies"
 							"required_behavioral_competencies", "required_to_work_in_shifts",
 						"required_to_travel", "required_background_check",
 						"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
 						"maximum_salary", "brief_summary", "main_responsibilities", "position"
 					]
+				if isinstance(sync_job_timming, list):
+					if sync_job_timming[0]:
+						payload["start_date"] = sync_job_timming[0]
+					if sync_job_timming[1]:
+						payload["end_date"] = sync_job_timming[1]
 
 				for field in field_names:
 					value = getattr(doc, field, None)
 					if isinstance(value, list):
 						child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
-						if field in ["required_core_skills", "required_behavioral_competencies"]:
-							payload[field] = "Dummy data"
-						else:
+						if field in ["required_education", "required_core_competencies", "required_behavioral_competencies"]:
 							payload[field] = child_list
 					else:
 						payload[field] = getattr(doc, field, None)
