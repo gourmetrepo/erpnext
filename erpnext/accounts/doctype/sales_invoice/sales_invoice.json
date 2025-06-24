@@ -157,6 +157,7 @@
   "campaign",
   "is_discounted",
   "vsp_reference",
+  "vsp_sales_invoice_type",
   "col_break23",
   "status",
   "source",
@@ -1573,12 +1574,18 @@
    "label": "VSP Reference ",
    "options": "VSP Secondary Lease Contract",
    "read_only": 1
+  },
+  {
+   "fieldname": "vsp_sales_invoice_type",
+   "fieldtype": "Data",
+   "label": "VSP Sales Invoice Type",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 181,
  "is_submittable": 1,
- "modified": "2025-06-16 15:01:07.779127",
+ "modified": "2025-06-24 18:44:33.600143",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Sales Invoice",

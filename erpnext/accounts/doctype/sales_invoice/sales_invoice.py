@@ -279,6 +279,18 @@ class SalesInvoice(SellingController):
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
+		
+		if self.vsp_reference:
+			if self.vsp_sales_invoice_type == "Insurance":
+				vsp_doc = frappe.get_doc("VSP Secondary Lease Contract", self.vsp_reference)
+				asset_installment_si_name = vsp_doc.get("asset_installment_sales_invoice")
+				frappe.enqueue(
+					"nerp.nerp.doctype.vsp_secondary_lease_contract.vsp_secondary_lease_contract.create_payment_entry",
+					queue="si_tertiary", 
+					asset_installment_si_name=asset_installment_si_name,
+					insurance_si_doc_name=self.name,
+					enqueue_after_commit=True
+				)
 
 	def validate_pos_return(self):
 
