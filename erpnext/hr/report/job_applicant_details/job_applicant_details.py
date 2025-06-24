@@ -9,6 +9,7 @@ def execute(filters=None):
 
 def get_columns():
 	return [
+		{"label": "Job Applicant", "fieldname": "job_applicant", "fieldtype": "Link", "options": "Job Applicant", "width": 200},
 		{"label": "Full Name", "fieldname": "full_name", "fieldtype": "Data", "width": 200},
 		{"label": "Age", "fieldname": "age", "fieldtype": "Int", "width": 100},
 		{"label": "Mobile", "fieldname": "mobile", "fieldtype": "Data", "width": 120},
@@ -39,10 +40,11 @@ def get_data(filters=None):
 
 	status_filter = filters.get('status') if filters and filters.get('status') else None
 	job_opening_filter = filters.get('job_opening') if filters and filters.get('job_opening') else None
+	platform_filter = filters.get('platform') if filters and filters.get('platform') else None
 
 	data = frappe.db.sql("""
 		SELECT
-			ja.name,
+			ja.name as job_applicant,
 			ja.first_name,
 			ja.middle_name,
 			ja.last_name,
@@ -76,8 +78,9 @@ def get_data(filters=None):
 		LEFT JOIN `tabJob Opening` jo ON jo.name = ja.applied_on
 		LEFT JOIN `tabJob Applicant Work Experience` we ON we.parent = ja.name
 		LEFT JOIN `tabJob Applicant Education` ed ON ed.parent = ja.name
-		WHERE ja.job_applicant_status = %s AND ja.applied_on = %s
-	""", (status_filter, job_opening_filter), as_dict=True, debug=True)
+		LEFT JOIN `tabJob Posting Sites Platform` jpsp ON jpsp.parent = jo.name
+		WHERE ja.job_applicant_status = %s AND ja.applied_on = %s AND jpsp.site_name = %s
+	""", (status_filter, job_opening_filter, platform_filter), as_dict=True)
 
 	result = []
 
@@ -145,6 +148,7 @@ def get_data(filters=None):
 			age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 		result.append({
+			"job_applicant": base_row.job_applicant,
 			"full_name": full_name,
 			"age": age,
 			"mobile": base_row.mobile,
