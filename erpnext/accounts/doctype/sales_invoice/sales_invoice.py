@@ -150,7 +150,8 @@ class SalesInvoice(SellingController):
 	def before_save(self):
 		set_account_for_mode_of_payment(self)
 	
-	def submit(self):
+	def submit(self, *args, **kwargs):
+		ignore_workflow = kwargs.get('ignore_workflow', False)
 		if self.delivery_note_reference:
 			supplier,shipping_type = frappe.get_value('Delivery Note',self.delivery_note_reference,['transporter','shipping_type'])
 			if shipping_type == 'Palletized' and self.request_from!='RMS':
@@ -160,7 +161,7 @@ class SalesInvoice(SellingController):
 		time.sleep(1)
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Queued' WHERE `name`='{docname}';".format(docname=self.name))
 		frappe.db.commit()
-		self.queue_action('submit',queue_name="si_tertiary")
+		self.queue_action('submit',queue_name="si_tertiary",ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
 		self.validate_pos_paid_amount()
