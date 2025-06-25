@@ -52,18 +52,14 @@
   "contact",
   "permanent_address",
   "permanent_city",
-  "applicant_source_section",
-  "source",
   "column_break_49",
-  "source_id",
   "education_details_section",
   "education",
   "work_experience_section",
   "work_experience",
   "total_work_experience_years",
   "competency_framework_section",
-  "current_core_competencies",
-  "current_behavioral_competencies",
+  "required_competencies",
   "references_section",
   "references",
   "applicant_preferences_section",
@@ -85,7 +81,10 @@
   "applicant_consent_regarding_information_provided",
   "applicant_declaration",
   "truthful_information",
-  "personal_data_consent"
+  "personal_data_consent",
+  "applicant_source_section",
+  "source",
+  "source_id"
  ],
  "fields": [
   {
@@ -528,21 +527,15 @@
    "read_only": 1
   },
   {
-   "fieldname": "current_core_competencies",
+   "fieldname": "required_competencies",
    "fieldtype": "Table",
-   "label": "Current Core Competencies",
-   "options": "Core Skills"
-  },
-  {
-   "fieldname": "current_behavioral_competencies",
-   "fieldtype": "Table",
-   "label": "Current Behavioral Competencies",
-   "options": "Behavioral Skills"
+   "label": "Required Competencies",
+   "options": "Competencies"
   }
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-06-20 18:32:15.028211",
+ "modified": "2025-06-25 18:29:44.362648",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",

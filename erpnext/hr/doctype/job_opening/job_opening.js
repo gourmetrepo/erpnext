@@ -56,8 +56,7 @@ frappe.ui.form.on('Job Opening', {
 				frm.refresh_field("required_background_check");
 
 				frm.clear_table("required_education");
-				frm.clear_table("required_core_competencies");
-				frm.clear_table("required_behavioral_competencies");
+				frm.clear_table("required_competencies");
 
 				r.message.required_education.forEach(element => {
 					let education_title = element.education_title;
@@ -71,36 +70,21 @@ frappe.ui.form.on('Job Opening', {
 					})
 				});
 
-				r.message.required_core_competencies.forEach(element => {
+				r.message.required_competencies.forEach(element => {
 					let temp_skill = element.competencies;
 					let type = element.type;
-					let temp_proficiency = element.proficiency_level;
 
-					frm.add_child('required_core_competencies', {
+					frm.add_child('required_competencies', {
 						competencies: temp_skill,
 						type: type,
-						proficiency_level: temp_proficiency,
 					})
 				})
-
-				r.message.required_behavioral_competencies.forEach(element => {
-					let temp_skill = element.competencies;
-					let type = element.type;
-					let temp_proficiency = element.proficiency_level;
-
-					frm.add_child('required_behavioral_competencies', {
-						competencies: temp_skill,
-						type: type,
-						proficiency_level: temp_proficiency,
-					})
-				});
 
 				frm.set_value("main_responsibilities", r.message.main_responsibilities);
 				frm.refresh_field("main_responsibilities");
 
 				frm.refresh_field('required_education');
-				frm.refresh_field('required_core_competencies');
-				frm.refresh_field('required_behavioral_competencies');
+				frm.refresh_field('required_competencies');
 			}
 		});
 	}

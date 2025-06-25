@@ -28,8 +28,7 @@
   "minimum_required_experience",
   "maximum_required_experience",
   "competency_framework_section",
-  "required_core_competencies",
-  "required_behavioral_competencies",
+  "required_competencies",
   "job_preferences_section",
   "required_to_work_in_shifts",
   "required_to_travel",
@@ -152,13 +151,6 @@
    "label": "Competency Framework"
   },
   {
-   "fetch_from": "position.required_behavioral_competencies",
-   "fieldname": "required_behavioral_competencies",
-   "fieldtype": "Table",
-   "label": "Required Behavioral Competencies",
-   "options": "Behavioral Skills"
-  },
-  {
    "fieldname": "job_preferences_section",
    "fieldtype": "Section Break",
    "label": "Job Preferences"
@@ -278,12 +270,6 @@
    "print_hide": 1
   },
   {
-   "fieldname": "required_core_competencies",
-   "fieldtype": "Table",
-   "label": "Required Core Competencies",
-   "options": "Core Skills"
-  },
-  {
    "fieldname": "job_posting_sites_section",
    "fieldtype": "Section Break",
    "label": "Job Posting Sites"
@@ -293,11 +279,17 @@
    "fieldtype": "Table",
    "label": "Job Posting Sites",
    "options": "Job Posting Sites Platform"
+  },
+  {
+   "fieldname": "required_competencies",
+   "fieldtype": "Table",
+   "label": "Required Competencies",
+   "options": "Competencies"
   }
  ],
  "icon": "fa fa-bookmark",
  "idx": 1,
- "modified": "2025-06-19 17:58:44.275305",
+ "modified": "2025-06-25 18:05:50.512749",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Opening",
