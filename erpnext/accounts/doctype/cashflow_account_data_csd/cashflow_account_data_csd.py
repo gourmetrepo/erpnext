@@ -335,9 +335,9 @@ def insertDataAccountConfig(from_date, to_date, company, cash_flow_head, cash_fl
 				'company':company,
 				'account': str(cash_flow_title),
 				'date':current_date,
-				'opening': account_opening,
-				'closing' : account_closing,
-				'value' : account_total
+				'opening': account_opening if account_opening!=None else 0,
+				'closing' : account_closing if account_closing!=None else 0,
+				'value' : account_total if account_total!=None else 0
 			}
 			frappe.get_doc(save_doc).save(ignore_permissions=True)
 			frappe.db.commit()
