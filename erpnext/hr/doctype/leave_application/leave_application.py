@@ -6,6 +6,7 @@ import frappe
 from frappe import _
 from frappe.utils import cint, cstr, date_diff, flt, formatdate, getdate, get_link_to_form, \
 	comma_or, get_fullname, add_days, nowdate, get_datetime_str
+from nerp.utils import get_config_by_name, validate_payroll, getActiveWorkflow, get_month_interval_dates, get_year_interval_date
 from erpnext.hr.utils import set_employee_name, get_leave_period
 from erpnext.hr.doctype.leave_block_list.leave_block_list import get_applicable_block_dates
 from erpnext.hr.doctype.employee.employee import get_holiday_list_for_employee
@@ -14,6 +15,7 @@ from erpnext.hr.doctype.leave_ledger_entry.leave_ledger_entry import create_leav
 from datetime import timedelta, datetime
 import requests
 import json
+import six
 
 class LeaveDayBlockedError(frappe.ValidationError): pass
 class OverlapError(frappe.ValidationError): pass
@@ -52,11 +54,13 @@ class LeaveApplication(Document):
 		self.queue_action('submit',queue_name="hr_secondary", enqueue_after_commit=True,ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
-		if self.status == "Open":
-			frappe.throw(_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
+		if self.status == "Open" and not getActiveWorkflow("Leave Application"):
+			frappe.throw(
+				_("Only Leave Applications with status 'Approved' and 'Rejected' can be submitted"))
 
 		self.validate_back_dated_application()
 		self.update_attendance()
+		# frappe.enqueue(method="nerp.nerp.report.provisional_salary_report.provisional_salary_report.single_employee_salary_data",employee=employee,date=employee.date, queue='long',timeout=13000)
 
 		# notify leave applier about approval
 		self.notify_employee()
@@ -86,18 +90,51 @@ class LeaveApplication(Document):
 						frappe.throw(_("{0} applicable after {1} working days").format(self.leave_type, leave_type.applicable_after))
 
 	def validate_dates(self):
-		if self.from_date and self.to_date and (getdate(self.to_date) < getdate(self.from_date)):
-			frappe.throw(_("To date cannot be before from date"))
+		if self.status == "Rejected":
+			pass
+		else:
+			if self.from_date and self.to_date and (getdate(self.to_date) < getdate(self.from_date)):
+				frappe.throw(_("To date cannot be before from date"))
 
-		if self.half_day and self.half_day_date \
-			and (getdate(self.half_day_date) < getdate(self.from_date)
-			or getdate(self.half_day_date) > getdate(self.to_date)):
+			if self.half_day and self.half_day_date \
+					and (getdate(self.half_day_date) < getdate(self.from_date)
+						or getdate(self.half_day_date) > getdate(self.to_date)):
 
-				frappe.throw(_("Half Day Date should be between From Date and To Date"))
+				frappe.throw(
+					_("Half Day Date should be between From Date and To Date"))
 
-		if not is_lwp(self.leave_type) and self.leave_type not in get_config_by_name("ALLOWED_LEAVE_TYPES_TO_APPLY_WITHOUT_ALLOCATION", []):
-			self.validate_dates_across_allocation()
-			self.validate_back_dated_application()
+			### Customization ###
+			if not is_lwp(self.leave_type) and self.leave_type not in get_config_by_name("ALLOWED_LEAVE_TYPES_TO_APPLY_WITHOUT_ALLOCATION", []):
+				### Customization ###
+				self.validate_dates_across_allocation()
+				self.validate_back_dated_application()
+
+			# cannot apply leave if payroll is started/processed
+
+			validate_payroll(self.employee, self.from_date, self.to_date)
+
+			# Leave Application Validations for No Holidays Shift, Labour Employee
+			emp_holiday_list = frappe.db.get_value(
+				"Employee", self.employee, "holiday_list")
+			if emp_holiday_list in get_config_by_name("STRICT_HOLIDAY_LISTS", []) \
+					and self.leave_type in get_config_by_name("STRICT_LEAVE_TYPES", []):
+				allowed_leaves_in_the_month, availed_leaves_in_the_month = get_allowed_leaves_in_month(
+					self.employee, self.leave_type, self.posting_date, self.from_date)
+
+				# For Api Nonetype issue
+				if not self.total_leave_days:
+					self.total_leave_days = get_number_of_leave_days(
+						self.employee, self.leave_type, self.from_date, self.to_date, self.half_day, self.half_day_date)
+
+				remainig_leaves = float(allowed_leaves_in_the_month) - float(
+					availed_leaves_in_the_month) - float(self.total_leave_days)
+				if remainig_leaves < 0 and self.is_new():
+					can_be_availed_leaves = float(
+						allowed_leaves_in_the_month) - float(availed_leaves_in_the_month)
+					if can_be_availed_leaves < 0:
+						can_be_availed_leaves = 0.0
+					frappe.throw("You have already availed maximum leaves for type '{0}', You can get {1} leaves in this month.".format(
+						self.leave_type, can_be_availed_leaves))
 
 	def validate_dates_across_allocation(self):
 		if frappe.db.get_value("Leave Type", self.leave_type, "allow_negative"):
@@ -131,16 +168,24 @@ class LeaveApplication(Document):
 		if self.status == "Approved":
 			for dt in daterange(getdate(self.from_date), getdate(self.to_date)):
 				date = dt.strftime("%Y-%m-%d")
-				status = "Half Day" if getdate(date) == getdate(self.half_day_date) else "On Leave"
+				### Customization ###
+				# because of self.half_day_date is None/null getdate() function will return today's date
+				# and it will mark leave as "Half Day"
+				status = "On Leave"
+				if self.half_day_date:
+					status = "Half Day" if getdate(date) == getdate(
+						self.half_day_date) else "On Leave"
+				### Customization ###
 
-				attendance_name = frappe.db.exists('Attendance', dict(employee = self.employee,
-					attendance_date = date, docstatus = ('!=', 2)))
-
+				attendance_name = frappe.db.exists('Attendance', dict(employee=self.employee,
+																	attendance_date=date, docstatus=('!=', 2)))
+				activation_status=frappe.get_value("Employee", self.employee, "attendance_activation")
 				if attendance_name:
 					# update existing attendance, change absent to on leave
 					doc = frappe.get_doc('Attendance', attendance_name)
 					if doc.status != status:
 						doc.db_set('status', status)
+						doc.db_set('attendance_activation', activation_status)
 						doc.db_set('leave_type', self.leave_type)
 						doc.db_set('leave_application', self.name)
 				else:
@@ -153,9 +198,13 @@ class LeaveApplication(Document):
 					doc.leave_type = self.leave_type
 					doc.leave_application = self.name
 					doc.status = status
+					doc.attendance_activation=activation_status
 					doc.flags.ignore_validate = True
 					doc.insert(ignore_permissions=True)
 					doc.submit()
+				# frappe.db.commit()
+				# frappe.enqueue(method="nerp.nerp.report.provisional_salary_report.provisional_salary_report.single_employee_salary_data",employee=self.employee,date=date, queue='hr_primary',timeout=13000)
+		# single_employee_salary_data("014991"
 
 	def cancel_attendance(self):
 		if self.docstatus == 2:
@@ -218,21 +267,24 @@ class LeaveApplication(Document):
 	def validate_balance_leaves(self):
 		if self.from_date and self.to_date:
 			self.total_leave_days = get_number_of_leave_days(self.employee, self.leave_type,
-				self.from_date, self.to_date, self.half_day, self.half_day_date)
+															self.from_date, self.to_date, self.half_day, self.half_day_date)
 
-			if self.total_leave_days <= 0:
-				frappe.throw(_("The day(s) on which you are applying for leave are holidays. You need not apply for leave."))
+			if self.leave_type != "Leave Without Pay" and self.total_leave_days <= 0:
+				frappe.throw(
+					_("The day(s) on which you are applying for leave are holidays. You need not apply for leave."))
 
+			### Customization ###
 			if not is_lwp(self.leave_type) and self.leave_type not in get_config_by_name("ALLOWED_LEAVE_TYPES_TO_APPLY_WITHOUT_ALLOCATION", []):
+				### Customization ###
 				self.leave_balance = get_leave_balance_on(self.employee, self.leave_type, self.from_date, self.to_date,
-					consider_all_leaves_in_the_allocation_period=True)
+														consider_all_leaves_in_the_allocation_period=True)
 				if self.status != "Rejected" and (self.leave_balance < self.total_leave_days or not self.leave_balance):
 					if frappe.db.get_value("Leave Type", self.leave_type, "allow_negative"):
 						frappe.msgprint(_("Note: There is not enough leave balance for Leave Type {0}")
-							.format(self.leave_type))
+										.format(self.leave_type))
 					else:
 						frappe.throw(_("There is not enough leave balance for Leave Type {0}")
-							.format(self.leave_type))
+									.format(self.leave_type))
 
 	def validate_leave_overlap(self):
 		if not self.name:
@@ -901,3 +953,170 @@ def push_leave_application_to_rms(docname):
 
 def enqueue_leave_application(self):
     frappe.enqueue('erpnext.hr.doctype.leave_application.leave_application.push_leave_application_to_rms', docname=self.name, queue="hr_sync")
+
+def get_allowed_leaves_in_month(employee, leave_type, posting_date=frappe.utils.today(), from_date=frappe.utils.today()):
+	
+	from_date_month_start, from_date_month_end = get_month_interval_dates(
+		from_date)
+		
+	posting_date_month_start, posting_date_month_end = get_month_interval_dates(
+		posting_date)
+
+	if from_date < posting_date:
+		last_month_end_date = from_date_month_start - timedelta(days=1)
+		last_month_start_date, last_month_end_date = get_month_interval_dates(
+			last_month_end_date)
+	else :
+		last_month_end_date = posting_date_month_start - timedelta(days=1)
+		last_month_start_date, last_month_end_date = get_month_interval_dates(
+			last_month_end_date)
+
+	second_last_month_end_date = last_month_start_date - timedelta(days=1)
+	second_last_month_start_date, second_last_month_end_date = get_month_interval_dates(
+		second_last_month_end_date)
+
+	# if this is first month of company year then ignore previous year months
+	year_start_date, year_end_date = get_year_interval_date(from_date)
+
+	year_month_start_date, year_month_end_date = get_month_interval_dates(
+		year_start_date)
+	
+	employee_info = frappe.db.get_value('Employee', {'employee': employee}, ['internal_designation', 'date_of_joining'])
+	internal_designation = employee_info[0]
+	date_of_joining = datetime.combine(employee_info[1], datetime.min.time())
+
+	holiday_list_start_end = frappe.db.get_value('Holiday List', {'name': 'Sunday'}, ['from_date', 'to_date'])
+	
+	holiday_list_start = datetime.combine(holiday_list_start_end[0], datetime.min.time())
+	holiday_list_end = datetime.combine(holiday_list_start_end[1], datetime.min.time())
+
+	date_range_end = holiday_list_end
+	# date of joining check
+	if holiday_list_start <= date_of_joining <=holiday_list_end:
+		date_range_start = date_of_joining
+	else:
+		date_range_start = holiday_list_start
+
+	if internal_designation not in get_config_by_name("INTERNAL_DESIGNATION_FOR_LEAVE", []):
+		date_range_start = from_date_month_start
+		date_range_end = from_date_month_end
+	else:
+		if from_date_month_end == posting_date_month_end:
+			date_range_start = posting_date_month_start
+			date_range_end = posting_date_month_end
+		elif from_date_month_end < posting_date_month_end:
+			date_range_start = from_date_month_start
+			date_range_end = from_date_month_end
+		else:
+			date_range_start = datetime.date(from_date_month_start)
+			date_range_end = datetime.date(from_date_month_end)
+
+
+	num_of_sundays = frappe.db.sql(f"SELECT COUNT(NAME) AS sunday from tabHoliday WHERE parent='Sunday' AND parenttype='Holiday List' AND holiday_date>='{date_range_start}' AND holiday_date<='{date_range_end}'")
+	
+	if num_of_sundays:
+		num_of_sundays = num_of_sundays[0][0]
+	else:
+		num_of_sundays = 0
+	allowed_leaves = 0
+	allocation_limit = num_of_sundays
+	max_availed_limit = num_of_sundays
+
+	allowed_leaves = max_availed_limit
+
+	# TODO: Will remove
+	leaves_availed_in_range = get_leaves_for_period(
+		employee, leave_type, date_range_start, date_range_end)
+
+	leaves_availed_in_curr_month = leaves_availed_in_last_month = leaves_availed_in_second_month = 0
+
+	last_month_check = second_month_check = 0
+
+	leaves_availed_in_curr_month = get_leaves_for_period(
+		employee, leave_type, from_date_month_start, from_date_month_end)
+	
+	if leaves_availed_in_curr_month < 0:
+				leaves_availed_in_curr_month = leaves_availed_in_curr_month * -1
+	
+	# not First Month (jan)
+	if from_date_month_start != year_start_date:
+		leaves_availed_in_last_month = get_leaves_for_period(
+			employee, leave_type, last_month_start_date, last_month_end_date)
+		
+		last_month_check = 1
+
+		if leaves_availed_in_last_month < 0:
+				leaves_availed_in_last_month = leaves_availed_in_last_month * -1
+
+		# not 2nd Month (Feb)
+		if year_month_end_date != (from_date_month_start - timedelta(days=1)):
+			leaves_availed_in_second_month = get_leaves_for_period(
+				employee, leave_type, second_last_month_start_date, second_last_month_end_date)
+			
+			second_month_check = 1
+
+			if leaves_availed_in_second_month < 0:
+				leaves_availed_in_second_month = leaves_availed_in_second_month * -1
+
+	total_availed_leaves = leaves_availed_in_curr_month + leaves_availed_in_last_month + leaves_availed_in_second_month
+
+	# TODO: investigate the negative value 
+	# TODO: Will remove
+	if leaves_availed_in_range < 0:
+		leaves_availed_in_range = leaves_availed_in_range * -1
+
+	if not isinstance(from_date, six.string_types):
+		from_date = from_date.strftime("%Y-%m-%d")
+
+	_posting_date_obj = datetime.strptime(from_date, '%Y-%m-%d')
+	_curr_date_obj = datetime.strptime(frappe.utils.today(), '%Y-%m-%d')
+
+	if from_date_month_start == year_start_date or _posting_date_obj > date_range_end:
+		allowed_leaves = allocation_limit
+
+	#TODO: Wil remove
+	leaves_pending_in_range = get_pending_leaves_for_period(
+		employee, leave_type, date_range_start, date_range_end)
+	
+	leaves_pending_in_current_month = leaves_pending_in_last_month = leaves_pending_in_second_month = 0
+
+	leaves_pending_in_current_month = get_pending_leaves_for_period(
+		employee, leave_type, date_range_start, date_range_end)
+
+	# first Month (jan)
+	if from_date_month_start != year_start_date:
+		leaves_pending_in_last_month = get_pending_leaves_for_period(
+			employee, leave_type, last_month_start_date, last_month_end_date)
+
+		last_month_check = 1
+
+		# 2nd Month (Feb)
+		if year_month_end_date != (from_date_month_start - timedelta(days=1)):
+			leaves_pending_in_second_month = get_pending_leaves_for_period(
+				employee, leave_type, second_last_month_start_date, second_last_month_end_date)
+
+			second_month_check = 1
+   
+	total_leaves_in_currt_month = leaves_availed_in_curr_month + leaves_pending_in_current_month
+	total_leaves_in_last_month = leaves_availed_in_last_month + leaves_pending_in_last_month
+	total_leaves_in_second_month = leaves_availed_in_second_month + leaves_pending_in_second_month
+
+
+	# Carry Forward Use Cases:
+		# 1. If a user did not avail any leave from last month then 2 leaves carry forward.
+		# 2. If a user availed 1 leave from last month then 1 leave carry forward.
+		# 3. If a user availed more than 1 leave then no leave carry forward.
+		# 4. If a user did not avail leave in the last two month then 2 leave from each month, total 4 carry forward.
+
+	if from_date_month_end <= posting_date_month_end:
+		if total_leaves_in_last_month > 1:
+			allowed_leaves += 0
+		elif total_leaves_in_last_month == 1:
+			allowed_leaves += 1
+		elif total_leaves_in_last_month < 1 and last_month_check :
+			if total_leaves_in_second_month < 1 and second_month_check : 
+				allowed_leaves += 4
+			else:
+				allowed_leaves += 2
+
+	return allowed_leaves, total_leaves_in_currt_month
