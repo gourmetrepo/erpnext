@@ -8,7 +8,7 @@ from frappe import _
 from frappe.utils import flt, rounded
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.document import Document
-
+from nerp.utils import get_config_by_name, get_earned_salary_till_date
 from erpnext.hr.doctype.loan.loan import get_monthly_repayment_amount, validate_repayment_method
 
 class LoanApplication(Document):
@@ -16,6 +16,38 @@ class LoanApplication(Document):
 		validate_repayment_method(self.repayment_method, self.loan_amount, self.repayment_amount, self.repayment_periods)
 		self.validate_loan_amount()
 		self.get_repayment_details()
+		# validate_same_loan_request
+		filters = {
+			'name': ('!=', self.name),
+			"applicant_type": self.applicant_type,
+			"applicant": self.applicant,
+			"loan_type": self.loan_type,
+			"status": "Open"
+		}
+		
+		if frappe.db.get_value("Loan Application", filters, "name"):
+			frappe.throw("An Open Loan application for '{0}' loan type already exist".format(self.loan_type))
+		
+		# validate advance against salary loan
+		if self.loan_type == get_config_by_name("ADVANCE_SALARY_LOAN_TYPE", "Advance Against Salary"):
+			max_percentage_for_salary_loan = get_config_by_name("MAX_PERCENTAGE_FOR_ADV_SALARY_LOAN", 60)
+			multiplier = max_percentage_for_salary_loan / 100
+			earned_salary = get_earned_salary_till_date(self.applicant, self.posting_date)
+			
+			if earned_salary is None or not earned_salary:
+				frappe.throw(_("You have no earned salary, Cannot avail loan."))
+			
+			max_loan_amount = round(earned_salary * multiplier, 2)
+			
+			if self.loan_amount > max_loan_amount:
+				frappe.throw(_("Advance Against Salary Loan Amount cannot be more than {0}% of Employee Earned Salary. Please enter ({1}) or less.".format(
+					max_percentage_for_salary_loan,
+					max_loan_amount
+				)))
+		
+		# validate on submit, status shouldn't be Open
+		if self.status == "Open" and self.docstatus == 1:
+			frappe.throw(_("Cannot submit with Open status."))
 
 	def validate_loan_amount(self):
 		maximum_loan_limit = frappe.db.get_value('Loan Type', self.loan_type, 'maximum_loan_amount')
