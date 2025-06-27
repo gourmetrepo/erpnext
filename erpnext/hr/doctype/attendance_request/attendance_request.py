@@ -9,6 +9,7 @@ from frappe.model.document import Document
 from frappe.utils import date_diff, add_days, getdate
 from erpnext.hr.doctype.employee.employee import is_holiday
 from erpnext.hr.utils import validate_dates
+from nerp.constants.globals import STATUS_APPROVED, LOG_TYPE_IN, LOG_TYPE_OUT
 
 class AttendanceRequest(Document):
 	def validate(self):
@@ -31,23 +32,63 @@ class AttendanceRequest(Document):
 				attendance_obj.cancel()
 
 	def create_attendance(self):
+		if self.workflow_state != STATUS_APPROVED:
+			return False
 		request_days = date_diff(self.to_date, self.from_date) + 1
+		holiday_dates = []
 		for number in range(request_days):
 			attendance_date = add_days(self.from_date, number)
-			skip_attendance = self.validate_if_attendance_not_applicable(attendance_date)
-			if not skip_attendance:
-				attendance = frappe.new_doc("Attendance")
-				attendance.employee = self.employee
-				attendance.employee_name = self.employee_name
-				if self.half_day and date_diff(getdate(self.half_day_date), getdate(attendance_date)) == 0:
-					attendance.status = "Half Day"
-				else:
-					attendance.status = "Present"
-				attendance.attendance_date = attendance_date
-				attendance.company = self.company
-				attendance.attendance_request = self.name
-				attendance.save(ignore_permissions=True)
-				attendance.submit()
+			if is_holiday(self.employee, attendance_date):
+					holiday_dates.append(attendance_date.strftime('%d/%m/%Y'))
+			# skip_attendance = self.validate_if_attendance_not_applicable(attendance_date)
+			# if not skip_attendance:
+				### cancel old attendance if exists ###
+			old_attendance_name = None
+			try:
+				old_attendance_name = frappe.db.get_value('Attendance',  {"employee": self.employee, "attendance_date": attendance_date, "docstatus": 1},"name")
+				if(old_attendance_name):
+					old_attendance = frappe.get_doc("Attendance", old_attendance_name)
+					old_attendance.cancel()
+					#del_ci_sql = "delete from `tabEmployee Checkin` where attendance = '{0}'".format(old_attendance_name)
+					#frappe.db.sql(del_ci_sql)
+			except Exception as error:
+				frappe.log_error(message=error, title="Exception in Create Attendance")
+				pass
+			### cancel old attendance if exists ###
+			activation_status=frappe.get_value("Employee", self.employee, "attendance_activation")
+			attendance = frappe.new_doc("Attendance")
+			attendance.employee = self.employee
+			attendance.employee_name = self.employee_name
+			if self.half_day and date_diff(getdate(self.half_day_date), getdate(attendance_date)) == 0:
+				attendance.status = "Half Day"
+			else:
+				attendance.status = "Present"
+			attendance.attendance_date = attendance_date
+			attendance.company = self.company
+			attendance.attendance_activation=activation_status
+			attendance.attendance_request = self.name
+			attendance.amended_from = old_attendance_name
+			attendance.save(ignore_permissions=True)
+			attendance.submit()
+			# frappe.db.commit()
+			# frappe.enqueue(method="nerp.nerp.report.provisional_salary_report.provisional_salary_report.single_employee_salary_data",employee=self.employee,date=attendance_date, queue='hr_primary',timeout=13000)
+			if self.check_in:
+				employee_checkin = frappe.new_doc("Employee Checkin")
+				employee_checkin.employee = self.employee
+				employee_checkin.attendance = attendance.name
+				employee_checkin.log_type = LOG_TYPE_IN
+				employee_checkin.time = self.check_in
+				employee_checkin.save(ignore_permissions=True)
+			if self.check_out:
+				employee_checkout = frappe.new_doc("Employee Checkin")
+				employee_checkout.employee = self.employee
+				employee_checkout.attendance = attendance.name
+				employee_checkout.log_type = LOG_TYPE_OUT
+				employee_checkout.time = self.check_out
+				employee_checkout.save(ignore_permissions=True)
+		if is_holiday(self.employee, attendance_date):
+			message = '<ul><li>' +'</li><li>'.join(holiday_dates) + "</ul>"    
+			frappe.msgprint(message,'Attendance Submitted on Holiday(s):')
 
 	def validate_if_attendance_not_applicable(self, attendance_date):
 		# Check if attendance_date is a Holiday
