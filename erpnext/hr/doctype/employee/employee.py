@@ -13,6 +13,7 @@ from frappe.model.document import Document
 from erpnext.utilities.transaction_base import delete_events
 from frappe.utils.nestedset import NestedSet
 from erpnext.hr.doctype.job_offer.job_offer import get_staffing_plan_detail
+from nerp.utils import validate_cnic_mask
 
 class EmployeeUserDisabledError(frappe.ValidationError): pass
 class EmployeeLeftValidationError(frappe.ValidationError): pass
@@ -37,24 +38,21 @@ class Employee(NestedSet):
 	
 
 	def autoname(self):
-		naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
-		if not naming_method:
-			throw(_("Please setup Employee Naming System in Human Resource > HR Settings"))
-		else:
-			if naming_method == 'Naming Series':
-				set_name_by_naming_series(self)
-			elif naming_method == 'Employee Number':
-				self.name = self.employee_number
-			elif naming_method == 'Full Name':
-				self.set_employee_name()
-				self.name = self.employee_name
-
-		self.employee = self.name
+		# Checking gap in naming series and assign new value to naming
+		gap_name = frappe.db.sql("""SELECT t1.name AS `current`, ((SELECT e.name FROM `tabEmployee` e where e.name = (t1.name + 1) limit 1) - t1.name) AS `difference`
+									FROM `tabEmployee` t1
+									HAVING difference IS NULL
+									order by t1.name ASC limit 1;""", as_dict=True)
+		if gap_name and gap_name[0] and gap_name[0]['current']:
+			length = len(gap_name[0]['current'])
+			gap_naming = str(int(gap_name[0]['current']) + 1)
+			gap_naming = gap_naming.rjust(length, '0')
+			self.name = gap_naming
+			self.employee = self.name
 
 	def validate(self):
 		from erpnext.controllers.status_updater import validate_status
-		validate_status(self.status, ["Active", "Temporary Leave", "Left"])
-
+		validate_status(self.status, ["Active", "Temporary Leave", "Left", "Pending"])
 		self.employee = self.name
 		self.set_employee_name()
 		self.validate_date()
@@ -62,6 +60,7 @@ class Employee(NestedSet):
 		self.validate_status()
 		self.validate_reports_to()
 		self.validate_preferred_email()
+		validate_external_work_history(self)
 		if self.job_applicant:
 			self.validate_onboarding_process()
 
@@ -72,6 +71,15 @@ class Employee(NestedSet):
 			if existing_user_id:
 				remove_user_permission(
 					"Employee", self.name, existing_user_id)
+		
+		if self.reference_details:
+			for reference_detail in self.reference_details:
+				if reference_detail.cnic and not validate_cnic_mask(reference_detail.cnic):
+					frappe.throw("CNIC '{0}' format is invalid".format(reference_detail.cnic))
+		
+		if self.payment_mode:
+			if self.payment_mode == "Facial Recognition" and not self.image:
+				frappe.throw(_("Employee Image is Missing. Payment Mode can not be set to Facial Recognition."))
 
 	def set_employee_name(self):
 		self.employee_name = ' '.join(filter(lambda x: x, [self.first_name, self.middle_name, self.last_name]))
@@ -194,13 +202,14 @@ class Employee(NestedSet):
 			)
 			if reports_to:
 				link_to_employees = [frappe.utils.get_link_to_form('Employee', employee.name, label=employee.employee_name) for employee in reports_to]
-				message = _("The following employees are currently still reporting to {0}:").format(frappe.bold(self.employee_name))
-				message += "<br><br><ul><li>" + "</li><li>".join(link_to_employees)
-				message += "</li></ul><br>"
-				message += _("Please make sure the employees above report to another Active employee.")
-				throw(message, EmployeeLeftValidationError, _("Cannot Relieve Employee"))
+				throw(_("Employee status cannot be set to 'Left' as following employees are currently reporting to this employee:&nbsp;")
+					+ ', '.join(link_to_employees), EmployeeLeftValidationError)
 			if not self.relieving_date:
 				throw(_("Please enter relieving date."))
+		### customizations ###
+		elif self.status == 'Active':
+			if self.relieving_date:
+				throw(_("Please remove relieving date."))
 
 	def validate_for_enabled_user_id(self, enabled):
 		if not self.status == 'Active':
@@ -486,3 +495,16 @@ def update_employee(employee):
 def support_calculate_reporting_to(doc):
 	if doc:
 		doc.calculate_reporting_to()
+
+
+def validate_external_work_history(self):
+	try:
+		if self.external_work_history:
+			for wh in self.external_work_history:
+				if wh.total_experience:
+					wh.total_experience = float(wh.total_experience)
+	except Exception as e:
+		title = "Error parsing experience value to float"
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=title)
+		frappe.throw("Total Experience in Employee External Work History must be a numeric value")
