@@ -13,7 +13,6 @@ from frappe.model.document import Document
 from erpnext.utilities.transaction_base import delete_events
 from frappe.utils.nestedset import NestedSet
 from erpnext.hr.doctype.job_offer.job_offer import get_staffing_plan_detail
-from nerp.utils import validate_cnic_mask
 
 class EmployeeUserDisabledError(frappe.ValidationError): pass
 class EmployeeLeftValidationError(frappe.ValidationError): pass
@@ -73,6 +72,7 @@ class Employee(NestedSet):
 					"Employee", self.name, existing_user_id)
 		
 		if self.reference_details:
+			from nerp.utils import validate_cnic_mask
 			for reference_detail in self.reference_details:
 				if reference_detail.cnic and not validate_cnic_mask(reference_detail.cnic):
 					frappe.throw("CNIC '{0}' format is invalid".format(reference_detail.cnic))
