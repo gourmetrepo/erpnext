@@ -9,6 +9,8 @@
   "offer_status",
   "applicant_id",
   "job_opening_id",
+  "company",
+  "location",
   "column_break_3",
   "offer_date",
   "full_name",
@@ -137,10 +139,26 @@
    "fieldtype": "Data",
    "label": "Position Title",
    "read_only": 1
+  },
+  {
+   "fetch_from": "job_opening_id.company",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "job_opening_id.location",
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Physical Location",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-06-13 16:16:58.149002",
+ "modified": "2025-07-01 16:16:45.980418",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Offer",
