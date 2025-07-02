@@ -8,6 +8,19 @@ frappe.ui.form.on('Department', {
 			frm.set_read_only();
 			frm.set_intro(__("This is a root department and cannot be edited."));
 		}
+
+		frm.set_query("expense_account", function() {
+            if(!frm.doc.company){
+                frappe.msgprint("Please select Company first");
+            }
+            return {
+                "filters": {
+                    "company": frm.doc.company,
+                    "root_type": "Expense",
+                    "is_group": 0
+                }
+            };
+        });
 	},
 	validate: function(frm) {
 		if(frm.doc.name=="All Departments") {

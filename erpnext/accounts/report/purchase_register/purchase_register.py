@@ -11,9 +11,19 @@ def execute(filters=None):
 	return _execute(filters)
 
 def _execute(filters=None, additional_table_columns=None, additional_query_columns=None):
+	invoice_mill_mapping = {}
 	if not filters: filters = {}
 
 	invoice_list = get_invoices(filters, additional_query_columns)
+	
+	# get mill no mapping
+	mill_mapping = get_mill_no_mapping(invoice_list)
+	invoice_mill_mapping = {item['name']: item.pop('mill_no') for item in mill_mapping}
+	
+	# remove permit no from data
+	for invc in invoice_list:
+		invc.pop('permit_no')
+	
 	columns, expense_accounts, tax_accounts = get_columns(invoice_list, additional_table_columns)
 
 	if not invoice_list:
@@ -71,6 +81,10 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 		row += [total_tax, inv.base_grand_total, flt(inv.base_grand_total, 0), inv.outstanding_amount]
 		data.append(row)
 
+	# Add Mapping of mill no in data
+	for d in data:
+		d.insert(10, invoice_mill_mapping.get(d[0], None))
+
 	return columns, data
 
 
@@ -86,7 +100,7 @@ def get_columns(invoice_list, additional_table_columns):
 	columns += [
 		_("Supplier Group") + ":Link/Supplier Group:120", _("Tax Id") + "::80", _("Payable Account") + ":Link/Account:120",
 		_("Mode of Payment") + ":Link/Mode of Payment:80", _("Project") + ":Link/Project:80",
-		_("Bill No") + "::120", _("Bill Date") + ":Date:80", _("Remarks") + "::150",
+		_("Bill No") + "::120", _("Mill No") + "::80", _("Bill Date") + ":Date:80", _("Remarks") + "::150",
 		_("Purchase Order") + ":Link/Purchase Order:100",
 		_("Purchase Receipt") + ":Link/Purchase Receipt:100",
 		{
@@ -176,13 +190,30 @@ def get_invoices(filters, additional_query_columns):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
 		select
-			name, posting_date, credit_to, supplier, supplier_name, tax_id, bill_no, bill_date,
+			name, permit_no, posting_date, credit_to, supplier, supplier_name, tax_id, bill_no, bill_date,
 			remarks, base_net_total, base_grand_total, outstanding_amount,
 			mode_of_payment {0}
 		from `tabPurchase Invoice`
 		where docstatus = 1 %s
 		order by posting_date desc, name desc""".format(additional_query_columns or '') % conditions, filters, as_dict=1)
 
+def get_mill_no_mapping(invoices_list):
+	permit_cond = get_permit_condition(invoices_list)
+	if permit_cond:
+		return frappe.db.sql(f"""
+			Select pi.name, gp.mill_vehicle_no AS mill_no from `tabPurchase Invoice` pi
+			left join `tabGate Pass` gp ON pi.permit_no = gp.permit_no
+			{permit_cond};""", as_dict=1, debug=1)
+	return ""
+
+def get_permit_condition(inv_list):
+	cond = ""
+	if len(inv_list) > 0:
+		permit_no = [item['permit_no'] for item in inv_list if item['permit_no']]
+		if len(permit_no) > 0:
+			cond = "where pi.permit_no in ({})".format(', '.join(f"'{pno}'" for pno in permit_no))
+
+	return cond
 
 def get_invoice_expense_map(invoice_list):
 	expense_details = frappe.db.sql("""

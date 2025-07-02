@@ -149,6 +149,9 @@ class SalesInvoice(SellingController):
 
 	def before_save(self):
 		set_account_for_mode_of_payment(self)
+  
+	def submit(self):
+		self.queue_action('submit',queue="long",timeout=13000)
 
 	def on_submit(self):
 		self.validate_pos_paid_amount()
@@ -209,6 +212,9 @@ class SalesInvoice(SellingController):
 
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
+		
+		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE name='{docname}';".format(docname=self.name))
+		frappe.db.commit()
 
 	def validate_pos_return(self):
 

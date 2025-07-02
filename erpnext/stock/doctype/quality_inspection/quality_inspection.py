@@ -7,6 +7,9 @@ from frappe.model.document import Document
 from erpnext.stock.doctype.quality_inspection_template.quality_inspection_template \
 	import get_template_details
 from frappe.model.mapper import get_mapped_doc
+from nerp.apis.login import get_ip, get_config_by_name
+
+
 
 class QualityInspection(Document):
 	def validate(self):

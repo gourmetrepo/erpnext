@@ -21,7 +21,7 @@ from erpnext.hr.doctype.employee_benefit_claim.employee_benefit_claim import get
 class SalarySlip(TransactionBase):
 	def __init__(self, *args, **kwargs):
 		super(SalarySlip, self).__init__(*args, **kwargs)
-		self.series = 'Sal Slip/{0}/.#####'.format(self.employee)
+		self.series = 'Salary/{0}/.#####'.format(self.employee)
 		self.whitelisted_globals = {
 			"int": int,
 			"float": float,
@@ -452,7 +452,8 @@ class SalarySlip(TransactionBase):
 					'variable_based_on_taxable_salary': struct_row.variable_based_on_taxable_salary,
 					'deduct_full_tax_on_selected_payroll_date': struct_row.deduct_full_tax_on_selected_payroll_date,
 					'additional_amount': amount if struct_row.get("is_additional_component") else 0,
-					'exempted_from_income_tax': struct_row.exempted_from_income_tax
+					'exempted_from_income_tax': struct_row.exempted_from_income_tax,
+					'impact_on_bank_salary':struct_row.impact_on_bank_salary
 				})
 		else:
 			if struct_row.get("is_additional_component"):
@@ -920,7 +921,11 @@ class SalarySlip(TransactionBase):
 
 			#setting repayment schedule and updating total amount to pay
 			repayment_status = 1 if doc.docstatus == 1 else 0
+			ss_ref = ""
+			if repayment_status:
+				ss_ref =  self.name
 			frappe.db.set_value("Repayment Schedule", loan.repayment_name, "paid", repayment_status)
+			frappe.db.set_value("Repayment Schedule", loan.repayment_name, "salary_slip_ref", ss_ref)
 			doc.reload()
 			doc.update_total_amount_paid()
 			doc.set_status()

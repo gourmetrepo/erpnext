@@ -388,7 +388,7 @@ erpnext.accounts.ReconciliationRow = class ReconciliationRow {
 		})
 
 		frappe.xcall('erpnext.accounts.page.bank_reconciliation.bank_reconciliation.get_linked_payments',
-			{ bank_transaction: data, freeze: true, freeze_message: __("Finding linked payments") }
+			{ bank_transaction: data, freeze: true, freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`, }
 		).then((result) => {
 			me.make_dialog(result)
 		})

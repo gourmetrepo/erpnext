@@ -38,7 +38,7 @@ frappe.ui.form.on('Opening Invoice Creation Tool', {
 				freeze: true,
 				btn: $(btn_primary),
 				method: "make_invoices",
-				freeze_message: __("Creating {0} Invoice", [frm.doc.invoice_type]),
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 				callback: (r) => {
 					if(!r.exc){
 						frappe.msgprint(__("Opening {0} Invoice created", [frm.doc.invoice_type]));

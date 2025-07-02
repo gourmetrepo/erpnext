@@ -15,5 +15,18 @@ frappe.listview_settings['Work Order'] = {
 				"Cancelled": "darkgrey"
 			}[doc.status], "status,=," + doc.status];
 		}
-	}
+	},
+	onload: function(frm) {
+		console.log(frm.filters);
+		frappe.route_options = {
+			// "status":["!=","Stopped"],
+			"company": frappe.get_cookie('company'),
+			"creation": ["Between", [frappe.datetime.add_days(frappe.datetime.get_today(), -10), frappe.datetime.get_today()]],
+		};
+		if(frm.filters.length > 0){
+		frm.filters.forEach(function(filter) {
+			console.log(filter)
+			frappe.route_options[filter[1]] = filter[3];
+		});}
+	},
 };

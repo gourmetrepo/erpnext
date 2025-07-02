@@ -112,16 +112,19 @@ class Loan(AccountsController):
 	def set_status(self, from_validate=False):
 		disbursement = self.get_disbursement_entry()
 		disbursement_date = None
-
-		self.status = "Draft"
+		if self.status != "Disbursed":
+			self.status = "Draft"
 
 		if (not disbursement or disbursement.disbursed_amount == 0) and self.docstatus == 1:
 			self.status = "Sanctioned"
 		if disbursement:
 			self.validate_disbursed_amount_and_loan_amount(disbursement.disbursed_amount)
-			if disbursement.disbursed_amount == self.loan_amount and disbursement.disbursed_amount != 0:
+			if disbursement.disbursed_amount == self.loan_amount and disbursement.disbursed_amount != 0 and self.status != "Disbursed":
 				self.status = "Disbursed"
-				disbursement_date = disbursement.posting_date
+				if self.posting_date < disbursement.posting_date:
+					disbursement_date = self.posting_date
+				else:
+					disbursement_date = disbursement.posting_date
 				self.validate_disbursement_date(disbursement_date, self.status)
 
 		if self.total_amount_paid == self.total_payment:
@@ -145,8 +148,8 @@ class Loan(AccountsController):
 		return frappe.db.sql("""
 			select posting_date, ifnull(sum(credit_in_account_currency), 0) as disbursed_amount
 			from `tabGL Entry`
-			where account = %s and against_voucher_type = 'Loan' and against_voucher = %s
-		""", (self.payment_account, self.name), as_dict=1)[0]
+			where against_voucher_type = 'Loan' and against_voucher = %s
+		""", (self.name), as_dict=1)[0]
 
 def validate_repayment_method(repayment_method, loan_amount, monthly_repayment_amount, repayment_periods):
 	if repayment_method == "Repay Over Number of Periods" and not repayment_periods:

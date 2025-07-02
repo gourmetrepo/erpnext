@@ -1,4 +1,13 @@
 frappe.listview_settings['Material Request'] = {
+		onload: function(me) {
+		if (Object.values(frappe.route_options).length == 0){
+			frappe.route_options = {
+				// "status": "Draft",
+				"company": frappe.get_cookie('company') ,
+				"creation":["Between",[frappe.datetime.add_days(frappe.datetime.get_today(), - 10),frappe.datetime.get_today()]]
+			};
+		}
+	},
 	add_fields: ["material_request_type", "status", "per_ordered", "per_received"],
 	get_indicator: function(doc) {
 		if(doc.status=="Stopped") {

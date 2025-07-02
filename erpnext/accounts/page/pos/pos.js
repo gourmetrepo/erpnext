@@ -291,7 +291,7 @@ erpnext.pos.PointOfSale = erpnext.taxes_and_totals.extend({
 		frappe.call({
 			method: "erpnext.accounts.doctype.sales_invoice.pos.get_pos_data",
 			freeze: true,
-			freeze_message: __("Master data syncing, it might take some time"),
+			freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			callback: function (r) {
 				localStorage.setItem('doc', JSON.stringify(r.message.doc));
 				me.set_pos_profile_title(r.message.pos_profile.name);

@@ -324,8 +324,7 @@ def make_payment_request(**args):
 			"reference_name": args.dn,
 			"party_type": args.get("party_type") or "Customer",
 			"party": args.get("party") or ref_doc.get("customer"),
-			"bank_account": bank_account,
-			# "business_unit": ref_doc.items[0].business_unit
+			"bank_account": bank_account
 		})
 
 		if args.order_type == "Shopping Cart" or args.mute_email:

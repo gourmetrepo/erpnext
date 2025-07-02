@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 import frappe
+import json
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import formatdate, getdate
@@ -16,16 +17,7 @@ class ShiftRequest(Document):
 		self.validate_shift_request_overlap_dates()
 
 	def on_submit(self):
-		date_list = self.get_working_days(self.from_date, self.to_date)
-		for date in date_list:
-			assignment_doc = frappe.new_doc("Shift Assignment")
-			assignment_doc.company = self.company
-			assignment_doc.shift_type = self.shift_type
-			assignment_doc.employee = self.employee
-			assignment_doc.date = date
-			assignment_doc.shift_request = self.name
-			assignment_doc.insert()
-			assignment_doc.submit()
+		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.create_shift_assignment", queue='hr_secondary', doc=self, enqueue_after_commit=True)
 
 	def on_cancel(self):
 		shift_assignment_list = frappe.get_list("Shift Assignment", {'employee': self.employee, 'shift_request': self.name})
@@ -94,3 +86,41 @@ class ShiftRequest(Document):
 			reference_date += timedelta(days=1)
 
 		return date_list
+
+
+@frappe.whitelist()
+def create_shift_assignment(doc):
+	try:
+		doc_list = []
+		date_list = doc.get_working_days(doc.from_date, doc.to_date)
+		for date in date_list:
+			assignment_doc = frappe.new_doc("Shift Assignment")
+			assignment_doc.company = doc.company
+			assignment_doc.shift_type = doc.shift_type
+			assignment_doc.employee = doc.employee
+			assignment_doc.date = date
+			assignment_doc.shift_request = doc.name
+			assignment_doc.save()
+			doc_list.append(assignment_doc.name)
+		frappe.enqueue("erpnext.hr.doctype.shift_request.shift_request.submit_shift_assignment", queue='hr_secondary', doc_names=doc_list, enqueue_after_commit=True)
+	except Exception as e:
+		frappe.db.rollback()
+		# add a comment (?)
+		if frappe.local.message_log:
+			msg = json.loads(frappe.local.message_log[-1]).get('message')
+		else:
+			msg = '<pre><code>' + frappe.get_traceback() + '</pre></code>'
+
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + msg)
+		frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while saving shift assignment: {e}")
+
+
+@frappe.whitelist()
+def submit_shift_assignment(doc_names):
+	if doc_names:
+		try:			
+			for name in doc_names:
+				shift_assignment_doc = frappe.get_doc("Shift Assignment", name)
+				shift_assignment_doc.submit()
+		except Exception as e:
+			frappe.log_error(title="Shift Assignment Exception", message=f"An exception occurred while submitting shift assignment: {e}")

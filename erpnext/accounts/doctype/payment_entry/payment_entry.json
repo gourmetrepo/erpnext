@@ -167,7 +167,6 @@
    "depends_on": "eval:in_list([\"Receive\", \"Pay\"], doc.payment_type) && doc.party_type",
    "fieldname": "party_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Party Name"
   },
   {
@@ -208,7 +207,6 @@
    "depends_on": "eval:(in_list([\"Internal Transfer\", \"Pay\"], doc.payment_type) || doc.party)",
    "fieldname": "paid_from",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "label": "Account Paid From",
    "options": "Account",
    "print_hide": 1,
@@ -241,7 +239,6 @@
    "depends_on": "eval:(in_list([\"Internal Transfer\", \"Receive\"], doc.payment_type) || doc.party)",
    "fieldname": "paid_to",
    "fieldtype": "Link",
-   "in_global_search": 1,
    "label": "Account Paid To",
    "options": "Account",
    "print_hide": 1,
@@ -278,6 +275,7 @@
    "fieldtype": "Currency",
    "label": "Paid Amount",
    "options": "paid_from_account_currency",
+   "precision": "0",
    "reqd": 1
   },
   {
@@ -306,6 +304,7 @@
    "fieldtype": "Currency",
    "label": "Received Amount",
    "options": "paid_to_account_currency",
+   "precision": "0",
    "print_hide": 1,
    "reqd": 1
   },
@@ -576,7 +575,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2021-03-10 13:05:16.958866",
+ "modified": "2025-01-27 15:21:08.002938",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry",
@@ -615,7 +614,6 @@
    "write": 1
   }
  ],
- "show_name_in_global_search": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "title_field": "title",

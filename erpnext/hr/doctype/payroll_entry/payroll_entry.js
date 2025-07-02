@@ -5,6 +5,9 @@ var in_progress = false;
 
 frappe.ui.form.on('Payroll Entry', {
 	onload: function (frm) {
+		frm.remove_custom_button("Make Bank Entry");
+        frm.remove_custom_button("Submit Salary Slip");
+
 		if (!frm.doc.posting_date) {
 			frm.doc.posting_date = frappe.datetime.nowdate();
 		}
@@ -17,9 +20,20 @@ frappe.ui.form.on('Payroll Entry', {
 				}
 			};
 		});
+
+		if(!frm.doc.docstatus){
+            frm.events.payroll_frequency(frm);
+        }
 	},
 
 	refresh: function(frm) {
+		if (frm.doc.queue_status == 'Queued'){
+			frappe.workflow.get_transitions(frm.doc).then(() => {
+				frm.page.hide_actions_menu();
+				frm.remove_custom_button("Submit Salary Slip");
+			});
+        }
+
 		if (frm.doc.docstatus == 0) {
 			if(!frm.is_new()) {
 				frm.page.clear_primary_action();
@@ -43,6 +57,18 @@ frappe.ui.form.on('Payroll Entry', {
 			if (frm.custom_buttons) frm.clear_custom_buttons();
 			frm.events.add_context_buttons(frm);
 		}
+		frm.set_query("employee", function() {
+            if(!frm.doc.company){
+                frappe.msgprint("Please select Company first");
+            }
+            let filters = {"company": frm.doc.company};
+            return {
+                "filters": filters
+            };
+        });
+	},
+	employee: function (frm) {
+		frm.events.clear_employee_table(frm);
 	},
 
 	get_employee_details: function (frm) {
@@ -126,6 +152,17 @@ frappe.ui.form.on('Payroll Entry', {
 				}
 			};
 		});
+
+		frm.set_query("bank_payment_account", function () {
+			var account_types = ["Bank", "Cash"];
+			return {
+				filters: {
+					"account_type": ["in", account_types],
+					"is_group": 0,
+					"company": frm.doc.company
+				}
+			};
+		});
 	},
 
 	payroll_frequency: function (frm) {
@@ -157,6 +194,16 @@ frappe.ui.form.on('Payroll Entry', {
 			in_progress = false;
 		}
 		frm.events.clear_employee_table(frm);
+
+		var d = new Date( frm.doc.start_date );
+	    var date = d.getDate();
+	    var start_date = frappe.utils.get_config_by_name('MONTHLY_ATTENDANCE_START_DATE', 26)
+	    if (date && date != start_date) {
+	        validated = false;
+	        cur_frm.set_value("start_date", "");
+	        cur_frm.set_value("end_date", "");
+	        frappe.throw("Please select "+ start_date +" of the month.");
+	    }
 	},
 
 	project: function (frm) {
@@ -211,7 +258,7 @@ frappe.ui.form.on('Payroll Entry', {
 				},
 				doc: frm.doc,
 				freeze: true,
-				freeze_message: __('Validating Employee Attendance...')
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 			});
 		}else{
 			frm.fields_dict.attendance_detail_html.html("");
@@ -235,7 +282,7 @@ const submit_salary_slip = function (frm) {
 				callback: function() {frm.events.refresh(frm);},
 				doc: frm.doc,
 				freeze: true,
-				freeze_message: __('Submitting Salary Slips and creating Journal Entry...')
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 			});
 		},
 		function() {
@@ -259,7 +306,7 @@ let make_bank_entry = function (frm) {
 				);
 			},
 			freeze: true,
-			freeze_message: __("Creating Payment Entries......")
+			freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`,
 		});
 	} else {
 		frappe.msgprint(__("Payment Account is mandatory"));

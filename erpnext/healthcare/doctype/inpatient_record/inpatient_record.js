@@ -35,7 +35,7 @@ var discharge_patient = function(frm) {
 			}
 		},
 		freeze: true,
-		freeze_message: "Process Discharge"
+		freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 	});
 };
 
@@ -74,7 +74,7 @@ var admit_patient_dialog = function(frm){
 					}
 				},
 				freeze: true,
-				freeze_message: "Process Admission"
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 			});
 			frm.refresh_fields();
 			dialog.hide();
@@ -140,7 +140,7 @@ var transfer_patient_dialog = function(frm){
 					}
 				},
 				freeze: true,
-				freeze_message: "Process Transfer"
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 			});
 			frm.refresh_fields();
 			dialog.hide();

@@ -74,6 +74,50 @@ class PurchaseInvoice(BuyingController):
         self.set_onload("supplier_tds", supplier_tds)
 
     def before_save(self):
+        # Add customer loan deduction if exists
+        if self.is_new():
+            pass
+        else:
+             if len(self.customer_loan_deduction) > 0:
+                customer = frappe.db.get_value('Customer Supplier Relationship',{'supplier':self.supplier},['customer'])
+                company = "Rasool Nawaz Sugar Mill (Pvt.) Ltd."
+                party_type = 'Customer'
+
+                if customer:
+                    total_receivable = frappe.db.sql('''SELECT (SUM(debit) - SUM(credit)) AS total_receivable
+                                    FROM `tabGL Entry` 
+                                    WHERE party_type='{1}' 
+                                    AND party='{0}' 
+                                    AND ACCOUNT IN (SELECT ACCOUNT 
+                                                    FROM `tabParty Account` 
+                                                    WHERE parenttype='{1}' 
+                                                    AND parent='{0}' 
+                                                    AND company='{2}')
+                                    GROUP BY party '''.format(customer,party_type,company),as_dict=True)
+
+                    if len(total_receivable) > 0:
+                        if flt(total_receivable[0]['total_receivable']) != flt(self.customer_loan_deduction[0].total_recieveable):
+                            total_receivable_value = flt(total_receivable[0]['total_receivable'])
+                            self.customer_loan_deduction[0].total_recieveable = flt(total_receivable[0]['total_receivable'])
+                        else:
+                            total_receivable_value = self.customer_loan_deduction[0].total_recieveable
+                    else:
+                        total_receivable_value = 0.00
+                        self.customer_loan_deduction[0].total_recieveable = 0.00
+                
+                if flt(total_receivable_value) > 0.00:
+                    if not self.customer_loan_deduction[0].total_payable:
+                        self.customer_loan_deduction[0].total_payable = self.rounded_total
+                        
+                    if flt(total_receivable_value) > flt(self.customer_loan_deduction[0].total_payable):
+                        self.customer_loan_deduction[0].allocated_amount = self.customer_loan_deduction[0].total_payable
+                    else:
+                        self.customer_loan_deduction[0].allocated_amount = total_receivable_value
+
+                    self.customer_loan_deduction[0].net_payable = flt(self.customer_loan_deduction[0].total_payable) - flt(self.customer_loan_deduction[0].allocated_amount)
+                    self.customer_loan_deduction[0].net_recieveable = flt(total_receivable_value) - flt(self.customer_loan_deduction[0].allocated_amount)
+                    self.customer_loan_deduction[0].allocation_percentage = flt(((flt(self.customer_loan_deduction[0].allocated_amount) / flt(total_receivable_value)) * 100),4)
+
         if not self.on_hold:
             self.release_date = ""
 

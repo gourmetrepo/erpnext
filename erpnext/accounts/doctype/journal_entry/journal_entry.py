@@ -52,6 +52,7 @@ class JournalEntry(AccountsController):
 		self.update_loan()
 		self.update_inter_company_jv()
 		self.update_invoice_discounting()
+		self.update_payment_order_amount()
 
 	def on_cancel(self):
 		from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
@@ -67,6 +68,7 @@ class JournalEntry(AccountsController):
 		self.unlink_inter_company_jv()
 		self.unlink_asset_adjustment_entry()
 		self.update_invoice_discounting()
+		self.update_payment_order_amount()
 
 	def get_title(self):
 		return self.pay_to_recd_from or self.accounts[0].account
@@ -325,7 +327,7 @@ class JournalEntry(AccountsController):
 					formatted_voucher_total = fmt_money(voucher_total, order.precision("grand_total"),
 						currency=account_currency)
 
-				if flt(voucher_total) < (flt(order.advance_paid) + total):
+				if flt(round(voucher_total)) < (flt(order.advance_paid) + total):
 					frappe.throw(_("Advance paid against {0} {1} cannot be greater \
 						than Grand Total {2}").format(reference_type, reference_name, formatted_voucher_total))
 
@@ -342,7 +344,7 @@ class JournalEntry(AccountsController):
 				if invoice.docstatus != 1:
 					frappe.throw(_("{0} {1} is not submitted").format(reference_type, reference_name))
 
-				if total and flt(invoice.outstanding_amount) < total:
+				if total and flt(invoice.outstanding_amount,0) < total: # to getting the rounded up value as shown in outstanding_column
 					frappe.throw(_("Payment against {0} {1} cannot be greater than Outstanding Amount {2}")
 						.format(reference_type, reference_name, invoice.outstanding_amount))
 
@@ -644,6 +646,28 @@ class JournalEntry(AccountsController):
 
 			d.account_balance = account_balance[d.account]
 			d.party_balance = party_balance[(d.party_type, d.party)]
+	
+	def update_payment_order_amount(self):
+		# update amount in payment order
+		if self.docstatus == 1:
+			if self.payment_order:
+				frappe.db.sql(
+					f"""Update `tabPayment Order Detail` SET amount_paid = (amount_paid + {self.total_credit}) WHERE 
+					`parent`='{self.payment_order}'
+					AND
+					`supplier` IN (SELECT DISTINCT(`party`) AS supplier FROM `tabJournal Entry Account` 
+					WHERE `parent`='{self.name}'
+					AND `party` IS NOT NULL);""")
+		if self.docstatus == 2:
+			if self.payment_order:
+				frappe.db.sql(
+					f"""Update `tabPayment Order Detail` SET amount_paid = (amount_paid - {self.total_credit}) WHERE 
+					`parent`='{self.payment_order}'
+					AND
+					`supplier` IN (SELECT DISTINCT(`party`) AS supplier FROM `tabJournal Entry Account` 
+					WHERE `parent`='{self.name}'
+					AND `party` IS NOT NULL);""")
+
 
 @frappe.whitelist()
 def get_default_bank_cash_account(company, account_type=None, mode_of_payment=None, account=None):

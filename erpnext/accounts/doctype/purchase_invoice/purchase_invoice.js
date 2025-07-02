@@ -41,6 +41,8 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 
 		if(!doc.is_return && doc.docstatus == 1 && doc.outstanding_amount != 0){
 			if(doc.on_hold) {
+				$("[data-doctype='Payment Entry']").hide();
+				$("[data-doctype='Payment Request']").hide();
 				this.frm.add_custom_button(
 					__('Change Release Date'),
 					function() {me.change_release_date()},
@@ -62,7 +64,9 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 
 		if(doc.docstatus == 1 && doc.outstanding_amount != 0
 			&& !(doc.is_return && doc.return_against)) {
-			this.frm.add_custom_button(__('Payment'), this.make_payment_entry, __('Create'));
+				if (!doc.on_hold){
+					this.frm.add_custom_button(__('Payment'), this.make_payment_entry, __('Create'));
+				}
 			cur_frm.page.set_inner_btn_group_as_primary(__('Create'));
 		}
 
@@ -79,7 +83,7 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 			}
 		}
 
-		if (doc.outstanding_amount > 0 && !cint(doc.is_return)) {
+		if (doc.outstanding_amount > 0 && !cint(doc.is_return) && !doc.on_hold) {
 			cur_frm.add_custom_button(__('Payment Request'), function() {
 				me.make_payment_request()
 			}, __('Create'));
@@ -481,6 +485,28 @@ cur_frm.cscript.select_print_heading = function(doc,cdt,cdn){
 		cur_frm.pformat.print_heading = __("Purchase Invoice");
 }
 
+cur_frm.cscript.make_payment_request = function() {
+        var me = this;
+		const payment_request_type = "Outward";
+
+		frappe.call({
+			method:"nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_request",
+			args: {
+				dt: me.frm.doc.doctype,
+				dn: me.frm.doc.name,
+				recipient_id: me.frm.doc.contact_email,
+				payment_request_type: payment_request_type,
+				party_type: payment_request_type == 'Outward' ? "Supplier" : "Customer",
+				party: payment_request_type == 'Outward' ? me.frm.doc.supplier : me.frm.doc.customer
+			},
+			callback: function(r) {
+				if(!r.exc){
+					var doc = frappe.model.sync(r.message);
+					frappe.set_route("Form", r.message.doctype, r.message.name);
+				}
+			}
+		});
+	}
 frappe.ui.form.on("Purchase Invoice", {
 	setup: function(frm) {
 		frm.custom_make_buttons = {
@@ -497,26 +523,6 @@ frappe.ui.form.on("Purchase Invoice", {
 				}
 			}
 		}
-
-
-		// frm.fields_dict['items'].grid.get_field('business_unit').get_query = function(doc) {
-		// 	return {
-		// 		query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-		// 		filters: {
-		// 				'supplier': doc.supplier
-		// 		}
-		// 	}
-		// }
-
-		// frm.set_query('business_unit', function() {
-        //     return {
-        //         query: 'sugar_mill.sugar_mill.apis.supplier.get_business_unit',
-		// 		filters: {
-		// 				'supplier': frm.doc.supplier
-		// 		}
-
-        //     };
-        // });
 
 		frm.set_query("cost_center", function() {
 			return {
@@ -541,6 +547,31 @@ frappe.ui.form.on("Purchase Invoice", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+
+		console.log(frm.doc.token_no);
+        if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no == undefined){
+		    frm.set_value('naming_series', 'PISM-.YY.-');
+		    refresh_field('naming_series');
+	    }else if(frm.doc.company == 'Rasool Nawaz Sugar Mill (Pvt.) Ltd.' && frm.doc.token_no != ''){
+		    frm.set_value('naming_series', 'CPR-' + frappe.utils.get_config_by_name("SERIES_YEAR") + '-');
+		    refresh_field('naming_series');
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "qty", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "rate", frm.doc.name);
+            df.read_only = 1;		    
+            var df = frappe.meta.get_docfield("Purchase Invoice Item", "amount", frm.doc.name);
+            df.read_only = 1;		    
+            frm.set_df_property("items", "read_only", 1);
+            refresh_field("items");
+	    }
+	    frappe.db.get_value('Purchase Invoice',frm.doc.name,'taxes_and_charges_deducted',
+          function(d) {
+            var tax_and_charges = d.taxes_and_charges_deducted
+    	    console.log('tax_and_charges',tax_and_charges);
+    	    if(frm.doc.token_no != '' && tax_and_charges == 0 && frm.doc.docstatus == 0){
+    	         frm.trigger('taxes_and_charges')
+    	    }
+        })
 	},
 
 	is_subcontracted: function(frm) {

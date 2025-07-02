@@ -154,7 +154,6 @@
   {
    "fieldname": "cheque_no",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "in_list_view": 1,
    "label": "Reference Number",
    "no_copy": 1,
@@ -192,6 +191,7 @@
    "oldfieldname": "total_debit",
    "oldfieldtype": "Currency",
    "options": "Company:company:default_currency",
+   "precision": "0",
    "print_hide": 1,
    "read_only": 1
   },
@@ -203,6 +203,7 @@
    "oldfieldname": "total_credit",
    "oldfieldtype": "Currency",
    "options": "Company:company:default_currency",
+   "precision": "0",
    "print_hide": 1,
    "read_only": 1
   },
@@ -286,7 +287,6 @@
   {
    "fieldname": "remark",
    "fieldtype": "Small Text",
-   "in_global_search": 1,
    "label": "Remark",
    "no_copy": 1,
    "oldfieldname": "remark",
@@ -489,7 +489,7 @@
  "icon": "fa fa-file-text",
  "idx": 176,
  "is_submittable": 1,
- "modified": "2020-01-16 13:05:30.634226",
+ "modified": "2025-01-27 15:02:31.721377",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Journal Entry",

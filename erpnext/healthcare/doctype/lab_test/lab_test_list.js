@@ -52,7 +52,7 @@ var create_multiple_dialog = function(listview){
 					}
 				},
 				freeze: true,
-				freeze_message: __("Creating Lab Test...")
+				freeze_message: `<img src="/assets/erpnext/images/output-onlinegiftools.gif" style="width: 150px; height: 150px;" />`
 			});
 			dialog.hide();
 		}
