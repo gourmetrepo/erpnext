@@ -366,7 +366,7 @@ class BuyingController(StockController):
 			# 	rm.rate = get_valuation_rate(raw_material_data.rm_item_code, self.supplier_warehouse,
 			# 		self.doctype, self.name, currency=self.company_currency, company=self.company)
 			if not rm.rate:
-				batch_valuation_rate = frappe.db.sql(f"""Select `valuation_rate` from `tabBatch` where `name`={rm.batch_no}""",as_dict=True)
+				batch_valuation_rate = frappe.db.sql(f"""Select `valuation_rate` from `tabBatch` where `name`='{rm.batch_no}'""",as_dict=True)
 				if len(batch_valuation_rate) and batch_valuation_rate[0].get('valuation_rate'):
 					rm.rate = batch_valuation_rate[0].get('valuation_rate')
 				else:
@@ -873,7 +873,7 @@ def get_subcontracted_raw_materials_from_se(purchase_order, fg_item):
 			sed.subcontracted_item AS main_item_code,
 			{serial_no_concat_syntax} AS serial_nos,
 			{batch_no_concat_syntax} AS batch_nos,
-			{batch_valuation_rate} AS batch_valuation_rates,
+			{batch_valuation_rate} AS batch_valuation_rates
 		FROM `tabStock Entry` se,`tabStock Entry Detail` sed
 		WHERE
 			se.name = sed.parent
