@@ -888,7 +888,7 @@ def get_subcontracted_raw_materials_from_se(purchase_order, fg_item):
 		'mariadb': common_query.format(
 			serial_no_concat_syntax="GROUP_CONCAT(sed.serial_no)",
 			batch_no_concat_syntax="GROUP_CONCAT(sed.batch_no)",
-			batch_valuation_rate="GROUP_CONCAT(sed.valuation_rate)",
+			batch_valuation_rate="GROUP_CONCAT(sed.valuation_rate)"
 		),
 		'postgres': common_query.format(
 			serial_no_concat_syntax="STRING_AGG(sed.serial_no, ',')",
