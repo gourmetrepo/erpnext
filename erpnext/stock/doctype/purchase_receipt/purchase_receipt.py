@@ -75,6 +75,10 @@ class PurchaseReceipt(BuyingController):
 			})
 
 	def validate(self):
+		# Subcontracting valuation rate configurations
+		# if self.subcontracted:
+		# 	update_valuation_rate_for_subcontracting(self)
+
 		self.validate_posting_time()
 		super(PurchaseReceipt, self).validate()
 
@@ -95,8 +99,8 @@ class PurchaseReceipt(BuyingController):
 			throw(_("Posting Date cannot be future date"))
 
 		# Subcontracting valuation rate configurations
-		if self.subcontracted:
-			update_valuation_rate_for_subcontracting(self)
+		# if self.subcontracted:
+		# 	update_valuation_rate_for_subcontracting(self)
 
 
 	def validate_cwip_accounts(self):
@@ -720,36 +724,36 @@ def delete_items(data):
 	frappe.db.commit()
 
 
-def update_valuation_rate_for_subcontracting(doc):
-	if not doc.subcontracted:
-		return
+# def update_valuation_rate_for_subcontracting(doc):
+# 	if not doc.subcontracted:
+# 		return
 	
-	# Considering purchase receipt can be created against only one purchase order (not multiple purchase orders)
-	purchase_order_reference = None
-	for item in doc.items:
-		if item.purchase_order:
-			purchase_order_reference = item.purchase_order
-			break
+# 	# Considering purchase receipt can be created against only one purchase order (not multiple purchase orders)
+# 	purchase_order_reference = None
+# 	for item in doc.items:
+# 		if item.purchase_order:
+# 			purchase_order_reference = item.purchase_order
+# 			break
 
-	valuation_rates = frappe.db.sql(
-		f"""
-		SELECT sed.`batch_no` as `batch_no`, sed.`item_code` as `item_code`, sed.`valuation_rate` as `valuation_rate` FROM `tabStock Entry` se
-		INNER JOIN `tabStock Entry Detail` sed
-		ON sed.`parent`=se.`name`
-		WHERE se.`purchase_order`={frappe.db.escape(purchase_order_reference)}
-		AND se.`stock_entry_type`="Send to Subcontractor";
-		""", as_dict=True
-	)
+# 	valuation_rates = frappe.db.sql(
+# 		f"""
+# 		SELECT sed.`batch_no` as `batch_no`, sed.`item_code` as `item_code`, sed.`valuation_rate` as `valuation_rate` FROM `tabStock Entry` se
+# 		INNER JOIN `tabStock Entry Detail` sed
+# 		ON sed.`parent`=se.`name`
+# 		WHERE se.`purchase_order`={frappe.db.escape(purchase_order_reference)}
+# 		AND se.`stock_entry_type`="Send to Subcontractor";
+# 		""", as_dict=True
+# 	)
 
-	valuation_batchwise_data = {}
-	for valuation_rate in valuation_rates:
-		if valuation_rate.get('item_code') not in valuation_batchwise_data:
-			valuation_batchwise_data[valuation_rate.get('item_code')] = {}
+# 	valuation_batchwise_data = {}
+# 	for valuation_rate in valuation_rates:
+# 		if valuation_rate.get('item_code') not in valuation_batchwise_data:
+# 			valuation_batchwise_data[valuation_rate.get('item_code')] = {}
 
-		if valuation_rate.get('batch_no') not in valuation_batchwise_data[valuation_rate.get('item_code')]:
-			valuation_batchwise_data[valuation_rate.get('item_code')][valuation_rate.get('batch_no')] = valuation_rate.get('valuation_rate')
+# 		if valuation_rate.get('batch_no') not in valuation_batchwise_data[valuation_rate.get('item_code')]:
+# 			valuation_batchwise_data[valuation_rate.get('item_code')][valuation_rate.get('batch_no')] = valuation_rate.get('valuation_rate')
 
-	for supplied_item in doc.supplied_items:
-		if supplied_item.rm_item_code in valuation_batchwise_data and supplied_item.batch_no in valuation_batchwise_data[supplied_item.rm_item_code]:
-			supplied_item.rate = valuation_batchwise_data[supplied_item.rm_item_code][supplied_item.batch_no]
-			supplied_item.amount = supplied_item.rate * supplied_item.consumed_qty
+# 	for supplied_item in doc.supplied_items:
+# 		if supplied_item.rm_item_code in valuation_batchwise_data and supplied_item.batch_no in valuation_batchwise_data[supplied_item.rm_item_code]:
+# 			supplied_item.rate = valuation_batchwise_data[supplied_item.rm_item_code][supplied_item.batch_no]
+# 			supplied_item.amount = supplied_item.rate * supplied_item.consumed_qty

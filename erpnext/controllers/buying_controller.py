@@ -333,6 +333,7 @@ class BuyingController(StockController):
 					for batch_data in batches_qty:
 						qty = batch_data['qty']
 						raw_material.batch_no = batch_data['batch']
+						raw_material.rate = batch_data.get('valuation_rate')
 						if qty > 0:
 							self.append_raw_material_to_be_backflushed(item, raw_material, qty)
 				else:
@@ -351,20 +352,25 @@ class BuyingController(StockController):
 		rm.consumed_qty = qty
 
 		if not raw_material_data.get('non_stock_item'):
-			from erpnext.stock.utils import get_incoming_rate
-			rm.rate = get_incoming_rate({
-				"item_code": raw_material_data.rm_item_code,
-				"warehouse": self.supplier_warehouse,
-				"posting_date": self.posting_date,
-				"posting_time": self.posting_time,
-				"qty": -1 * qty,
-				"serial_no": rm.serial_no
-			})
-
+			#from erpnext.stock.utils import get_incoming_rate
+			# rm.rate = get_incoming_rate({
+			# 	"item_code": raw_material_data.rm_item_code,
+			# 	"warehouse": self.supplier_warehouse,
+			# 	"posting_date": self.posting_date,
+			# 	"posting_time": self.posting_time,
+			# 	"qty": -1 * qty,
+			# 	"serial_no": rm.serial_no
+			# })
+		
+			# if not rm.rate:
+			# 	rm.rate = get_valuation_rate(raw_material_data.rm_item_code, self.supplier_warehouse,
+			# 		self.doctype, self.name, currency=self.company_currency, company=self.company)
 			if not rm.rate:
-				rm.rate = get_valuation_rate(raw_material_data.rm_item_code, self.supplier_warehouse,
-					self.doctype, self.name, currency=self.company_currency, company=self.company)
-
+				batch_valuation_rate = frappe.db.sql(f"""Select `valuation_rate` from `tabBatch` where `name`={rm.batch_no}""",as_dict=True)
+				if len(batch_valuation_rate) and batch_valuation_rate[0].get('valuation_rate'):
+					rm.rate = batch_valuation_rate[0].get('valuation_rate')
+				else:
+					frappe.throw(f"""{rm.batch_no} batch rate is missing""")
 		rm.amount = qty * flt(rm.rate)
 		fg_item_doc.rm_supp_cost += rm.amount
 
@@ -432,25 +438,32 @@ class BuyingController(StockController):
 				if item.batch_no and frappe.db.get_value("Item", rm.rm_item_code, "has_batch_no") and not rm.batch_no:
 					rm.batch_no = item.batch_no
 
-			# get raw materials rate
-			if self.doctype == "Purchase Receipt":
-				from erpnext.stock.utils import get_incoming_rate
-				rm.rate = get_incoming_rate({
-					"item_code": bom_item.item_code,
-					"warehouse": self.supplier_warehouse,
-					"posting_date": self.posting_date,
-					"posting_time": self.posting_time,
-					"qty": -1 * required_qty,
-					"serial_no": rm.serial_no
-				})
-				if not rm.rate:
-					rm.rate = get_valuation_rate(bom_item.item_code, self.supplier_warehouse,
-						self.doctype, self.name, currency=self.company_currency, company = self.company)
-			else:
-				rm.rate = bom_item.rate
+		# get raw materials rate
+		if self.doctype == "Purchase Receipt":
+			raw_materials_cost = 0.0
+			supplied_items = self.get("supplied_items")
+			for d in supplied_items:
+				if d.main_item_code == item.item_code:
+					raw_materials_cost += flt(d.amount)
+				
 
-			rm.amount = required_qty * flt(rm.rate)
-			raw_materials_cost += flt(rm.amount)
+			# from erpnext.stock.utils import get_incoming_rate
+			# rm.rate = get_incoming_rate({
+			# 	"item_code": bom_item.item_code,
+			# 	"warehouse": self.supplier_warehouse,
+			# 	"posting_date": self.posting_date,
+			# 	"posting_time": self.posting_time,
+			# 	"qty": -1 * required_qty,
+			# 	"serial_no": rm.serial_no
+			# })
+			# if not rm.rate:
+			# 	rm.rate = get_valuation_rate(bom_item.item_code, self.supplier_warehouse,
+			# 		self.doctype, self.name, currency=self.company_currency, company = self.company)
+		# else:
+		# 	rm.rate = bom_item.rate
+
+		# rm.amount = required_qty * flt(rm.rate)
+		# raw_materials_cost += flt(rm.amount)
 
 		if self.doctype in ("Purchase Receipt", "Purchase Invoice"):
 			item.rm_supp_cost = raw_materials_cost
@@ -859,7 +872,8 @@ def get_subcontracted_raw_materials_from_se(purchase_order, fg_item):
 			sed.stock_uom,
 			sed.subcontracted_item AS main_item_code,
 			{serial_no_concat_syntax} AS serial_nos,
-			{batch_no_concat_syntax} AS batch_nos
+			{batch_no_concat_syntax} AS batch_nos,
+			{batch_valuation_rate} AS batch_valuation_rates,
 		FROM `tabStock Entry` se,`tabStock Entry Detail` sed
 		WHERE
 			se.name = sed.parent
@@ -873,11 +887,13 @@ def get_subcontracted_raw_materials_from_se(purchase_order, fg_item):
 	raw_materials = frappe.db.multisql({
 		'mariadb': common_query.format(
 			serial_no_concat_syntax="GROUP_CONCAT(sed.serial_no)",
-			batch_no_concat_syntax="GROUP_CONCAT(sed.batch_no)"
+			batch_no_concat_syntax="GROUP_CONCAT(sed.batch_no)",
+				
 		),
 		'postgres': common_query.format(
 			serial_no_concat_syntax="STRING_AGG(sed.serial_no, ',')",
-			batch_no_concat_syntax="STRING_AGG(sed.batch_no, ',')"
+			batch_no_concat_syntax="STRING_AGG(sed.batch_no, ',')",
+			batch_valuation_rate = "STRING_AGG(sed.valuation_rate)"
 		)
 	}, (purchase_order, fg_item), as_dict=1)
 
@@ -1007,6 +1023,7 @@ def get_transferred_batch_qty_map(purchase_order, fg_item):
 	transferred_batches = frappe.db.sql("""
 		SELECT
 			sed.batch_no,
+			sed.valuation_rate,
 			SUM(sed.qty) AS qty,
 			sed.item_code,
 			sed.subcontracted_item
