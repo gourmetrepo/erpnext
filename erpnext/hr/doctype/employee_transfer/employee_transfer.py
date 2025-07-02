@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import getdate
-from erpnext.hr.utils import update_employee
+from frappe.utils import getdate,get_datetime
+# from erpnext.hr.utils import update_employee 		Custom update_employee written here.
 
 class EmployeeTransfer(Document):
 	def validate(self):
@@ -23,9 +23,11 @@ class EmployeeTransfer(Document):
 				frappe.DocstatusTransitionError)
 	def submit(self, *args, **kwargs):
 		ignore_workflow = kwargs.get('ignore_workflow', False)
-		self.queue_action('submit',queue_name="hr_secondary",ignore_workflow=ignore_workflow)
+		# self.queue_action('submit',queue_name="hr_secondary",ignore_workflow=ignore_workflow)
+		self.submit(ignore_workflow=ignore_workflow)
   
-	def on_submit(self):
+	def on_submit(self):	
+		# this code is moved here while removing monkeypatch
 		employee = frappe.get_doc("Employee", self.employee)
 		if self.create_new_employee_id:
 			new_employee = frappe.copy_doc(employee)
@@ -51,8 +53,36 @@ class EmployeeTransfer(Document):
 				employee.company = self.new_company
 				employee.date_of_joining = self.transfer_date
 			employee.save()
+		
+		# this is core code and is not in use..
+		# employee = frappe.get_doc("Employee", self.employee)
+		# if self.create_new_employee_id:
+		# 	new_employee = frappe.copy_doc(employee)
+		# 	new_employee.name = None
+		# 	new_employee.employee_number = None
+		# 	new_employee = update_employee(new_employee, self.transfer_details, date=self.transfer_date)
+		# 	if self.new_company and self.company != self.new_company:
+		# 		new_employee.internal_work_history = []
+		# 		new_employee.date_of_joining = self.transfer_date
+		# 		new_employee.company = self.new_company
+		# 	#move user_id to new employee before insert
+		# 	if employee.user_id and not self.validate_user_in_details():
+		# 		new_employee.user_id = employee.user_id
+		# 		employee.db_set("user_id", "")
+		# 	new_employee.insert()
+		# 	self.db_set("new_employee_id", new_employee.name)
+		# 	#relieve the old employee
+		# 	employee.db_set("relieving_date", self.transfer_date)
+		# 	employee.db_set("status", "Left")
+		# else:
+		# 	employee = update_employee(employee, self.transfer_details, date=self.transfer_date)
+		# 	if self.new_company and self.company != self.new_company:
+		# 		employee.company = self.new_company
+		# 		employee.date_of_joining = self.transfer_date
+		# 	employee.save()
 
 	def on_cancel(self):
+		# code moved here from nerp while removing monkeypatch
 		employee = frappe.get_doc("Employee", self.employee)
 		if self.create_new_employee_id:
 			if self.new_employee_id:
@@ -66,6 +96,21 @@ class EmployeeTransfer(Document):
 		if self.new_company != self.company:
 			employee.company = self.company
 		employee.save()
+     
+		# core code not in use.
+		# employee = frappe.get_doc("Employee", self.employee)
+		# if self.create_new_employee_id:
+		# 	if self.new_employee_id:
+		# 		frappe.throw(_("Please delete the Employee <a href='#Form/Employee/{0}'>{0}</a>\
+		# 			to cancel this document").format(self.new_employee_id))
+		# 	#mark the employee as active
+		# 	employee.status = "Active"
+		# 	employee.relieving_date = ''
+		# else:
+		# 	employee = update_employee(employee, self.transfer_details, cancel=True)
+		# if self.new_company != self.company:
+		# 	employee.company = self.company
+		# employee.save()
 
 	def validate_user_in_details(self):
 		for item in self.transfer_details:
@@ -74,6 +119,22 @@ class EmployeeTransfer(Document):
 		return False
 
 
+def update_employee(employee, details, date=None, cancel=False):
+	internal_work_history = {}
+	for item in details:
+		fieldtype = frappe.get_meta("Employee").get_field(item.fieldname).fieldtype
+		new_data = item.new if not cancel else item.current
+		if fieldtype == "Date" and new_data:
+			new_data = getdate(new_data)
+		elif fieldtype =="Datetime" and new_data:
+			new_data = get_datetime(new_data)
+		setattr(employee, item.fieldname, new_data)
+		if item.fieldname in ["department", "designation", "branch","sub_branch"]:
+			internal_work_history[item.fieldname] = item.new
+	if internal_work_history and not cancel:
+		internal_work_history["from_date"] = date
+		employee.append("internal_work_history", internal_work_history)
+	return employee
 
 def validate_reporting_to(doc):
 	reporting_to_flag = False
