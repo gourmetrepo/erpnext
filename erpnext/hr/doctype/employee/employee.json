@@ -60,6 +60,8 @@
   "salary_mode",
   "bank_name",
   "bank_ac_no",
+  "column_break_52",
+  "payment_mode",
   "health_insurance_section",
   "health_insurance_provider",
   "health_insurance_no",
@@ -74,6 +76,7 @@
   "permanent_accommodation_type",
   "permanent_address",
   "current_accommodation_type",
+  "residing_city",
   "current_address",
   "sb53",
   "bio",
@@ -781,13 +784,31 @@
    "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Reporting Dict"
+  },
+  {
+   "fieldname": "column_break_52",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Thumb Impression",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "Thumb Impression\nFacial Recognition\nManual",
+   "reqd": 1
+  },
+  {
+   "fieldname": "residing_city",
+   "fieldtype": "Link",
+   "label": "Residing City",
+   "options": "City"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-02-07 14:38:23.387619",
- "modified_by": "Administrator",
+ "modified": "2025-07-03 10:35:23.495096",
+ "modified_by": "nabeel.ahmad@gourmetpakistan.com",
  "module": "HR",
  "name": "Employee",
  "name_case": "Title Case",
