@@ -177,6 +177,7 @@ class SalesInvoice(SellingController):
 			self.status_updater = []
 
 		self.update_status_updater_args()
+		self.check_per_billed_status()
 		self.update_prevdoc_status()
 		self.update_billing_status_in_dn()
 		self.clear_unallocated_mode_of_payments()
@@ -250,7 +251,7 @@ class SalesInvoice(SellingController):
 			self.update_billing_status_for_zero_amount_refdoc("Delivery Note")
 			self.update_billing_status_for_zero_amount_refdoc("Sales Order")
 			self.check_credit_limit()
-
+			
 		self.update_serial_no()
 
 		if not cint(self.is_pos) == 1 and not self.is_return:
@@ -279,7 +280,7 @@ class SalesInvoice(SellingController):
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
-		
+
 		if self.vsp_reference:
 			if self.vsp_sales_invoice_type == "Insurance":
 				vsp_doc = frappe.get_doc("VSP Secondary Lease Contract", self.vsp_reference)
@@ -1368,6 +1369,24 @@ class SalesInvoice(SellingController):
 
 		if update:
 			self.db_set('status', self.status, update_modified = update_modified)
+
+	def check_per_billed_status(self):
+		if self.is_return:
+			self.status_updater.append({
+				'source_dt': 'Sales Invoice Item',
+				'target_field': 'billed_amt',
+				'target_ref_field': 'amount',
+				'target_dt': 'Sales Order Item',
+				'join_field': 'so_detail',
+				'target_parent_dt': 'Sales Order',
+				'target_parent_field': 'per_billed',
+				'source_field': 'amount',
+				'join_field': 'so_detail',
+				'percent_join_field': 'sales_order',
+				'status_field': 'billing_status',
+				'keyword': 'Billed',
+				'overflow_type': 'billing'
+				})
 
 def get_discounting_status(sales_invoice):
 	status = None
