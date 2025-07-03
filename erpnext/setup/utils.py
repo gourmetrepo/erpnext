@@ -39,7 +39,7 @@ def before_tests():
 			"fy_end_date"		:"2011-12-31",
 			"language"			:"english",
 			"company_tagline"	:"Testing",
-			"email"				:"test@erpnext.com",
+			"email"				:"gerp@gicoh.com",
 			"password"			:"test",
 			"chart_of_accounts" : "Standard",
 			"domains"			: ["Manufacturing"],
