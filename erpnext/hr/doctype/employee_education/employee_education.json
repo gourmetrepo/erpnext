@@ -7,13 +7,15 @@
   "school_univ",
   "qualification",
   "type",
-  "maj_opt_subj",
   "level",
-  "currently_enrolled",
   "year_of_passing",
   "class_per",
+  "maj_opt_subj",
+  "start_date",
+  "currently_enrolled",
+  "completion_date",
   "is_highest_education",
-  "is_relevent_to_job"
+  "is_relevant_to_job"
  ],
  "fields": [
   {
@@ -37,7 +39,6 @@
   {
    "fieldname": "level",
    "fieldtype": "Select",
-   "hidden": 1,
    "in_list_view": 1,
    "label": "Level",
    "oldfieldname": "level",
@@ -47,7 +48,6 @@
   {
    "fieldname": "year_of_passing",
    "fieldtype": "Int",
-   "hidden": 1,
    "in_list_view": 1,
    "label": "Year of Passing",
    "oldfieldname": "year_of_passing",
@@ -57,7 +57,7 @@
    "fieldname": "class_per",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "CGPA/ Percentage",
+   "label": "Class / Percentage",
    "oldfieldname": "class_per",
    "oldfieldtype": "Data"
   },
@@ -65,21 +65,32 @@
    "fieldname": "maj_opt_subj",
    "fieldtype": "Text",
    "in_list_view": 1,
-   "label": "Specialization",
+   "label": "Major/Optional Subjects",
    "oldfieldname": "maj_opt_subj",
    "oldfieldtype": "Text"
   },
   {
    "fieldname": "type",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Type",
    "options": "\nDegree\nCertification"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
   },
   {
    "default": "0",
    "fieldname": "currently_enrolled",
    "fieldtype": "Check",
    "label": "Currently Enrolled"
+  },
+  {
+   "fieldname": "completion_date",
+   "fieldtype": "Date",
+   "label": "Completion Date"
   },
   {
    "default": "0",
@@ -89,15 +100,16 @@
   },
   {
    "default": "0",
-   "fieldname": "is_relevent_to_job",
+   "fieldname": "is_relevant_to_job",
    "fieldtype": "Check",
-   "label": "Is Relevent to Job"
+   "in_list_view": 1,
+   "label": "Is Relevant to Job"
   }
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-07-04 15:59:13.935336",
- "modified_by": "Administrator",
+ "modified": "2025-07-02 22:12:35.311736",
+ "modified_by": "nabeel.ahmad@gourmetpakistan.com",
  "module": "HR",
  "name": "Employee Education",
  "owner": "Administrator",
