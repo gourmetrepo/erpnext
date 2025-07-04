@@ -76,8 +76,9 @@
   "permanent_accommodation_type",
   "permanent_address",
   "current_accommodation_type",
-  "current_address",
+  "residing_city",
   "sb53",
+  "current_address",
   "bio",
   "personal_details",
   "passport_number",
@@ -795,12 +796,18 @@
    "label": "Payment Mode",
    "options": "Thumb Impression\nFacial Recognition\nManual",
    "reqd": 1
+  },
+  {
+   "fieldname": "residing_city",
+   "fieldtype": "Link",
+   "label": "Residing City",
+   "options": "City"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-05-05 15:30:17.153543",
+ "modified": "2025-07-02 21:49:02.855314",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",
