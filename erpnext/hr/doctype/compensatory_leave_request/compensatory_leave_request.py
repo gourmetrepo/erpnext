@@ -61,12 +61,16 @@ class CompensatoryLeaveRequest(Document):
 				leave_allocation.db_set("new_leaves_allocated", leave_allocation.total_leaves_allocated)
 				leave_allocation.db_set("total_leaves_allocated", leave_allocation.total_leaves_allocated)
 
+				if getdate(leave_allocation.from_date) > getdate(self.work_from_date):
+					leave_allocation.db_set("from_date", self.work_from_date)
+
 				# generate additional ledger entry for the new compensatory leaves off
 				create_additional_leave_ledger_entry(leave_allocation, date_difference, add_days(self.work_end_date, 1))
 
 			else:
 				leave_allocation = self.create_leave_allocation(leave_period, date_difference)
 			self.leave_allocation=leave_allocation.name
+			self.db_update()
 		else:
 			frappe.throw(_("There is no leave period in between {0} and {1}").format(format_date(self.work_from_date), format_date(self.work_end_date)))
 
@@ -115,7 +119,7 @@ class CompensatoryLeaveRequest(Document):
 			employee=self.employee,
 			employee_name=self.employee_name,
 			leave_type=self.leave_type,
-			from_date=add_days(self.work_end_date, 1),
+			from_date=self.work_from_date,
 			to_date=leave_period[0].to_date,
 			carry_forward=cint(is_carry_forward),
 			new_leaves_allocated=date_difference,
