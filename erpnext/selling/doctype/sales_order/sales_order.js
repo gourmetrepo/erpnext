@@ -34,7 +34,9 @@ frappe.ui.form.on("Sales Order", {
 				}
 			};
 		})
-
+		setTimeout(() => {
+		$('.dropdown-menu li:contains("Duplicate")').hide();  // Force hide
+		}, 5); // Wait for menu to render
 	},
 	refresh: function(frm) {
 		if(frm.doc.docstatus === 1 && frm.doc.status !== 'Closed'
@@ -48,6 +50,9 @@ frappe.ui.form.on("Sales Order", {
 				})
 			});
 		}
+		setTimeout(() => {
+		$('.dropdown-menu li:contains("Duplicate")').hide();  // Force hide
+		}, 5); // Wait for menu to render
 	},
 	onload: function(frm) {
 		if (!frm.doc.transaction_date){
