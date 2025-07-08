@@ -624,7 +624,7 @@ def update_project_reference(project_id, docname):
 		frappe.db.sql(
 			f"""
 			UPDATE `tabPurchase Order Item` 
-			SET project = {frappe.db.escape(project_id)}
+			SET `project` = {frappe.db.escape(project_id)}
 			WHERE `material_request` = {frappe.db.escape(docname)}
 			"""
 		)
@@ -632,7 +632,7 @@ def update_project_reference(project_id, docname):
 		frappe.db.sql(
 			f"""
 			UPDATE `tabPurchase Order` 
-			SET project = {frappe.db.escape(project_id)}
+			SET `project_based` = 1
 			WHERE `name` in (select `parent` from `tabPurchase Order Item` where `material_request` = {frappe.db.escape(docname)})
 			"""
 		)
