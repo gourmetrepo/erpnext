@@ -303,7 +303,7 @@ def make_purchase_order(source_name, target_doc=None):
 						mri.item_code = dri.item_code AND dri.company='{0}'  AND dri.supplier_code = '{1}' AND dri.docstatus = 1 
 					WHERE 
 						mri.item_code = '{2}' 
-      					AND mri.parent= '{3}'
+	  					AND mri.parent= '{3}'
 						AND mri.docstatus = 1 
 				""".format(data_dict['company'],data_dict['supplier'],d.item_code,source_name )
 			buying_rate_check = frappe.db.sql(sql_query,as_dict=True)
@@ -600,20 +600,20 @@ def validate_company_cost_center_and_accounts(self):
 
 @frappe.whitelist()
 def update_project_reference(project_id, docname):
-    """Updates the project reference in Material Request Items and returns a response"""
+	"""Updates the project reference in Material Request Items and returns a response"""
 	""" Project would be updated on parent as well as child table in MR and will also enable project_based material request.
 		It will also replicate these changes on POs from this MR """
-    if not project_id or not docname:
-        return {"status": "error", "message": _("Missing required parameters.")}
+	if not project_id or not docname:
+		return {"status": "error", "message": _("Missing required parameters.")}
 
-    try:
-        user = frappe.session.user
-        
-        frappe.db.sql("""
-            UPDATE `tabMaterial Request Item`
-            SET project = %s
-            WHERE parent = %s
-        """, (project_id, docname))
+	try:
+		user = frappe.session.user
+		
+		frappe.db.sql("""
+			UPDATE `tabMaterial Request Item`
+			SET project = %s
+			WHERE parent = %s
+		""", (project_id, docname))
 
 		frappe.db.sql(f"""
 			UPDATE `tabMaterial Request`
@@ -637,19 +637,19 @@ def update_project_reference(project_id, docname):
 			"""
 		)
 
-        frappe.db.commit()
-        doc = frappe.get_doc("Material Request", docname)
-        doc.add_comment("Comment", text=f"Project field updated to {project_id} by {user}")
-        frappe.db.commit()
+		frappe.db.commit()
+		doc = frappe.get_doc("Material Request", docname)
+		doc.add_comment("Comment", text=f"Project field updated to {project_id} by {user}")
+		frappe.db.commit()
 
-        return {"status": "success", "message": _("Project updated successfully!")}
+		return {"status": "success", "message": _("Project updated successfully!")}
 
-    except frappe.DoesNotExistError:
-        return {"status": "error", "message": _("Document not found.")}
+	except frappe.DoesNotExistError:
+		return {"status": "error", "message": _("Document not found.")}
 
-    except Exception as e:
-        frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
-        return {"status": "error", "message": str(e)}
+	except Exception as e:
+		frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
+		return {"status": "error", "message": str(e)}
 
 
 # Code by Moeiz to validate project based material requests
