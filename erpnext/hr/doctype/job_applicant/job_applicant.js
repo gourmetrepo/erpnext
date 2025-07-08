@@ -62,7 +62,7 @@ frappe.ui.form.on("Job Applicant", {
     nationality: function(frm) {
 		if (frm.doc.nationality == 'Pakistan') {
 			frm.set_df_property("cnic", "reqd", 1);
-			frm.set_df_property("place_of_issue", "reqd", 1);
+			// frm.set_df_property("place_of_issue", "reqd", 1);
 			frm.set_df_property("issue_date", "reqd", 1);
 			frm.set_df_property("valid_upto", "reqd", 1);
 			frm.set_df_property("passport", "reqd", 0);
