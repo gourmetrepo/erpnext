@@ -603,6 +603,8 @@ def validate_company_cost_center_and_accounts(self):
 @frappe.whitelist()
 def update_project_reference(project_id, docname):
     """Updates the project reference in Material Request Items and returns a response"""
+	""" Project would be updated on parent as well as child table in MR and will also enable project_based material request.
+		It will also replicate these changes on POs from this MR """
     if not project_id or not docname:
         return {"status": "error", "message": _("Missing required parameters.")}
 
@@ -614,6 +616,28 @@ def update_project_reference(project_id, docname):
             SET project = %s
             WHERE parent = %s
         """, (project_id, docname))
+
+		frappe.db.sql(f"""
+			UPDATE `tabMaterial Request`
+			SET project = {frappe.db.escape(project_id)}, project_based = 1
+			WHERE `name` = {frappe.db.escape(docname)}
+		""")
+
+		frappe.db.sql(
+			f"""
+			UPDATE `tabPurchase Order Item` 
+			SET project = {frappe.db.escape(project_id)}
+			WHERE `material_request` = {frappe.db.escape(docname)}
+			"""
+		)
+
+		frappe.db.sql(
+			f"""
+			UPDATE `tabPurchase Order` 
+			SET project = {frappe.db.escape(project_id)}
+			WHERE `name` in (select `parent` from `tabPurchase Order Item` where `material_request` = {frappe.db.escape(docname)})
+			"""
+		)
 
         frappe.db.commit()
         doc = frappe.get_doc("Material Request", docname)
