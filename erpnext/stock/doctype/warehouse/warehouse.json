@@ -16,6 +16,7 @@
   "column_break_4",
   "account",
   "company",
+  "reporting_warehouse",
   "disabled",
   "address_and_contact",
   "address_html",
@@ -229,14 +230,19 @@
   {
    "fieldname": "section_break_3",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "reporting_warehouse",
+   "fieldtype": "Select",
+   "label": "Reporting Warehouse",
+   "options": "\nCSD Distributors\nRetail Shops\nKey-Account"
   }
  ],
  "icon": "fa fa-building",
  "idx": 1,
  "is_tree": 1,
- "links": [],
- "modified": "2020-08-03 18:41:52.442502",
- "modified_by": "Administrator",
+ "modified": "2025-06-20 19:56:48.800449",
+ "modified_by": "attiqur.rehman@gourmetpakistan.com",
  "module": "Stock",
  "name": "Warehouse",
  "nsm_parent_field": "parent_warehouse",

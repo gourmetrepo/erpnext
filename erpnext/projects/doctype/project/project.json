@@ -61,7 +61,9 @@
   "day_to_send",
   "weekly_time_to_send",
   "column_break_45",
-  "message"
+  "message",
+  "assets_section",
+  "project_assets"
  ],
  "fields": [
   {
@@ -439,12 +441,23 @@
    "fieldname": "message",
    "fieldtype": "Text",
    "label": "Message"
+  },
+  {
+   "fieldname": "assets_section",
+   "fieldtype": "Section Break",
+   "label": "Assets"
+  },
+  {
+   "fieldname": "project_assets",
+   "fieldtype": "Table",
+   "label": "Project Assets",
+   "options": "Project Assets"
   }
  ],
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
  "max_attachments": 4,
- "modified": "2024-12-05 13:01:42.215114",
+ "modified": "2025-07-08 16:39:45.416317",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",

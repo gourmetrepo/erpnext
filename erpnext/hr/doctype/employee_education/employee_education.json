@@ -39,6 +39,7 @@
   {
    "fieldname": "level",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Level",
    "oldfieldname": "level",
@@ -48,6 +49,7 @@
   {
    "fieldname": "year_of_passing",
    "fieldtype": "Int",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Year of Passing",
    "oldfieldname": "year_of_passing",
@@ -57,7 +59,7 @@
    "fieldname": "class_per",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Class / Percentage",
+   "label": "CGPA/ Percentage",
    "oldfieldname": "class_per",
    "oldfieldtype": "Data"
   },
@@ -65,7 +67,7 @@
    "fieldname": "maj_opt_subj",
    "fieldtype": "Text",
    "in_list_view": 1,
-   "label": "Major/Optional Subjects",
+   "label": "Specialization",
    "oldfieldname": "maj_opt_subj",
    "oldfieldtype": "Text"
   },
@@ -108,8 +110,8 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-07-02 22:12:35.311736",
- "modified_by": "nabeel.ahmad@gourmetpakistan.com",
+ "modified": "2025-07-03 13:34:07.711094",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Education",
  "owner": "Administrator",
