@@ -790,8 +790,6 @@ function project_based_configurations(frm){
 
 
 	if (frm.doc.project_based){
-		// Project field in items child table would be read only if project based MR
-		frm.get_field("items").grid.toggle_enable("project", 0);
 		if(!frm.doc.project || frm.doc.project == "") {
 			frm.set_df_property('items', 'cannot_add_rows', true);
 			frm.set_df_property('items', 'cannot_delete_rows', true);
@@ -803,8 +801,6 @@ function project_based_configurations(frm){
 			frm.set_df_property('items', 'cannot_delete_all_rows', false);
 			frm.fields_dict['items'].grid.wrapper.find('.grid-remove-rows').show();
 		}
-	}else{
-		frm.get_field("items").grid.toggle_enable("project", 1);
 	}
 
 	frm.refresh_field('items');
