@@ -26,6 +26,7 @@ from erpnext.accounts.doctype.sales_invoice.sales_invoice import validate_inter_
 from erpnext.accounts.doctype.tax_withholding_category.tax_withholding_category import get_party_tax_withholding_details
 from erpnext.accounts.deferred_revenue import validate_service_stop_date
 from erpnext.stock.doctype.purchase_receipt.purchase_receipt import get_item_account_wise_additional_cost
+from erpnext.accounts.utils import make_inter_unit_overhead_purchase_journal_entry
 
 form_grid_templates = {
 	"items": "templates/form_grid/item_grid.html"
@@ -393,6 +394,13 @@ class PurchaseInvoice(BuyingController):
 
 		self.update_project()
 		update_linked_doc(self.doctype, self.name, self.inter_company_invoice_reference)
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.supplier_name in ["Unit 5", "Unit 8", "Unit 11"] and self.docstatus == 1:
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_overhead_purchase_journal_entry",
+				queue="gl",
+				purchase_invoice=self.name,
+				enqueue_after_commit=True
+			)
 
 	def make_gl_entries(self, gl_entries=None, repost_future_gle=True, from_repost=False):
 		if not self.grand_total:

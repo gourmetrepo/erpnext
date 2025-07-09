@@ -26,7 +26,7 @@ from erpnext.accounts.doctype.loyalty_program.loyalty_program import \
 from erpnext.accounts.deferred_revenue import validate_service_stop_date
 import time
 from erpnext.healthcare.utils import manage_invoice_submit_cancel
-
+from erpnext.accounts.utils import make_inter_unit_overhead_journal_entry, make_inter_unit_sales_journal_entry
 from six import iteritems
 
 form_grid_templates = {
@@ -164,6 +164,7 @@ class SalesInvoice(SellingController):
 		self.queue_action('submit',queue_name="si_tertiary",ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
+		frappe.log_error(f"on submit called {self.docstatus}", "Sales Invoice")
 		self.validate_pos_paid_amount()
 
 		if not self.auto_repeat:
@@ -241,6 +242,7 @@ class SalesInvoice(SellingController):
 			# 	frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
 
 		try:
+			frappe.log_error("info", "Adding GL entry to queue for Sales Invoice: {0}".format(self.name))
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
 			traceback = frappe.get_traceback()
@@ -292,7 +294,20 @@ class SalesInvoice(SellingController):
 					insurance_si_doc_name=self.name,
 					enqueue_after_commit=True
 				)
-
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.customer_name in ["Unit 5", "Unit 8", "Unit 11"] and self.docstatus == 1:
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_overhead_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_sales_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+	
 	def validate_pos_return(self):
 
 		if self.is_pos and self.is_return:
@@ -1695,3 +1710,4 @@ def create_invoice_discounting(source_name, target_doc=None):
 	})
 
 	return invoice_discounting
+
