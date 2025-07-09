@@ -43,6 +43,9 @@ class JournalEntry(AccountsController):
 		if not self.title:
 			self.title = self.get_title()
 
+		# Check for empty cost center
+		validate_company_cost_center(self)
+
 	def on_submit(self):
 		self.validate_cheque_info()
 		self.check_credit_limit()
@@ -1072,3 +1075,11 @@ def make_reverse_journal_entry(source_name, target_doc=None):
 	}, target_doc)
 
 	return doclist 
+
+
+def validate_company_cost_center(journal_entry):
+	if journal_entry.accounts:
+		default_cost_center = frappe.get_cached_value('Company',  journal_entry.company,  "cost_center")
+		for account in journal_entry.accounts: 
+			if not account.cost_center:
+				account.cost_center=default_cost_center
