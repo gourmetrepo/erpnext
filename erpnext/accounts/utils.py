@@ -1621,8 +1621,8 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"party": pi.get("supplier"),
 							"credit_in_account_currency": "",
 							"credit": 0.0,
-							"debit_in_account_currency": inter_unit_payable,
-							"debit": inter_unit_payable,
+							"debit_in_account_currency": total_payable_amount,
+							"debit": total_payable_amount,
 							"is_advance": "No",
 							"against_account": "",
 							"reference_type": "Purchase Invoice",
@@ -1638,8 +1638,8 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"account": gl_amount.get("account"),
 							"party_type": "Supplier",
 							"party": pi.get("supplier"),
-							"credit_in_account_currency": total_payable_amount,
-							"credit": total_payable_amount,
+							"credit_in_account_currency": inter_unit_payable,
+							"credit": inter_unit_payable,
 							"debit_in_account_currency": "",
 							"debit": 0.0,
 							"is_advance": "No",
@@ -1659,10 +1659,10 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"account": f"9.01.22.001 - Inter Unit Transfer Overheads - U{company_no}",
 							"party_type": "",
 							"party": "",
-							"credit_in_account_currency": "",
-							"credit": 0.0,
-							"debit_in_account_currency": jv_amount,
-							"debit": jv_amount,
+							"credit_in_account_currency": jv_amount,
+							"credit": jv_amount,
+							"debit_in_account_currency": "",
+							"debit": 0.0,
 							"is_advance": "No",
 							"against_account": "",
 							"user_remark": pi.get("name"),
@@ -1755,6 +1755,10 @@ def fetch_amount_from_gl_entry(voucher_type, voucher_no):
 				if "Inter Company Payables" in entry.get("account", "")
 				and entry.get("amount") != 0.0
 			]
+			frappe.log_error(
+				f"Fetched amount from GL Entry: {amount[0].get('amount')} for {voucher_type} {voucher_no}",
+				title=voucher_type + " Fetch Amount"
+			)
 			return amount[0]
 		else:
 			return 0.0
