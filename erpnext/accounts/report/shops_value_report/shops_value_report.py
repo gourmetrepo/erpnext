@@ -59,6 +59,21 @@ SELECT party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT('
                     WHERE account IN ({unit_accounts.get('ng_accounts')})
                     AND DATE(posting_date) ='{today}' AND company='{unit}' AND Voucher_type='Sales Invoice' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
                     GROUP BY  account, party
+
+                    UNION ALL
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
+                    FROM `tabGL Entry` 
+                    WHERE account IN ({unit_accounts.get('icecream')})
+                    AND DATE(posting_date) ='{today}' AND company='{unit}' AND Voucher_type='Payment Entry' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
+                    GROUP BY  account, party
+                
+                    UNION ALL
+                    SELECT party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT('''',Voucher_no, '''' )) AS ref_doc
+                    FROM `tabGL Entry` 
+                    WHERE account IN ({unit_accounts.get('icecream')})
+                    AND DATE(posting_date) ='{today}' AND company='{unit}' AND Voucher_type='Sales Invoice' AND party IN (SELECT DISTINCT customer FROM `tabCustomers Company Assignment` WHERE company='{unit}')
+                    GROUP BY  account, party
+
                     ) AS a
 					INNER JOIN `tabCustomer` AS c ON a.party = c.`name`  
                     GROUP BY party, account""",
