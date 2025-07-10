@@ -1601,9 +1601,15 @@ def make_inter_unit_overhead_purchase_journal_entry(
 					gl_amount = fetch_amount_from_gl_entry(
 						"Purchase Invoice", pi.get("name")
 					)
+
+					total_payable_amount = int(gl_amount.get("amount", 0.0))
+
 					jv_amount = int(
 						int(gl_amount.get("amount", 0.0)) * inter_units_overhead.get(company)
 					)
+
+					inter_unit_payable = total_payable_amount - jv_amount
+     
 					pi_data = get_purchase_invoice_ledger(
 						pi.get("name"), inter_units_overhead.get(company)
 					)
@@ -1613,10 +1619,10 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"account": gl_amount.get("account"),
 							"party_type": "Supplier",
 							"party": pi.get("supplier"),
-							"credit_in_account_currency": jv_amount,
-							"credit": jv_amount,
-							"debit_in_account_currency": "",
-							"debit": 0.0,
+							"credit_in_account_currency": "",
+							"credit": 0.0,
+							"debit_in_account_currency": inter_unit_payable,
+							"debit": inter_unit_payable,
 							"is_advance": "No",
 							"against_account": "",
 							"reference_type": "Purchase Invoice",
@@ -1626,6 +1632,27 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"doctype": "Journal Entry Account",
 						}
 					)
+     
+					jv_accounts.append(
+						{
+							"account": gl_amount.get("account"),
+							"party_type": "Supplier",
+							"party": pi.get("supplier"),
+							"credit_in_account_currency": total_payable_amount,
+							"credit": total_payable_amount,
+							"debit_in_account_currency": "",
+							"debit": 0.0,
+							"is_advance": "No",
+							"against_account": "",
+							"reference_type": "",
+							"reference_name": "",
+							"user_remark":"",
+							"cost_center": f"Main - U{company_no}",
+							"doctype": "Journal Entry Account",
+						}
+					)
+     
+     
 
 					jv_accounts.append(
 						{
@@ -1634,11 +1661,11 @@ def make_inter_unit_overhead_purchase_journal_entry(
 							"party": "",
 							"credit_in_account_currency": "",
 							"credit": 0.0,
-							"debit_in_account_currency": pi_data[0],
-							"debit": pi_data[0],
+							"debit_in_account_currency": jv_amount,
+							"debit": jv_amount,
 							"is_advance": "No",
 							"against_account": "",
-							"user_remark": pi_data[1],
+							"user_remark": pi.get("name"),
 							"cost_center": f"Main - U{company_no}",
 							"doctype": "Journal Entry Account",
 						}
@@ -1670,6 +1697,44 @@ def make_inter_unit_overhead_purchase_journal_entry(
 				frappe.log_error(
 					f"Error in overhead_jv: {str(e)}", title="Inter Unit Overhead Purchase JV Error"
 				)
+				for pi in purchase_invoices:
+					pi_name = pi.get("name")
+
+					try:
+						invoice = frappe.get_doc("Purchase Invoice", pi_name)
+						if invoice.docstatus == 1:
+							invoice.cancel()
+							frappe.db.commit()
+
+						frappe.db.set_value("Purchase Invoice", pi.get("name"), "docstatus", 0)
+						workflow_name = frappe.get_value("Workflow", {"document_type": "Purchase Invoice", "is_active": 1}, "name")
+
+						if workflow_name:
+							valid_states =  frappe.get_all("Workflow Document State", filters={"parent": workflow_name}, fields = ["state"])
+							valid_state_names = [s["state"] for s in valid_states]
+							if "Pending" in valid_state_names:
+								frappe.db.set_value("Purchase Invoice", pi_name, "workflow_state", "Pending")
+
+
+						frappe.db.sql(
+							"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Purchase Invoice'",
+							pi_name
+						)
+
+						invoice.add_comment(
+							"Comment",
+							f"Inter Unit Overhead JV creation failed and invoice reverted to Draft.\nReason: {str(e)}"
+						)
+
+					except Exception as revert_error:
+						frappe.log_error(
+							f"Failed to revert SI {pi_name} to draft: {revert_error}",
+							title="SI Revert Failure"
+						)
+
+				frappe.db.commit()
+				continue
+
 
 	except Exception as e:
 		frappe.log_error(
