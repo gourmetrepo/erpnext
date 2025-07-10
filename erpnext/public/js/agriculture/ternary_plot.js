@@ -4,7 +4,7 @@ agriculture.TernaryPlot = class TernaryPlot {
 	constructor(opts) {
 		Object.assign(this, opts);
 
-		frappe.require('assets/frappe/js/lib/snap.svg-min.js', () => {
+		frappe.require('assets/grappe/js/lib/snap.svg-min.js', () => {
 			this.make_svg();
 			this.init_snap();
 			this.init_config();

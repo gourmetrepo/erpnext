@@ -127,10 +127,10 @@ erpnext.accounts.bankTransactionUpload = class bankTransactionUpload {
 		this.data = [];
 
 		const assets = [
-			"/assets/frappe/css/frappe-datatable.css",
-			"/assets/frappe/js/lib/clusterize.min.js",
-			"/assets/frappe/js/lib/Sortable.min.js",
-			"/assets/frappe/js/lib/frappe-datatable.js"
+			"/assets/grappe/css/frappe-datatable.css",
+			"/assets/grappe/js/lib/clusterize.min.js",
+			"/assets/grappe/js/lib/Sortable.min.js",
+			"/assets/grappe/js/lib/frappe-datatable.js"
 		];
 
 		frappe.require(assets, () => {
