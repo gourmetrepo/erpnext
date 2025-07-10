@@ -77,7 +77,7 @@ def send_job_offer_email(job_offer_name):
     
     if not applicant or not applicant.email:
         frappe.throw("No applicant email found.")
-    subject = f"Job Offer for <strong>{job_offer.position_title}</strong> at Gourmet Pakistan"
+    subject = f"Job Offer for {job_offer.position_title} at Gourmet Pakistan"
     message = f"""
 		<p>Dear {applicant.full_name},</p>
   		<p>I am pleased to extend the following offer of employment to you on behalf of Gourmet Foods. You have been selected for the position of {job_offer.position_title}”.
