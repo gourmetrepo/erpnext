@@ -8,6 +8,7 @@ from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe import _
 from frappe.utils.data import get_link_to_form
+from frappe.utils.pdf import get_pdf
 
 class JobOffer(Document):
 	def on_update_after_submit(self):
@@ -22,8 +23,9 @@ class JobOffer(Document):
 			frappe.throw(_("Job Offer can only be created with status <b>Offered<b>"))
 
 	def on_submit(self):
-		if self.applicant_id:
+		if self.applicant_id:	
 			frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offered")
+		send_job_offer_email(self.name)
 
 	def on_cancel(self):
 		self.offer_status = "Cancelled"
@@ -66,3 +68,47 @@ def make_employee(source_name, target_doc=None):
 				}}
 		}, target_doc, set_missing_values)
 	return doc
+
+
+@frappe.whitelist()
+def send_job_offer_email(job_offer_name):
+    job_offer = frappe.get_doc("Job Offer", job_offer_name)
+    applicant = frappe.get_doc("Job Applicant", job_offer.applicant_id)
+    
+    if not applicant or not applicant.email:
+        frappe.throw("No applicant email found.")
+    subject = f"Job Offer for {job_offer.position_title} at Gourmet Pakistan"
+    message = f"""
+		<p>Dear {applicant.full_name},</p>
+  		<p>I am pleased to extend the following offer of employment to you on behalf of Gourmet Foods. You have been selected for the position of {job_offer.position_title}”.
+		<p>Congratulations!</p>
+  		<p>We believe that your knowledge, skills and experience would be an ideal fit for our team. We hope you will enjoy your role and make a significant contribution to the overall success of Gourmet foods.</p>
+		<p>Please acknowledge the Job offer letter attached, mention your date of joining and share it back after signing it. In case of any query kindly contact me.</p>
+		<br>
+  		<p>Kindly bring 4 Passport size pics , 4 CNIC’s copies , 1 CNIC’s copy of Beneficiary, and all your experience and educational certificates / Letters copies on your date of joining.</p>
+		<br>
+        <p>Best Regards,</p>
+        <p>Human Resources<br>Gourmet Pakistan</p>
+    """
+
+    # Rendering html of print format "Job Offer Template" and sending it as attachment in mail.
+    html = frappe.get_print(
+        "Job Offer", 
+        job_offer_name,
+        print_format="Job Offer Template",
+        as_pdf=False        
+    )
+    pdf_file = get_pdf(html)
+    
+    if not applicant.email:
+        frappe.throw("No applicant email found.")
+    frappe.sendmail(
+        sender="recruitment@gourmetpakistan.com",
+        recipients=applicant.email,
+        subject=subject,
+        message=message,
+        attachments=[{
+            "fname": f"Offer Letter.pdf",
+            "fcontent": pdf_file,
+        }]
+    )
