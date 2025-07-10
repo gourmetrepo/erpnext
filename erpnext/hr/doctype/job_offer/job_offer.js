@@ -1,5 +1,31 @@
 
 frappe.ui.form.on("Job Offer", {
+    refresh: function(frm) {
+        // Custom button to send Job Offer email
+        if (frm.doc.docstatus == 1) {
+            frm.add_custom_button(__('Send Job Offer Email'), function () {
+                frappe.confirm(
+                    'Are you sure you want to send the Job Offer email?',
+                    () => {
+                        frappe.call({
+                            method: 'erpnext.hr.doctype.job_offer.job_offer.send_job_offer_email', 
+                            args: {
+                                job_offer_name: frm.doc.name
+                            },
+                            freeze: true,
+                            freeze_message: "Sending Job Offer email...",
+                            callback: function (r) {
+                                if (r.message) {
+                                    frappe.msgprint(r.message);
+                                }
+                            }
+                        });
+                    }
+                );
+            }, __('Actions'));
+        }
+    },
+
     setup: function(frm) {
         frm.set_query("terms_and_conditions", function() {
             return {
