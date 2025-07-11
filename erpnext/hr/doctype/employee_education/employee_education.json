@@ -5,14 +5,13 @@
  "engine": "InnoDB",
  "field_order": [
   "school_univ",
-  "specialization",
-  "type",
   "qualification",
+  "type",
+  "maj_opt_subj",
   "level",
   "currently_enrolled",
   "year_of_passing",
   "class_per",
-  "maj_opt_subj",
   "is_highest_education",
   "is_relevent_to_job"
  ],
@@ -38,6 +37,7 @@
   {
    "fieldname": "level",
    "fieldtype": "Select",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Level",
    "oldfieldname": "level",
@@ -47,6 +47,7 @@
   {
    "fieldname": "year_of_passing",
    "fieldtype": "Int",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Year of Passing",
    "oldfieldname": "year_of_passing",
@@ -56,7 +57,7 @@
    "fieldname": "class_per",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Class / Percentage",
+   "label": "CGPA/ Percentage",
    "oldfieldname": "class_per",
    "oldfieldtype": "Data"
   },
@@ -64,14 +65,9 @@
    "fieldname": "maj_opt_subj",
    "fieldtype": "Text",
    "in_list_view": 1,
-   "label": "Major/Optional Subjects",
+   "label": "Specialization",
    "oldfieldname": "maj_opt_subj",
    "oldfieldtype": "Text"
-  },
-  {
-   "fieldname": "specialization",
-   "fieldtype": "Data",
-   "label": "Specialization"
   },
   {
    "fieldname": "type",
@@ -100,7 +96,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-07-01 17:19:04.865983",
+ "modified": "2025-07-04 15:59:13.935336",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee Education",

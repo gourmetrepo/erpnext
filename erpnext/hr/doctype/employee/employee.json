@@ -25,6 +25,11 @@
   "employment_type",
   "gender",
   "date_of_birth",
+  "marital_status",
+  "husband_name",
+  "nationality",
+  "religion",
+  "blood_group",
   "date_of_joining",
   "emergency_contact_details",
   "emergency_phone_number",
@@ -73,21 +78,23 @@
   "personal_email",
   "unsubscribed",
   "column_break4",
-  "permanent_accommodation_type",
-  "permanent_address",
+  "current_address",
   "current_accommodation_type",
   "residing_city",
+  "permanent_address",
+  "permanent_accommodation_type",
+  "identity_documents_section",
   "sb53",
-  "current_address",
   "bio",
+  "social_profile_section",
+  "about_me",
+  "employee_interests",
   "personal_details",
   "passport_number",
   "date_of_issue",
   "valid_upto",
   "place_of_issue",
   "column_break6",
-  "marital_status",
-  "blood_group",
   "family_background",
   "health_details",
   "educational_qualification",
@@ -554,7 +561,7 @@
    "description": "Short biography for website and other publications.",
    "fieldname": "bio",
    "fieldtype": "Text Editor",
-   "label": "Bio / Cover Letter"
+   "label": "Cover Letter"
   },
   {
    "collapsible": 1,
@@ -802,12 +809,53 @@
    "fieldtype": "Link",
    "label": "Residing City",
    "options": "City"
+  },
+  {
+   "fieldname": "husband_name",
+   "fieldtype": "Data",
+   "label": "Husband Name"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "social_profile_section",
+   "fieldtype": "Section Break",
+   "label": "Social Profile"
+  },
+  {
+   "fieldname": "about_me",
+   "fieldtype": "Small Text",
+   "label": "About Me"
+  },
+  {
+   "fieldname": "employee_interests",
+   "fieldtype": "Table",
+   "label": "Interests",
+   "options": "Employee Interests"
+  },
+  {
+   "fieldname": "nationality",
+   "fieldtype": "Link",
+   "label": "Nationality",
+   "options": "Country",
+   "reqd": 1
+  },
+  {
+   "fieldname": "religion",
+   "fieldtype": "Select",
+   "label": "Religion",
+   "options": "\nIslam\nChristianity\nHinduism\nBuddhism\nJudaism\nSikhism\nOther"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "identity_documents_section",
+   "fieldtype": "Section Break",
+   "label": "Identity Documents"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-07-02 21:49:02.855314",
+ "modified": "2025-07-04 16:11:39.399570",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",

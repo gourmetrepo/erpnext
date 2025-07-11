@@ -25,12 +25,14 @@
   "middle_name",
   "last_name",
   "full_name",
+  "father_name",
   "date_of_birth",
   "column_break_69",
   "gender",
   "religion",
   "blood_group",
   "marital_status",
+  "husband_name",
   "identity_details_section",
   "nationality",
   "place_of_birth",
@@ -235,6 +237,7 @@
   {
    "fieldname": "place_of_issue",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Place of Issue"
   },
   {
@@ -529,13 +532,23 @@
   {
    "fieldname": "required_competencies",
    "fieldtype": "Table",
-   "label": "Required Competencies",
+   "label": "Competencies",
    "options": "Competencies"
+  },
+  {
+   "fieldname": "father_name",
+   "fieldtype": "Data",
+   "label": "Father Name"
+  },
+  {
+   "fieldname": "husband_name",
+   "fieldtype": "Data",
+   "label": "Husband Name"
   }
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-06-25 18:29:44.362648",
+ "modified": "2025-07-08 14:27:37.870345",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
