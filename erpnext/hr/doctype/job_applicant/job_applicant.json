@@ -204,7 +204,7 @@
    "fieldname": "marital_status",
    "fieldtype": "Select",
    "label": "Marital Status",
-   "options": "\nSingle\nMarried\nDivorced\nWindowed",
+   "options": "\nSingle\nMarried\nDivorced\nWidowed",
    "reqd": 1
   },
   {
@@ -548,7 +548,7 @@
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-07-08 14:27:37.870345",
+ "modified": "2025-07-11 16:01:57.420386",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
