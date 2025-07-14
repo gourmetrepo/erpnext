@@ -96,6 +96,32 @@ class PaymentEntry(AccountsController):
 		self.update_payment_schedule()
 		self.set_status()
 		self.update_payment_order_amount()
+		if self.mode_of_payment == "Wire Transfer":
+			# park entry to the HBL integration
+			from nrp_manufacturing.hbl import send_request
+			import re
+			from datetime import datetime
+			# if data.get("supplier_bank_code") == "054":
+				# lft_or_ibft = "IFT"
+			# else:
+			# 	lft_or_ibft = "IBFT"
+			lft_or_ibft = "IFT"
+			posting_date = datetime.strptime(self.posting_date,"%Y-%m-%d")
+			payment_order_reference = posting_date.strftime("%m")
+			payment_order_reference += posting_date.strftime("%y")
+			payment_order_reference += lft_or_ibft
+			payment_order_reference += re.sub(r"\D", "", self.payment_order)
+			hbl_data = {
+				"payment_entry_name": self.name.replace("-",""),
+				"payment_order_reference": payment_order_reference,
+				"supplier_name": self.party_name,
+				"supplier_address": "",
+				"supplier_bank_code":"",
+				"supplier_bank_account":"",
+				"payment_purpose":"",
+				"transaction_month":posting_date.strftime("%m")
+			}
+			send_request(hbl_data)
 
 	def on_cancel(self):
 		self.setup_party_account_field()
