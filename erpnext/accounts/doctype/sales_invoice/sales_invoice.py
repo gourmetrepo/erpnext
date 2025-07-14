@@ -164,7 +164,6 @@ class SalesInvoice(SellingController):
 		self.queue_action('submit',queue_name="si_tertiary",ignore_workflow=ignore_workflow)
 
 	def on_submit(self):
-		frappe.log_error(f"on submit called {self.docstatus}", "Sales Invoice")
 		self.validate_pos_paid_amount()
 
 		if not self.auto_repeat:
@@ -242,7 +241,6 @@ class SalesInvoice(SellingController):
 			# 	frappe.db.set_value("Sales Invoice", self.name, "freight_ref_jv", jv_freight.name)
 
 		try:
-			frappe.log_error("info", "Adding GL entry to queue for Sales Invoice: {0}".format(self.name))
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
 			traceback = frappe.get_traceback()
