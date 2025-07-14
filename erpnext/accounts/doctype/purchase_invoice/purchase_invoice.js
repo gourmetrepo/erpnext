@@ -31,7 +31,7 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 			return {
 				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					company: this.frm.doc.company
+					company: doc.company
 				}
 			};
 		};
