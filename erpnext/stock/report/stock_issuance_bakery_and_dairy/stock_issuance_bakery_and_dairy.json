@@ -1,0 +1,129 @@
+{
+ "add_total_row": 1,
+ "creation": "2025-07-08 16:11:59.425413",
+ "disable_prepared_report": 1,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2025-07-08 16:11:59.425413",
+ "modified_by": "Administrator",
+ "module": "Stock",
+ "name": "Stock Issuance Bakery And Dairy",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Stock Entry",
+ "report_name": "Stock Issuance Bakery And Dairy",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Stock User"
+  },
+  {
+   "role": "Manufacturing Manager"
+  },
+  {
+   "role": "Manufacturing User"
+  },
+  {
+   "role": "Stock Manager"
+  },
+  {
+   "role": "Store User"
+  },
+  {
+   "role": "Sales User"
+  },
+  {
+   "role": "Store Manager"
+  },
+  {
+   "role": "Shipping User"
+  },
+  {
+   "role": "Shipping Manager"
+  },
+  {
+   "role": "Admin Manager"
+  },
+  {
+   "role": "Admin User"
+  },
+  {
+   "role": "System Auditor"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Director Sales & Marketing"
+  },
+  {
+   "role": "Auditor"
+  },
+  {
+   "role": "CEO"
+  },
+  {
+   "role": "Head of Procurement"
+  },
+  {
+   "role": "Purchase User"
+  },
+  {
+   "role": "SSAM Manager"
+  },
+  {
+   "role": "Configuration Manager"
+  },
+  {
+   "role": "Director IT"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "CFO"
+  },
+  {
+   "role": "Director Finance"
+  },
+  {
+   "role": "Live Cake Shop Admin"
+  },
+  {
+   "role": "Quality User"
+  },
+  {
+   "role": "S&S Rights Only Repot"
+  },
+  {
+   "role": "SSAM User"
+  },
+  {
+   "role": "Director"
+  },
+  {
+   "role": "HOD"
+  },
+  {
+   "role": "Director A-2"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Engineer"
+  },
+  {
+   "role": "AM Engineer"
+  },
+  {
+   "role": "Plant Head"
+  },
+  {
+   "role": "Engineering Manager"
+  }
+ ]
+}

@@ -28,8 +28,13 @@ class Asset(AccountsController):
 
 		self.status = self.get_status()
 
+		# Code by Moeiz to validate project is non group
+		validate_project(self)
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
+
+	def before_save(self):
+		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amount
 
 	def on_submit(self):
 		self.validate_in_use_date()
@@ -43,6 +48,9 @@ class Asset(AccountsController):
 				traceback = frappe.get_traceback()
 				frappe.log_error(message=traceback,title='Exc GL entry Adding Queue'+str(self.name))
 				self.add_comment('Comment', _('Action Failed') + '<br><br>' + traceback)
+		
+		# Update project master data with assets
+		update_assets_in_project(self)
 
 	def before_cancel(self):
 		self.cancel_auto_gen_movement()
@@ -797,3 +805,53 @@ def validate_company_cost_center_and_accounts(asset):
 
 	if asset.cost_center and asset.cost_center not in cost_centers:
 		frappe.throw(_("Cost Center {0} does not belong to company {1}").format(asset.cost_center, company))
+
+
+def validate_project(doc):
+	if doc.project:
+		is_group_project = frappe.db.get_value("Project", doc.project, "is_group")
+		if is_group_project:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(doc.project))
+
+def update_assets_in_project(asset):
+	if asset.project:
+		# Check if the project exists
+		project = frappe.get_doc("Project", asset.project)
+		if not project:
+			frappe.throw(_("Project {0} does not exist.").format(asset.project))
+
+		project_assets = project.project_assets
+		found = False
+		sum_of_asset_gross_values = 0
+		for project_asset in project_assets:
+			if project_asset.asset_id == asset.name:
+				project_asset.asset_name =  asset.asset_name
+				project_asset.gross_value = asset.asset_gross_value
+				found = True
+			
+			sum_of_asset_gross_values += project_asset.gross_value
+		
+		
+		if not found:
+			project_asset_doc = frappe.new_doc("Project Assets")
+			estimated_cost = 0
+			actual_cost = 0
+			if sum_of_asset_gross_values > 0:
+				estimated_cost = project.estimated_costing / sum_of_asset_gross_values * asset.asset_gross_value
+				actual_cost = asset.asset_gross_value + estimated_cost
+			else:
+				estimated_cost = project.estimated_costing / asset.asset_gross_value * asset.asset_gross_value
+				actual_cost = asset.asset_gross_value + estimated_cost
+			
+			project_asset_doc.update({
+				"asset_id": asset.name,
+				"asset_name": asset.asset_name,
+				"gross_value": asset.asset_gross_value,
+				"estimated_cost": estimated_cost,
+				"actual_cost": actual_cost
+
+			})
+			project.append("project_assets", project_asset_doc)
+			project.save()
+
+		

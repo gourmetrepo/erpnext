@@ -32,14 +32,19 @@ frappe.ui.form.on("Delivery Note", {
 		});
 		erpnext.queries.setup_warehouse_query(frm);
 
-		frm.set_query('project', function(doc) {
+		/*
+		Code by Moeiz
+		Project Module updated
+		*/
+		frm.fields_dict['project'].get_query = function() {
 			return {
-				query: "erpnext.controllers.queries.get_project_name",
+				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					'customer': doc.customer
+					company: frm.doc.company,
+					customer: frm.doc.customer
 				}
 			}
-		})
+		}
 		frm.set_query('vehicle',function(doc){
 			return {
 				filters: {
@@ -95,7 +100,16 @@ frappe.ui.form.on("Delivery Note", {
 			}
 		});
 
-
+		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company,
+					customer: frm.doc.customer
+				}
+			};
+		};
 	},
 	validate: function (frm) {
         if (!frm.doc.is_return) {

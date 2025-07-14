@@ -26,6 +26,14 @@ frappe.ui.form.on("Project", {
 				}
 			}
 		});
+
+		frm.set_query('parent_project', function () {
+			return {
+				filters: {
+					"is_group": true
+				}
+			};
+		});
 		var so = frappe.meta.get_docfield("Project", "sales_order");
 		so.get_route_options_for_new_doc = function (field) {
 			if (frm.is_new()) return;
@@ -118,6 +126,15 @@ frappe.ui.form.on("Project", {
 				});
 			}
 		}
+
+        frm.add_custom_button('Project Executive Summary', function() {
+            frappe.after_ajax(() => {
+                frappe.set_route('query-report', 'Project Executive Summary');
+                setTimeout(() => {
+                    frappe.query_report.set_filter_value('project', frm.doc.name);
+                }, 500);
+            });
+        });
 	},
 	import_type: function(frm){
 		if (frm.doc.import_type == 'Letter of Credit'){
@@ -174,7 +191,7 @@ frappe.ui.form.on("Project", {
 			frm.set_df_property('clearing_account', 'reqd', 0);
 			frm.set_df_property('clearing_account', 'hidden', 1);
 		}
-	},
+	}
 });
 
 function open_form(frm, doctype, child_doctype, parentfield) {

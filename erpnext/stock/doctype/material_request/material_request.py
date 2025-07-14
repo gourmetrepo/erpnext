@@ -76,6 +76,15 @@ class MaterialRequest(BuyingController):
 		validate_for_items(self)
 
 		self.set_title()
+		
+		# Code by Moeiz to validate non group projects
+		if self.project:
+			validate_project(self)
+		# Code by Moeiz to validate project based material requests
+		if self.project_based:
+			validate_project_based_material_request(self)
+		
+		
 		validate_company_cost_center_and_accounts(self)
 		# self.validate_qty_against_so()
 		# NOTE: Since Item BOM and FG quantities are combined, using current data, it cannot be validated
@@ -294,7 +303,7 @@ def make_purchase_order(source_name, target_doc=None):
 						mri.item_code = dri.item_code AND dri.company='{0}'  AND dri.supplier_code = '{1}' AND dri.docstatus = 1 
 					WHERE 
 						mri.item_code = '{2}' 
-      					AND mri.parent= '{3}'
+	  					AND mri.parent= '{3}'
 						AND mri.docstatus = 1 
 				""".format(data_dict['company'],data_dict['supplier'],d.item_code,source_name )
 			buying_rate_check = frappe.db.sql(sql_query,as_dict=True)
@@ -591,29 +600,72 @@ def validate_company_cost_center_and_accounts(self):
 
 @frappe.whitelist()
 def update_project_reference(project_id, docname):
-    """Updates the project reference in Material Request Items and returns a response"""
-    if not project_id or not docname:
-        return {"status": "error", "message": _("Missing required parameters.")}
+	"""Updates the project reference in Material Request Items and returns a response"""
+	""" Project would be updated on parent as well as child table in MR and will also enable project_based material request.
+		It will also replicate these changes on POs from this MR """
+	if not project_id or not docname:
+		return {"status": "error", "message": _("Missing required parameters.")}
 
-    try:
-        user = frappe.session.user
-        
-        frappe.db.sql("""
-            UPDATE `tabMaterial Request Item`
-            SET project = %s
-            WHERE parent = %s
-        """, (project_id, docname))
+	try:
+		user = frappe.session.user
+		
+		frappe.db.sql("""
+			UPDATE `tabMaterial Request Item`
+			SET project = %s
+			WHERE parent = %s
+		""", (project_id, docname))
 
-        frappe.db.commit()
-        doc = frappe.get_doc("Material Request", docname)
-        doc.add_comment("Comment", text=f"Project field updated to {project_id} by {user}")
-        frappe.db.commit()
+		frappe.db.sql(f"""
+			UPDATE `tabMaterial Request`
+			SET project = {frappe.db.escape(project_id)}, project_based = 1
+			WHERE `name` = {frappe.db.escape(docname)}
+		""")
 
-        return {"status": "success", "message": _("Project updated successfully!")}
+		frappe.db.sql(
+			f"""
+			UPDATE `tabPurchase Order Item` 
+			SET `project` = {frappe.db.escape(project_id)}
+			WHERE `material_request` = {frappe.db.escape(docname)}
+			"""
+		)
 
-    except frappe.DoesNotExistError:
-        return {"status": "error", "message": _("Document not found.")}
+		frappe.db.sql(
+			f"""
+			UPDATE `tabPurchase Order` 
+			SET `project_based` = 1
+			WHERE `name` in (select `parent` from `tabPurchase Order Item` where `material_request` = {frappe.db.escape(docname)})
+			"""
+		)
 
-    except Exception as e:
-        frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
-        return {"status": "error", "message": str(e)}
+		frappe.db.commit()
+		doc = frappe.get_doc("Material Request", docname)
+		doc.add_comment("Comment", text=f"Project field updated to {project_id} by {user}")
+		frappe.db.commit()
+
+		return {"status": "success", "message": _("Project updated successfully!")}
+
+	except frappe.DoesNotExistError:
+		return {"status": "error", "message": _("Document not found.")}
+
+	except Exception as e:
+		frappe.log_error(f"Error updating project reference: {str(e)}", "Update Project Reference")
+		return {"status": "error", "message": str(e)}
+
+
+# Code by Moeiz to validate project based material requests
+def validate_project_based_material_request(mr):
+	"""Validate project based material requests"""
+	if not mr.project:
+		frappe.throw(_("Project is required for project based material request."))
+
+	for item in mr.items:
+		if not item.project or item.project != mr.project:
+			item.project = mr.project
+
+
+
+def validate_project(mr):
+	if mr.project:
+		is_project = frappe.db.get_value("Project", mr.project, "is_group")
+		if is_project:
+			frappe.throw(_("Project {0} is a group project. Please select a non-group project.").format(mr.project))

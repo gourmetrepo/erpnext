@@ -542,6 +542,28 @@ if (frm.doc.docstatus === 0) {
 			frm.fields_dict['items'].grid.toggle_enable('uom', false);
 			
 		}
+
+		// Code by Moeiz
+		// Only allow non group projects in project LOV
+		frm.fields_dict['project'].get_query = function() {
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+		frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
+		
+			return {
+				query: "erpnext.projects.doctype.project.project.get_projects",
+				filters: {
+					company: frm.doc.company
+				}
+			};
+		};
+
+
 	},
 
 	purpose: function(frm) {

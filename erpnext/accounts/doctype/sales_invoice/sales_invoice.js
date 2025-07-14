@@ -514,24 +514,29 @@ cur_frm.fields_dict.write_off_cost_center.get_query = function(doc) {
 	}
 }
 
-// project name
-//--------------------------
-cur_frm.fields_dict['project'].get_query = function(doc, cdt, cdn) {
-	return{
-		query: "erpnext.controllers.queries.get_project_name",
-		filters: {'customer': doc.customer}
-	}
-}
+/*
+Code by Moeiz
+Project Module updated
+*/
+cur_frm.fields_dict['project'].get_query = function() {
+	return {
+		query: "erpnext.projects.doctype.project.project.get_projects",
+		filters: {
+			company: cur_frm.doc.company,
+			customer: cur_frm.doc.customer
+		}
+	};
+};
+cur_frm.fields_dict['items'].grid.get_field('project').get_query = function(doc, cdt, cdn) {
 
-// Income Account in Details Table
-// --------------------------------
-cur_frm.set_query("income_account", "items", function(doc) {
-	return{
-		query: "erpnext.controllers.queries.get_income_account",
-		filters: {'company': doc.company}
-	}
-});
-
+	return {
+		query: "erpnext.projects.doctype.project.project.get_projects",
+		filters: {
+			company: cur_frm.doc.company,
+			customer: cur_frm.doc.customer
+		}
+	};
+};
 
 // Cost Center in Details Table
 // -----------------------------

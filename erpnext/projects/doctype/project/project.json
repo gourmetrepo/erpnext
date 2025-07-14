@@ -7,6 +7,9 @@
  "document_type": "Setup",
  "engine": "InnoDB",
  "field_order": [
+  "is_group",
+  "old_parent",
+  "parent_project",
   "project_name",
   "company",
   "status",
@@ -61,7 +64,11 @@
   "day_to_send",
   "weekly_time_to_send",
   "column_break_45",
-  "message"
+  "message",
+  "assets_section",
+  "project_assets",
+  "lft",
+  "rgt"
  ],
  "fields": [
   {
@@ -439,15 +446,62 @@
    "fieldname": "message",
    "fieldtype": "Text",
    "label": "Message"
+  },
+  {
+   "fieldname": "assets_section",
+   "fieldtype": "Section Break",
+   "label": "Assets"
+  },
+  {
+   "fieldname": "project_assets",
+   "fieldtype": "Table",
+   "label": "Project Assets",
+   "options": "Project Assets"
+  },
+  {
+   "fieldname": "lft",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Left",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rgt",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Right",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_group",
+   "fieldtype": "Check",
+   "label": "Is Group"
+  },
+  {
+   "fieldname": "old_parent",
+   "fieldtype": "Link",
+   "label": "Old Parent",
+   "options": "Project"
+  },
+  {
+   "fieldname": "parent_project",
+   "fieldtype": "Link",
+   "label": "Parent Project",
+   "options": "Project"
   }
  ],
  "icon": "fa fa-puzzle-piece",
  "idx": 29,
+ "is_tree": 1,
  "max_attachments": 4,
- "modified": "2024-12-05 13:01:42.215114",
+ "modified": "2025-07-08 16:47:44.669478",
  "modified_by": "Administrator",
  "module": "Projects",
  "name": "Project",
+ "nsm_parent_field": "parent_project",
  "owner": "Administrator",
  "permissions": [
   {
