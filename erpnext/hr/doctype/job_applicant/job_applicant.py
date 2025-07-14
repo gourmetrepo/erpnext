@@ -16,6 +16,8 @@ import json
 
 class JobApplicant(Document):
 	def autoname(self):
+		if not self.full_name:
+			self.update_full_name()
 		full_name = self.full_name or ""
 		position_title = self.position_title or ""
 		self.series = f"{self.email}-.#####"
@@ -51,7 +53,10 @@ class JobApplicant(Document):
 		
 		if total_experience:
 			self.total_work_experience_years = flt(total_experience / 365, 1)
-
+   
+	def update_full_name(self):
+		names = [self.first_name, self.middle_name, self.last_name]
+		self.full_name = ' '.join(name for name in names if name)
 
 @frappe.whitelist()
 def update_job_applicant_status_to_career_portal(doc, method=None):
