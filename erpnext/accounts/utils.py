@@ -922,6 +922,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 				AND si.company IN ({units})
 				AND si.docstatus=1
 				AND si.outstanding_amount != 0
+				AND so.order_type = 'Inter Unit Sales'
 				AND so.transaction_date >= '2025-05-05'
 				GROUP BY si.name""",
 			as_dict=True
@@ -1040,10 +1041,10 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
 			jv_accounts.append({
 				"account": round_off_account,
-				"debit": abs(rounding_difference) if rounding_difference > 0 else 0.0,
-				"credit": abs(rounding_difference )if rounding_difference < 0 else 0.0,
-				"debit_in_account_currency": rounding_difference if rounding_difference > 0 else 0.0,
-				"credit_in_account_currency": rounding_difference if rounding_difference < 0 else 0.0,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
 				"cost_center": f"Main - U{company_no}",
 				"doctype": "Journal Entry Account",
 				"is_advance": "No",
@@ -1097,6 +1098,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 				AND si.company IN ({units})
 				AND si.docstatus=1
 				AND si.outstanding_amount != 0
+				AND so.order_type = 'Inter Unit Sales'
 				AND so.transaction_date >= '2025-05-05'
 				GROUP BY si.name""",
 			as_dict=True
@@ -1169,6 +1171,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 			WHERE si.name = "{sales_invoice}"
 			AND si.customer_name IN ({units})
 			AND si.docstatus = 1
+			AND so.order_type = 'Inter Unit Sales'
 			AND so.transaction_date >= '2025-05-05'
 			AND si.outstanding_amount != 0
 			{condition}
@@ -1291,10 +1294,10 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
 			jv_accounts.append({
 				"account": round_off_account,
-				"debit": abs(rounding_difference) if rounding_difference > 0 else 0.0,
-				"credit": abs(rounding_difference )if rounding_difference < 0 else 0.0,
-				"debit_in_account_currency": rounding_difference if rounding_difference > 0 else 0.0,
-				"credit_in_account_currency": rounding_difference if rounding_difference < 0 else 0.0,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
 				"cost_center": f"Main - U{company_no}",
 				"doctype": "Journal Entry Account",
 				"is_advance": "No",
@@ -1589,10 +1592,10 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
 			jv_accounts.append({
 				"account": round_off_account,
-				"debit": abs(rounding_difference) if rounding_difference > 0 else 0.0,
-				"credit": abs(rounding_difference )if rounding_difference < 0 else 0.0,
-				"debit_in_account_currency": rounding_difference if rounding_difference > 0 else 0.0,
-				"credit_in_account_currency": rounding_difference if rounding_difference < 0 else 0.0,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
 				"cost_center": f"Main - U{company_no}",
 				"doctype": "Journal Entry Account",
 				"is_advance": "No",
