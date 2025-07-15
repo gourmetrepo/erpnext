@@ -149,17 +149,16 @@ def get_columns(filters):
 		"""return columns based on filters"""
 		
 		columns = [
-			("Posting Date") + "::120",
-			("Day Diff") + "::120",
-			("Company") + "::120",
-			("Ref Doc") + "::120",
-			("Supplier") + "::120",
-			("Supplier Name") + "::320",
-			("Amount") + ":Currency:120",
-			("Amount Paid") + ":Currency:120",
-			("Stock Value") + ":Currency:120",
-			# ("Account") + "::330",
-			("GL Balance") + ":Currency:120"
+		
+			{"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Date",  "width": 120},
+			{"label": "Day Diff", "fieldname": "day_diff", "fieldtype": "Data",  "width": 120},
+			{"label": "Ref Doc", "fieldname": "ref_doc", "fieldtype": "Data", "width": 120},
+			{"label": "Supplier", "fieldname": "Supplier", "fieldtype": "Data",  "width": 120},
+			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data", "precision":"0", "align": "right", "width": 320},
+			{"label": "Amount", "fieldname": "amount", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
+			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
+			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
+			{"label": "GL Balance", "fieldname": "gl_balance", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120}
 		]
 
 
