@@ -20,7 +20,7 @@ def execute(filters=None):
     SELECT * FROM (
         SELECT 
             pmodiffstock.*,
-            IFNULL(SUM(gl.credit - gl.debit), 0) AS gl_balance
+            IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
 
 
         FROM (
@@ -79,7 +79,7 @@ def execute(filters=None):
         UNION ALL
         SELECT 
             expdiffstock.*,
-           IFNULL(SUM(gl.credit - gl.debit), 0) AS gl_balance
+           IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
 
 
         FROM (
@@ -155,11 +155,11 @@ def get_columns(filters):
 			("Ref Doc") + "::120",
 			("Supplier") + "::120",
 			("Supplier Name") + "::320",
-			("Amount") + "::120",
-			("Amount Paid") + "::120",
-			("Stock Value") + "::120",
+			("Amount") + ":Currency:120",
+			("Amount Paid") + ":Currency:120",
+			("Stock Value") + ":Currency:120",
 			# ("Account") + "::330",
-			("GL Balance") + "::120"
+			("GL Balance") + ":Currency:120"
 		]
 
 
