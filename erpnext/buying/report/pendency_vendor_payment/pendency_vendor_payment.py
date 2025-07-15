@@ -13,7 +13,7 @@ def execute(filters=None):
 	if filters.get("company") == "ALL":
 		company = f" and m.company IN ('Unit 5', 'Unit 8', 'Unit 11')"
 	else:
-		company = f"""and  m.company='{filters.get('company')}'"""
+		company = f""" and  m.company='{filters.get('company')}'"""
 	data = []
 	data = frappe.db.sql(
                 f"""SELECT * FROM (SELECT pmodiffstock.*,gl.account,SUM(credit-debit) AS balance FROM (SELECT PMOdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stockvalue FROM `tabStock Ledger Entry` AS sle
