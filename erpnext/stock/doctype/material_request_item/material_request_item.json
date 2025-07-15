@@ -46,7 +46,7 @@
   "expense_account",
   "accounting_dimensions_section",
   "project",
-  "lease_contract_references",
+  "lease_contract_documents",
   "dimension_col_break",
   "cost_center",
   "section_break_37",
@@ -408,7 +408,7 @@
    "label": "Manufacturer Part Number"
   },
   {
-   "fieldname": "lease_contract_references",
+   "fieldname": "lease_contract_documents",
    "fieldtype": "Table MultiSelect",
    "label": "Lease Contract References",
    "options": "Lease Contract Request"
@@ -416,7 +416,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-07-15 14:39:31.163450",
+ "modified": "2025-07-15 16:11:24.144637",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Material Request Item",
