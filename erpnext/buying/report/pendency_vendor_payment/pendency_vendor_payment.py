@@ -33,7 +33,7 @@ def execute(filters=None):
                 PMOdiff.supplier_name,
                 PMOdiff.amount,
                 PMOdiff.amount_paid,
-                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stock_value
 
             FROM (
                 SELECT 
@@ -92,7 +92,7 @@ def execute(filters=None):
                 expdiff.supplier_name,
                 expdiff.amount,
                 expdiff.amount_paid,
-                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stock_value
 
             FROM (
                 SELECT 
@@ -154,7 +154,7 @@ def get_columns(filters):
 			{"label": "Day Diff", "fieldname": "day_diff", "fieldtype": "Data",  "width": 120},
 			{"label": "Ref Doc", "fieldname": "ref_doc", "fieldtype": "Data", "width": 120},
 			{"label": "Supplier", "fieldname": "supplier", "fieldtype": "Data",  "width": 120},
-			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data", "precision":"0", "align": "right", "width": 320},
+			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data",  "width": 320},
 			{"label": "Amount", "fieldname": "amount", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
