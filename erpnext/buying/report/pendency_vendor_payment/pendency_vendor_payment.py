@@ -60,16 +60,16 @@ def get_columns(filters):
 		"""return columns based on filters"""
 		
 		columns = [
-			("Posting Date") + "::200",
+			("Posting Date") + "::120",
 			("Day Diff") + "::120",
 			("Company") + "::120",
 			("Ref Doc") + "::120",
 			("Supplier") + "::120",
-			("Supplier Name") + "::120",
+			("Supplier Name") + "::320",
 			("Amount") + "::120",
 			("Amount Paid") + "::120",
 			("Stock Value") + "::120",
-			("Account") + "::120",
+			("Account") + "::330",
 			("Balance") + "::120"
 		]
 
