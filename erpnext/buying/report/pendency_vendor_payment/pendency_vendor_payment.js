@@ -7,7 +7,8 @@ frappe.query_reports["Pendency Vendor Payment"] = {
 	{
 			fieldname: "company",
 			label: __("Company"),
-			fieldtype: "Link",
+			// fieldtype: "Link",
+			 fieldtype: "MultiSelectList",
 			options: "Company",
 			default: frappe.defaults.get_user_default("Company"),
 			reqd: 1
