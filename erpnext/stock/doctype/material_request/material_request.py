@@ -248,7 +248,7 @@ class MaterialRequest(BuyingController):
 						"lease_contract": lease_contract.name,
 						"parent": item.name,
 						"parenttype": "Material Request Item",
-						"parentfield": "lease_contract_references",
+						"parentfield": "lease_contract_documents",
 						"idx": i+1
 					})
 					contract_reference.insert(ignore_permissions=True)
