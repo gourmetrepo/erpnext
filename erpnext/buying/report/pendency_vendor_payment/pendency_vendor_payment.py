@@ -18,8 +18,6 @@ def execute(filters=None):
 	data = []
 	data = frappe.db.sql(f"""
     SELECT * FROM (
-        
-        -- ========== Payment Order Data ==========
         SELECT 
             pmodiffstock.*,
             SUM(gl.credit - gl.debit) AS gl_balance
@@ -78,8 +76,6 @@ def execute(filters=None):
         GROUP BY pmodiffstock.supplier, pmodiffstock.company
 
         UNION ALL
-
-        -- ========== Expense Entry Data ==========
         SELECT 
             expdiffstock.*,
             SUM(gl.credit - gl.debit) AS gl_balance
@@ -141,10 +137,8 @@ def execute(filters=None):
 
     ) AS datanotpaid
 
-    ORDER BY day_diff DESC
-""", as_dict=True)
-	if not data:
-		frappe.throw(_("No records found for the given filters."))
+    ORDER BY day_diff DESC""", as_dict=True,debug=True)
+
 	columns = get_columns(filters)
 	
 	return columns, data
