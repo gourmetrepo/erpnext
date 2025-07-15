@@ -1518,7 +1518,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 		company_no = comp[1]
 
 		if pi.get("item_category") != "Finished Good":
-			frappe.throw(f"Invalid item category '{pi.get('item_category')}' in Purchase Invoice {purchase_invoice}. Only 'Finished Good' allowed.")
+			frappe.log_error( title="Invalid item category", message = f"Invalid item category '{pi.get('item_category')}' in Purchase Invoice {purchase_invoice}. Only 'Finished Good' allowed.")
 			return
 
 		gl_amount = fetch_amount_from_gl_entry("Purchase Invoice", purchase_invoice)

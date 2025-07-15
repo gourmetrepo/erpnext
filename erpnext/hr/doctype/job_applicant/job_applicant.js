@@ -16,6 +16,15 @@ frappe.ui.form.on("Job Applicant", {
             $('input[data-fieldname="cnic"]').mask(frappe.utils.get_config_by_name('CNIC_MASK','99999-9999999-9'),{autoclear: false});
             $('input[data-fieldname="contact"]').mask(frappe.utils.get_config_by_name('CELL_NUMBER_MASK','0399-9999999'),{autoclear: false});
         });	
+
+		if (frm.doc.job_applicant_status == "Offer Accepted") {
+			frm.add_custom_button(__('New Employee'),
+				() => frappe.model.open_mapped_doc({
+					method: 'erpnext.hr.doctype.job_applicant.job_applicant.make_employee',
+					frm: frm
+				}), __('Create')           
+			);
+		}
 	},
 
     before_save: function(frm){
