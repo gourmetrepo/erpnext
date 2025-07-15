@@ -31,7 +31,7 @@ INNER JOIN `tabPayment Order` AS m ON m.name = d.parent
  GROUP BY PMOdiff.supplier,PMOdiff.company ) AS pmodiffstock
  INNER JOIN `tabGL Entry` AS gl ON gl.`party` = pmodiffstock.supplier  AND pmodiffstock.company = gl.`company`
   INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
- GROUP BY gl.account,pmodiffstock.supplier,pmodiffstock.company
+ GROUP BY pmodiffstock.supplier,pmodiffstock.company
  UNION ALL 
  SELECT pmodiffstock.*,round(SUM(credit-debit)) AS balance FROM (SELECT expdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
 INNER JOIN `tabBatch` AS btch ON btch.`batch_id` = sle.`batch_no` AND btch.`supplier` IS NOT NULL 
@@ -49,7 +49,7 @@ INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent
  GROUP BY expdiff.supplier,expdiff.company ) AS pmodiffstock
  INNER JOIN `tabGL Entry` AS gl ON gl.`party` = pmodiffstock.supplier  AND pmodiffstock.company = gl.`company`
   INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
- GROUP BY gl.account,pmodiffstock.supplier,pmodiffstock.company
+ GROUP BY pmodiffstock.supplier,pmodiffstock.company
  ) AS datanotpaid 
  ORDER BY day_diff DESC""",as_dict=True)
 	columns = get_columns(filters)
