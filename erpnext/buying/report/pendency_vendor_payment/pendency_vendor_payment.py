@@ -20,7 +20,7 @@ def execute(filters=None):
     SELECT * FROM (
         SELECT 
             pmodiffstock.*,
-            IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
+            FORMAT(IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0)) AS gl_balance
 
 
         FROM (
@@ -31,9 +31,9 @@ def execute(filters=None):
                 PMOdiff.ref_doc,
                 PMOdiff.supplier,
                 PMOdiff.supplier_name,
-                PMOdiff.amount,
-                PMOdiff.amount_paid,
-                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+                FORMAT(PMOdiff.amount),
+                FORMAT(PMOdiff.amount_paid),
+                FORMAT(ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0)))) AS stockvalue
 
             FROM (
                 SELECT 
@@ -79,7 +79,7 @@ def execute(filters=None):
         UNION ALL
         SELECT 
             expdiffstock.*,
-           IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
+           FORMAT(IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0)) AS gl_balance
 
 
         FROM (
@@ -90,9 +90,9 @@ def execute(filters=None):
                 expdiff.ref_doc,
                 expdiff.supplier,
                 expdiff.supplier_name,
-                expdiff.amount,
-                expdiff.amount_paid,
-                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+                FORMAT(expdiff.amount),
+                FORMAT(expdiff.amount_paid),
+                FORMAT(ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0)))) AS stockvalue
 
             FROM (
                 SELECT 
