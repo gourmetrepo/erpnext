@@ -153,7 +153,7 @@ def get_columns(filters):
 			{"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Date",  "width": 120},
 			{"label": "Day Diff", "fieldname": "day_diff", "fieldtype": "Data",  "width": 120},
 			{"label": "Ref Doc", "fieldname": "ref_doc", "fieldtype": "Data", "width": 120},
-			{"label": "Supplier", "fieldname": "Supplier", "fieldtype": "Data",  "width": 120},
+			{"label": "Supplier", "fieldname": "supplier", "fieldtype": "Data",  "width": 120},
 			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data", "precision":"0", "align": "right", "width": 320},
 			{"label": "Amount", "fieldname": "amount", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
