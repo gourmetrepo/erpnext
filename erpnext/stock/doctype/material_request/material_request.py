@@ -246,9 +246,10 @@ class MaterialRequest(BuyingController):
 					
 					contract_reference = frappe.new_doc("Lease Contract Request").update({
 						"lease_contract": lease_contract.name,
-						"parent": item.name,
-						"parenttype": "Material Request Item",
-						"parentfield": "lease_contract_documents",
+						"parent": self.name,
+						"parenttype": "Material Request",
+						"parentfield": "lease_reference_document",
+						"item": item.item_code,
 						"idx": i+1
 					})
 					contract_reference.insert(ignore_permissions=True)

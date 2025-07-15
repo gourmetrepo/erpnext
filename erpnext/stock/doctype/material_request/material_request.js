@@ -636,6 +636,11 @@ function project_based_configurations(frm){
 // Code by Moeiz
 // Leasing Module Development
 function leasing_finance_changes(frm){
+	frm.set_df_property('lease_reference_document', 'cannot_add_rows', true);
+	frm.set_df_property('lease_reference_document', 'cannot_delete_rows', true);
+	frm.set_df_property('lease_reference_document', 'cannot_delete_all_rows', true);
+	frm.fields_dict['lease_reference_document'].grid.wrapper.find('.grid-remove-rows').hide();
+
 	if(frm.doc.material_request_type === "Lease"){
 		frm.set_df_property('lease_type', 'reqd', 1);
 		frm.set_df_property('lease_type', 'hidden', 0);
