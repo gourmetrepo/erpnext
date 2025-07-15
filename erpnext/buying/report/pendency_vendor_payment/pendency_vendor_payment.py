@@ -57,20 +57,21 @@ INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent
 	return columns, data
 
 def get_columns(filters):
-    """return columns based on filters"""
+		"""return columns based on filters"""
+		
+		columns = [
+		_("Posting Date") + "::200",
+		_("Day Diff") + "::120",
+		_("Company") + "::120",
+		_("Ref Doc") + "::120",
+		_("Supplier") + "::120",
+		_("Supplier Name") + "::120",
+		_("Amount") + "::120",
+		_("Amount Paid") + "::120",
+		_("Stock Value") + "::120",
+		_("Account") + "::120",
+		_("Balance") + "::120"
+		]
 
-    columns = (
-        [_("posting Date") + "::200"]
-        + [_("Day Diff") + "::120"]
-        + [_("Company") + "::120"]
-        + [_("Ref Doc") + "::120"]
-        + [_("Supplier") + "::120"]
-        + [_("Supplier Name") + "::120"]
-        + [_("amount") + "::120"]
-        + [_("amount_paid") + "::120"]
-        + [_("stockvalue") + "::120"]
-        + [_("Account") + "::120"]
-        + [_("Balance") + "::120"]
-    )
 
-    return columns
+		return columns
