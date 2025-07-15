@@ -20,7 +20,8 @@ def execute(filters=None):
     SELECT * FROM (
         SELECT 
             pmodiffstock.*,
-            SUM(gl.credit - gl.debit) AS gl_balance
+            IFNULL(SUM(gl.credit - gl.debit), 0) AS gl_balance
+
 
         FROM (
             SELECT 
@@ -78,7 +79,8 @@ def execute(filters=None):
         UNION ALL
         SELECT 
             expdiffstock.*,
-            SUM(gl.credit - gl.debit) AS gl_balance
+           IFNULL(SUM(gl.credit - gl.debit), 0) AS gl_balance
+
 
         FROM (
             SELECT 
@@ -137,7 +139,7 @@ def execute(filters=None):
 
     ) AS datanotpaid
 
-    ORDER BY day_diff DESC""", as_dict=True,debug=True)
+    ORDER BY day_diff DESC""", as_dict=True)
 
 	columns = get_columns(filters)
 	
