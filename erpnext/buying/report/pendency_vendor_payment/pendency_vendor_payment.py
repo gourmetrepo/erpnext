@@ -16,42 +16,135 @@ def execute(filters=None):
 		company = f""" and  m.company='{filters.get('company')}'"""
 	
 	data = []
-	data = frappe.db.sql(
-                f"""SELECT * FROM (SELECT pmodiffstock.*,round(SUM(debit-credit)) AS gl_balance FROM (SELECT PMOdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
-INNER JOIN `tabBatch` AS btch ON btch.`batch_id` = sle.`batch_no` AND btch.`supplier` IS NOT NULL 
-INNER JOIN (
-SELECT m.posting_date,CONCAT(
-        TIMESTAMPDIFF(MONTH, m.posting_date, CURDATE()), 'M-',
-        DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
-    )  AS day_diff,m.company,d.parent as ref_doc,d.`supplier`,d.`supplier_name`,ROUND(d.`amount`) AS amount,ROUND(d.`amount_paid`) AS amount_paid FROM `tabPayment Order Detail` AS d
-INNER JOIN `tabPayment Order` AS m ON m.name = d.parent 
- WHERE d.amount_paid!=d.amount AND m.docstatus=1  {company} 
- GROUP BY m.posting_date,m.company,d.`supplier`
- ) AS PMOdiff ON PMOdiff.supplier = btch.`supplier` AND PMOdiff.company = btch.`company`
- GROUP BY PMOdiff.supplier,PMOdiff.company ) AS pmodiffstock
- INNER JOIN `tabGL Entry` AS gl ON gl.`party` = pmodiffstock.supplier  AND pmodiffstock.company = gl.`company`
-  INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
- GROUP BY pmodiffstock.supplier,pmodiffstock.company
- UNION ALL 
- SELECT pmodiffstock.*,round(SUM(debit-credit)) AS gl_balance FROM (SELECT expdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
-INNER JOIN `tabBatch` AS btch ON btch.`batch_id` = sle.`batch_no` AND btch.`supplier` IS NOT NULL 
-INNER JOIN (
-SELECT m.posting_date,CONCAT(
-        TIMESTAMPDIFF(MONTH, m.posting_date, CURDATE()), 'M-',
-        DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
-    )  AS day_diff,m.company,d.parent as ref_doc,d.`party`AS supplier,sup.`supplier_name` AS supplier_name,ROUND(d.`amount`) AS amount, 0 AS amount_paid FROM `tabExpense Entry Item` AS d
-INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent 
- INNER JOIN `tabSupplier` sup ON sup.name =  d.`party` 
- WHERE  m.docstatus!=1 AND m.`management_approval_date` IS NOT NULL {company} 
- GROUP BY m.posting_date,m.company,d.`party`
- ) AS expdiff 
- ON expdiff.supplier = btch.`supplier` AND expdiff.company = btch.`company`
- GROUP BY expdiff.supplier,expdiff.company ) AS pmodiffstock
- INNER JOIN `tabGL Entry` AS gl ON gl.`party` = pmodiffstock.supplier  AND pmodiffstock.company = gl.`company`
-  INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
- GROUP BY pmodiffstock.supplier,pmodiffstock.company
- ) AS datanotpaid 
- ORDER BY day_diff DESC""",as_dict=True)
+	data = frappe.db.sql(f"""
+    SELECT * FROM (
+        
+        -- ========== Payment Order Data ==========
+        SELECT 
+            pmodiffstock.*,
+            SUM(gl.credit - gl.debit) AS gl_balance
+
+        FROM (
+            SELECT 
+                PMOdiff.posting_date,
+                PMOdiff.day_diff,
+                PMOdiff.company,
+                PMOdiff.ref_doc,
+                PMOdiff.supplier,
+                PMOdiff.supplier_name,
+                PMOdiff.amount,
+                PMOdiff.amount_paid,
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+
+            FROM (
+                SELECT 
+                    m.posting_date,
+                    CONCAT(
+                        TIMESTAMPDIFF(MONTH, m.posting_date, CURDATE()), 'M-',
+                        DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
+                    ) AS day_diff,
+                    m.company,
+                    d.parent AS ref_doc,
+                    d.supplier,
+                    d.supplier_name,
+                    ROUND(d.amount) AS amount,
+                    ROUND(d.amount_paid) AS amount_paid
+
+                FROM `tabPayment Order Detail` AS d
+                INNER JOIN `tabPayment Order` AS m ON m.name = d.parent
+                WHERE 
+                    d.amount_paid != d.amount
+                    AND m.docstatus = 1
+                    {company}
+
+                GROUP BY m.posting_date, m.company, d.supplier
+            ) AS PMOdiff
+
+            LEFT JOIN `tabBatch` AS btch 
+                ON PMOdiff.supplier = btch.supplier AND PMOdiff.company = btch.company
+
+            LEFT JOIN `tabStock Ledger Entry` AS sle 
+                ON btch.batch_id = sle.batch_no
+
+            GROUP BY PMOdiff.supplier, PMOdiff.company
+        ) AS pmodiffstock
+
+        LEFT JOIN `tabGL Entry` AS gl 
+            ON gl.party = pmodiffstock.supplier AND pmodiffstock.company = gl.company
+
+        LEFT JOIN `tabAccount` AS acc 
+            ON acc.name = gl.account AND acc.account_type IN ('Payable', 'Receivable')
+
+        GROUP BY pmodiffstock.supplier, pmodiffstock.company
+
+        UNION ALL
+
+        -- ========== Expense Entry Data ==========
+        SELECT 
+            expdiffstock.*,
+            SUM(gl.credit - gl.debit) AS gl_balance
+
+        FROM (
+            SELECT 
+                expdiff.posting_date,
+                expdiff.day_diff,
+                expdiff.company,
+                expdiff.ref_doc,
+                expdiff.supplier,
+                expdiff.supplier_name,
+                expdiff.amount,
+                expdiff.amount_paid,
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
+
+            FROM (
+                SELECT 
+                    m.posting_date,
+                    CONCAT(
+                        TIMESTAMPDIFF(MONTH, m.posting_date, CURDATE()), 'M-',
+                        DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
+                    ) AS day_diff,
+                    m.company,
+                    d.parent AS ref_doc,
+                    d.party AS supplier,
+                    sup.supplier_name AS supplier_name,
+                    ROUND(d.amount) AS amount,
+                    0 AS amount_paid
+
+                FROM `tabExpense Entry Item` AS d
+                INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent
+                INNER JOIN `tabSupplier` AS sup ON sup.name = d.party
+
+                WHERE 
+                    m.docstatus != 1
+                    AND m.management_approval_date IS NOT NULL
+                    {company}
+
+                GROUP BY m.posting_date, m.company, d.party
+            ) AS expdiff
+
+            LEFT JOIN `tabBatch` AS btch 
+                ON expdiff.supplier = btch.supplier AND expdiff.company = btch.company
+
+            LEFT JOIN `tabStock Ledger Entry` AS sle 
+                ON btch.batch_id = sle.batch_no
+
+            GROUP BY expdiff.supplier, expdiff.company
+        ) AS expdiffstock
+
+        LEFT JOIN `tabGL Entry` AS gl 
+            ON gl.party = expdiffstock.supplier AND expdiffstock.company = gl.company
+
+        LEFT JOIN `tabAccount` AS acc 
+            ON acc.name = gl.account AND acc.account_type IN ('Payable', 'Receivable')
+
+        GROUP BY gl.account, expdiffstock.supplier, expdiffstock.company
+
+    ) AS datanotpaid
+
+    ORDER BY day_diff DESC
+""", as_dict=True)
+	if not data:
+		frappe.throw(_("No records found for the given filters."))
 	columns = get_columns(filters)
 	
 	return columns, data
