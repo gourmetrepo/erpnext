@@ -157,7 +157,7 @@ def get_columns(filters):
 			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data", "precision":"0", "align": "right", "width": 320},
 			{"label": "Amount", "fieldname": "amount", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
-			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120}
+			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "GL Balance", "fieldname": "gl_balance", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120}
 		]
 	
