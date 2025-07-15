@@ -17,7 +17,7 @@ def execute(filters=None):
 	
 	data = []
 	data = frappe.db.sql(
-                f"""SELECT * FROM (SELECT pmodiffstock.*,round(SUM(credit-debit)) AS balance FROM (SELECT PMOdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
+                f"""SELECT * FROM (SELECT pmodiffstock.*,round(SUM(debit-credit)) AS gl_balance FROM (SELECT PMOdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
 INNER JOIN `tabBatch` AS btch ON btch.`batch_id` = sle.`batch_no` AND btch.`supplier` IS NOT NULL 
 INNER JOIN (
 SELECT m.posting_date,CONCAT(
@@ -33,7 +33,7 @@ INNER JOIN `tabPayment Order` AS m ON m.name = d.parent
   INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
  GROUP BY pmodiffstock.supplier,pmodiffstock.company
  UNION ALL 
- SELECT pmodiffstock.*,round(SUM(credit-debit)) AS balance FROM (SELECT expdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
+ SELECT pmodiffstock.*,round(SUM(debit-credit)) AS gl_balance FROM (SELECT expdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stock_value FROM `tabStock Ledger Entry` AS sle
 INNER JOIN `tabBatch` AS btch ON btch.`batch_id` = sle.`batch_no` AND btch.`supplier` IS NOT NULL 
 INNER JOIN (
 SELECT m.posting_date,CONCAT(
@@ -70,7 +70,7 @@ def get_columns(filters):
 			("Amount Paid") + "::120",
 			("Stock Value") + "::120",
 			# ("Account") + "::330",
-			("Balance") + "::120"
+			("GL Balance") + "::120"
 		]
 
 
