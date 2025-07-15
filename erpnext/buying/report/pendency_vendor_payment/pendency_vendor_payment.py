@@ -20,7 +20,7 @@ def execute(filters=None):
     SELECT * FROM (
         SELECT 
             pmodiffstock.*,
-            FORMAT(IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0)) AS gl_balance
+            IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
 
 
         FROM (
@@ -31,9 +31,9 @@ def execute(filters=None):
                 PMOdiff.ref_doc,
                 PMOdiff.supplier,
                 PMOdiff.supplier_name,
-                FORMAT(PMOdiff.amount),
-                FORMAT(PMOdiff.amount_paid),
-                FORMAT(ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0)))) AS stockvalue
+                PMOdiff.amount,
+                PMOdiff.amount_paid,
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
 
             FROM (
                 SELECT 
@@ -79,7 +79,7 @@ def execute(filters=None):
         UNION ALL
         SELECT 
             expdiffstock.*,
-           FORMAT(IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0)) AS gl_balance
+           IFNULL( ROUND(SUM(gl.credit - gl.debit)), 0) AS gl_balance
 
 
         FROM (
@@ -90,9 +90,9 @@ def execute(filters=None):
                 expdiff.ref_doc,
                 expdiff.supplier,
                 expdiff.supplier_name,
-                FORMAT(expdiff.amount),
-                FORMAT(expdiff.amount_paid),
-                FORMAT(ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0)))) AS stockvalue
+                expdiff.amount,
+                expdiff.amount_paid,
+                ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stockvalue
 
             FROM (
                 SELECT 
@@ -155,11 +155,11 @@ def get_columns(filters):
 			{"label": "Ref Doc", "fieldname": "ref_doc", "fieldtype": "Data", "width": 120},
 			{"label": "Supplier", "fieldname": "Supplier", "fieldtype": "Data",  "width": 120},
 			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data", "precision":"0", "align": "right", "width": 320},
-			{"label": "Amount", "fieldname": "amount", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
-			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
-			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120},
-			{"label": "GL Balance", "fieldname": "gl_balance", "fieldtype": "Data", "precision":"0", "align": "right", "width": 120}
+			{"label": "Amount", "fieldname": "amount", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
+			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
+			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120}
+			{"label": "GL Balance", "fieldname": "gl_balance", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120}
 		]
-
+	
 
 		return columns
