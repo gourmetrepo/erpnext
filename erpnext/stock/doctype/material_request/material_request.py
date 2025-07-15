@@ -102,6 +102,11 @@ class MaterialRequest(BuyingController):
 		self.update_requested_qty_in_production_plan()
 		if self.material_request_type == 'Purchase':
 			self.validate_budget()
+		
+		# Code by Moeiz
+		# Leasing Module Development
+		if self.material_request_type == "Lease":
+			self.create_lease_contracts()
 
 	def before_save(self):
 		self.set_status(update=True)
@@ -221,6 +226,40 @@ class MaterialRequest(BuyingController):
 			doc = frappe.get_doc('Production Plan', production_plan)
 			doc.set_status()
 			doc.db_set('status', doc.status)
+		
+	def create_lease_contracts(self):
+		try:
+			for item in self.items:
+				for i in range(0, item.qty):
+					lease_contract_dict = {
+					"doctype": "Lease Contract",
+					"fixed_asset_item_code": item.item_code,
+					"cost_center": item.cost_center if item.cost_center else None,
+					"company": self.company,
+					"material_request": self.name,
+					"lease_type": self.lease_type if self.lease_type else None,
+					"employee": self.employee_lease if self.employee_lease else 0,
+					"vsp": self.vsp if self.vsp else 0
+					}
+					lease_contract = frappe.get_doc(lease_contract_dict)
+					lease_contract.insert()
+					
+					contract_reference = frappe.new_doc("Lease Contract Request").update({
+						"lease_contract": lease_contract.name,
+						"parent": self.name,
+						"parenttype": "Material Request",
+						"parentfield": "lease_reference_document",
+						"item": item.item_code,
+						"idx": i+1
+					})
+					contract_reference.insert(ignore_permissions=True)
+				
+
+				frappe.db.commit()
+		except Exception as e:
+			frappe.log_error(str(e), "Error in creating lease contracts on MR {0}".format(self.name))
+			frappe.db.rollback()
+
 
 def update_completed_and_requested_qty(stock_entry, method):
 	if stock_entry.doctype == "Stock Entry":

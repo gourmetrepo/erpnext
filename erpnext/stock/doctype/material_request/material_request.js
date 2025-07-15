@@ -25,6 +25,11 @@ frappe.ui.form.on('Material Request', {
 			};
 		});
 
+		// Code by Moeiz
+		// Leasing Module Development
+		leasing_finance_changes(frm);
+
+
 	},
 
 	onload: function(frm) {
@@ -106,6 +111,9 @@ frappe.ui.form.on('Material Request', {
 		}
 
 		project_based_configurations(frm);
+		// Code by Moeiz
+		// Leasing Module Development
+		leasing_finance_changes(frm);
 
 	},
 
@@ -362,6 +370,9 @@ frappe.ui.form.on('Material Request', {
 	},
 	material_request_type: function(frm) {
 		frm.toggle_reqd('customer', frm.doc.material_request_type=="Customer Provided");
+		// Code by Moeiz
+		// Leasing Module Development
+		leasing_finance_changes(frm);
 	},
 
 	project_based: function(frm) {
@@ -620,4 +631,52 @@ function project_based_configurations(frm){
 	}
 
 	frm.refresh_field('items');
+}
+
+// Code by Moeiz
+// Leasing Module Development
+function leasing_finance_changes(frm){
+	frm.set_df_property('lease_reference_document', 'cannot_add_rows', true);
+	frm.set_df_property('lease_reference_document', 'cannot_delete_rows', true);
+	frm.set_df_property('lease_reference_document', 'cannot_delete_all_rows', true);
+	frm.fields_dict['lease_reference_document'].grid.wrapper.find('.grid-remove-rows').hide();
+
+	if(frm.doc.material_request_type === "Lease"){
+		frm.set_df_property('lease_type', 'reqd', 1);
+		frm.set_df_property('lease_type', 'hidden', 0);
+		frm.set_df_property('lease_type', 'read_only', 0);
+
+		frm.set_df_property('vsp', 'hidden', 0);
+		frm.set_df_property('vsp', 'read_only', 0);
+		frm.set_df_property('employee_lease', 'hidden', 0);
+		frm.set_df_property('employee_lease', 'read_only', 0);
+
+		frm.fields_dict['items'].grid.get_field('item_code').get_query = function() {
+			return {
+				filters: [
+					['is_fixed_asset', '=', 1],
+					['asset_category', '=', 'Vehicles - Leased']
+				]
+			};
+		};
+		
+	}else{
+		frm.set_df_property('lease_type', 'reqd', 0);
+		frm.set_df_property('lease_type', 'hidden', 1);
+		frm.set_df_property('lease_type', 'read_only', 1);
+		
+		frm.set_df_property('vsp', 'hidden', 1);
+		frm.set_df_property('vsp', 'read_only', 1);
+		frm.set_df_property('employee_lease', 'hidden', 1);
+		frm.set_df_property('employee_lease', 'read_only', 1);
+
+		frm.fields_dict['items'].grid.get_field('item_code').get_query = function() {
+			return {
+				filters: [
+					['is_purchase_item', '=', 1]
+				]
+			};
+		};
+	}
+
 }
