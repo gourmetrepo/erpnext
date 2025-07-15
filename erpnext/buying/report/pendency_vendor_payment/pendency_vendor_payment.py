@@ -14,6 +14,7 @@ def execute(filters=None):
 		company = f" and m.company IN ('Unit 5', 'Unit 8', 'Unit 11')"
 	else:
 		company = f""" and  m.company='{filters.get('company')}'"""
+	
 	data = []
 	data = frappe.db.sql(
                 f"""SELECT * FROM (SELECT pmodiffstock.*,gl.account,SUM(credit-debit) AS balance FROM (SELECT PMOdiff.*,ROUND(SUM(`actual_qty`*sle.`valuation_rate`)) AS stockvalue FROM `tabStock Ledger Entry` AS sle
@@ -50,7 +51,7 @@ INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent
   INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
  GROUP BY gl.account,pmodiffstock.supplier,pmodiffstock.company
  ) AS datanotpaid 
- ORDER BY day_diff DESC""",as_dict=True,debug=True)
+ ORDER BY day_diff DESC""",as_dict=True)
 	columns = get_columns(filters)
 	
 	return columns, data
