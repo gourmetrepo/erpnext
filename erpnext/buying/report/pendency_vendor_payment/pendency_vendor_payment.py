@@ -50,7 +50,7 @@ INNER JOIN `tabExpense Entry` AS m ON m.name = d.parent
   INNER JOIN `tabAccount` ON `tabAccount`.`name` = gl.account AND account_type IN ('Payable','Receivable')
  GROUP BY gl.account,pmodiffstock.supplier,pmodiffstock.company
  ) AS datanotpaid 
- ORDER BY day_diff DESC""",as_dict=True)
+ ORDER BY day_diff DESC""",as_dict=True,debug=True)
 	columns = get_columns(filters)
 	
 	return columns, data
