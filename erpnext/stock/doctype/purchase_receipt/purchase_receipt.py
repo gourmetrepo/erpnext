@@ -190,7 +190,7 @@ class PurchaseReceipt(BuyingController):
 		from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 		update_serial_nos_after_submit(self, "items")
 
-		#self.make_gl_entries()
+		# self.make_gl_entries()
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:
@@ -392,7 +392,7 @@ class PurchaseReceipt(BuyingController):
 				valuation_tax[tax.name] += \
 					(tax.add_deduct_tax == "Add" and 1 or -1) * flt(tax.base_tax_amount_after_discount_amount)
 
-		if negative_expense_to_be_booked and valuation_tax:
+		if negative_expense_to_be_booked  and valuation_tax:
 			# Backward compatibility:
 			# If expenses_included_in_valuation account has been credited in against PI
 			# and charges added via Landed Cost Voucher,
@@ -437,7 +437,37 @@ class PurchaseReceipt(BuyingController):
 		if warehouse_with_no_account:
 			frappe.msgprint(_("No accounting entries for the following warehouses") + ": \n" +
 				"\n".join(warehouse_with_no_account))
-
+		if (self.doctype == 'Purchase Receipt' and self.purchase_order_type == 'Import' and self.import_costing_sheet): # in case of landed cost import costing tax separate
+			for d in gl_entries:
+				if flt(d.debit) > 0:
+					against_account = d.account
+					break
+			for tax in self.get("taxes"):
+				if valuation_tax.get(tax.name):
+					account = tax.account_head
+					account_currency = get_account_currency(account)
+					applicable_amount = tax.tax_amount
+					#credit side
+					gl_entries.append(
+						self.get_gl_dict({
+							"account": account,
+							"cost_center": tax.cost_center,
+							"credit": applicable_amount,
+							"remarks": self.remarks or _("Accounting Entry for Stock"),
+							"against": against_account
+						}, item=tax, account_currency=account_currency)
+					)
+					# debit side
+					gl_entries.append(
+						self.get_gl_dict({
+							"account": against_account,
+							"cost_center": tax.cost_center,
+							"debit": applicable_amount,
+							"remarks": self.remarks or _("Accounting Entry for Stock"),
+							"against": account
+						}, item=tax, account_currency=account_currency)
+					)
+			
 		return process_gl_map(gl_entries)
 
 	def get_asset_gl_entry(self, gl_entries):
@@ -458,8 +488,11 @@ class PurchaseReceipt(BuyingController):
 		cwip_account = get_asset_account("capital_work_in_progress_account", asset_category = item.asset_category, \
 			company = self.company)
 
-		asset_amount = flt(item.net_amount) + flt(item.item_tax_amount/self.conversion_rate)
-		base_asset_amount = flt(item.base_net_amount + item.item_tax_amount)
+		if (self.doctype == 'Purchase Receipt' and self.purchase_order_type == 'Import' and self.import_costing_sheet): # in case of landed cost import costing tax separate
+			base_asset_amount = flt(item.net_amount)
+		else:
+			asset_amount = flt(item.net_amount) + flt(item.item_tax_amount/self.conversion_rate)
+			base_asset_amount = flt(item.base_net_amount + item.item_tax_amount)
 
 		cwip_account_currency = get_account_currency(cwip_account)
 		# debit cwip account
