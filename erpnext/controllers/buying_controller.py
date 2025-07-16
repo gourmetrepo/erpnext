@@ -117,8 +117,7 @@ class BuyingController(StockController):
 
 	def get_asset_items(self):
 		if self.doctype not in ['Purchase Order', 'Purchase Invoice', 'Purchase Receipt']:
-			if not (self.doctype == 'Purchase Receipt' and self.purchase_order_type == 'Import' and self.import_costing_sheet):
-				return []
+			return []
 
 		return [d.item_code for d in self.items if d.is_fixed_asset]
 
