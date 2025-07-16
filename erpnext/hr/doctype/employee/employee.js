@@ -325,6 +325,25 @@ frappe.ui.form.on('Employee',{
         }
         return true;
     },
+	nationality: function(frm) {
+		if (frm.doc.nationality == 'Pakistan') {
+			frm.set_df_property("cnic_no", "reqd", 1);
+			frm.set_df_property("cnic_issue_date", "reqd", 1);
+			frm.set_df_property("cnic_valid_upto", "reqd", 1);
+			frm.set_df_property("passport_number", "reqd", 0);
+			frm.set_df_property("place_of_issue", "reqd", 0);
+			frm.set_df_property("date_of_issue", "reqd", 0);
+			frm.set_df_property("valid_upto", "reqd", 0);
+		} else {
+			frm.set_df_property("cnic_no", "reqd", 0);
+			frm.set_df_property("cnic_issue_date", "reqd", 0);
+			frm.set_df_property("cnic_valid_upto", "reqd", 0);
+			frm.set_df_property("passport_number", "reqd", 1);
+			frm.set_df_property("place_of_issue", "reqd", 1);
+			frm.set_df_property("date_of_issue", "reqd", 1);
+			frm.set_df_property("valid_upto", "reqd", 1);
+		}
+	},
 	make_dashboard: function(frm) {
 		let employee_details_columns;
 		let employee_details_data;

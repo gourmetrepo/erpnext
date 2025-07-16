@@ -36,6 +36,7 @@ def execute(filters=None):
                 PMOdiff.ref_doc,
                 PMOdiff.supplier,
                 PMOdiff.supplier_name,
+				PMOdiff.mode_of_payment,
                 PMOdiff.amount,
                 PMOdiff.amount_paid,
                 ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stock_value
@@ -48,14 +49,23 @@ def execute(filters=None):
                         DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
                     ) AS day_diff,
                     m.company,
-                    d.parent AS ref_doc,
+                    CONCAT(
+                            "<a href='https://nrp.gourmetpakistan.com/desk#Form/Payment%20Order/", 
+                            d.parent, 
+                            "' target='_blank'>", 
+                            d.parent, 
+                            "</a>"
+                        ) AS ref_doc,
+
                     d.supplier,
                     d.supplier_name,
+					dr.mode_of_payment as mode_of_payment,
                     ROUND(d.amount) AS amount,
                     ROUND(d.amount_paid) AS amount_paid
 
                 FROM `tabPayment Order Detail` AS d
                 INNER JOIN `tabPayment Order` AS m ON m.name = d.parent
+				LEFT JOIN `tabPayment Order Reference` dr ON dr.`parent` = m.name AND d.supplier = dr.`supplier`
                 WHERE 
                     d.amount_paid != d.amount
                     AND m.docstatus = 1
@@ -95,6 +105,7 @@ def execute(filters=None):
                 expdiff.ref_doc,
                 expdiff.supplier,
                 expdiff.supplier_name,
+				expdiff.mode_of_payment,
                 expdiff.amount,
                 expdiff.amount_paid,
                 ROUND(SUM(IFNULL(sle.actual_qty * sle.valuation_rate, 0))) AS stock_value
@@ -107,9 +118,15 @@ def execute(filters=None):
                         DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
                     ) AS day_diff,
                     m.company,
-                    d.parent AS ref_doc,
-                    d.party AS supplier,
+                    CONCAT(
+                        "<a href='https://nrp.gourmetpakistan.com/desk#Form/Expense%20Entry/", 
+                        d.parent, 
+                        "' target='_blank'>", 
+                        d.parent, 
+                        "</a>"
+                    ) AS ref_doc,  d.party AS supplier,
                     sup.supplier_name AS supplier_name,
+					m.mode_of_payment AS mode_of_payment,
                     ROUND(d.amount) AS amount,
                     0 AS amount_paid
 
@@ -153,7 +170,7 @@ def execute(filters=None):
 
 def get_columns(filters):
 		"""return columns based on filters"""
-		
+	
 		columns = [
 		
 			{"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Date",  "width": 120},
@@ -161,6 +178,7 @@ def get_columns(filters):
 			{"label": "Ref Doc", "fieldname": "ref_doc", "fieldtype": "Data", "width": 120},
 			{"label": "Supplier", "fieldname": "supplier", "fieldtype": "Data",  "width": 120},
 			{"label": "Supplier Name", "fieldname": "supplier_name", "fieldtype": "Data",  "width": 320},
+			{"label": "Mode of Payment", "fieldname": "mode_of_payment", "fieldtype": "Data",  "width": 120},
 			{"label": "Amount", "fieldname": "amount", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Amount Paid", "fieldname": "amount_paid", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
 			{"label": "Stock Value", "fieldname": "stock_value", "fieldtype": "Currency", "precision":"0", "align": "right", "width": 120},
