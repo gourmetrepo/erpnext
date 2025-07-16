@@ -49,7 +49,14 @@ def execute(filters=None):
                         DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
                     ) AS day_diff,
                     m.company,
-                    d.parent AS ref_doc,
+                    CONCAT(
+                            "<a href='https://nrp.gourmetpakistan.com/desk#Form/Payment%20Order/", 
+                            d.parent, 
+                            "' target='_blank'>", 
+                            d.parent, 
+                            "</a>"
+                        ) AS ref_doc,
+
                     d.supplier,
                     d.supplier_name,
 					dr.mode_of_payment as mode_of_payment,
@@ -111,8 +118,13 @@ def execute(filters=None):
                         DATEDIFF(CURDATE(), m.posting_date) % 30, 'D'
                     ) AS day_diff,
                     m.company,
-                    d.parent AS ref_doc,
-                    d.party AS supplier,
+                    CONCAT(
+                        "<a href='https://nrp.gourmetpakistan.com/desk#Form/Expense%20Entry/", 
+                        d.parent, 
+                        "' target='_blank'>", 
+                        d.parent, 
+                        "</a>"
+                    ) AS ref_doc,  d.party AS supplier,
                     sup.supplier_name AS supplier_name,
 					m.mode_of_payment AS mode_of_payment,
                     ROUND(d.amount) AS amount,
@@ -158,7 +170,7 @@ def execute(filters=None):
 
 def get_columns(filters):
 		"""return columns based on filters"""
-		
+	
 		columns = [
 		
 			{"label": "Posting Date", "fieldname": "posting_date", "fieldtype": "Date",  "width": 120},
