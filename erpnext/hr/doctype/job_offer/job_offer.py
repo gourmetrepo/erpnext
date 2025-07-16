@@ -7,7 +7,7 @@ from frappe.utils import cint
 from frappe.model.document import Document
 from frappe.model.mapper import get_mapped_doc
 from frappe import _
-from frappe.utils.data import get_link_to_form
+from frappe.utils.data import get_link_to_form, getdate, nowdate
 from frappe.utils.pdf import get_pdf
 
 class JobOffer(Document):
@@ -21,6 +21,9 @@ class JobOffer(Document):
 	def before_save(self):
 		if self.is_new() and self.offer_status != "Offered":
 			frappe.throw(_("Job Offer can only be created with status <b>Offered<b>"))
+
+		if getdate(self.offer_date) < getdate(nowdate()):
+			frappe.throw(_("Offer Date cannot be in the past."))
 
 	def on_submit(self):
 		if self.applicant_id:	
