@@ -71,22 +71,21 @@
   "health_insurance_provider",
   "health_insurance_no",
   "contact_details",
-  "cell_number",
-  "prefered_contact_email",
-  "prefered_email",
-  "company_email",
   "personal_email",
-  "unsubscribed",
-  "column_break4",
-  "permanent_accommodation_type",
-  "permanent_address",
+  "cell_number",
   "current_accommodation_type",
   "current_address",
-  "current_accommodation_type",
   "residing_city",
-  "permanent_address",
   "permanent_accommodation_type",
-  "identity_documents_section",
+  "permanent_address",
+  "emergency_phone_number",
+  "person_to_be_contacted",
+  "relation",
+  "unsubscribed",
+  "column_break4",
+  "company_email",
+  "prefered_contact_email",
+  "prefered_email",
   "sb53",
   "bio",
   "social_profile_section",
@@ -104,17 +103,22 @@
   "education",
   "previous_work_experience",
   "external_work_history",
+  "total_work_experience_years",
+  "family_background",
   "history_in_company",
-  "internal_work_history",
+  "employee_documents_section",
+  "attachments",
   "exit",
-  "resignation_letter_date",
-  "relieving_date",
   "reason_for_leaving",
+  "resignation_letter_date",
+  "notice_number_of_days",
+  "date_of_retirement",
+  "relieving_date",
   "leave_encashed",
   "encashment_date",
   "exit_interview_details",
-  "held_on",
   "reason_for_resignation",
+  "held_on",
   "new_workplace",
   "feedback",
   "lft",
@@ -794,12 +798,98 @@
    "fieldtype": "Long Text",
    "hidden": 1,
    "label": "Reporting Dict"
+  },
+  {
+   "fieldname": "column_break_52",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Thumb Impression",
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "Thumb Impression\nFacial Recognition\nManual",
+   "reqd": 1
+  },
+  {
+   "fieldname": "residing_city",
+   "fieldtype": "Link",
+   "label": "Residing City",
+   "options": "City"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "social_profile_section",
+   "fieldtype": "Section Break",
+   "label": "Social Profile"
+  },
+  {
+   "fieldname": "about_me",
+   "fieldtype": "Small Text",
+   "label": "About Me"
+  },
+  {
+   "fieldname": "employee_interests",
+   "fieldtype": "Table",
+   "label": "Interests",
+   "options": "Employee Interests"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "identity_documents_section",
+   "fieldtype": "Section Break",
+   "label": "Identity Documents"
+  },
+  {
+   "default": "0",
+   "fieldname": "total_work_experience_years",
+   "fieldtype": "Data",
+   "label": "Total Work Experience (Years)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_21",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "linkedin_profile",
+   "fieldtype": "Data",
+   "label": "LinkedIn Profile"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "comp_and_ben_section",
+   "fieldtype": "Section Break",
+   "label": "Comp & Ben"
+  },
+  {
+   "depends_on": "eval:doc.health_insurance_provider",
+   "fieldname": "health_insurance_plan",
+   "fieldtype": "Data",
+   "label": "Health Insurance Plan"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "employee_documents_section",
+   "fieldtype": "Section Break",
+   "label": "Employee Documents"
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Table",
+   "label": "Attachments",
+   "options": "Attachments"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-07-03 10:35:23.495096",
+ "modified": "2025-07-16 16:31:23.521891",
  "modified_by": "nabeel.ahmad@gourmetpakistan.com",
  "module": "HR",
  "name": "Employee",
