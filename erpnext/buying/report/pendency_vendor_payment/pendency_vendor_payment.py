@@ -15,6 +15,11 @@ def execute(filters=None):
 	else:
 		company = f""" and  m.company='{filters.get('company')}'"""
 	
+	from nrp_manufacturing.utils import  get_config_by_name
+	company_business_group = frappe.db.get_value('Company', filters.get("company"), 'business_group')
+	site_config = get_config_by_name('expense_entry_management_approval_date')
+	workflow_state = site_config.get(company_business_group)
+	
 	data = []
 	data = frappe.db.sql(f"""
     SELECT * FROM (
@@ -116,6 +121,7 @@ def execute(filters=None):
                     m.docstatus != 1
                     AND m.management_approval_date IS NOT NULL
                     {company}
+					AND m.workflow_state = '{workflow_state}'
 
                 GROUP BY m.posting_date, m.company, d.party
             ) AS expdiff
