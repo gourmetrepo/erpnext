@@ -37,10 +37,10 @@
   "create_user",
   "create_user_permission",
   "employment_details",
+  "job_application_history",
   "job_applicant",
   "scheduled_confirmation_date",
   "bio",
-  "col_break_22",
   "contract_end_date",
   "linkedin_profile",
   "website",
@@ -324,12 +324,14 @@
   {
    "fieldname": "job_applicant",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Job Applicant",
    "options": "Job Applicant"
   },
   {
    "fieldname": "scheduled_confirmation_date",
    "fieldtype": "Date",
+   "hidden": 1,
    "label": "Offer Date",
    "oldfieldname": "scheduled_confirmation_date",
    "oldfieldtype": "Date"
@@ -340,10 +342,6 @@
    "label": "Confirmation Date",
    "oldfieldname": "final_confirmation_date",
    "oldfieldtype": "Date"
-  },
-  {
-   "fieldname": "col_break_22",
-   "fieldtype": "Column Break"
   },
   {
    "fieldname": "contract_end_date",
@@ -883,13 +881,19 @@
    "fieldtype": "Table",
    "label": "Attachments",
    "options": "Attachments"
+  },
+  {
+   "fieldname": "job_application_history",
+   "fieldtype": "Table",
+   "label": "Job Application History",
+   "options": "Job Application History"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-07-16 16:31:23.521891",
- "modified_by": "nabeel.ahmad@gourmetpakistan.com",
+ "modified": "2025-07-17 17:02:15.901249",
+ "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",
  "name_case": "Title Case",

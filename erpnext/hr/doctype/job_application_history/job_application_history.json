@@ -1,0 +1,61 @@
+{
+ "creation": "2025-07-17 16:25:47.961626",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "application_type",
+  "job_opening",
+  "job_applicant",
+  "applied_on",
+  "offer_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "application_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Application Type",
+   "options": "\nExternal\nInternal"
+  },
+  {
+   "fieldname": "job_opening",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Job Opening",
+   "options": "Job Opening"
+  },
+  {
+   "fieldname": "job_applicant",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Job Applicant",
+   "options": "Job Applicant"
+  },
+  {
+   "fetch_from": "job_applicant.job_application_date",
+   "fieldname": "applied_on",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Applied On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "offer_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Offer Date"
+  }
+ ],
+ "istable": 1,
+ "modified": "2025-07-17 16:37:28.255517",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Job Application History",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
