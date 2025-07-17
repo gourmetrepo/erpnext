@@ -11,6 +11,8 @@
   "application_details_section",
   "job_applicant_status",
   "applied_on",
+  "application_type",
+  "employee",
   "column_break_4",
   "job_application_date",
   "position_title",
@@ -545,11 +547,24 @@
    "fieldname": "husband_name",
    "fieldtype": "Data",
    "label": "Husband Name"
+  },
+  {
+   "fieldname": "application_type",
+   "fieldtype": "Select",
+   "label": "Application Type",
+   "options": "External\nInternal"
+  },
+  {
+   "depends_on": "eval:doc.application_type == \"Internal\"",
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
   }
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-07-15 17:45:44.718379",
+ "modified": "2025-07-17 15:34:04.964518",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",

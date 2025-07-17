@@ -19,11 +19,11 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "Functional\nBehavioral",
+   "options": "Functional\nBehavioral\nOther",
    "reqd": 1
   }
  ],
- "modified": "2025-04-17 15:55:39.921533",
+ "modified": "2025-07-17 15:43:29.449459",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Skill",
