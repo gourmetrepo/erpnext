@@ -105,6 +105,7 @@
    "default": "Applied",
    "fieldname": "job_applicant_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Job Applicant Status",
    "options": "\nApplied\nLonglisted\nShortlisted\nInterview\nAccepted\nRejected\nOn Hold\nOffered\nOffer Accepted\nOffer Rejected\nHired",
    "reqd": 1
@@ -548,7 +549,7 @@
  ],
  "icon": "fa fa-text",
  "idx": 1,
- "modified": "2025-07-11 16:01:57.420386",
+ "modified": "2025-07-15 17:45:44.718379",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Applicant",
