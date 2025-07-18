@@ -89,6 +89,11 @@ frappe.ui.form.on("Job Applicant", {
 			frm.set_df_property("passport_valid_upto", "reqd", 1);
 		}
 	},
+	application_type: function(frm) {
+		if (frm.doc.application_type == 'Internal') {
+			frm.set_df_property("employee", "reqd", 1);
+		}
+	}
 });
 
 
