@@ -61,6 +61,7 @@
   {
    "fieldname": "total_experience",
    "fieldtype": "Data",
+   "hidden": 1,
    "in_list_view": 1,
    "label": "Total Experience",
    "oldfieldname": "total_experience",
@@ -98,7 +99,7 @@
  ],
  "idx": 1,
  "istable": 1,
- "modified": "2025-07-02 22:48:02.826796",
+ "modified": "2025-07-15 12:12:50.361504",
  "modified_by": "nabeel.ahmad@gourmetpakistan.com",
  "module": "HR",
  "name": "Employee External Work History",
