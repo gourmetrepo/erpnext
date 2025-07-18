@@ -17,11 +17,11 @@ erpnext.accounts.PurchaseInvoice = erpnext.buying.BuyingController.extend({
 		}
 
 
-		this.frm.fields_dict['project'].get_query = function() {
+		this.frm.fields_dict['project'].get_query = function(doc) {
 			return {
 				query: "erpnext.projects.doctype.project.project.get_projects",
 				filters: {
-					company: this.frm.doc.company
+					company: doc.company
 				}
 			};
 		};
