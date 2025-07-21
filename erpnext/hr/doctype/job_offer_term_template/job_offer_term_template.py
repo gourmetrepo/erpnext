@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2025, Frappe Technologies Pvt. Ltd. and contributors
+# For license information, please see license.txt
+
+from __future__ import unicode_literals
+# import frappe
+from frappe.model.document import Document
+
+class JobOfferTermTemplate(Document):
+	
+    def autoname(self):
+        if not self.name:
+            self.name  = self.template_name
+            self.title = self.template_name

@@ -1,12 +1,13 @@
-from __future__ import unicode_literals
 from frappe import _
 
 def get_data():
-     return {
-        'fieldname': 'job_title',
+    return {
+        'fieldname': 'applied_on',
+        'non_standard_fieldnames': {
+        },
         'transactions': [
             {
                 'items': ['Job Applicant']
             }
-        ],
+        ]
     }

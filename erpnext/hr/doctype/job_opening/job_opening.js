@@ -1,72 +1,91 @@
-// Copyright (c) 2018, Frappe Technologies Pvt. Ltd. and contributors
+// Copyright (c) 2025, Shahzad Naser and contributors
 // For license information, please see license.txt
 
 frappe.ui.form.on('Job Opening', {
-	onload: function(frm) {
-		frm.set_query("department", function() {
+	onload: (frm) => {
+		frm.set_query('job_requisition_id', () => {
 			return {
-				"filters": {
-					"company": frm.doc.company,
+				filters: {
+					job_requisition_status: "Open & Approved"
 				}
 			};
 		});
 
-		frm.set_query("branch", function() {
-            if(!frm.doc.department){
-                frappe.msgprint("Please select Department first");
-            }
-            return {
-                "filters": {
-                    "department": frm.doc.department,
-                    "parent":["<","0"]
-                }
-            };
-        });
-        
-        frm.set_query("sub_branch", function() {
-            if(!frm.doc.branch){
-                frappe.msgprint("Please select Branch first");
-            }
-            return {
-                "filters": {
-                    "branch": frm.doc.branch
-                }
-            };
-        });
+		frm.fields_dict.job_requisition_id.get_data = function(txt) {
+            return frappe.db.get_list('Job Requisition', {
+                fields: ['name', 'designation'],
+                filters: {
+                    job_requisition_status: 'Open & Approved',
+                    name: ['like', `%${txt}%`]
+                },
+                limit: 10
+            }).then(results => {
+                return results.map(d => ({
+                    value: d.name,
+                    description: d.designation || ''
+                }));
+            });
+        };
 	},
-	designation: function(frm){
-	    if(frm.doc.designation && frm.doc.company && frm.doc.department && frm.doc.branch && frm.doc.sub_branch){
-			frappe.call({
-				"method": "erpnext.hr.doctype.staffing_plan.staffing_plan.get_active_staffing_plan_details",
-				args: {
-					company: frm.doc.company,
-					designation: frm.doc.designation,
-					date: frappe.datetime.now_date(), // ToDo - Date in Job Opening?
-					department: frm.doc.department,
-					branch: frm.doc.branch,
-					sub_branch: frm.doc.sub_branch
-				},
-				callback: function (data) {
-					if(data.message){
-						frm.set_value('staffing_plan', data.message[0].name);
-						frm.set_value('planned_vacancies', data.message[0].vacancies);
-					} else {
-						frm.set_value('staffing_plan', "");
-						frm.set_value('planned_vacancies', 0);
-						frappe.show_alert({
-							indicator: 'orange',
-							message: __('No Staffing Plans found for this Designation')
-						});
-					}
-				}
-			});
-		}
-		else{
-			frm.set_value('staffing_plan', "");
-			frm.set_value('planned_vacancies', 0);
-		}
+
+	job_requisition_id: (frm) => {
+		frappe.call({
+			"method": "frappe.client.get",
+			args: {
+				doctype: "Job Requisition",
+				name: frm.doc.job_requisition_id
+			},
+			callback: function (r) {
+				frm.set_value("required_to_work_in_shifts", r.message.required_to_work_in_shifts);
+				frm.refresh_field("required_to_work_in_shifts");
+				frm.set_value("required_to_travel", r.message.required_to_travel);
+				frm.refresh_field("required_to_travel");
+			}
+		});
 	},
-	company: function(frm) {
-		frm.set_value('designation', "");
+
+	position: (frm) => {
+		frappe.call({
+			"method": "frappe.client.get",
+			args: {
+				doctype: "Position",
+				name: frm.doc.position
+			},
+			callback: function (r) {
+				frm.set_value("required_background_check", r.message.required_background_check);
+				frm.refresh_field("required_background_check");
+
+				frm.clear_table("required_education");
+				frm.clear_table("required_competencies");
+
+				r.message.required_education.forEach(element => {
+					let education_title = element.education_title;
+					let type = element.type;
+					let specialization = element.specialization;
+
+					frm.add_child('required_education', {
+						education_title: education_title,
+						type: type,
+						specialization: specialization,
+					})
+				});
+
+				r.message.required_competencies.forEach(element => {
+					let temp_skill = element.competencies;
+					let type = element.type;
+
+					frm.add_child('required_competencies', {
+						competencies: temp_skill,
+						type: type,
+					})
+				})
+
+				frm.set_value("main_responsibilities", r.message.main_responsibilities);
+				frm.refresh_field("main_responsibilities");
+
+				frm.refresh_field('required_education');
+				frm.refresh_field('required_competencies');
+			}
+		});
 	}
 });
