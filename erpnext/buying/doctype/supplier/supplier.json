@@ -25,6 +25,7 @@
   "supplier_group",
   "supplier_type",
   "pan",
+  "bank_account",
   "language",
   "allow_purchase_invoice_creation_without_purchase_order",
   "allow_purchase_invoice_creation_without_purchase_receipt",
@@ -378,13 +379,19 @@
    "fieldname": "allow_purchase_invoice_creation_without_purchase_receipt",
    "fieldtype": "Check",
    "label": "Allow Purchase Invoice Creation Without Purchase Receipt"
+  },
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "label": "Bank Account",
+   "options": "Bank Account"
   }
  ],
  "icon": "fa fa-user",
  "idx": 370,
  "image_field": "image",
- "modified": "2023-06-05 11:29:24.265848",
- "modified_by": "zubair@gourmetpakistan.com",
+ "modified": "2025-07-17 15:57:09.138466",
+ "modified_by": "shoaib.rehmat@gourmetpakistan.com",
  "module": "Buying",
  "name": "Supplier",
  "name_case": "Title Case",
