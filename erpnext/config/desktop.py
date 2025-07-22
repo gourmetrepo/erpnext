@@ -226,4 +226,13 @@ def get_data():
 			'standard': 1,
 			"description": "Publish items to other ERPNext users."
 		},
+		{
+			"module_name": "Recruitment",
+			"category": "Modules",
+			"label": _("Recruitment"),
+			"color": "#2ecc71",
+			"icon": "octicon octicon-briefcase",
+			"type": "module",
+			"description": _("Manage recruitment and hiring.")
+		},
 	]
