@@ -451,7 +451,12 @@ cur_frm.fields_dict['select_print_heading'].get_query = function(doc, cdt, cdn) 
 		]
 	}
 }
-
+cur_frm.set_query("expense_account", "items", function(doc) {
+	return {
+		query: "erpnext.controllers.queries.get_expense_account",
+		filters: {'is_group':0,'company': doc.company }
+	}
+});
 cur_frm.cscript.expense_account = function(doc, cdt, cdn){
 	var d = locals[cdt][cdn];
 	if(d.idx == 1 && d.expense_account){
@@ -462,7 +467,6 @@ cur_frm.cscript.expense_account = function(doc, cdt, cdn){
 	}
 	refresh_field('items');
 }
-
 cur_frm.fields_dict["items"].grid.get_field("cost_center").get_query = function(doc) {
 	return {
 		filters: {
@@ -512,6 +516,14 @@ frappe.ui.form.on("Purchase Invoice", {
 			return {
 				filters: {
 					'root_type': 'Asset',
+					'company': doc.company,
+					"is_group": 0
+				}
+			}
+		}
+		frm.fields_dict['items'].grid.get_field('expense_account').get_query = function(doc) {
+			return {
+				filters: {
 					'company': doc.company,
 					"is_group": 0
 				}

@@ -18,7 +18,7 @@ frappe.ui.form.on("Item Group", {
 			const row = locals[cdt][cdn];
 			return {
 				query: "erpnext.controllers.queries.get_expense_account",
-				filters: { company: row.company }
+				filters: { is_group:0,company: row.company }
 			}
 		}
 		frm.fields_dict["item_group_defaults"].grid.get_field("income_account").get_query = function(doc, cdt, cdn) {

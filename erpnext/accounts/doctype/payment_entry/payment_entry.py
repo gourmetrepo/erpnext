@@ -102,16 +102,19 @@ class PaymentEntry(AccountsController):
 		self.update_payment_schedule()
 		self.set_status()
 		self.update_payment_order_amount()
-		if self.mode_of_payment == "Wire Transfer":
+		if self.mode_of_payment == "Wire Transfer" and self.party:
+			supplier = frappe.get_doc('Supplier',self.party)
+			supplier_bank_account = frappe.get_doc('Bank Account', supplier.bank_account)
+			bank = frappe.get_doc('Bank',supplier_bank_account.bank)
 			# park entry to the HBL integration
 			from nrp_manufacturing.hbl import send_request
 			import re
 			from datetime import datetime
-			# if data.get("supplier_bank_code") == "054":
-				# lft_or_ibft = "IFT"
-			# else:
-			# 	lft_or_ibft = "IBFT"
-			lft_or_ibft = "IFT"
+			if bank.bank_code == "054":
+				lft_or_ibft = "IFT"
+			else:
+				lft_or_ibft = "IBFT"
+
 			posting_date = datetime.strptime(self.posting_date,"%Y-%m-%d")
 			payment_order_reference = posting_date.strftime("%m")
 			payment_order_reference += posting_date.strftime("%y")
@@ -122,8 +125,8 @@ class PaymentEntry(AccountsController):
 				"payment_order_reference": payment_order_reference,
 				"supplier_name": self.party_name,
 				"supplier_address": "",
-				"supplier_bank_code":"",
-				"supplier_bank_account":"",
+				"supplier_bank_code":bank.bank_code,
+				"supplier_bank_account":supplier_bank_account.iban if supplier_bank_account.iban else supplier_bank_account.account_no,
 				"payment_purpose":"",
 				"transaction_month":posting_date.strftime("%m")
 			}

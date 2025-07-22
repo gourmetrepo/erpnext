@@ -286,7 +286,7 @@ $.extend(erpnext.item, {
 			const row = locals[cdt][cdn];
 			return {
 				query: "erpnext.controllers.queries.get_expense_account",
-				filters: { company: row.company }
+				filters: { is_group:0,company: row.company }
 			}
 		}
 
