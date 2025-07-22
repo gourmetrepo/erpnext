@@ -5,74 +5,186 @@
 
 from __future__ import unicode_literals
 import frappe
-
-from frappe.website.website_generator import WebsiteGenerator
+from frappe.model.document import Document
 from frappe import _
-from erpnext.hr.doctype.staffing_plan.staffing_plan import get_designation_counts, get_active_staffing_plan_details
+from nerp.utils import get_config_by_name
+import requests
+import json
+from frappe.model.naming import make_autoname
 
-class JobOpening(WebsiteGenerator):
-	website = frappe._dict(
-		template = "templates/generators/job_opening.html",
-		condition_field = "publish",
-		page_title_field = "job_title",
-	)
 
-	def validate(self):
-		if not self.route:
-			self.route = frappe.scrub(self.job_title).replace('_', '-')
-		self.validate_current_vacancies()
+class JobOpening(Document):
+	def autoname(self):
+		self.title = f"{self.position_title}"
 
-	def validate_current_vacancies(self):
-		if not self.staffing_plan:
-			staffing_plan = get_active_staffing_plan_details(self.company,
-				self.designation)
-			if staffing_plan:
-				self.staffing_plan = staffing_plan[0].name
-				self.planned_vacancies = staffing_plan[0].vacancies
-		elif not self.planned_vacancies:
-			planned_vacancies = frappe.db.sql("""
-				select vacancies from `tabStaffing Plan Detail`
-				where parent=%s and designation=%s""", (self.staffing_plan, self.designation))
-			self.planned_vacancies = planned_vacancies[0][0] if planned_vacancies else None
+	def before_save(self):
+		if self.is_new() and self.job_opening_status != "Open":
+			frappe.throw(_("Job Opening can only be created with status <b>Open<b>."))
 
-		if self.staffing_plan and self.planned_vacancies:
-			staffing_plan_company = frappe.db.get_value("Staffing Plan", self.staffing_plan, "company")
-			lft, rgt = frappe.get_cached_value('Company',  staffing_plan_company,  ["lft", "rgt"])
+		if not self.creation_date:
+			self.creation_date = frappe.utils.nowdate()
+		if not self.is_new() and self.name:
+			update_job_opening_to_career_portal(self)
+		
+		# self.load_competencies()
+		
+	def load_competencies(self):
+		"""Load competencies from the selected position"""
+		if self.position:
+			position_doc = frappe.get_doc("Position", self.position)
 
-			designation_counts = get_designation_counts(self.designation, self.company)
-			current_count = designation_counts['employee_count'] + designation_counts['job_openings']
+			self.required_core_skills = []
+			for core_skill in position_doc.required_core_skills:
+				core_doc = frappe.new_doc("Core Skills")
+				core_doc.update({
+					"skill": core_skill.get("skill"),
+					"required_proficiency_level": core_skill.get("required_proficiency_level"),
+				})
+				self.append("required_core_skills", core_doc)
+			
+			self.required_behavioral_competencies = []
+			for behavioral_competency in position_doc.required_behavioral_competencies:
+				behavioral_doc = frappe.new_doc("Behavioral Skills")
+				behavioral_doc.update({
+					"skill": behavioral_competency.get("skill"),
+					"required_proficiency_level": behavioral_competency.get("required_proficiency_level"),
+					
+				})
+				self.append("required_behavioral_competencies", behavioral_doc)
 
-			if self.planned_vacancies <= current_count:
-				frappe.throw(_("Job Openings for designation {0} already open \
-					or hiring completed as per Staffing Plan {1}"
-					.format(self.designation, self.staffing_plan)))
 
-	def get_context(self, context):
-		context.parents = [{'route': 'jobs', 'title': _('All Jobs') }]
+@frappe.whitelist()
+def sync_job_openings(doc, method=None):
+	if doc:
+		for platform in doc.job_posting_sites:
+			if platform.get("site_name") == "Career Portal":
+				sync_jobs_to_career_portal(doc, sync_job_timming = [platform.get("start_time"), platform.get("end_time")])
+			else:
+				continue
 
-def get_list_context(context):
-	context.title = _("Jobs")
-	context.introduction = _('Current Job Openings')
-	context.get_list = get_job_openings
 
-def get_job_openings(doctype, txt=None, filters=None, limit_start=0, limit_page_length=20, order_by=None):
-	fields = ['name', 'status', 'job_title', 'description']
+def sync_jobs_to_career_portal(doc, method=None, sync_job_timming=None):
+	payload = {}
+	
+	field_names = [
+			"name", "docstatus", "parent", "parentfield",
+			"parenttype", "idx", "job_title", "company", "status", "designation", "department",
+			"staffing_plan", "route", "_user_tags",
+			"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
+			"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
+			"no_of_openings", "required_education", "required_competencies",
+				"required_to_work_in_shifts",
+			"required_to_travel", "required_background_check",
+			"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
+			"maximum_salary", "brief_summary", "main_responsibilities", "position"
+		]
+	if isinstance(sync_job_timming, list):
+		if sync_job_timming[0]:
+			payload["start_date"] = sync_job_timming[0]
+		if sync_job_timming[1]:
+			payload["end_date"] = sync_job_timming[1]
 
-	filters = filters or {}
-	filters.update({
-		'status': 'Open'
-	})
+	for field in field_names:
+		value = getattr(doc, field, None)
+		if isinstance(value, list):
+			child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
+			if field in [ "required_education", "required_competencies"]:
+				payload[field] = child_list
+		else:
+			payload[field] = getattr(doc, field, None)
 
-	if txt:
-		filters.update({
-			'job_title': ['like', '%{0}%'.format(txt)],
-			'description': ['like', '%{0}%'.format(txt)]
-		})
+	base_url = get_config_by_name("Career_PORTAL_BASE_URL")
 
-	return frappe.get_all(doctype,
-		filters,
-		fields,
-		start=limit_start,
-		page_length=limit_page_length,
-		order_by=order_by
-	)
+	url  = f"{base_url}api/jobs/create"
+	headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
+	try:
+		for x in range(1, 4):
+
+			res = requests.request("POST", url, headers=headers, data= json.dumps(payload, default=json_serial))
+			integeration_payload = str(json.dumps(payload, default=json_serial))
+			nrp_integeration = {
+				"ref_doctype": "Job Opening",
+				"doctype": "Nrp Integration",
+				"request": integeration_payload
+			}
+
+			nrp_integeration["title"] = "On job opening  --- {0}".format(doc.name)
+			nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+			frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+			frappe.db.commit()
+			if res.status_code != 201:
+				frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+			else:
+				break
+
+	except requests.exceptions.RequestException as e:
+		frappe.log_error(f"Failed to sync job opening to Career Portal: {str(e)}", "Job Opening Sync")
+
+def json_serial(obj):
+	from datetime import datetime, date
+	"""JSON serializer for datetime or date objects."""
+	if isinstance(obj, (datetime, date)):
+		return obj.strftime('%Y-%m-%d')
+	raise TypeError(f"Type {type(obj)} not serializable")
+
+@frappe.whitelist()
+def update_job_opening_to_career_portal(doc, method=None, sync_job_timming=None):
+	if doc:
+		for platform in doc.job_posting_sites:
+			if platform.get("site_name") == "Career Portal":
+			
+				payload = {}
+				
+				field_names = [
+						"name", "docstatus", "parent", "parentfield",
+						"parenttype", "idx", "job_title", "company", "status", "designation", "department",
+						"staffing_plan", "route", "_user_tags",
+						"_comments", "_assign", "_liked_by", "branch", "sub_branch", "job_opening_status",
+						"p", "job_requisition_id", "position_title", "cadre", "grade", "location",
+						"no_of_openings", "required_education", "required_competencies", "required_to_work_in_shifts",
+						"required_to_travel", "required_background_check",
+						"should_be_able_to_join_in_days", "preferred_interview_mode", "minimum_salary",
+						"maximum_salary", "brief_summary", "main_responsibilities", "position"
+					]
+				if isinstance(sync_job_timming, list):
+					if sync_job_timming[0]:
+						payload["start_date"] = sync_job_timming[0]
+					if sync_job_timming[1]:
+						payload["end_date"] = sync_job_timming[1]
+
+				for field in field_names:
+					value = getattr(doc, field, None)
+					if isinstance(value, list):
+						child_list = [child_doc.as_dict() for child_doc in value if hasattr(child_doc, 'as_dict')]
+						if field in ["required_education", "required_competencies"]:
+							payload[field] = child_list
+					else:
+						payload[field] = getattr(doc, field, None)
+
+				base_url = get_config_by_name("Career_PORTAL_BASE_URL")
+
+				url  = f"{base_url}api/jobs/{doc.name}/update"
+				headers = {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")}
+				try:
+					for x in range(1, 4):
+
+						res = requests.request("POST", url, headers=headers, data= json.dumps(payload, default=json_serial))
+						integeration_payload = str(json.dumps(payload, default=json_serial))
+						nrp_integeration = {
+							"ref_doctype": "Job Opening",
+							"doctype": "Nrp Integration",
+							"request": integeration_payload
+						}
+
+						nrp_integeration["title"] = "On job opening update  --- {0}".format(doc.name)
+						nrp_integeration["response"] = str(res.status_code) + ': ' + res.reason
+						frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+						frappe.db.commit()
+						if res.status_code != 201:
+							frappe.log_error(message=res.reason, title="Error in Career Portal Api | Status: {0} Retery: {1}".format(str(res.status_code),x))
+						else:
+							break
+				except requests.exceptions.RequestException as e:
+					frappe.log_error(f"Failed to update job opening to Career Portal: {str(e)}", "Job Opening Update")
+			else:
+				continue
