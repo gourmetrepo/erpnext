@@ -16,7 +16,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Application Type",
-   "options": "\nExternal\nInternal"
+   "options": "External\nInternal"
   },
   {
    "fieldname": "job_opening",
@@ -48,7 +48,7 @@
   }
  ],
  "istable": 1,
- "modified": "2025-07-17 16:37:28.255517",
+ "modified": "2025-07-23 12:04:29.396994",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Job Application History",
