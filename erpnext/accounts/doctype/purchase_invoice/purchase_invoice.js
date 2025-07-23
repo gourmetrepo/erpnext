@@ -568,7 +568,7 @@ frappe.ui.form.on("Purchase Invoice", {
           function(d) {
             var tax_and_charges = d.taxes_and_charges_deducted
     	    console.log('tax_and_charges',tax_and_charges);
-    	    if(frm.doc.token_no != '' && tax_and_charges == 0 && frm.doc.docstatus == 0){
+    	    if(frm.doc.token_no && tax_and_charges == 0 && frm.doc.docstatus == 0){
     	         frm.trigger('taxes_and_charges')
     	    }
         })
