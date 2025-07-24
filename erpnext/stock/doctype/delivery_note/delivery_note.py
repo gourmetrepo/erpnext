@@ -911,26 +911,27 @@ def validate_palletized_items(doc):
 		if not isinstance(actual_qty, (int, float)) or actual_qty < 0 or (isinstance(actual_qty, float) and not actual_qty.is_integer()):
 			frappe.throw("Returnable Item qty must be a whole number for Row {0}".format(item.get("idx")))
 @frappe.whitelist()
+@frappe.whitelist()
 def make_purchase_order_interunit(delivery_note_name):
+	from frappe.utils import flt
 	from collections import defaultdict
 	delivery_note = frappe.get_doc("Delivery Note",delivery_note_name)
 	po = frappe.new_doc("Purchase Order")
 	po.supplier = frappe.db.get_value('Supplier',{'supplier_name':delivery_note.company},'name')
-	item_map = defaultdict(lambda: {"qty": 0, "rate": 0, "conversion_factor": None, "uom": None, "count": 0 })
+	item_map = defaultdict(lambda: {"qty": 0, "rate": 0, "conversion_factor": None, "uom": None, "total_amount": 0 })
 
 	for item in delivery_note.items:
 		if item.against_sales_order:
 			rate = frappe.db.get_value('Batch', item.batch_no, 'valuation_rate') or 0
-			print(f"Batch .no {item.batch_no} rate {rate}")
 			item_map[item.item_code]["qty"] += item.qty
 			item_map[item.item_code]["rate"] += rate
 			item_map[item.item_code]["conversion_factor"] = item.conversion_factor
 			item_map[item.item_code]["uom"] = item.uom
-			item_map[item.item_code]["count"] += 1 
+			item_map[item.item_code]["total_amount"] += item.qty * rate  
 
 	for item_code, data in item_map.items():
 		total_qty = data.get("qty")
-		rate = data.get("rate") / data.get("count") if  data.get("count", 0) else 0
+		rate = flt(data.get("total_amount") / data.get("qty"), 3) if data.get("total_amount") and data.get("qty") else 0
 
 		po.append("items", {
 			"item_code": item_code,
