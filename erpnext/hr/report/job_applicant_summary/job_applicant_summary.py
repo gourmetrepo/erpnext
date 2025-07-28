@@ -17,72 +17,72 @@ def get_columns(filters=None):
 			"label": "Platform",
 			"fieldname": "platform",
 			"fieldtype": "Data",
-			"width": 190
+			"width": 110
 		},
 		{
 			"label": "Applied",
 			"fieldname": "applied",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 80
 		},
 		{
 			"label": "Longlisted",
 			"fieldname": "longlisted",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 100
 		},
 		{
 			"label": "Shortlisted",
 			"fieldname": "shortlisted",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 100
 		},
 		{
 			"label": "Interview",
 			"fieldname": "interview",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 90
 		},
 		{
 			"label": "Accepted",
 			"fieldname": "accepted",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 90
 		},
 		{
 			"label": "Rejected",
 			"fieldname": "rejected",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 90
 		},
 		{	"label": "On Hold",
 			"fieldname": "on_hold",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 80
 		},
 		{
 			"label": "Offered",
 			"fieldname": "offered",
 			"fieldtype": "Int",
-			"width": 120
+			"width": 80
 		},
 		{
 			"label": "Offer Accepted",
 			"fieldname": "offer_accepted",
 			"fieldtype": "Int",
-			"width": 130
+			"width": 120
 		},
 		{
 			"label": "Offer Rejected",
 			"fieldname": "offer_rejected",
 			"fieldtype": "Int",
-			"width": 130
+			"width": 120
 		},
 		{
 			"label": "Hired",
 			"fieldname": "hired",
 			"fieldtype": "Int",
-			"width": 130
+			"width": 75
 		}
 	]
  
