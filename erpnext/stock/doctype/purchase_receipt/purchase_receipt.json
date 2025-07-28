@@ -13,6 +13,7 @@
   "naming_series",
   "supplier",
   "supplier_name",
+  "sub_contractor",
   "supplier_delivery_note",
   "column_break1",
   "posting_date",
@@ -1072,12 +1073,19 @@
    "fieldtype": "Currency",
    "label": "Total Landed Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "sub_contractor",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Sub Contractor",
+   "options": "Supplier"
   }
  ],
  "icon": "fa fa-truck",
  "idx": 261,
  "is_submittable": 1,
- "modified": "2025-01-29 12:16:33.180287",
+ "modified": "2025-07-28 11:58:59.156421",
  "modified_by": "Administrator",
  "module": "Stock",
  "name": "Purchase Receipt",
