@@ -113,6 +113,7 @@
   "column_break_77",
   "source",
   "campaign",
+  "against_document",
   "printing_details",
   "language",
   "letter_head",
@@ -1210,13 +1211,19 @@
    "in_standard_filter": 1,
    "label": "Customer Category",
    "read_only": 1
+  },
+  {
+   "fieldname": "against_document",
+   "fieldtype": "Data",
+   "label": "Against Document",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-07-01 14:58:40.633653",
- "modified_by": "zeeshan.riaz@gourmetpakistan.com",
+ "modified": "2025-07-29 14:42:14.057330",
+ "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",
  "owner": "Administrator",

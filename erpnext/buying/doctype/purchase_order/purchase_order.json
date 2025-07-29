@@ -115,6 +115,7 @@
   "column_break_74",
   "per_received",
   "per_billed",
+  "against_document",
   "column_break5",
   "letter_head",
   "select_print_heading",
@@ -1052,12 +1053,18 @@
    "oldfieldtype": "Currency",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "against_document",
+   "fieldtype": "Data",
+   "label": "Against Document",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-03-21 15:47:49.842314",
+ "modified": "2025-07-29 14:44:21.129451",
  "modified_by": "Administrator",
  "module": "Buying",
  "name": "Purchase Order",
