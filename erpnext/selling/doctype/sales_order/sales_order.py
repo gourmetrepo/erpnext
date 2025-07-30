@@ -78,6 +78,8 @@ class SalesOrder(SellingController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
+
+
 	def validate_po(self):
 		# validate p.o date v/s delivery date
 		if self.po_date and not self.skip_delivery_note:
@@ -235,14 +237,61 @@ class SalesOrder(SellingController):
 						else:
 							has_fg_not_preform = True
 					else:
-						has_non_fg = True
+						clubbed_returnable_items[returnable.returnable_item]['qty'] += qty
+					
+				for item, returnable in clubbed_returnable_items.items():
+					returnable_doc = frappe.new_doc("Sale Order Returnable Item")
+					returnable_doc.item_code = item
+					returnable_doc.item_name = returnable['item_name']
+					returnable_doc.rate = returnable['rate']
+					returnable_doc.qty = returnable['qty']
+					returnable_doc.is_allways_return = returnable['is_allways_return']
+					self.append('returnable_items', returnable_doc)
+					
+					# temp_item = self.append('returnable_items',{})
+					# temp_item.item_code = returnable.returnable_item
+					# temp_item.item_name = returnable.returnable_item_name
+					# temp_item.rate = returnable.sale_price
+					# temp_item.item_group = returnable.item_group
+					# temp_item.qty = qty
+					# temp_item.is_allways_return = returnable.is_allways_return
+		else:
+			returnables = returnable_items(self.items,self.company)
+			self.returnable_items = {} # reset		
+			for returnable in returnables:
+				ordered_qty = 0
+				for item in self.items:
+					if item.item_code == returnable.item:
+						ordered_qty = item.qty
+						break
+				if ordered_qty == 0:
+					frappe.throw(f"Item {returnable.item_name} qty must be greater then zero")
+				if returnable.returnable_qty == 1:
+					qty = ordered_qty / returnable.item_qty
+				else:
+					res = returnable.item_qty / returnable.returnable_qty
+					qty = ordered_qty * res
+				qty = math.ceil(qty)
+				# check if item is ordered then please adjust the RI quantity
+				minus_qty = 0
+				for i in self.items:
+					if i.item_code == returnable.returnable_item:
+						minus_qty = i.qty
+						break
+				qty -= minus_qty
+				temp_item = self.append('returnable_items',{})
+				temp_item.item_code = returnable.returnable_item
+				temp_item.item_name = returnable.returnable_item_name
+				temp_item.rate = returnable.sale_price
+				temp_item.item_reference = returnable.item
+				temp_item.qty = qty
+				temp_item.is_allways_return = returnable.is_allways_return
 
-				if has_fg_preform and has_fg_not_preform:
-					frappe.throw(_("You cannot mix 'Finished Good + Preform' and 'Finished Good + other' items in the same Sales Order."))
-
-				if has_fg_not_preform and has_non_fg:
-					frappe.throw(_("You cannot mix 'Finished Good + non-Preform' items with 'Non-Finished Good' items in the same Sales Order."))
-
+	def save(self, *args, **kwargs):
+		# Log Sales Order at GSSM
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 
 	def submit(self, *args, **kwargs):
@@ -278,6 +327,11 @@ class SalesOrder(SellingController):
 		if self.coupon_code:
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
+		
+		# Log Sales Order at GSSM
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 		# For Sub Contractor
 		if self.request_from == "SubContractor":
