@@ -263,6 +263,11 @@ class PayrollEntry(Document):
 		return payroll_payable_account
 
 	def make_accrual_jv_entry(self):
+		
+		draft_salary = frappe.db.get_value("Salary Slip", {"payroll_entry": self.name, "docstatus": 0}, "name")
+		if draft_salary:
+			frappe.throw(_("Salary Slips {0} is in Draft state. Please submit it before submitting Payroll Entry.").format(draft_salary))	
+
 		import datetime
 		self.check_permission('write')
 		# date_obj = datetime.strptime(self.end_date, '%Y-%m-%d')
