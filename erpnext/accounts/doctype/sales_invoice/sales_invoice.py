@@ -149,6 +149,16 @@ class SalesInvoice(SellingController):
 
 	def before_save(self):
 		set_account_for_mode_of_payment(self)
+
+		if self.request_from == "SubContractor":
+			try:
+				frappe.enqueue("erpnext.accounts.doctype.sales_invoice.sales_invoice.submit_doc_for_subcontractor", docname=self.name, queue="si_primary", enqueue_after_commit=True)
+				frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback()
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback, title=f"Error while enqueue submit_doc_for_subcontractor from sales invoice: {self.name}.")
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
 	
 	def submit(self, *args, **kwargs):
 		ignore_workflow = kwargs.get('ignore_workflow', False)
@@ -1709,3 +1719,14 @@ def create_invoice_discounting(source_name, target_doc=None):
 
 	return invoice_discounting
 
+@frappe.whitelist()
+def submit_doc_for_subcontractor(docname):
+	try:
+		doc = frappe.get_doc("Sales Invoice", docname)
+		doc.submit()
+		frappe.db.commit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while submitting PI: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
