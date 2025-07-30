@@ -180,6 +180,28 @@ class PurchaseReceipt(BuyingController):
 		from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 		update_serial_nos_after_submit(self, "items")
 
+		# Check for sub contractor
+		if self.supplier == "SUP-IU-00005" and self.company in ["Unit 5", "Unit 8", "Unit 11"]:
+			try:
+				frappe.enqueue("erpnext.stock.doctype.purchase_receipt.purchase_receipt.create_documents_flow", docname=self.name, queue="long", enqueue_after_commit=True)
+				frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback()
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback, title=f"Error while enqueue create_documents_flow from purchase receipt: {self.name}.")
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+		
+		# Create purchase invoice for subcontractor
+		if self.request_from == "SubContractor":
+			try:
+				frappe.enqueue("erpnext.stock.doctype.purchase_receipt.purchase_receipt.create_purchase_invoice", docname=self.name, queue="long", enqueue_after_commit=True)
+				frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback()
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback, title=f"Error while enqueue create_purchase_invoice from purchase receipt: {self.name}.")
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
 		# self.make_gl_entries()
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
@@ -790,3 +812,116 @@ def delete_items(data):
 # 		if supplied_item.rm_item_code in valuation_batchwise_data and supplied_item.batch_no in valuation_batchwise_data[supplied_item.rm_item_code]:
 # 			supplied_item.rate = valuation_batchwise_data[supplied_item.rm_item_code][supplied_item.batch_no]
 # 			supplied_item.amount = supplied_item.rate * supplied_item.consumed_qty
+
+
+@frappe.whitelist()
+def create_documents_flow(docname):
+	from datetime import datetime
+	items = {
+		"po_items": [],
+		"so_items": []
+	}
+	try:
+		doc = frappe.get_doc("Purchase Receipt", docname)
+		# Get appropriate company
+		company = frappe.get_value("Supplier", doc.supplier, "represents_company")
+
+		# Get appropriate customer
+		customer = frappe.get_value("Customer", {"represents_company": doc.company}, "name")
+
+		for dt in doc.items:
+			items["so_items"].append({
+				"item_code": dt.get("item_code"),
+				"qty": dt.get("qty"),
+				"discount_percentage": 0.0,
+				"doctype": "Sales Order Item"
+			})
+			items["po_items"].append({
+				"item_code": dt.get("item_code"),
+				"qty": dt.get("qty"),
+				"discount_percentage": 0.0,
+				"doctype": "Purchase Order Item"
+			})
+
+		# Create Purchase Order
+		po_dict = {
+			"doctype": "Purchase Order",
+			"company": company,
+			"supplier": doc.sub_contractor,
+			"request_from": "SubContractor",
+			"purchase_order_type": "Local",
+			"subcontracted": 1,
+			"is_subcontracted": "Yes",
+			"schedule_date": datetime.today().strftime('%Y-%m-%d'),
+			"items": items.get("po_items", []),
+			"against_document": doc.name
+		}
+		
+		purchase_order = frappe.get_doc(po_dict)
+		purchase_order.save(ignore_permissions=True)
+		purchase_order.submit()
+		frappe.db.commit()
+
+		# Create Sales Order
+		so_dict = {
+			"doctype": "Sales Order",
+			"company": company,
+			"customer": customer,
+			"delivery_date": datetime.today().strftime('%Y-%m-%d'),
+			"order_type": "Sales",
+			"request_from": "SubContractor",
+			"items": items.get("so_items", []),
+			"against_document": doc.name,
+			"sub_contractor": doc.sub_contractor
+		}
+
+		sales_order = frappe.get_doc(so_dict)
+		sales_order.save(ignore_permissions=True)
+		sales_order.submit()
+		frappe.db.commit()
+
+	except Exception as error:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error creating documents flow from Purchase Receipt: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(error))
+
+
+@frappe.whitelist()
+def create_purchase_invoice(docname):
+	from datetime import datetime
+	try:
+		frappe.db.commit()
+		doc = frappe.get_doc("Purchase Receipt", docname)
+
+		pi_items = []
+		for dt in doc.items:
+			pi_items.append({
+				"item_code": dt.get("item_code"),
+				"qty": dt.get("qty"),
+				"discount_percentage": 0.0,
+				"purchase_order": dt.purchase_order,
+				"purchase_receipt": doc.name,
+				"doctype": "Purchase Invoice Item"
+			})
+
+		pi_dict = {
+			"doctype": "Purchase Invoice",
+			"company": doc.company,
+			"supplier": doc.supplier,
+			"is_subcontracted": "Yes",
+			"posting_date": datetime.today().strftime('%Y-%m-%d'),
+			"due_date": datetime.today().strftime('%Y-%m-%d'),
+			"posting_time": datetime.today().strftime('%H:%M:%S.%f'),
+			"items": pi_items,
+			"supplier_warehouse": doc.supplier_warehouse
+		}
+
+		purchase_invoice = frappe.get_doc(pi_dict)
+		purchase_invoice.save(ignore_permissions=True)
+		frappe.db.commit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while creating PI from purchase receipt: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
