@@ -286,12 +286,16 @@ class SalesOrder(SellingController):
 				temp_item.item_reference = returnable.item
 				temp_item.qty = qty
 				temp_item.is_allways_return = returnable.is_allways_return
+		# if self.request_from == "GSSM":
+		# 	from nrp_manufacturing.utils import send_notification_to_gssm
+		# 	send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
-	def save(self, *args, **kwargs):
-		# Log Sales Order at GSSM
-		if self.request_from == "GSSM":
-			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
+
+	# def save(self, *args, **kwargs):
+	# 	# Log Sales Order at GSSM
+	# 	if self.request_from == "GSSM":
+	# 		from nrp_manufacturing.utils import send_notification_to_gssm
+	# 		send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 
 	def submit(self, *args, **kwargs):
@@ -329,9 +333,9 @@ class SalesOrder(SellingController):
 			update_coupon_code_count(self.coupon_code,'used')
 		
 		# Log Sales Order at GSSM
-		if self.request_from == "GSSM":
-			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
+		# if self.request_from == "GSSM":
+		# 	from nrp_manufacturing.utils import send_notification_to_gssm
+		# 	send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 		# For Sub Contractor
 		if self.request_from == "SubContractor":
