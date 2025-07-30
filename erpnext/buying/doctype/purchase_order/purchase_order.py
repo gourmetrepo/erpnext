@@ -275,6 +275,16 @@ class PurchaseOrder(BuyingController):
 		update_linked_doc(self.doctype, self.name, self.inter_company_order_reference)
 		if self.company=='Unit 6':
 			close_old_po(self.supplier,self.name,self.company)
+
+		if self.request_from == "SubContractor":
+			try:
+				frappe.enqueue("erpnext.buying.doctype.purchase_order.purchase_order.create_purchase_receipt_for_subcontractor", docname=self.name, queue="long", enqueue_after_commit=True)
+				frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback()
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback, title=f"Error while enqueue PR from purchase order: {self.name}.")
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
 	  
 	def on_cancel(self):
 		super(PurchaseOrder, self).on_cancel()
@@ -856,3 +866,49 @@ def validate_inter_unit(purchase_order):
 	if purchase_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and purchase_order.supplier_name in ['Unit 5', 'Unit 8', 'Unit 11']:
 		if purchase_order.purchase_order_type != 'Inter Unit Purchase':
 			purchase_order.purchase_order_type = 'Inter Unit Purchase'
+
+@frappe.whitelist()
+def create_purchase_receipt_for_subcontractor(docname):
+	from datetime import datetime
+	try:
+		frappe.db.commit()
+		doc = frappe.get_doc("Purchase Order", docname)
+
+		pr_items = []
+		for dt in doc.items:
+			pr_items.append({
+				"item_code": dt.get("item_code"),
+				"qty": dt.get("qty"),
+				"discount_percentage": 0.0,
+				"manufacturing_date": datetime.today().strftime('%Y-%m-%d'),
+				"expiry_date" : (datetime.today().replace(year=datetime.today().year + 1)).strftime('%Y-%m-%d'),
+				"purchase_order": doc.name,
+				"doctype": "Purchase Receipt Item"
+			})
+
+		# Create Purchase Receipt
+		set_warehouse = frappe.get_value("Supplier", doc.supplier, "supplier_warehouse")
+		pr_dict = {
+			"doctype": "Purchase Receipt",
+			"company": doc.company,
+			"supplier": doc.supplier,
+			"request_from": doc.request_from,
+			"purchase_order_type": "Local",
+			"subcontracted": 1,
+			"is_subcontracted": "Yes",
+			"posting_date": datetime.today().strftime('%Y-%m-%d'),
+			"posting_time": datetime.today().strftime('%H:%M:%S.%f'),
+			"set_warehouse": set_warehouse,
+			"items": pr_items,
+			"supplier_warehouse": doc.supplier_warehouse
+		}
+
+		purchase_receipt = frappe.get_doc(pr_dict)
+		purchase_receipt.save(ignore_permissions=True)
+		purchase_receipt.submit()
+		frappe.db.commit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while creating PR from purchase order: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))

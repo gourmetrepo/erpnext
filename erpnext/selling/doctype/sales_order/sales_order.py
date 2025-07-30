@@ -299,6 +299,17 @@ class SalesOrder(SellingController):
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
 
+		# For Sub Contractor
+		if self.request_from == "SubContractor":
+			try:
+				frappe.enqueue("erpnext.selling.doctype.sales_order.sales_order.create_delivery_note_for_subcontractor", docname=self.name, queue="so_secondary", enqueue_after_commit=True)
+				frappe.db.commit()
+			except Exception as e:
+				frappe.db.rollback()
+				traceback = frappe.get_traceback()
+				frappe.log_error(message=traceback, title=f"Error While enqueue DN from sales order: {self.name}.")
+				self.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
 	def on_cancel(self):
 		super(SalesOrder, self).on_cancel()
 
@@ -1351,3 +1362,46 @@ def validate_inter_unit(sales_order):
 	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
 		if sales_order.order_type != 'Inter Unit Sales':
 			sales_order.order_type = 'Inter Unit Sales'
+
+@frappe.whitelist()
+def create_delivery_note_for_subcontractor(docname):
+	from datetime import datetime
+	try:
+		frappe.db.commit()
+		doc = frappe.get_doc("Sales Order", docname)
+
+		dn_items = []
+		for dt in doc.items:
+			dn_items.append({
+				"item_code": dt.get("item_code"),
+				"qty": dt.get("qty"),
+				"discount_percentage": 0.0,
+				"against_sales_order": doc.name,
+				"doctype": "Delivery Note Item"
+			})
+
+		# Create Delivery Note
+		supplier_warehouse = frappe.get_value("Supplier", doc.sub_contractor, "supplier_warehouse")
+		dn_dict = {
+			"doctype": "Delivery Note",
+			"company": doc.company,
+			"customer": doc.customer,
+			"posting_date": datetime.today().strftime('%Y-%m-%d'),
+			"posting_time": datetime.today().strftime('%H:%M:%S.%f'),
+			"sale_order_refrence": doc.name,
+			"request_from": "SubContractor",
+			"items": dn_items,
+			"set_warehouse": supplier_warehouse,
+			"customer_type": "Supplier",
+			"transporter": doc.sub_contractor,
+			"vehicle_no": "1122"
+		}
+
+		delivery_note = frappe.get_doc(dn_dict)
+		delivery_note.save(ignore_permissions=True)
+		delivery_note.submit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while creating DN from sales order: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
