@@ -80,6 +80,8 @@ class SalesOrder(SellingController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
+
+
 	def validate_po(self):
 		# validate p.o date v/s delivery date
 		if self.po_date and not self.skip_delivery_note:
@@ -313,6 +315,14 @@ class SalesOrder(SellingController):
 				temp_item.item_reference = returnable.item
 				temp_item.qty = qty
 				temp_item.is_allways_return = returnable.is_allways_return
+
+	def save(self, *args, **kwargs):
+		# Log Sales Order at GSSM
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
+
+
 	def submit(self, *args, **kwargs):
 		# if self.request_from == 'RMS':
 		# 	if(self.section in get_config_by_name('dn_queue_section',[])):
@@ -345,6 +355,11 @@ class SalesOrder(SellingController):
 		if self.coupon_code:
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
+		
+		# Log Sales Order at GSSM
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 	def on_cancel(self):
 		super(SalesOrder, self).on_cancel()
