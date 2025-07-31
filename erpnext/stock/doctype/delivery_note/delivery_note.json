@@ -51,7 +51,6 @@
   "ignore_pricing_rule",
   "sec_warehouse",
   "set_warehouse",
-  "set_warehouse_once",
   "col_break_warehouse",
   "to_warehouse",
   "items_section",
