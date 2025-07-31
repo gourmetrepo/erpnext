@@ -1280,14 +1280,6 @@
    "hidden": 1,
    "label": "Set Warehouse Once",
    "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "set_warehouse_once",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Set Warehouse Once",
-   "read_only": 1
   }
  ],
  "icon": "fa fa-truck",
