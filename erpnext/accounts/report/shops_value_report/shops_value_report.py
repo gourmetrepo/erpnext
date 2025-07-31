@@ -77,7 +77,7 @@ SELECT party,account,SUM(credit)-SUM(debit) AS shop_value, GROUP_CONCAT(CONCAT('
                     ) AS a
 					INNER JOIN `tabCustomer` AS c ON a.party = c.`name`  
                     GROUP BY party, account""",
-                as_dict=True,
+                as_dict=True,debug=True
             )
 
             grouped_data = {}
