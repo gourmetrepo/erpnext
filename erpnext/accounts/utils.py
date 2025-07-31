@@ -1532,7 +1532,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 			frappe.throw(f"No overhead config for company: {company}")
 
 		jv_amount = total_payable_amount * overhead_percent
-		inter_unit_payable = total_payable_amount - jv_amount
+		inter_unit_payable = total_payable_amount + jv_amount
 
 		jv_accounts = []
 
