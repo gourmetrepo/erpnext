@@ -2,6 +2,9 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+import json
+
+import requests
 import frappe
 from frappe.utils import cint
 from frappe.model.document import Document
@@ -28,12 +31,56 @@ class JobOffer(Document):
 	def on_submit(self):
 		if self.applicant_id:	
 			frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Offered")
+			sync_job_offer_with_career_portal(self)
 
 	def on_cancel(self):
 		self.offer_status = "Cancelled"
 		if self.applicant_id:
 			frappe.db.set_value("Job Applicant", self.applicant_id, "job_applicant_status", "Accepted")
 
+def sync_job_offer_with_career_portal(doc):
+    from nerp.utils import get_config_by_name
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': get_config_by_name("CAREER_PORTAL_API_TOKEN")
+    }
+    
+    try:
+        job_applicant = frappe.get_doc("Job Applicant", doc.applicant_id)
+
+        payload = {
+            "status": "Offered",
+            "offer_data": doc.as_dict()
+        }
+        
+        baseurl = get_config_by_name("Career_PORTAL_BASE_URL")
+        url = f"{baseurl}api/user/applications/{job_applicant.source_id}/status"  
+        
+        for x in range(1, 4):
+            res = requests.post(url, headers=headers, data=json.dumps(payload))
+            integeration_payload = json.dumps(payload)
+            
+            nrp_integeration = {
+                "ref_doctype": "Job Offer",
+                "doctype": "Nrp Integration",
+                "request": integeration_payload,
+                "title": f"On Submit Job Offer — {doc.name}",
+                "response": f"{res.status_code}: {res.reason}"
+            }
+
+            frappe.get_doc(nrp_integeration).save(ignore_permissions=True)
+            frappe.db.commit()
+
+            if res.status_code != 200:
+                frappe.log_error(
+                    message=res.text,
+                    title=f"Error in Career Portal API | Status: {res.status_code} Retry: {x}"
+                )
+            else:
+                break
+    except requests.exceptions.RequestException as e:
+        frappe.log_error(f"Failed to sync Job Offer: {str(e)}", "Job Offer Sync Failure")
 
 def update_job_applicant(status, job_applicant):
 	if status in ("Accepted", "Rejected"):
