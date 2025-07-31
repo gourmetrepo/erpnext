@@ -854,7 +854,7 @@ def create_documents_flow(docname):
 		company = frappe.get_value("Supplier", doc.supplier, "represents_company")
 
 		# Get appropriate customer
-		customer = frappe.get_value("Customer", {"represents_company": doc.company}, "name")
+		customer, price_list = frappe.get_value("Customer", {"represents_company": doc.company}, ["name", "default_price_list"])
 
 		for dt in doc.items:
 			items["so_items"].append({
@@ -899,7 +899,8 @@ def create_documents_flow(docname):
 			"request_from": "SubContractor",
 			"items": items.get("so_items", []),
 			"against_document": doc.name,
-			"sub_contractor": doc.sub_contractor
+			"sub_contractor": doc.sub_contractor,
+			"selling_price_list": price_list
 		}
 
 		sales_order = frappe.get_doc(so_dict)
