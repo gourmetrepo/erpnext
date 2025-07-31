@@ -1394,7 +1394,8 @@ def create_delivery_note_for_subcontractor(docname):
 			"set_warehouse": supplier_warehouse,
 			"customer_type": "Supplier",
 			"transporter": doc.sub_contractor,
-			"vehicle_no": "1122"
+			"vehicle_no": "1122",
+			"selling_price_list": doc.selling_price_list
 		}
 
 		delivery_note = frappe.get_doc(dn_dict)
