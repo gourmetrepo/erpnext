@@ -80,7 +80,8 @@ class SalesOrder(SellingController):
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
 
-
+		# Validation for interunit CSD suggested by Zain Riaz (unit 5, 8, 11)
+		validate_inter_unit(self)
 
 	def validate_po(self):
 		# validate p.o date v/s delivery date
@@ -1466,3 +1467,9 @@ def create_delivery_note_for_subcontractor(docname):
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=traceback, title=f"Error while creating DN from sales order: {doc.name}.")
 		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
+def validate_inter_unit(sales_order):
+	"""Validate inter-unit sales order for CSD Unit 5, Unit 8, Unit 11."""
+	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
+		if sales_order.order_type != 'Inter Unit Sales':
+			sales_order.order_type = 'Inter Unit Sales'
