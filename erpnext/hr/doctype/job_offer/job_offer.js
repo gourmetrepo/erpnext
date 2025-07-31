@@ -78,6 +78,23 @@ frappe.ui.form.on("Job Offer", {
             });
         }
     },
+    salary_component_template: function(frm) {
+        if (!frm.doc.salary_component_template) return;
+        frappe.db.get_doc("Salary Component Template", frm.doc.salary_component_template)
+            .then(template => {
+                frm.clear_table("salary_component_details");
+                (template.salary_components_and_amounts || []).forEach(row => {
+                    let child = frm.add_child("salary_component_details", {
+                        salary_components: row.salary_components,
+                        amount: row.amount
+                    });
+                });
+                frm.refresh_field("salary_component_details");
+            })
+            .catch(err => {
+                frappe.msgprint("Could not fetch template: " + err.message);
+            });    
+    },
     select_job_offer_template: function(frm) {
         if (!frm.doc.select_job_offer_template) return;
 
