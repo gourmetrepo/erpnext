@@ -593,11 +593,6 @@ class SalesOrder(SellingController):
 		if tot_qty != 0:
 			self.db_set("per_delivered", flt(delivered_qty/tot_qty) * 100,
 				update_modified=False)
-			if self.request_from == "GSSM":
-				from nrp_manufacturing.utils import send_notification_to_gssm
-				send_notification_to_gssm(status=f"Delivered: {self.per_delivered}, Remaining: {flt(100-self.per_delivered)}", document_number=self.name, document_type="Sales Order")
-
-				
 
 
 	def set_indicator(self):
