@@ -1223,18 +1223,20 @@
   {
    "fieldname": "closed_date",
    "fieldtype": "Datetime",
-   "label": "Closed Date"
+   "label": "Closed Date",
+   "read_only": 1
   },
   {
    "fieldname": "reopened_date",
    "fieldtype": "Datetime",
-   "label": "Reopened Date"
+   "label": "Reopened Date",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-08-04 15:58:25.455301",
+ "modified": "2025-08-04 16:16:09.694023",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",
