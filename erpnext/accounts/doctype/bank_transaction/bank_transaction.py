@@ -256,6 +256,7 @@ def create_doc_from_import(file_url):
 				"credit": float(data.get("Credit", "")),
 				"debit": float(data.get("Debit", "")),
 				"balance": float(data.get("Balance", "")),
+				"unallocated_amount": abs(flt(data.get("Credit", "")) - flt(data.get("Debit", ""))),
 				"date": date
 			}
 
