@@ -15,6 +15,7 @@
   "section_break_4",
   "debit",
   "credit",
+  "balance",
   "column_break_7",
   "currency",
   "section_break_10",
@@ -160,11 +161,22 @@
    "fieldname": "unallocated_amount",
    "fieldtype": "Currency",
    "label": "Unallocated Amount"
+  },
+  {
+   "fieldname": "balance",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Balance"
   }
  ],
  "is_submittable": 1,
+<<<<<<< Updated upstream
  "modified": "2025-04-24 16:36:40.278580",
  "modified_by": "Administrator",
+=======
+ "modified": "2025-08-04 13:55:49.046993",
+ "modified_by": "attiqur.rehman@gourmetpakistan.com",
+>>>>>>> Stashed changes
  "module": "Accounts",
  "name": "Bank Transaction",
  "owner": "Administrator",
