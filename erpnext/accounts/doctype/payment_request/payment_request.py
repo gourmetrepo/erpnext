@@ -348,7 +348,8 @@ def make_payment_request(**args):
 			"company": ref_doc.company,
 			"party_type": args.get("party_type") or "Customer",
 			"party": args.get("party") or ref_doc.get("customer"),
-			"bank_account": bank_account
+			"bank_account": bank_account,
+			"lease_contract_reference": ref_doc.get("lease_contract_reference", None) # Code by Moeiz, Lease Contract Configurations
 		})
 
 		if args.order_type == "Shopping Cart" or args.mute_email:
