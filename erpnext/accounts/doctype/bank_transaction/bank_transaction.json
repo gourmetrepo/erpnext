@@ -170,13 +170,8 @@
   }
  ],
  "is_submittable": 1,
-<<<<<<< Updated upstream
- "modified": "2025-04-24 16:36:40.278580",
- "modified_by": "Administrator",
-=======
  "modified": "2025-08-04 13:55:49.046993",
  "modified_by": "attiqur.rehman@gourmetpakistan.com",
->>>>>>> Stashed changes
  "module": "Accounts",
  "name": "Bank Transaction",
  "owner": "Administrator",
