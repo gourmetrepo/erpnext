@@ -4,7 +4,7 @@
 frappe.listview_settings['Bank Transaction'] = {
 	onload: function(listview) {
         listview.page.add_inner_button(__('Download Template'), function() {
-            const filePath = "/assets/erpnext/csv/Bank_Transactions.csv";
+            const filePath = "/assets/erpnext/csv/Bank Transaction.csv";
             const baseUrl = window.location.origin;
             const fileUrl = baseUrl + filePath;
             window.open(fileUrl, '_blank');
