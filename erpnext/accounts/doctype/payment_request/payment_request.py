@@ -186,6 +186,12 @@ class PaymentRequest(Document):
 				"cost_center": company_details.cost_center,
 				"amount": payment_entry.difference_amount
 			})
+		
+		# Code by Moeiz
+		# Leasing Contract Configurations
+		payment_entry.update({
+			"lease_contract_reference": self.get("lease_contract_reference", None)
+		})
 
 		if submit:
 			payment_entry.insert(ignore_permissions=True)

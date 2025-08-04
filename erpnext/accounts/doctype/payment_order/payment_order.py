@@ -126,7 +126,10 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 		je.voucher_type = "Cash Entry"
 
 	paid_amt = 0
-	
+
+	# Code by Moeiz
+	# Lease Contract Configurations
+	lease_contract_reference = None
 	for d in doc.references:
 		if (d.supplier == supplier
 			and (not mode_of_payment or mode_of_payment == d.mode_of_payment)):
@@ -143,6 +146,8 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 			})
 
 			paid_amt += d.amount
+			if d.get('lease_contract_reference', None) and not lease_contract_reference:
+				lease_contract_reference = d.get('lease_contract_reference', None)
 
 	# je.append('references', {
 	# 	'total_amount': paid_amt,
@@ -154,6 +159,12 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 	je.paid_amount = paid_amt
 	je.received_amount = paid_amt
 	je.flags.ignore_mandatory = True
+	
+	# Code by Moeiz
+	# Lease Contract Configurations
+	je.lease_contract_reference = lease_contract_reference
+	
+	
 	je.save()
 	# doc.references[0].mode_of_payment == 'BANK' or 
 	# if doc.references[0].mode_of_payment == 'Cheque':
