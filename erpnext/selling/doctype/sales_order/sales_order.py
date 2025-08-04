@@ -6,7 +6,7 @@ import math
 import frappe
 import json
 import frappe.utils
-from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, strip_html
+from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, strip_html,now_datetime
 from frappe import _
 from six import string_types
 from frappe.model.utils import get_fetch_values
@@ -504,9 +504,9 @@ class SalesOrder(SellingController):
 					frappe.throw(_("Cannot close Sales Order. Sales Invoices: {0} are already at draft for this Sales Order.").format(", ".join(existing_sales_invoice_links)))
 
 		if status == "Closed":
-			frappe.db.set_value("Sales Order", self.name, "closed_date", frappe.utils.now(), update_modified=True)
+			frappe.db.sql(""" update `tabSales Order` set closed_date = %s where name = %s """, (frappe.utils.now(), self.name))
 		elif status == "Draft":
-			frappe.db.set_value("Sales Order", self.name, "reopened_date", frappe.utils.now(), update_modified=True)
+			frappe.db.sql(""" update `tabSales Order` set reopened_date = %s where name = %s """, (frappe.utils.now(), self.name))
 
 		self.check_modified_date()
 		self.set_status(update=True, status=status)
