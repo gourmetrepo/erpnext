@@ -21,6 +21,8 @@
   "company",
   "transaction_date",
   "delivery_date",
+  "closed_date",
+  "reopened_date",
   "po_no",
   "po_date",
   "tax_id",
@@ -1217,12 +1219,22 @@
    "fieldtype": "Data",
    "label": "Against Document",
    "read_only": 1
+  },
+  {
+   "fieldname": "closed_date",
+   "fieldtype": "Datetime",
+   "label": "Closed Date"
+  },
+  {
+   "fieldname": "reopened_date",
+   "fieldtype": "Datetime",
+   "label": "Reopened Date"
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-07-29 14:42:14.057330",
+ "modified": "2025-08-04 15:58:25.455301",
  "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",
