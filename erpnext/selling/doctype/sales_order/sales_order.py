@@ -6,7 +6,7 @@ import math
 import frappe
 import json
 import frappe.utils
-from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, strip_html,now_datetime
+from frappe.utils import cstr, flt, getdate, cint, nowdate, add_days, get_link_to_form, strip_html
 from frappe import _
 from six import string_types
 from frappe.model.utils import get_fetch_values
