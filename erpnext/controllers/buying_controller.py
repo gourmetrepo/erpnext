@@ -730,6 +730,10 @@ class BuyingController(StockController):
 			row.item_code, ['asset_naming_series', 'asset_category'], as_dict=1)
 
 		purchase_amount = flt(row.base_rate + row.item_tax_amount)
+		# Code by Moeiz
+		# Leasing Contract Configurations for Fixed Assets
+		lease_contract_reference = self.get('lease_contract_reference', None)
+
 		asset = frappe.get_doc({
 			'doctype': 'Asset',
 			'item_code': row.item_code,
@@ -744,13 +748,19 @@ class BuyingController(StockController):
 			'purchase_receipt_amount': purchase_amount,
 			'gross_purchase_amount': purchase_amount,
 			'purchase_receipt': self.name if self.doctype == 'Purchase Receipt' else None,
-			'purchase_invoice': self.name if self.doctype == 'Purchase Invoice' else None
+			'purchase_invoice': self.name if self.doctype == 'Purchase Invoice' else None,
+			'lease_contract_reference': lease_contract_reference
 		})
 		if self.project:
 			asset.update({'project': self.project})
 		if item_data.cost_center:
 			asset.update({'cost_center': item_data.cost_center})
-
+		
+		if lease_contract_reference and self.doctype == 'Purchase Receipt':
+			cost_center = frappe.db.get_value('Lease Contract', lease_contract_reference, 'cost_center')
+			if cost_center:
+				asset.update({'cost_center': cost_center})
+		
 		asset.flags.ignore_validate = True
 		asset.flags.ignore_mandatory = True
 		asset.set_missing_values()
