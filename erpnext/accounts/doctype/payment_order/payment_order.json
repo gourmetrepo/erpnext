@@ -12,6 +12,7 @@
   "column_break_2",
   "posting_date",
   "company_bank",
+  "wire_transfer",
   "company_bank_account",
   "account",
   "section_break_5",
@@ -104,10 +105,16 @@
    "fieldname": "account",
    "fieldtype": "Data",
    "label": "Account"
+  },
+  {
+   "default": "0",
+   "fieldname": "wire_transfer",
+   "fieldtype": "Check",
+   "label": "Wire Transfer"
   }
  ],
  "is_submittable": 1,
- "modified": "2020-04-06 18:00:56.022642",
+ "modified": "2025-07-01 15:17:20.560185",
  "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Order",

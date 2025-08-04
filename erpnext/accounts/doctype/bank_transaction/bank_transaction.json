@@ -10,8 +10,8 @@
   "date",
   "column_break_2",
   "status",
-  "company",
   "bank_account",
+  "company",
   "section_break_4",
   "debit",
   "credit",
@@ -63,9 +63,8 @@
    "fieldname": "bank_account",
    "fieldtype": "Link",
    "in_standard_filter": 1,
-   "label": "Account",
-   "options": "Account",
-   "reqd": 1
+   "label": "Bank Account",
+   "options": "Account"
   },
   {
    "fetch_from": "bank_account.company",
@@ -74,7 +73,7 @@
    "in_standard_filter": 1,
    "label": "Company",
    "options": "Company",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "section_break_4",
@@ -164,8 +163,8 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2025-05-19 12:42:36.176158",
- "modified_by": "attiqur.rehman@gourmetpakistan.com",
+ "modified": "2025-04-24 16:36:40.278580",
+ "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Bank Transaction",
  "owner": "Administrator",
