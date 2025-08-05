@@ -129,19 +129,6 @@ frappe.ui.form.on("Purchase Receipt", {
 		});
 	},
 
-	supplier: function(frm) {
-		if (frm.doc.company && frm.doc.supplier == "SUP-IU-00005" && ["Unit 5", "Unit 8", "Unit 11"].includes(frm.doc.company)) {
-			frm.set_df_property('sub_contractor', 'hidden', false);
-		}
-		frm.set_query('sub_contractor', function() {
-			return {
-				filters: {
-					third_party_warehouse: 1
-				}
-			};
-		});
-	},
-
 	toggle_display_account_head: function(frm) {
 		var enabled = erpnext.is_perpetual_inventory_enabled(frm.doc.company)
 		frm.fields_dict["items"].grid.set_column_disp(["cost_center"], enabled);
