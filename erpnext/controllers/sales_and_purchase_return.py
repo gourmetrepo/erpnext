@@ -211,7 +211,8 @@ def make_return_doc(doctype, source_name, target_doc=None):
 	default_warehouse_for_sales_return = frappe.db.get_value("Company", company, "default_warehouse_for_sales_return")
 	def set_missing_values(source, target):
 		doc = frappe.get_doc(target)
-		doc.approved_at = None
+		if doctype == "Delivery Note":
+			doc.approved = None
 		doc.is_return = 1
 		if doc.is_return == 1 and (doc.doctype!='Purchase Invoice' or doc.doctype!='Sales Invoice'):
 			doc.naming_series = 'MAT-VC-.YYYY.-'
