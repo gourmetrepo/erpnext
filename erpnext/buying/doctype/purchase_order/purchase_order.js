@@ -174,6 +174,18 @@ frappe.ui.form.on("Purchase Order", {
 			}
 		});
 	},
+	supplier: function(frm) {
+		if (frm.doc.company && frm.doc.supplier == "SUP-IU-00005" && ["Unit 5", "Unit 8", "Unit 11"].includes(frm.doc.company)) {
+			frm.set_df_property('sub_contractor', 'hidden', false);
+		}
+		frm.set_query('sub_contractor', function() {
+			return {
+				filters: {
+					third_party_warehouse: 1
+				}
+			};
+		});
+	},
 	// ==============purchase order history  ticket 62056================
 	show_history:function(frm){
 		if(frm.doc.select_vehicle){
