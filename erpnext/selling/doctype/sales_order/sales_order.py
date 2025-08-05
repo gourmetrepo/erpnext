@@ -422,6 +422,11 @@ class SalesOrder(SellingController):
 		# 		if existing_draft_level_si:
 		# 			existing_sales_invoice_links = ["""<a href="#Form/Sales Invoice/{0}">{1}</a>""".format(si.name, si.name) for si in existing_draft_level_si]
 		# 			frappe.throw(_("Cannot close Sales Order. Sales Invoices: {0} are already at draft for this Sales Order.").format(", ".join(existing_sales_invoice_links)))
+		if status == "Closed":
+			frappe.db.sql(""" update `tabSales Order` set closed_date = %s where name = %s """, (frappe.utils.now(), self.name))
+		elif status == "Draft":
+			frappe.db.sql(""" update `tabSales Order` set reopened_date = %s where name = %s """, (frappe.utils.now(), self.name))
+
 		self.check_modified_date()
 		self.set_status(update=True, status=status)
 		self.update_reserved_qty()
