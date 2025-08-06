@@ -15,6 +15,7 @@ from erpnext.accounts.doctype.account.account import get_account_currency
 
 from erpnext.stock.utils import get_stock_value_on
 from erpnext.stock import get_warehouse_account_map
+from nrp_manufacturing.utils import get_config_by_name
 
 
 class FiscalYearError(frappe.ValidationError): pass
