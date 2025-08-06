@@ -57,6 +57,8 @@ class SalesOrder(SellingController):
 		self.validate_for_items()
 		self.validate_warehouse()
 		self.validate_drop_ship()
+		# Validation for interunit CSD suggested by Zain Riaz (unit 5, 8, 11)
+		validate_inter_unit(self)
 		self.validate_serial_no_based_delivery()
 		validate_inter_company_party(self.doctype, self.customer, self.company, self.inter_company_order_reference)
 
@@ -1344,3 +1346,8 @@ def validate_company_cost_center_and_accounts(sales_order):
 		if tax.cost_center and tax.cost_center not in cost_centers:
 			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
 
+def validate_inter_unit(sales_order):
+	"""Validate inter-unit sales order for CSD Unit 5, Unit 8, Unit 11."""
+	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
+		if sales_order.order_type != 'Inter Unit Sales':
+			sales_order.order_type = 'Inter Unit Sales'
