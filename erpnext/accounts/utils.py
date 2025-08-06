@@ -1487,6 +1487,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 					 pi.supplier AS supplier, pi.supplier_name AS supplier_name, pi.total AS total,
 					 pii.purchase_order AS purchase_order
 				FROM `tabPurchase Invoice` pi
+				INNER JOIN `tabPurchase Invoice Item` pii ON pii.parent=pi.name
 				LEFT JOIN `tabPurchase Receipt Item` AS pri ON pri.parent=pii.purchase_receipt
                 LEFT JOIN `tabPurchase Order Item` AS poi ON poi.parent=pri.purchase_order
                 LEFT JOIN `tabSales Order Item` AS soi ON soi.parent=poi.sales_order
@@ -1638,6 +1639,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 					 pii.purchase_order AS purchase_order
 				FROM `tabPurchase Invoice` pi
 				LEFT JOIN `tabPurchase Receipt Item` AS pri ON pri.parent=pii.purchase_receipt
+				INNER JOIN `tabPurchase Invoice Item` pii ON pii.parent=pi.name
                 LEFT JOIN `tabPurchase Order Item` AS poi ON poi.parent=pri.purchase_order
                 LEFT JOIN `tabSales Order Item` AS soi ON soi.parent=poi.sales_order
 				WHERE pi.name = "{purchase_invoice}"
