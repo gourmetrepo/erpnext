@@ -34,7 +34,7 @@ class Asset(AccountsController):
 		validate_company_cost_center_and_accounts(self)
 
 	def before_save(self):
-		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amountz
+		self.asset_gross_value = self.gross_purchase_amount + self.asset_capitalized_amount
 
 	def on_submit(self):
 		self.validate_in_use_date()
