@@ -397,6 +397,14 @@ class PurchaseInvoice(BuyingController):
 		self.update_project()
 		update_linked_doc(self.doctype, self.name, self.inter_company_invoice_reference)
 
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.supplier_name in ["Unit 5", "Unit 8", "Unit 11"] and self.docstatus == 1:
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_overhead_purchase_journal_entry",
+				queue="gl",
+				purchase_invoice=self.name,
+				enqueue_after_commit=True
+			)
+
 	def make_gl_entries(self, gl_entries=None, repost_future_gle=True, from_repost=False):
 		if not self.grand_total:
 			return
