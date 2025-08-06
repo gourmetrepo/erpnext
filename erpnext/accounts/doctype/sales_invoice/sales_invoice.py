@@ -282,6 +282,21 @@ class SalesInvoice(SellingController):
 		frappe.db.sql("UPDATE `tabSales Invoice` SET queue_status='Completed' WHERE `name`='{docname}';".format(docname=self.name))
 		if "Healthcare" in active_domains:
 			manage_invoice_submit_cancel(self, "on_submit")
+   
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.customer_name in ["Unit 5", "Unit 8", "Unit 11"] and self.docstatus == 1:
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_overhead_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_sales_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+	
 
 	def validate_pos_return(self):
 
