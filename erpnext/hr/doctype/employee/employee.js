@@ -352,6 +352,26 @@ frappe.ui.form.on('Employee',{
 			frm.set_df_property("valid_upto", "reqd", 1);
 		}
 	},
+	// Updating with all fields due to user requirement..
+	same_address_check: function(frm) {
+        frm.toggle_enable(['permanent_address', 'permanent_city'], !frm.doc.same_address_check);
+        if (frm.doc.same_address_check) {
+            update_permanent_fields(frm);
+        } else {
+            frm.set_value('permanent_address', '');
+            frm.set_value('permanent_city', '');
+        }
+    },
+    current_address: function(frm) {
+        if (frm.doc.same_address_check) {
+            update_permanent_fields(frm);
+        }
+    },
+    residing_city: function(frm) {
+        if (frm.doc.same_address_check) {
+            update_permanent_fields(frm);
+        }
+    },
 	make_dashboard: function(frm) {
 		let employee_details_columns;
 		let employee_details_data;
@@ -630,3 +650,8 @@ frappe.ui.form.on('Employee Address',{
     }
 });
 cur_frm.cscript = new erpnext.hr.EmployeeController({frm: cur_frm});
+
+function update_permanent_fields(frm) {
+    frm.set_value('permanent_address', frm.doc.current_address || '');
+    frm.set_value('permanent_city', frm.doc.residing_city || '');
+}
