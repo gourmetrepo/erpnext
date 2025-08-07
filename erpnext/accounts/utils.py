@@ -907,7 +907,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 		units = ", ".join(f"'{c}'" for c in inter_units_overhead.keys())
 
 		si = frappe.db.sql(
-			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, 
+			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
 					 si.customer AS customer, si.posting_date AS posting_date, 
 					 si.customer_name AS customer_name, si.total AS total, 
 					 sii.delivery_note AS delivery_note 
@@ -955,7 +955,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 		company_no = comp[1]
 		item_category = si.get("item_category")
 
-		if item_category != "Finished Good":
+		if item_category != "Finished Good" or si.get("so_item_group") == "FG Preforms":
 			frappe.log_error(f"Invalid item category '{item_category}' in Sales Invoice {sales_invoice}. Only 'Finished Good' allowed.")
 			return
 
@@ -1084,7 +1084,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 		frappe.log_error(f"Error in overhead_jv: {str(e)}", title="Inter Unit Overhead Sales JV Error")
 		try:
 			si = frappe.db.sql(
-			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, 
+			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
 					 si.customer AS customer, si.posting_date AS posting_date, 
 					 si.customer_name AS customer_name, si.total AS total, 
 					 sii.delivery_note AS delivery_note 
@@ -1159,6 +1159,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 				si.total AS total,
 				sii.sales_order AS sales_order,
 				soi.item_category AS so_item_category,
+				soi.item_group AS so_item_group,
 				soi.item_code AS so_item_code,
 				soi.qty AS so_qty,
 				soi.rate AS so_rate,
@@ -1204,7 +1205,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 						frappe.log_error(f"Journal Entry already exists for Sales Invoice {sales_invoice}")
 
 
-		if si.get("so_item_category") == "Finished Good":
+		if si.get("so_item_category") == "Finished Good" or si.get("so_item_group") == "FG Preforms":
 			frappe.log_error(f"Invalid item category '{si.get('so_item_category')}' in Sales Invoice {sales_invoice}. Only 'Non Finished Good' allowed.")
 			return
 
@@ -1485,7 +1486,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 		pi = frappe.db.sql(
 			f"""SELECT pi.name AS name, pi.company AS company, pri.item_category AS item_category,
 					 pi.supplier AS supplier, pi.supplier_name AS supplier_name, pi.total AS total,
-					 pii.purchase_order AS purchase_order
+					 pii.purchase_order AS purchase_order, soi.item_group AS soi_item_group
 				FROM `tabPurchase Invoice` pi
 				INNER JOIN `tabPurchase Invoice Item` pii ON pii.parent=pi.name
 				LEFT JOIN `tabPurchase Receipt Item` AS pri ON pri.parent=pii.purchase_receipt
@@ -1525,7 +1526,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 		comp = company.split(" ")
 		company_no = comp[1]
 
-		if pi.get("item_category") != "Finished Good":
+		if pi.get("item_category") != "Finished Good" or pi.get("soi_item_group") == "FG Preforms":
 			frappe.log_error( title="Invalid item category", message = f"Invalid item category '{pi.get('item_category')}' in Purchase Invoice {purchase_invoice}. Only 'Finished Good' allowed.")
 			return
 

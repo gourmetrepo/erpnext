@@ -50,6 +50,8 @@ class PurchaseOrder(BuyingController):
 			self.set_status()
 			self.check_on_hold_or_closed_status()
 			return
+
+		validate_inter_unit(self)
 		
 		# Code by Moeiz
 		# Project Based MR -> PO Validation
@@ -849,3 +851,8 @@ def validate_no_project_reference(doc):
 			if item.project:
 				frappe.throw(f"Purchase Order is not project based. Please remove project in Purchase Order items in Row# {item.idx} or Mark Purchase Order (or relevant Material Request) as Project Based")
 		
+def validate_inter_unit(purchase_order):
+	"""Validate inter-unit purchase order for CSD Unit 5, Unit 8, Unit 11."""
+	if purchase_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and purchase_order.supplier_name in ['Unit 5', 'Unit 8', 'Unit 11']:
+		if purchase_order.purchase_order_type != 'Inter Unit Purchase':
+			purchase_order.purchase_order_type = 'Inter Unit Purchase'
