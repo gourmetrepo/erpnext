@@ -339,6 +339,7 @@ class DeliveryNote(SellingController):
 		DeliveryNote.update_stock_ledger = update_stock_ledger
 		self.update_stock_ledger()
 		self.update_stock_reservation()
+		frappe.db.commit()
 		# stock_gl = frappe.new_doc('Stock GL Queue')
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
