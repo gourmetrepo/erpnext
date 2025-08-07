@@ -1205,7 +1205,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 						frappe.log_error(f"Journal Entry already exists for Sales Invoice {sales_invoice}")
 
 
-		if si.get("so_item_category") == "Finished Good" or si.get("so_item_group") == "FG Preforms":
+		if si.get("so_item_category") == "Finished Good" or (si.get("so_item_category") == "Finished Good"  and si.get("so_item_group") != "FG Preforms"):
 			frappe.log_error(f"Invalid item category '{si.get('so_item_category')}' in Sales Invoice {sales_invoice}. Only 'Non Finished Good' allowed.")
 			return
 
