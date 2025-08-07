@@ -82,6 +82,7 @@
   "column_break4",
   "current_accommodation_type",
   "current_address",
+  "same_address_check",
   "residing_city",
   "permanent_accommodation_type",
   "permanent_address",
@@ -846,12 +847,18 @@
    "fieldtype": "Table",
    "label": "Job Applicantion History",
    "options": "Job Application History"
+  },
+  {
+   "default": "0",
+   "fieldname": "same_address_check",
+   "fieldtype": "Check",
+   "label": "Permanent Address same as Current Address"
   }
  ],
  "icon": "fa fa-user",
  "idx": 24,
  "image_field": "image",
- "modified": "2025-07-23 17:26:53.863042",
+ "modified": "2025-08-07 18:18:40.636825",
  "modified_by": "Administrator",
  "module": "HR",
  "name": "Employee",
