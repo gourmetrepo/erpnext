@@ -37,9 +37,11 @@ class Employee(NestedSet):
 	
 	def before_save(self):
 		if self.is_new():
-			if self.job_applicant is not None:
-				frappe.db.set_value("Job Applicant", self.job_applicant, "job_applicant_status", "Hired")
-
+			for row in self.job_application_history:
+				if row.job_applicant:
+					job_applicant = frappe.get_doc("Job Applicant", row.job_applicant)
+					job_applicant.job_applicant_status = "Hired"
+					job_applicant.save(ignore_permissions=True)
 
 	def autoname(self):
 		naming_method = frappe.db.get_value("HR Settings", None, "emp_created_by")
