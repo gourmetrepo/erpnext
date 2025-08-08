@@ -1,0 +1,78 @@
+{
+ "add_total_row": 0,
+ "creation": "2025-08-08 14:30:08.259551",
+ "disable_prepared_report": 1,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "idx": 0,
+ "is_standard": "Yes",
+ "modified": "2025-08-08 14:30:08.259551",
+ "modified_by": "Administrator",
+ "module": "Accounts",
+ "name": "Profit and Loss Statement Monthly",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "GL Entry",
+ "report_name": "Profit and Loss Statement Monthly",
+ "report_type": "Script Report",
+ "roles": [
+  {
+   "role": "Auditor"
+  },
+  {
+   "role": "Accounts Manager"
+  },
+  {
+   "role": "Accounts User"
+  },
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "System Auditor"
+  },
+  {
+   "role": "CEO"
+  },
+  {
+   "role": "Manufacturing Manager"
+  },
+  {
+   "role": "Manufacturing User"
+  },
+  {
+   "role": "Configuration Manager"
+  },
+  {
+   "role": "Director IT"
+  },
+  {
+   "role": "SSAM Manager"
+  },
+  {
+   "role": "CFO"
+  },
+  {
+   "role": "Director Finance"
+  },
+  {
+   "role": "SSAM User"
+  },
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "Purchase User"
+  },
+  {
+   "role": "Head of Procurement"
+  },
+  {
+   "role": "Director"
+  },
+  {
+   "role": "Director CSD"
+  }
+ ]
+}
