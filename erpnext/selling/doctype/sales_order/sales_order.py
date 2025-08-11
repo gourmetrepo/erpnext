@@ -1393,12 +1393,14 @@ def create_delivery_note_for_subcontractor(docname):
 			"customer_type": "Supplier",
 			"transporter": doc.sub_contractor,
 			"vehicle_no": "1122",
-			"selling_price_list": doc.selling_price_list
+			"selling_price_list": doc.selling_price_list,
+			"against_document": doc.against_document
 		}
 
 		delivery_note = frappe.get_doc(dn_dict)
 		delivery_note.save(ignore_permissions=True)
-		delivery_note.submit()
+		frappe.db.commit()
+		# delivery_note.submit()
 	except Exception as e:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
