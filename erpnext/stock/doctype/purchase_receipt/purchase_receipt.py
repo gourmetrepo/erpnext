@@ -870,25 +870,6 @@ def create_documents_flow(docname):
 				"doctype": "Purchase Order Item"
 			})
 
-		# Create Purchase Order
-		po_dict = {
-			"doctype": "Purchase Order",
-			"company": company,
-			"supplier": doc.sub_contractor,
-			"request_from": "SubContractor",
-			"purchase_order_type": "Local",
-			"subcontracted": 1,
-			"is_subcontracted": "Yes",
-			"schedule_date": datetime.today().strftime('%Y-%m-%d'),
-			"items": items.get("po_items", []),
-			"against_document": doc.name
-		}
-		
-		purchase_order = frappe.get_doc(po_dict)
-		purchase_order.save(ignore_permissions=True)
-		purchase_order.submit()
-		frappe.db.commit()
-
 		# Create Sales Order
 		so_dict = {
 			"doctype": "Sales Order",
@@ -908,6 +889,24 @@ def create_documents_flow(docname):
 		sales_order.submit()
 		frappe.db.commit()
 
+		# Create Purchase Order
+		po_dict = {
+			"doctype": "Purchase Order",
+			"company": company,
+			"supplier": doc.sub_contractor,
+			"request_from": "SubContractor",
+			"purchase_order_type": "Local",
+			"subcontracted": 1,
+			"is_subcontracted": "Yes",
+			"schedule_date": datetime.today().strftime('%Y-%m-%d'),
+			"items": items.get("po_items", []),
+			"against_document": doc.name
+		}
+		
+		purchase_order = frappe.get_doc(po_dict)
+		purchase_order.save(ignore_permissions=True)
+		purchase_order.submit()
+		frappe.db.commit()
 	except Exception as error:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
