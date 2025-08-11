@@ -899,15 +899,33 @@ def create_purchase_receipt_for_subcontractor(docname):
 			"posting_time": datetime.today().strftime('%H:%M:%S.%f'),
 			"set_warehouse": set_warehouse,
 			"items": pr_items,
-			"supplier_warehouse": doc.supplier_warehouse
+			"supplier_warehouse": doc.supplier_warehouse,
+			"against_document": doc.against_document
 		}
 
 		purchase_receipt = frappe.get_doc(pr_dict)
 		purchase_receipt.save(ignore_permissions=True)
 		purchase_receipt.submit()
 		frappe.db.commit()
+
+		# Get DN created from tooling process and submit it after PR
+		frappe.enqueue("erpnext.buying.doctype.purchase_order.purchase_order.get_auto_tooling_dn", ref_doc=doc.against_document, queue="so_secondary", enqueue_after_commit=True)
+		frappe.db.commit()
 	except Exception as e:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=traceback, title=f"Error while creating PR from purchase order: {doc.name}.")
 		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
+
+@frappe.whitelist()
+def get_auto_tooling_dn(ref_doc):
+	try:
+		dn_ref = frappe.get_value("Delivery Note", {"against_document": ref_doc}, "name")
+		delivery_note = frappe.get_doc("Delivery Note", dn_ref)
+		delivery_note.submit()
+		frappe.db.commit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while submitting DN after PR submission against Doc: {ref_doc}.")
