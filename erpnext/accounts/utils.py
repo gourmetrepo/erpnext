@@ -908,8 +908,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 
 		units = ", ".join(f"'{c}'" for c in inter_units_overhead.keys())
 
-		si = frappe.db.sql(
-			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
+		qurey = f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
 					 si.customer AS customer, si.posting_date AS posting_date, 
 					 si.customer_name AS customer_name, si.total AS total, 
 					 sii.delivery_note AS delivery_note 
@@ -924,9 +923,9 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 				AND si.outstanding_amount != 0
 				AND so.order_type = 'Inter Unit Sales'
 				AND so.transaction_date >= '2025-05-05'
-				GROUP BY si.name""",
-			as_dict=True
-		)
+				GROUP BY si.name"""
+
+		si = frappe.db.sql(qurey , as_dict=True)
 
 		if not si:
 			frappe.throw(f"No valid Sales Invoice found for {sales_invoice}")
@@ -1084,25 +1083,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 	except Exception as e:
 		frappe.log_error(f"Error in overhead_jv: {str(e)}", title="Inter Unit Overhead Sales JV Error")
 		try:
-			si = frappe.db.sql(
-			f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
-					 si.customer AS customer, si.posting_date AS posting_date, 
-					 si.customer_name AS customer_name, si.total AS total, 
-					 sii.delivery_note AS delivery_note 
-				FROM `tabSales Invoice` si
-				INNER JOIN `tabSales Invoice Item` sii ON sii.parent=si.name
-				LEFT JOIN `tabSales Order Item` soi ON soi.parent=sii.sales_order
-				LEFT JOIN `tabSales Order` so ON so.name=soi.parent
-				WHERE si.name="{sales_invoice}"
-				AND si.customer_name IN ({units})
-				AND si.company IN ({units})
-				AND si.docstatus=1
-				AND si.outstanding_amount != 0
-				AND so.order_type = 'Inter Unit Sales'
-				AND so.transaction_date >= '2025-05-05'
-				GROUP BY si.name""",
-			as_dict=True
-			)
+			si = frappe.db.sql( qurey, as_dict=True)
 
 			if not si:
 				return
@@ -1424,7 +1405,7 @@ def fetch_receviables_from_gl_entry(voucher_type, voucher_no):
 
 def get_delivery_note_from_sales_invoice(si_name):
 	try:
-		dn = dn = frappe.db.sql(
+		dn = frappe.db.sql(
 			"""
 		SELECT delivery_note  
 		FROM `tabSales Invoice Item` 
@@ -1482,8 +1463,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 		inter_units_overhead_companies = list(inter_units_overhead.keys())
 		units = "IN ({})".format(", ".join(f"'{c}'" for c in inter_units_overhead_companies))
 
-		pi = frappe.db.sql(
-			f"""SELECT pi.name AS name, pi.company AS company, pri.item_category AS item_category,
+		qurey = f"""SELECT pi.name AS name, pi.company AS company, pri.item_category AS item_category,
 					 pi.supplier AS supplier, pi.supplier_name AS supplier_name, pi.total AS total,
 					 pii.purchase_order AS purchase_order, soi.item_group AS soi_item_group
 				FROM `tabPurchase Invoice` pi
@@ -1494,10 +1474,10 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 				AND pi.company {units}
 				AND pi.outstanding_amount != 0
 				AND pi.docstatus = 1
-				GROUP BY pi.name;""",
-			as_dict=True,
-			debug=True
-		)
+				GROUP BY pi.name"""
+
+		pi = frappe.db.sql(qurey, as_dict=True)
+  
 
 		if not pi:
 			frappe.throw(f"No valid Purchase Invoice found for {purchase_invoice}")
@@ -1629,21 +1609,7 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 
 	except Exception as e:
 		try:
-			pi = frappe.db.sql(
-			f"""SELECT pi.name AS name, pi.company AS company, pri.item_category AS item_category,
-					 pi.supplier AS supplier, pi.supplier_name AS supplier_name, pi.total AS total,
-					 pii.purchase_order AS purchase_order
-				FROM `tabPurchase Invoice` pi
-				INNER JOIN `tabPurchase Invoice Item` pii ON pii.parent=pi.name
-				LEFT JOIN `tabPurchase Receipt Item` pri ON pri.parent=pii.purchase_receipt
-				WHERE pi.name = "{purchase_invoice}"
-				AND pi.supplier_name {units}
-				AND pi.company {units}
-				AND pi.outstanding_amount != 0
-				AND pi.docstatus = 1
-				GROUP BY pi.name;""",
-			as_dict=True,
-			)
+			pi = frappe.db.sql(qurey, as_dict=True)
 			if not pi:
 				return
       
