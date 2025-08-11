@@ -872,8 +872,7 @@ def validate_no_project_reference(doc):
 def validate_inter_unit(purchase_order):
 	"""Validate inter-unit purchase order for CSD Unit 5, Unit 8, Unit 11."""
 	if purchase_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and purchase_order.supplier_name in ['Unit 5', 'Unit 8', 'Unit 11']:
-		if purchase_order.purchase_order_type != 'Inter Unit Purchase':
-			purchase_order.purchase_order_type = 'Inter Unit Purchase'
+		frappe.throw(_("Inter-unit purchase order is not allowed for CSD Unit 5, Unit 8, Unit 11"))
 
 
 @frappe.whitelist()
