@@ -637,7 +637,55 @@ frappe.ui.form.on('Employee',{
 				frm.set_value("user_id", r.message)
 			}
 		});
-	}
+	},
+	after_save: function(frm) {
+		frappe.db.exists('Salary Structure Assignment', { employee: frm.doc.docname }).then(exists => {
+        	if (exists) {return;}
+		});
+
+        let job_applicant_name = null;
+        if (frm.doc.job_application_history && frm.doc.job_application_history.length > 0) {
+            job_applicant_name = frm.doc.job_application_history[frm.doc.job_application_history.length - 1].job_applicant;
+        }
+	
+		// If there is not job applicant found, an empty form will be loaded for salary structure assignment.
+        if (!job_applicant_name) {
+            frappe.msgprint(__('No Job Applicant found in the Employee Document. Please fill details for Salary Structure Assignment manually.'));
+			frappe.set_route('Form', 'Salary Structure Assignment', 'New Salary Structure Assignment');
+    		return;
+        }
+
+        frappe.call({
+		    method: 'frappe.client.get_value',
+		    args: {
+		        doctype: 'Job Offer',
+		        filters: {
+		            applicant_id: job_applicant_name
+		        },
+		        fieldname: 'name'
+		    },
+		    callback: function(res) {
+		        if (res.message) {
+		            let job_offer = res.message.name;
+		            frappe.call({
+		                method: 'erpnext.hr.doctype.employee.employee.create_salary_structure_assignment',
+		                args: {
+							employee_name: frm.doc.name,
+		                    job_offer_name: job_offer
+		                },
+		                callback: function (r) {
+		                    if (!r.exc && r.message && r.message.name) {
+							    frappe.set_route('Form', 'Salary Structure Assignment', r.message.name);
+							}
+		                }
+		            });
+		        } else {
+		            frappe.msgprint(__('No Job Offer found for current applicant.'));
+		        }
+		    }
+		});
+
+    }
 });
 
 frappe.ui.form.on('Employee Address',{

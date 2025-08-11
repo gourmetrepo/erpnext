@@ -488,3 +488,54 @@ def update_employee(employee):
 def support_calculate_reporting_to(doc):
 	if doc:
 		doc.calculate_reporting_to()
+  
+# Mapper to map values of "Salary Component Details child table" from Job Offer to Salary Structure Assignment Document..
+@frappe.whitelist()
+def create_salary_structure_assignment(employee_name, job_offer_name):
+    employee = frappe.get_doc("Employee", employee_name)
+    job_offer = frappe.get_doc("Job Offer", job_offer_name)
+
+    assignment = frappe.new_doc("Salary Structure Assignment")
+
+    assignment.employee = employee.name
+    assignment.employee_name = employee.employee_name
+    assignment.department = employee.department
+    assignment.company = employee.company
+    assignment.designation = employee.designation
+    assignment.from_date = employee.actual_date_of_joining
+    
+    # Fetch salary structure based on the company of the employee.
+    salary_structure = frappe.db.get_value("Salary Structure", {
+		"company": employee.company
+	}, "name")
+    assignment.salary_structure = salary_structure    
+    
+    # Fetch latest income tax slab based on the company of the employee.
+    income_tax_slab = frappe.db.get_value("Income Tax Slab",{
+		"company": employee.company,
+	}, "name", order_by="effective_from desc")
+    
+    assignment.income_tax_slab = income_tax_slab
+    
+    # Mapping from "Child table: Salary Component" to target fields in Salary Structure Assignment..
+    component_to_field_map = {
+        "Base Salary": "cash_salary",
+        "Medical Allowance": "medical_allowance",
+        "Rent Allowance": "rent_allowance",
+        "Car Allowance": "car_allowance",
+        "Fuel Allowance": "fuel_allowance",
+        "Maintenance Allowance": "maintanance_allowance",
+        "Travelling Allowance":"travelling_allowance",
+        "Special Allowance":"special_allowance"
+    }
+
+    for row in job_offer.salary_component_details:
+        component_name = row.salary_components
+        amount = row.amount
+        fieldname = component_to_field_map.get(component_name)
+        if fieldname and hasattr(assignment, fieldname):
+            setattr(assignment, fieldname, amount)
+
+    assignment.save()
+    return assignment.as_dict()
+
