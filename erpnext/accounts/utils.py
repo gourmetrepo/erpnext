@@ -901,7 +901,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 		if not sales_invoice:
 			frappe.throw("Sales Invoice is required.")
 
-
+		sales_invoice_name = sales_invoice
 		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
 		if not inter_units_overhead:
 			frappe.throw("Inter Unit Sale Purchase config not found.")
@@ -1083,21 +1083,17 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 	except Exception as e:
 		frappe.log_error(f"Error in overhead_jv: {str(e)}", title="Inter Unit Overhead Sales JV Error")
 		try:
-			si = frappe.db.sql( qurey, as_dict=True)
 
-			if not si:
-				return
-
-			invoice = frappe.get_doc("Sales Invoice", si)
+			invoice = frappe.get_doc("Sales Invoice", sales_invoice_name)
 			if invoice.docstatus == 1:
 				invoice.cancel()
 				frappe.db.commit()
 
-			frappe.db.set_value("Sales Invoice", sales_invoice, "docstatus", 0)
+			frappe.db.set_value("Sales Invoice", sales_invoice_name, "docstatus", 0)
 
 			frappe.db.sql(
 				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Sales Invoice'",
-				sales_invoice
+				sales_invoice_name
 			)
 
 			invoice.add_comment(
@@ -1107,7 +1103,7 @@ def make_inter_unit_overhead_journal_entry(sales_invoice=None):
 			frappe.db.commit()
 		except Exception as revert_error:
 			frappe.log_error(
-				f"Failed to revert SI {sales_invoice} to draft: {revert_error}",
+				f"Failed to revert SI {sales_invoice_name} to draft: {revert_error}",
 				title="SI Revert Failure"
 			)
 
@@ -1125,6 +1121,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 		if not sales_invoice:
 			frappe.throw("Sales Invoice is required")
 
+		sales_invoice_name = sales_invoice
 		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
 		if not inter_units_overhead:
 			frappe.throw("Inter Unit Sale Purchase config not found")
@@ -1318,21 +1315,17 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 		frappe.log_error(f"Error in Inter Unit Sales JV: {str(e)}", title="Inter Unit Sales JV Error")
 
 		try:
-			sales_invoices = frappe.db.sql(query, as_dict=True)
-			if not sales_invoices:
-				return
-
-			sales_invoice = sales_invoices[0].get("name")
-			invoice = frappe.get_doc("Sales Invoice", sales_invoice)
+			
+			invoice = frappe.get_doc("Sales Invoice", sales_invoice_name)
 			if invoice.docstatus == 1:
 				invoice.cancel()
 				frappe.db.commit()
 
-			frappe.db.set_value("Sales Invoice", sales_invoice, "docstatus", 0)
+			frappe.db.set_value("Sales Invoice", sales_invoice_name, "docstatus", 0)
 
 			frappe.db.sql(
 				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Sales Invoice'",
-				sales_invoice
+				sales_invoice_name
 			)
 
 			invoice.add_comment(
@@ -1344,7 +1337,7 @@ def make_inter_unit_sales_journal_entry(sales_invoice=None):
 
 		except Exception as revert_error:
 			frappe.log_error(
-				f"Failed to revert SI {sales_invoice} to draft: {revert_error}",
+				f"Failed to revert SI {sales_invoice_name} to draft: {revert_error}",
 				title="SI Revert Failure"
 			)
 
@@ -1458,7 +1451,8 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 
 		if not purchase_invoice:
 			frappe.throw("Purchase Invoice is required.")
-
+   
+		purchase_invoice_name = purchase_invoice
 		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
 		if not inter_units_overhead:
 			frappe.throw("Inter Unit Sale Purchase configuration not found.")
@@ -1612,27 +1606,24 @@ def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
 
 	except Exception as e:
 		try:
-			pi = frappe.db.sql(qurey, as_dict=True)
-			if not pi:
-				return
-      
-			invoice = frappe.get_doc("Purchase Invoice", purchase_invoice)
+			
+			invoice = frappe.get_doc("Purchase Invoice", purchase_invoice_name)
 			if invoice.docstatus == 1:
 				invoice.cancel()
 				frappe.db.commit()
 
-			frappe.db.set_value("Purchase Invoice", purchase_invoice, "docstatus", 0)
+			frappe.db.set_value("Purchase Invoice", purchase_invoice_name, "docstatus", 0)
 
 			workflow_name = frappe.get_value("Workflow", {"document_type": "Purchase Invoice", "is_active": 1}, "name")
 			if workflow_name:
 				valid_states = frappe.get_all("Workflow Document State", filters={"parent": workflow_name}, fields=["state"])
 				valid_state_names = [s["state"] for s in valid_states]
 				if "Pending" in valid_state_names:
-					frappe.db.set_value("Purchase Invoice", purchase_invoice, "workflow_state", "Pending")
+					frappe.db.set_value("Purchase Invoice", purchase_invoice_name, "workflow_state", "Pending")
 
 			frappe.db.sql(
 				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Purchase Invoice'",
-				purchase_invoice
+				purchase_invoice_name
 			)
 
 			invoice.add_comment(
