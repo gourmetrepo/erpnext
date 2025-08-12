@@ -753,7 +753,7 @@ def make_damage_stock_entry(doc):
 			i.uom = item.get('uom')
 			i.stock_uom = item.get('uom')
 			i.asset_maintenance = doc.get('name')
-			i.project = asset_maintenance_doc.get('project', None)
+			i.project = doc.get('project', None)
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
