@@ -515,7 +515,7 @@ def make_issue_material_request(doc):
 
 			i={}
 			i['item_code']= item.item
-			i["qty"]= item.demand_qty
+			i["qty"]= float(item.demand_qty) if isinstance(item.demand_qty, str) else item.demand_qty
 			i["uom"]= item.uom 
 			i["conversion_factor"]= 1
 			i["warehouse"]=warehouse[1]
