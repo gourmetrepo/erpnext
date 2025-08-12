@@ -257,7 +257,9 @@ def create_doc_from_import(file_url):
 				"debit": float(data.get("Debit", "")),
 				"balance": float(data.get("Balance", "")),
 				"unallocated_amount": abs(flt(data.get("Credit", "")) - flt(data.get("Debit", ""))),
-				"date": date
+				"date": date,
+				"reference_number": data.get("Reference Number", ""),
+				"description": data.get("Description", "")
 			}
 
 			frappe.enqueue("erpnext.accounts.doctype.bank_transaction.bank_transaction.create_bank_transaction", queue='long', payload=as_payload)
