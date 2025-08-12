@@ -240,6 +240,13 @@ frappe.ui.form.on("Purchase Order", {
 		erpnext.queries.setup_queries(frm, "Warehouse", function() {
 			return erpnext.queries.warehouse(frm.doc);
 		});
+		if (frm.is_new()) {
+            let restricted_companies = ["Unit 5", "Unit 8", "Unit 11"];
+            
+            if (restricted_companies.includes(frm.doc.company) && frm.doc.supplier) {
+                frappe.throw("You are not allowed to create a document for this company.");
+            }
+        }
 	},
 
 
