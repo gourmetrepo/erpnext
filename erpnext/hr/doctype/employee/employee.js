@@ -662,6 +662,8 @@ frappe.ui.form.on('Employee',{
 		        filters: {
 		            applicant_id: job_applicant_name
 		        },
+				freeze: true,
+				freeze_message: "Creating Salary Structure Assignment...",
 		        fieldname: 'name'
 		    },
 		    callback: function(res) {
@@ -680,7 +682,7 @@ frappe.ui.form.on('Employee',{
 		                }
 		            });
 		        } else {
-		            frappe.msgprint(__('No Job Offer found for current applicant.'));
+		            frappe.msgprint(__('No Job Offer found for this employee. Kindly Create Salary Structure Assignment Manually.'));
 		        }
 		    }
 		});
