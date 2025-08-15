@@ -21,6 +21,7 @@
   "is_internal_supplier",
   "represents_company",
   "image",
+  "supplier_warehouse",
   "column_break0",
   "supplier_group",
   "supplier_type",
@@ -385,13 +386,19 @@
    "fieldtype": "Link",
    "label": "Bank Account",
    "options": "Bank Account"
+  },
+  {
+   "fieldname": "supplier_warehouse",
+   "fieldtype": "Link",
+   "label": "Supplier Warehouse",
+   "options": "Warehouse"
   }
  ],
  "icon": "fa fa-user",
  "idx": 370,
  "image_field": "image",
- "modified": "2025-07-17 15:57:09.138466",
- "modified_by": "shoaib.rehmat@gourmetpakistan.com",
+ "modified": "2025-08-08 11:22:33.730541",
+ "modified_by": "Administrator",
  "module": "Buying",
  "name": "Supplier",
  "name_case": "Title Case",
