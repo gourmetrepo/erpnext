@@ -197,7 +197,7 @@ def create_doc_from_import(file_url):
 		filename = file_doc.get_full_path()
 
 		# Check for mandatory columns
-		mandatory_columns = ['Company', 'Account', 'Credit', 'Debit', 'Date', 'Description', 'Reference Number']
+		mandatory_columns = ['Account', 'Company', 'Date', 'Reference Number', 'Description', 'Debit', 'Credit', 'Balance']
 		file_data = csv_to_dict(filename, mandatory_columns)
 		
 		# Check for empty values
@@ -207,7 +207,7 @@ def create_doc_from_import(file_url):
 					companies.append(v)
 				elif k == 'Account':
 					accounts.append(v)
-				elif k == 'Credit' or k == 'Debit':
+				elif k == 'Credit' or k == 'Debit' or k == 'Balance':
 					if float(v) < 0.0:
 						frappe.throw(f"Value for '{k}' at row: {counter} must be greater than 0")	
 				if not v:
@@ -255,7 +255,11 @@ def create_doc_from_import(file_url):
 				"bank_account": data.get("Account", ""),
 				"credit": float(data.get("Credit", "")),
 				"debit": float(data.get("Debit", "")),
-				"date": date
+				"balance": float(data.get("Balance", "")),
+				"unallocated_amount": abs(flt(data.get("Credit", "")) - flt(data.get("Debit", ""))),
+				"date": date,
+				"reference_number": data.get("Reference Number", ""),
+				"description": data.get("Description", "")
 			}
 
 			frappe.enqueue("erpnext.accounts.doctype.bank_transaction.bank_transaction.create_bank_transaction", queue='long', payload=as_payload)

@@ -146,6 +146,15 @@ frappe.ui.form.on('Payment Order', {
             frappe.throw("Please select Company's default bank");
         }
 		frm.trigger("remove_row_if_empty");
+		var payment_order_request = {
+			docstatus: 1,
+			status: ["=", "Initiated"],
+			company: frm.doc.company,
+		}
+		if (frm.doc.wire_transfer == 1){
+			payment_order_request["mode_of_payment"] = "Wire Transfer"
+		}
+		console.log(payment_order_request)
 		erpnext.utils.map_current_doc({
 			method: "nrp_manufacturing.modules.gourmet.payment_request.payment_request.make_payment_order",
 			source_doctype: "Payment Request",
@@ -153,11 +162,7 @@ frappe.ui.form.on('Payment Order', {
 			setters: {
 				party: frm.doc.supplier || "",
 			},
-			get_query_filters: {
-				docstatus: 1,
-				status: ["=", "Initiated"],
-				company: frm.doc.company,
-			}
+			get_query_filters: payment_order_request
 		});
 	},
 	company: function(frm) {

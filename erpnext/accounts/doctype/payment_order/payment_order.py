@@ -36,7 +36,9 @@ class PaymentOrder(Document):
 			account_type = frappe.get_value('Account', bank_account, 'account_type')
 			if account_type == 'Cash':
 				frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.create_payment_entries", name=self.name, queue="long", enqueue_after_commit=True)
-
+		# Create auto payment entries for 'Wire Transfer' payment order
+		if self.wire_transfer == 1:
+			frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.create_payment_entries", name=self.name, autosubmit=1, queue="long", enqueue_after_commit=True)
 	def on_cancel(self):
 		self.update_payment_status(cancel=True)
 
@@ -80,7 +82,7 @@ def make_payment_records(name, supplier, mode_of_payment=None):
 	doc = frappe.get_doc('Payment Order', name)
 	make_journal_entry(doc, supplier, mode_of_payment)
 
-def make_journal_entry(doc, supplier, mode_of_payment=None):
+def make_journal_entry(doc, supplier, mode_of_payment=None, autosubmit=0):
 
 	#check payemnt already exit or not
 	if frappe.db.exists("Payment Entry", {"company": doc.company, "party": supplier,'payment_order':doc.name}):
@@ -155,6 +157,8 @@ def make_journal_entry(doc, supplier, mode_of_payment=None):
 	je.received_amount = paid_amt
 	je.flags.ignore_mandatory = True
 	je.save()
+	if autosubmit==1:
+		je.submit()
 	# doc.references[0].mode_of_payment == 'BANK' or 
 	# if doc.references[0].mode_of_payment == 'Cheque':
 	# 	from  nrp_manufacturing.utils import update_cheque_number
@@ -384,12 +388,12 @@ def validate_company_cost_center_and_accounts(payment_order):
 				frappe.throw(_("Row {0} Bank Account: {1} does not belong to company {2}").format(reference.idx, reference.bank_account, company))
 
 @frappe.whitelist()
-def create_payment_entries(name):
+def create_payment_entries(name, autosubmit=0):
 	try:
 		doc = frappe.get_doc('Payment Order', name)
 		for vd in doc.vendor_details:
 			try:
-				frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.make_journal_entry", doc=doc, supplier=vd.supplier, queue="long", enqueue_after_commit=True)
+				frappe.enqueue("erpnext.accounts.doctype.payment_order.payment_order.make_journal_entry", doc=doc, supplier=vd.supplier, autosubmit=autosubmit, queue="long", enqueue_after_commit=True)
 			except Exception as e:
 				traceback = frappe.get_traceback()
 				frappe.log_error(message=traceback,title=f"Error while creating payment entry for supplier: {vd.supplier} from payment order {name}")

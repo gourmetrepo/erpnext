@@ -7,6 +7,15 @@ frappe.ui.form.on("Supplier", {
 		if (frm.doc.__islocal == 1) {
 			frm.set_value("represents_company", "");
 		}
+		frm.set_query('bank_account', function (doc, cdt, cdn) {
+			var d = locals[cdt][cdn];
+			return {
+				filters: {
+					'party_type': 'Supplier',
+					'party': frm.doc.name
+				}
+			}
+		});
 		frm.set_query('account', 'accounts', function (doc, cdt, cdn) {
 			var d = locals[cdt][cdn];
 			return {

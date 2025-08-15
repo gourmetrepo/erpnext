@@ -81,7 +81,6 @@
    "bold": 1,
    "fieldname": "supplier_name",
    "fieldtype": "Data",
-   "in_global_search": 1,
    "label": "Supplier Name",
    "no_copy": 1,
    "oldfieldname": "supplier_name",

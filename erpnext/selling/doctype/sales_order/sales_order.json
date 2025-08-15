@@ -21,6 +21,8 @@
   "company",
   "transaction_date",
   "delivery_date",
+  "closed_date",
+  "reopened_date",
   "po_no",
   "po_date",
   "tax_id",
@@ -1208,13 +1210,25 @@
    "fieldtype": "Data",
    "label": "Customer Category",
    "read_only": 1
+  },
+  {
+   "fieldname": "closed_date",
+   "fieldtype": "Datetime",
+   "label": "Closed Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reopened_date",
+   "fieldtype": "Datetime",
+   "label": "Reopened Date",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-file-text",
  "idx": 105,
  "is_submittable": 1,
- "modified": "2025-05-17 16:52:08.769600",
- "modified_by": "muhammadyasir@gourmetpakistan.com",
+ "modified": "2025-07-31 18:27:30.727305",
+ "modified_by": "Administrator",
  "module": "Selling",
  "name": "Sales Order",
  "owner": "Administrator",

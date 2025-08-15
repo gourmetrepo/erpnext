@@ -92,7 +92,7 @@ def execute(filters=None):
 
 	add_additional_uom_columns(columns, data, include_uom, conversion_factors)
 	for row in data:
-		already_reserved = frappe.db.sql(f""" SELECT ifnull(sum(sri.reserved_qty),0) as total
+		already_reserved = frappe.db.sql(f""" SELECT ifnull(sum(sri.reserved_qty) - sum(sri.delivered_qty),0) as total
 								FROM `tabStock Reservation Item` as sri
 								JOIN `tabStock Reservation` AS sr ON sr.name = sri.parent
 								WHERE sri.item = {frappe.db.escape(row['item_code'])} and sr.warehouse = {frappe.db.escape(row['warehouse'])} and sr.fulfilled = 0""", as_dict=True)
