@@ -279,6 +279,8 @@ class Customer(TransactionBase):
 				
 				# Maintain logs
 				frappe.db.set_value('Nrp Integration', nrp_logs.name, 'response', str(response_gssm))
+			if self.customer_group in ["Key-Account Customer", "CSD Distributors"]:
+				add_default_credit_limit(self)
 		except ValidationError as error:
 			return json_error_response(str(error))
 		except frappe.PermissionError as error:
@@ -375,7 +377,6 @@ def get_loyalty_programs(doc):
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_customer_list(doctype, txt, searchfield, start, page_len, filters=None):
-	searchfield = "`tabCustomer`." + searchfield
 	from erpnext.controllers.queries import get_fields
 
 	if frappe.db.get_default("cust_master_name") == "Customer Name":
@@ -574,3 +575,14 @@ def get_customer_primary_contact(doctype, txt, searchfield, start, page_len, fil
 			'customer': customer,
 			'txt': '%%%s%%' % txt
 		})
+
+def add_default_credit_limit(doc):
+    ''' As Per disscussion with BA Team. The default credit limit 1 will be 
+    added for Unit 5, Unit 8, Unit 11 and the 
+    customer group is Key-Account & CSD-Distributor only. '''
+
+    if not doc.credit_limits and doc.customer_group in ['Key-Account Customer', 'CSD Distributors']:
+        for company in ['Unit 5', 'Unit 8', 'Unit 11']:
+            new_row = doc.append("credit_limits", {})
+            new_row.company = company
+            new_row.credit_limit = 1
