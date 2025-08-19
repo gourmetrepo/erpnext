@@ -1314,7 +1314,8 @@ def hbl_integration(doc):
 			"supplier_bank_code":bank.bank_code,
 			"supplier_bank_account":supplier_bank_account.iban if supplier_bank_account.iban else supplier_bank_account.account_no,
 			"payment_purpose":"Fund Transfer",
-			"transaction_month":posting_date.strftime("%m")
+			"transaction_month":posting_date.strftime("%m"),
+			"amount":doc.paid_amount
 		}
 		response = send_request(hbl_data)
 		doc.add_comment('Comment', _('HBL Integration Response: {0}').format(response))
