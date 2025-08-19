@@ -534,7 +534,8 @@
    "fieldtype": "Select",
    "label": "Raw Materials Supplied",
    "options": "No\nYes",
-   "print_hide": 1
+   "print_hide": 1,
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.is_subcontracted==\"Yes\"",
@@ -545,6 +546,7 @@
    "options": "Warehouse",
    "print_hide": 1,
    "print_width": "50px",
+   "read_only": 1,
    "width": "50px"
   },
   {
@@ -1291,10 +1293,10 @@
    "fieldtype": "Column Break"
   },
   {
-    "fieldname": "project",
-    "fieldtype": "Link",
-    "label": "Project",
-    "options": "Project"
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
   },
   {
    "fieldname": "tax_withholding_category",
@@ -1308,8 +1310,8 @@
  "icon": "fa fa-file-text",
  "idx": 204,
  "is_submittable": 1,
- "modified": "2020-09-21 12:22:09.164068",
- "modified_by": "Administrator",
+ "modified": "2025-08-19 11:32:23.617234",
+ "modified_by": "attiqur.rehman@gourmetpakistan.com",
  "module": "Accounts",
  "name": "Purchase Invoice",
  "name_case": "Title Case",
