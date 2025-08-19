@@ -37,7 +37,7 @@ def calculate_segment_profit(f_date=''):
 		InterunitRevenue={"Confectionery":0,"Concentrate":0,"Juice":0,"csd":0,"nineteenLtr":0,"Water":0,"other":0}
 		bgroup = ['19 Ltr','Concentrate','Confectionery','CSD (Carbonated Soft Drinks)','Juice','Other','Water']
 
-		if(f_date!=''):
+		if(f_date!='' and f_date is not None):
 			date_yesterday = f_date
 		
 		else:
