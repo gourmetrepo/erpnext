@@ -13,6 +13,7 @@
   "posting_date",
   "company",
   "mode_of_payment",
+  "bank_queue_status",
   "party_section",
   "party_type",
   "party",
@@ -576,11 +577,18 @@
    "label": "Status",
    "options": "\nDraft\nSubmitted\nCancelled",
    "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.mode_of_payment == 'Wire Transfer'",
+   "fieldname": "bank_queue_status",
+   "fieldtype": "Data",
+   "label": "Bank Queue Status",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2025-05-13 13:44:54.349623",
- "modified_by": "moeiz.shahzad@gourmetpakistan.com",
+ "modified": "2025-08-18 14:37:04.555138",
+ "modified_by": "Administrator",
  "module": "Accounts",
  "name": "Payment Entry",
  "owner": "Administrator",
