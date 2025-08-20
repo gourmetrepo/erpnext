@@ -246,22 +246,32 @@ class SalesOrder(SellingController):
 			temp_item.is_allways_return = returnable.is_allways_return
 
 		# Add check for Inter Unit Sales to avoid multi category items SO
-		if self.order_type=="Inter Unit Sales":
+		if self.order_type == "Inter Unit Sales":
 			inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
-			inter_units_overhead_companies = []
-			item_cats = []
-
-			if inter_units_overhead:
-				for k,v in inter_units_overhead.items():
-					inter_units_overhead_companies.append(k)
+			inter_units_overhead_companies = list(inter_units_overhead.keys()) if inter_units_overhead else []
 
 			if self.company in inter_units_overhead_companies and self.customer_name in inter_units_overhead_companies:
-				for item in self.items:
-					if item.item_category not in item_cats:
-						item_cats.append(item.item_category)
+				has_fg_preform = False
+				has_fg_not_preform = False
+				has_non_fg = False
 
-				if len(item_cats) > 1:
-					frappe.throw(_("Cannot create Sales Order for multiple item categories"))
+				for item in self.items:
+					cat = item.item_category
+					grp = item.item_group
+
+					if cat == "Finished Good":
+						if grp == "FG Preforms":
+							has_fg_preform = True
+						else:
+							has_fg_not_preform = True
+					else:
+						has_non_fg = True
+
+				if has_fg_preform and has_fg_not_preform:
+					frappe.throw(_("You cannot mix 'Finished Good + Preform' and 'Finished Good + other' items in the same Sales Order."))
+
+				if has_fg_not_preform and has_non_fg:
+					frappe.throw(_("You cannot mix 'Finished Good + non-Preform' items with 'Non-Finished Good' items in the same Sales Order."))
 
 
 	def submit(self, *args, **kwargs):
