@@ -103,8 +103,10 @@ class DeliveryNote(SellingController):
 
 	def so_required(self):
 		"""check in manage account if sales order required or not"""
-		if frappe.db.get_value("Selling Settings", None, 'so_required') == 'Yes':
+		if frappe.db.get_value("Selling Settings", None, 'so_required') == 'Yes' and self.return_type!='Shop Return':
 			for d in self.get('items'):
+				if d.against_sales_order is None and d.against_sales_order=='' and self.sale_order_refrence is not None and self.sale_order_refrence!='':
+					d.against_sales_order = self.sale_order_refrence
 				if not d.against_sales_order:
 					frappe.throw(_("Sales Order required for Item {0}").format(d.item_code))
 
@@ -120,7 +122,7 @@ class DeliveryNote(SellingController):
 		self.validate_uom_is_integer("stock_uom", "stock_qty")
 		self.validate_uom_is_integer("uom", "qty")
 		self.validate_with_previous_doc()
-
+		self.validate_sale_order()
 		if self._action != 'submit' and not self.is_return:
 			set_batch_nos(self, 'warehouse', True)
 
@@ -169,6 +171,7 @@ class DeliveryNote(SellingController):
 				and not self.is_return:
 			self.validate_rate_with_reference_doc([["Sales Order", "against_sales_order", "so_detail"],
 				["Sales Invoice", "against_sales_invoice", "si_detail"]])
+
 
 	def validate_proj_cust(self):
 		"""check for does customer belong to same project as entered.."""
