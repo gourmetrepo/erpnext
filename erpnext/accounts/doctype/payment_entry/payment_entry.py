@@ -1297,7 +1297,7 @@ def hbl_integration(doc):
 		import re
 		from datetime import datetime
 		if bank.bank_code == "054":
-			lft_or_ibft = "IFT"
+			lft_or_ibft = "IFT01"
 		else:
 			lft_or_ibft = "IBFT2"
 
@@ -1305,7 +1305,7 @@ def hbl_integration(doc):
 		payment_order_reference = posting_date.strftime("%m")
 		payment_order_reference += posting_date.strftime("%y")
 		payment_order_reference += lft_or_ibft
-		payment_order_reference += re.sub(r"\D", "", doc.payment_order[-5:])
+		payment_order_reference += re.sub(r"\D", "", doc.payment_order)[-5:]
 		hbl_data = {
 			"payment_entry_name": doc.name.replace("-","")[-16:],
 			"payment_order_reference": payment_order_reference,
@@ -1315,7 +1315,8 @@ def hbl_integration(doc):
 			"supplier_bank_account":supplier_bank_account.iban if supplier_bank_account.iban else supplier_bank_account.account_no,
 			"payment_purpose":"Fund Transfer",
 			"transaction_month":posting_date.strftime("%m"),
-			"amount":doc.paid_amount
+			"amount":doc.paid_amount,
+			"document_name":doc.name
 		}
 		response = send_request(hbl_data)
 		doc.add_comment('Comment', _('HBL Integration Response: {0}').format(response))
