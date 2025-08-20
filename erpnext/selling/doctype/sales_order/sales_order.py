@@ -58,6 +58,7 @@ class SalesOrder(SellingController):
 		self.validate_warehouse()
 		self.validate_drop_ship()
 		self.validate_serial_no_based_delivery()
+		validate_inter_unit(self)
 		validate_inter_company_party(self.doctype, self.customer, self.company, self.inter_company_order_reference)
 
 		if self.coupon_code:
@@ -1404,3 +1405,9 @@ def create_delivery_note_for_subcontractor(docname):
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=traceback, title=f"Error while creating DN from sales order: {doc.name}.")
 		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
+def validate_inter_unit(sales_order):
+	"""Validate inter-unit sales order for CSD Unit 5, Unit 8, Unit 11."""
+	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
+		if sales_order.order_type != 'Inter Unit Sales':
+			sales_order.order_type = 'Inter Unit Sales'

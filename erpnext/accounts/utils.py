@@ -15,6 +15,8 @@ from erpnext.accounts.doctype.account.account import get_account_currency
 
 from erpnext.stock.utils import get_stock_value_on
 from erpnext.stock import get_warehouse_account_map
+from nrp_manufacturing.utils import get_config_by_name
+
 
 
 class FiscalYearError(frappe.ValidationError): pass
@@ -887,3 +889,799 @@ def get_stock_accounts(company):
 		"account_type": "Stock",
 		"company": company
 	})
+ 
+@frappe.whitelist()
+def make_inter_unit_overhead_journal_entry(sales_invoice=None):
+	try:
+
+		if not sales_invoice and hasattr(frappe.local, 'form_dict') and frappe.local.form_dict.get("args"):
+			sales_invoice = frappe.local.form_dict.get("args", {}).get("sales_invoice")
+
+		if not sales_invoice:
+			frappe.throw("Sales Invoice is required.")
+
+		sales_invoice_name = sales_invoice
+		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
+		if not inter_units_overhead:
+			frappe.throw("Inter Unit Sale Purchase config not found.")
+
+		units = ", ".join(f"'{c}'" for c in inter_units_overhead.keys())
+
+		qurey = f"""SELECT si.name AS name, si.company AS company, soi.item_category AS item_category, soi.item_group AS so_item_group,
+					 si.customer AS customer, si.posting_date AS posting_date, 
+					 si.customer_name AS customer_name, si.total AS total, 
+					 sii.delivery_note AS delivery_note 
+				FROM `tabSales Invoice` si
+				INNER JOIN `tabSales Invoice Item` sii ON sii.parent=si.name
+				LEFT JOIN `tabSales Order Item` soi ON soi.parent=sii.sales_order
+				LEFT JOIN `tabSales Order` so ON so.name=soi.parent
+				WHERE si.name="{sales_invoice}"
+				AND si.customer_name IN ({units})
+				AND si.company IN ({units})
+				AND si.docstatus=1
+				AND si.outstanding_amount != 0
+				AND si.is_return = 0
+				AND so.order_type = 'Inter Unit Sales'
+				AND so.transaction_date >= '2025-05-05'
+				GROUP BY si.name"""
+
+		si = frappe.db.sql(qurey , as_dict=True)
+
+		if not si:
+			frappe.throw(f"No valid Sales Invoice found for {sales_invoice}")
+
+		si = si[0]
+		company = si.get("company")
+
+		existing_jv = frappe.db.sql(
+			f"""SELECT user_remark FROM `tabJournal Entry`
+				WHERE posting_date="{si.get('posting_date')}"
+				AND title LIKE ('%Inter Unit Overhead Sales%')
+				AND docstatus=1""",
+			as_dict=True
+		)
+
+		if existing_jv:
+			for existing in existing_jv:
+				remark = existing.get("user_remark", "")
+				if ":" in remark:
+					user_remark = remark.split(":", 1)[1]
+					si_list = [si.strip() for si in user_remark.split(",") if si.strip()]
+					if sales_invoice in si_list:
+						frappe.log_error(f"Journal Entry already exists for Sales Invoice {sales_invoice}")
+
+
+		comp = company.split(" ")
+		company_no = comp[1]
+		item_category = si.get("item_category")
+
+		if item_category != "Finished Good" or si.get("so_item_group") == "FG Preforms":
+			frappe.log_error(f"Invalid item category '{item_category}' in Sales Invoice {sales_invoice}. Only 'Finished Good' allowed.")
+			return
+
+		debt_account = f"7.01.01.001 - Gourmet Sales - U{company_no}"
+		inter_company_receivables_credit_account = f"2.03.02.001 - Inter Company Receivables - U{company_no}"
+		inter_unit_transfer_overheads_credit_account = f"9.01.22.001 - Inter Unit Transfer Overheads - U{company_no}"
+		cogs_direct_cost_credit_account = f"9.01.01.003 - COGS - Direct Cost - U{company_no}"
+
+		cogs_row = frappe.db.sql(
+			f"""SELECT debit AS amount FROM `tabGL Entry` 
+				WHERE voucher_no='{si.get("delivery_note")}' 
+				AND ACCOUNT='{cogs_direct_cost_credit_account}'""",
+			as_dict=True
+		)
+		if not cogs_row:
+			frappe.throw("No COGS GL Entry found for Delivery Note.")
+
+		cogs_amount = cogs_row[0].get("amount", 0)
+		overhead_percent = inter_units_overhead.get(company)
+		if not overhead_percent:
+			frappe.throw(f"No overhead config for company: {company}")
+
+		overhead_amount = cogs_amount * overhead_percent
+		total_receivable = cogs_amount + overhead_amount
+
+		receivable_entry = frappe.db.sql(
+			f"""SELECT debit AS amount FROM `tabGL Entry` 
+				WHERE voucher_no='{sales_invoice}' 
+				AND ACCOUNT='{inter_company_receivables_credit_account}'""",
+			as_dict=True
+		)
+		if not receivable_entry:
+			frappe.throw("Receivable not found for Sales Invoice.")
+
+		receivable_amount = receivable_entry[0].get("amount", 0)
+
+		jv_accounts = [
+			{
+				"account": debt_account,
+				"debit": si.get("total"),
+				"credit": 0,
+				"cost_center": f"Main - U{company_no}"
+			},
+			{
+				"account": inter_company_receivables_credit_account,
+				"party_type": "Customer",
+				"party": si.get("customer"),
+				"debit": total_receivable,
+				"credit": 0,
+				"cost_center": f"Main - U{company_no}"
+			},
+			{
+				"account": inter_company_receivables_credit_account,
+				"party_type": "Customer",
+				"party": si.get("customer"),
+				"debit": 0,
+				"credit": receivable_amount,
+				"reference_type": "Sales Invoice",
+				"reference_name": si.get("name"),
+				"cost_center": f"Main - U{company_no}"
+			},
+			{
+				"account": inter_unit_transfer_overheads_credit_account,
+				"debit": 0,
+				"credit": overhead_amount,
+				"cost_center": f"Main - U{company_no}"
+			},
+			{
+				"account": cogs_direct_cost_credit_account,
+				"debit": 0,
+				"credit": cogs_amount,
+				"cost_center": f"Main - U{company_no}"
+			}
+		]
+
+		total_debit = sum(float(acc.get("debit", 0)) for acc in jv_accounts)
+		total_credit = sum(float(acc.get("credit", 0)) for acc in jv_accounts)
+		rounding_difference = round(total_debit - total_credit, 3)
+  
+  
+		if abs(rounding_difference) > 0.001:
+			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
+			jv_accounts.append({
+				"account": round_off_account,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
+				"cost_center": f"Main - U{company_no}",
+				"doctype": "Journal Entry Account",
+				"is_advance": "No",
+				"user_remark": "Rounding Adjustment",
+				"against_account": ""
+			})
+
+		for acc in jv_accounts:
+			acc.setdefault("debit_in_account_currency", acc["debit"])
+			acc.setdefault("credit_in_account_currency", acc["credit"])
+			acc["doctype"] = "Journal Entry Account"
+			acc["is_advance"] = "No"
+			acc["user_remark"] = ""
+			acc["against_account"] = ""
+
+		jv_doc = frappe.get_doc({
+			"doctype": "Journal Entry",
+			"title": f"Inter Unit Overhead Sales JV for {company}",
+			"generated": "System Generated",
+			"voucher_type": "Inter Company Journal Entry",
+			"naming_series": "ACC-IUJV-.YYYY.-",
+			"posting_date": si.get("posting_date"),
+			"company": company,
+			"accounts": jv_accounts,
+			"user_remark": f"Inter Unit Journal Entry Overhead for Sales Invoice(s): {sales_invoice}"
+		})
+		jv_doc.save(ignore_permissions=True)
+		frappe.db.commit()
+
+		frappe.enqueue(
+			"nrp_manufacturing.utils.submit_jv_queue",
+			journal_entry_name=jv_doc.name,
+			queue="long",
+			enqueue_after_commit=True
+		)
+
+	except Exception as e:
+		frappe.log_error(f"Error in overhead_jv: {str(e)}", title="Inter Unit Overhead Sales JV Error")
+		try:
+
+			invoice = frappe.get_doc("Sales Invoice", sales_invoice_name)
+			if invoice.docstatus == 1:
+				invoice.cancel()
+				frappe.db.commit()
+
+			frappe.db.set_value("Sales Invoice", sales_invoice_name, "docstatus", 0)
+
+			frappe.db.sql(
+				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Sales Invoice'",
+				sales_invoice_name
+			)
+
+			invoice.add_comment(
+				"Comment",
+				f"Inter Unit Overhead JV creation failed and invoice reverted to Draft.\nReason: {str(e)}"
+			)
+			frappe.db.commit()
+		except Exception as revert_error:
+			frappe.log_error(
+				f"Failed to revert SI {sales_invoice_name} to draft: {revert_error}",
+				title="SI Revert Failure"
+			)
+
+@frappe.whitelist()
+def make_inter_unit_sales_journal_entry(sales_invoice=None):
+	try:
+
+		payload = {}
+		if hasattr(frappe.local, 'form_dict') and frappe.local.form_dict:
+			payload = frappe.local.form_dict
+
+		if payload.get("args"):
+			sales_invoice = payload.get("args", {}).get("sales_invoice")
+
+		if not sales_invoice:
+			frappe.throw("Sales Invoice is required")
+
+		sales_invoice_name = sales_invoice
+		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
+		if not inter_units_overhead:
+			frappe.throw("Inter Unit Sale Purchase config not found")
+
+		units = ", ".join(f"'{c}'" for c in inter_units_overhead.keys())
+		condition = f"AND si.company IN ({units})"
+
+		query = f"""
+			SELECT 
+				si.name AS name,
+				si.company AS company,
+				si.customer AS customer,
+				si.total AS total,
+				sii.sales_order AS sales_order,
+				soi.item_category AS so_item_category,
+				soi.item_group AS so_item_group,
+				soi.item_code AS so_item_code,
+				soi.qty AS so_qty,
+				soi.rate AS so_rate,
+				soi.amount AS so_amount,
+				si.posting_date AS posting_date
+			FROM `tabSales Invoice` si
+			INNER JOIN `tabSales Invoice Item` sii ON sii.parent = si.name
+			LEFT JOIN `tabSales Order Item` soi ON soi.parent = sii.sales_order
+			LEFT JOIN `tabSales Order` so ON so.name = soi.parent
+			WHERE si.name = "{sales_invoice}"
+			AND si.customer_name IN ({units})
+			AND si.docstatus = 1
+			AND so.order_type = 'Inter Unit Sales'
+			AND si.is_return = 0
+			AND so.transaction_date >= '2025-05-05'
+			AND si.outstanding_amount != 0
+			{condition}
+			GROUP BY si.name
+		"""
+
+		sales_invoices = frappe.db.sql(query, as_dict=True)
+
+		if not sales_invoices:
+			frappe.throw(f"No Sales Invoice found or it doesn't qualify for Inter Unit Sales JV: {sales_invoice}")
+
+		si = sales_invoices[0]
+		posting_date = si.get("posting_date")
+
+		existing_jv = frappe.db.sql(
+			"""SELECT user_remark FROM `tabJournal Entry`
+			   WHERE posting_date = %s AND title LIKE %s AND docstatus = 1""",
+			(posting_date, "%Inter Unit Sales JV for%"),
+			as_dict=True
+		)
+
+		if existing_jv:
+			for existing in existing_jv:
+				remark = existing.get("user_remark", "")
+				if ":" in remark:
+					user_remark = remark.split(":", 1)[1]
+					si_list = [si.strip() for si in user_remark.split(",") if si.strip()]
+					if sales_invoice in si_list:
+						frappe.log_error(f"Journal Entry already exists for Sales Invoice {sales_invoice}")
+
+
+		if si.get("so_item_category") == "Finished Good" and si.get("so_item_group") != "FG Preforms":
+			frappe.log_error(
+				f"Invalid item category '{si.get('so_item_category')}' in Sales Invoice {sales_invoice}. "
+				"Only 'Finished Good' items with item group 'FG Preforms' are allowed."
+			)
+			return
+
+		company = si.get("company")
+		comp = company.split(" ")
+		company_no = comp[1]
+
+		gl_amount = fetch_sales_amount_from_gl_entry("Sales Invoice", si.get("name"))
+		jv_amount = gl_amount.get("amount", 0.0)
+		dn_data = get_delivery_note_from_sales_invoice(si)
+		rce_amount = fetch_receviables_from_gl_entry("Sales Invoice", si.get("name"))
+
+		jv_accounts = []
+
+		jv_accounts.append({
+			"account": gl_amount.get("account"),
+			"party_type": "",
+			"party": "",
+			"credit_in_account_currency": "",
+			"credit": 0.0,
+			"debit_in_account_currency": jv_amount,
+			"debit": jv_amount,
+			"is_advance": "No",
+			"against_account": "",
+			"user_remark": "",
+			"reference_type": "",
+			"reference_name": "",
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		jv_accounts.append({
+			"account": dn_data.get("account"),
+			"party_type": "",
+			"party": "",
+			"credit_in_account_currency": dn_data.get("amount", 0.0),
+			"credit": dn_data.get("amount", 0.0),
+			"debit_in_account_currency": "",
+			"debit": 0.0,
+			"is_advance": "No",
+			"against_account": "",
+			"user_remark": dn_data.get("name"),
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		jv_accounts.append({
+			"account": rce_amount.get("account"),
+			"party_type": "Customer",
+			"party": si.get("customer", ""),
+			"credit_in_account_currency": rce_amount.get("amount", 0.0),
+			"credit": rce_amount.get("amount", 0.0),
+			"reference_type": "Sales Invoice",
+			"reference_name": si.get("name"),
+			"debit_in_account_currency": "",
+			"debit": 0.0,
+			"is_advance": "Yes",
+			"against_account": "",
+			"user_remark": rce_amount.get("name"),
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		jv_accounts.append({
+			"account": rce_amount.get("account"),
+			"party_type": "Customer",
+			"party": si.get("customer", ""),
+			"credit_in_account_currency": "",
+			"credit": 0.0,
+			"reference_type": "",
+			"reference_name": "",
+			"debit_in_account_currency": dn_data.get("amount", 0.0),
+			"debit": dn_data.get("amount", 0.0),
+			"is_advance": "No",
+			"against_account": "",
+			"user_remark": rce_amount.get("name"),
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+  
+  
+		total_debit = sum(float(acc.get("debit", 0)) for acc in jv_accounts)
+		total_credit = sum(float(acc.get("credit", 0)) for acc in jv_accounts)
+		rounding_difference = round(total_debit - total_credit, 3)
+  
+  
+		if abs(rounding_difference) > 0.001:
+			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
+			jv_accounts.append({
+				"account": round_off_account,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
+				"cost_center": f"Main - U{company_no}",
+				"doctype": "Journal Entry Account",
+				"is_advance": "No",
+				"user_remark": "Rounding Adjustment",
+				"against_account": ""
+			})
+
+		jv_payload = {
+			"title": f"Inter Unit Sales JV for {company}",
+			"generated": "System Generated",
+			"voucher_type": "Inter Company Journal Entry",
+			"naming_series": "ACC-IUJV-.YYYY.-",
+			"posting_date": posting_date,
+			"company": company,
+			"accounts": jv_accounts,
+			"doctype": "Journal Entry",
+			"user_remark": f"Inter Unit Journal Entry Overhead for Sales Invoice(s): {sales_invoice}",
+		}
+  
+
+		journal_entry = frappe.get_doc(jv_payload)
+		journal_entry.save(ignore_permissions=True, ignore_workflow=True)
+		frappe.db.commit()
+
+		frappe.enqueue(
+			"nrp_manufacturing.utils.submit_jv_queue",
+			journal_entry_name=journal_entry.name,
+			queue="long",
+			enqueue_after_commit=True,
+		)
+
+	except Exception as e:
+		frappe.log_error(f"Error in Inter Unit Sales JV: {str(e)}", title="Inter Unit Sales JV Error")
+
+		try:
+			
+			invoice = frappe.get_doc("Sales Invoice", sales_invoice_name)
+			if invoice.docstatus == 1:
+				invoice.cancel()
+				frappe.db.commit()
+
+			frappe.db.set_value("Sales Invoice", sales_invoice_name, "docstatus", 0)
+
+			frappe.db.sql(
+				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Sales Invoice'",
+				sales_invoice_name
+			)
+
+			invoice.add_comment(
+				"Comment",
+				f"Inter Unit Sales JV creation failed and invoice reverted to Draft.\nReason: {str(e)}"
+			)
+
+			frappe.db.commit()
+
+		except Exception as revert_error:
+			frappe.log_error(
+				f"Failed to revert SI {sales_invoice_name} to draft: {revert_error}",
+				title="SI Revert Failure"
+			)
+
+def fetch_sales_amount_from_gl_entry(voucher_type, voucher_no):
+	try:
+		gl_data = frappe.db.sql(
+			f"""
+			SELECT credit AS amount, account 
+			FROM `tabGL Entry`
+			WHERE voucher_type = %s AND voucher_no = %s
+			""",
+			(voucher_type, voucher_no),
+			as_dict=True
+		)
+
+		if gl_data:
+			amount = [
+				entry
+				for entry in gl_data
+				if "Gourmet Sales" in entry.get("account", "")
+				and entry.get("amount") != 0.0
+			]
+			return amount[0]
+		else:
+			return {"amount": 0.0, "account": ""}
+	except Exception as e:
+		frappe.log_error(
+			f"Error fetching amount from GL Entry: {str(e)}", title=voucher_type+" Fetch Amount Error" +voucher_no
+		)
+		return {"amount": 0.0, "account": ""}
+
+
+def fetch_receviables_from_gl_entry(voucher_type, voucher_no):
+	try:
+		gl_data = frappe.db.sql(
+			f"""
+			SELECT debit AS amount, account 
+			FROM `tabGL Entry`
+			WHERE voucher_type = %s AND voucher_no = %s
+			""",
+			(voucher_type, voucher_no),
+			as_dict=True
+		)
+
+		if gl_data:
+			amount = [
+				entry
+				for entry in gl_data
+				if "Inter Company Receivables" in entry.get("account", "")
+				and entry.get("amount") != 0.0
+			]
+			return amount[0]
+		else:
+			return {"amount": 0.0, "account": ""}
+	except Exception as e:
+		frappe.log_error(
+			f"Error fetching amount from GL Entry: {str(e)}", title=voucher_type +" Fetch Amount Error " + voucher_no
+		)
+		return {"amount": 0.0, "account": ""}
+
+
+def get_delivery_note_from_sales_invoice(si_name):
+	try:
+		dn = frappe.db.sql(
+			"""
+		SELECT delivery_note  
+		FROM `tabSales Invoice Item` 
+		WHERE parent = %s 
+		AND docstatus = 1
+		""",
+			(si_name["name"],),
+			as_dict=True
+		)
+		dn_set = {d["delivery_note"] for d in dn if d.get("delivery_note")}
+		if dn_set:
+			dn_set = list(dn_set)[0]
+			gl_data = frappe.db.sql(
+				f"""SELECT debit AS amount, account FROM `tabGL Entry` WHERE voucher_type='Delivery Note' AND voucher_no='{dn_set}';""",
+				as_dict=True
+			)
+			amount = [
+				entry
+				for entry in gl_data
+				if "COGS - Direct Cost" in entry.get("account")
+				and entry.get("amount") != 0.0
+			]
+			return {
+				"amount": int(amount[0].get("amount")),
+				"account": amount[0].get("account"),
+				"name": si_name.name,
+			}
+		else:
+			return None
+	except Exception as e:
+		frappe.log_error(
+			f"Error fetching Purchase Invoice for Purchase Receipt {si_name}: {str(e)}",
+			title="Fetch Purchase Invoice Error",
+		)
+		return None
+
+@frappe.whitelist()
+def make_inter_unit_overhead_purchase_journal_entry(purchase_invoice=None):
+	try:
+
+		payload = {}
+		if hasattr(frappe.local, 'form_dict') and frappe.local.form_dict:
+			payload = frappe.local.form_dict
+
+		if payload.get("args"):
+			purchase_invoice = payload.get("args", {}).get("purchase_invoice")
+
+		if not purchase_invoice:
+			frappe.throw("Purchase Invoice is required.")
+   
+		purchase_invoice_name = purchase_invoice
+		inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
+		if not inter_units_overhead:
+			frappe.throw("Inter Unit Sale Purchase configuration not found.")
+
+		inter_units_overhead_companies = list(inter_units_overhead.keys())
+		units = "IN ({})".format(", ".join(f"'{c}'" for c in inter_units_overhead_companies))
+
+		qurey = f"""SELECT pi.name AS name, pi.company AS company, pri.item_category AS item_category,
+					 pi.supplier AS supplier, pi.supplier_name AS supplier_name, pi.total AS total,
+					 pii.purchase_order AS purchase_order, soi.item_group AS soi_item_group
+				FROM `tabPurchase Invoice` pi
+				INNER JOIN `tabPurchase Invoice Item` pii ON pii.parent=pi.name
+				LEFT JOIN `tabPurchase Receipt Item` AS pri ON pri.parent=pii.purchase_receipt
+                LEFT JOIN `tabPurchase Order Item` AS poi ON poi.parent=pri.purchase_order
+                LEFT JOIN `tabSales Order Item` AS soi ON soi.parent=poi.sales_order
+				WHERE pi.name = "{purchase_invoice}"
+				AND pi.supplier_name {units}
+				AND pi.company {units}
+				AND pi.outstanding_amount != 0
+				AND pi.is_return = 0
+				AND poi.delivery_note IS NOT NULL
+				AND pi.docstatus = 1
+				GROUP BY pi.name"""
+
+		pi = frappe.db.sql(qurey, as_dict=True)
+  
+
+		if not pi:
+			frappe.throw(f"No valid Purchase Invoice found for {purchase_invoice}")
+
+		pi = pi[0]
+		company = pi.get("company")
+
+		existing_jv = frappe.db.sql(
+			"""SELECT user_remark FROM `tabJournal Entry`
+				WHERE posting_date = %s AND title LIKE %s AND docstatus = 1""",
+			(pi.get('posting_date'), "%Inter Unit Overhead Purchase%"),
+			as_dict=True
+		)
+
+		if existing_jv:
+			for jv in existing_jv:
+				remark = jv.get("user_remark", "")
+				if purchase_invoice in remark:
+					frappe.throw(f"Journal Entry already exists for Purchase Invoice {purchase_invoice}")
+
+		comp = company.split(" ")
+		company_no = comp[1]
+
+		if pi.get("item_category") != "Finished Good" or pi.get("soi_item_group") == "FG Preforms":
+			frappe.log_error( title="Invalid item category", message = f"Invalid item category '{pi.get('item_category')}' in Purchase Invoice {purchase_invoice}. Only 'Finished Good' allowed.")
+			return
+
+		gl_amount = fetch_amount_from_gl_entry("Purchase Invoice", purchase_invoice)
+		total_payable_amount = gl_amount.get("amount", 0.0)
+
+		overhead_percent = inter_units_overhead.get(company)
+		if not overhead_percent:
+			frappe.throw(f"No overhead config for company: {company}")
+
+		jv_amount = total_payable_amount * overhead_percent
+		inter_unit_payable = total_payable_amount + jv_amount
+
+		jv_accounts = []
+
+		jv_accounts.append({
+			"account": gl_amount.get("account"),
+			"party_type": "Supplier",
+			"party": pi.get("supplier"),
+			"credit_in_account_currency": 0.0,
+			"credit": 0.0,
+			"debit_in_account_currency": total_payable_amount,
+			"debit": total_payable_amount,
+			"is_advance": "No",
+			"against_account": "",
+			"reference_type": "Purchase Invoice",
+			"reference_name": purchase_invoice,
+			"user_remark": "",
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		jv_accounts.append({
+			"account": gl_amount.get("account"),
+			"party_type": "Supplier",
+			"party": pi.get("supplier"),
+			"credit_in_account_currency": inter_unit_payable,
+			"credit": inter_unit_payable,
+			"debit_in_account_currency": 0.0,
+			"debit": 0.0,
+			"is_advance": "No",
+			"against_account": "",
+			"user_remark": "",
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		jv_accounts.append({
+			"account": f"9.01.22.001 - Inter Unit Transfer Overheads - U{company_no}",
+			"party_type": "",
+			"party": "",
+			"credit_in_account_currency": 0.0 ,
+			"credit": 0.0,
+			"debit_in_account_currency":jv_amount,
+			"debit": jv_amount,
+			"is_advance": "No",
+			"against_account": "",
+			"user_remark": purchase_invoice,
+			"cost_center": f"Main - U{company_no}",
+			"doctype": "Journal Entry Account",
+		})
+
+		total_debit = sum(float(acc.get("debit", 0)) for acc in jv_accounts)
+		total_credit = sum(float(acc.get("credit", 0)) for acc in jv_accounts)
+		rounding_difference = round(total_debit - total_credit, 3)
+  
+  
+		if abs(rounding_difference) > 0.001:
+			round_off_account = f"10.01.16.002 - Round Off - U{company_no}"
+			jv_accounts.append({
+				"account": round_off_account,
+				"debit": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit": abs(rounding_difference )if rounding_difference > 0 else 0.0,
+				"debit_in_account_currency": abs(rounding_difference) if rounding_difference < 0 else 0.0,
+				"credit_in_account_currency": abs(rounding_difference) if rounding_difference > 0 else 0.0,
+				"cost_center": f"Main - U{company_no}",
+				"doctype": "Journal Entry Account",
+				"is_advance": "No",
+				"user_remark": "Rounding Adjustment",
+				"against_account": ""
+			})
+
+		jv_payload = {
+			"title": f"Inter Unit Overhead Purchase for {company}",
+			"generated": "System Generated",
+			"voucher_type": "Inter Company Journal Entry",
+			"naming_series": "ACC-IUJV-.YYYY.-",
+			"posting_date": pi.get("posting_date"),
+			"company": company,
+			"accounts": jv_accounts,
+			"doctype": "Journal Entry",
+			"user_remark": f"Inter Unit Journal Entry Overhead for Purchase Invoice(s): {purchase_invoice}",
+		}
+
+		journal_entry_overhead = frappe.get_doc(jv_payload)
+		journal_entry_overhead.save(ignore_permissions=True, ignore_workflow=True)
+		frappe.db.commit()
+
+		frappe.enqueue(
+			"nrp_manufacturing.utils.submit_jv_queue",
+			journal_entry_name=journal_entry_overhead.name,
+			queue="long",
+			enqueue_after_commit=True,
+		)
+
+	except Exception as e:
+		try:
+			
+			invoice = frappe.get_doc("Purchase Invoice", purchase_invoice_name)
+			if invoice.docstatus == 1:
+				invoice.cancel()
+				frappe.db.commit()
+
+			frappe.db.set_value("Purchase Invoice", purchase_invoice_name, "docstatus", 0)
+
+			workflow_name = frappe.get_value("Workflow", {"document_type": "Purchase Invoice", "is_active": 1}, "name")
+			if workflow_name:
+				valid_states = frappe.get_all("Workflow Document State", filters={"parent": workflow_name}, fields=["state"])
+				valid_state_names = [s["state"] for s in valid_states]
+				if "Pending" in valid_state_names:
+					frappe.db.set_value("Purchase Invoice", purchase_invoice_name, "workflow_state", "Pending")
+
+			frappe.db.sql(
+				"DELETE FROM `tabGL Entry` WHERE voucher_no=%s AND voucher_type='Purchase Invoice'",
+				purchase_invoice_name
+			)
+
+			invoice.add_comment(
+				"Comment",
+				f"Inter Unit Overhead JV creation failed and invoice reverted to Draft.\nReason: {str(e)}"
+			)
+			frappe.db.commit()
+
+		except Exception as revert_error:
+			frappe.log_error(
+				f"Failed to revert PI {purchase_invoice} to draft: {revert_error}",
+				title="PI Revert Failure"
+			)
+def fetch_amount_from_gl_entry(voucher_type, voucher_no):
+	try:
+		gl_data = frappe.db.sql(
+			f"""SELECT credit AS amount, account FROM `tabGL Entry` WHERE voucher_type='{voucher_type}' AND voucher_no='{voucher_no}';""",
+			as_dict=True
+		)
+		if gl_data:
+			amount = [
+				entry
+				for entry in gl_data
+				if "Inter Company Payables" in entry.get("account", "")
+				and entry.get("amount") != 0.0
+			]
+			return amount[0]
+		else:
+			return 0.0
+	except Exception as e:
+		frappe.log_error(
+			f"Error fetching amount from GL Entry: {str(e)}", title= voucher_type+" Fetch Amount Error "+voucher_no
+		)
+		return 0.0
+
+
+def get_purchase_invoice_ledger(pi_name, inter_unit_overhead):
+	try:
+		if not pi_name:
+			return None
+
+		gl_data = frappe.db.sql(
+			f"""SELECT debit AS amount, account FROM `tabGL Entry` WHERE voucher_type='Purchase Invoice' AND voucher_no='{pi_name}';""",
+			as_dict=True
+		)
+		amount = [entry for entry in gl_data if entry.get("amount") != 0.0]
+		return (
+			amount[0].get("amount") * inter_unit_overhead,
+			pi_name,
+		)
+	except Exception as e:
+		frappe.log_error(
+			f"Error fetching Purchase Invoice for Purchase Receipt {pi_name}: {str(e)}",
+			title="Fetch Purchase Invoice Error",
+		)
+		return None
