@@ -76,10 +76,10 @@ def get_stock_ledger_entries(filters):
                 TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ',
                 DATEDIFF(CURDATE(), DATE_ADD(pri.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()) MONTH)), ' D'
             )
-        WHEN sle.expiry_date IS NOT NULL THEN
+        WHEN b.expiry_date IS NOT NULL THEN
             CONCAT(
-                TIMESTAMPDIFF(MONTH, sle.expiry_date, CURDATE()), ' M, ',
-                DATEDIFF(CURDATE(), DATE_ADD(sle.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, sle.expiry_date, CURDATE()) MONTH)), ' D'
+                TIMESTAMPDIFF(MONTH, b.expiry_date, CURDATE()), ' M, ',
+                DATEDIFF(CURDATE(), DATE_ADD(b.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, b.expiry_date, CURDATE()) MONTH)), ' D'
             )
         ELSE 'No Expiry Date'
     END AS expiry_date,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
