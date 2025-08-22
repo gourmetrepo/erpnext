@@ -350,7 +350,7 @@ class DeliveryNote(SellingController):
 
 		if self.request_from == "GSSM":
 			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=None, document_number=self.sale_order_refrence, document_type="Sales Order")
+			send_notification_to_gssm(status=None, document_number=self.sale_order_refrence, document_type="Sales Order", vehicle=self.vehicle if self.vehicle else None, driver= self.driver if self.driver else None)
 
 			
 
