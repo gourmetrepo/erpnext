@@ -691,7 +691,7 @@ def make_sales_invoice(source_name, target_doc=None):
 			"add_if_empty": True
 		}
 	}, target_doc, set_missing_values)
-
+	doc.queue_status='Pending'
 	if doc.is_return == 1:
 		for item in doc.items:
 			if(item.qty > 0):
