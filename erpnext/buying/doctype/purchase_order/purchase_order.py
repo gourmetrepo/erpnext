@@ -872,6 +872,7 @@ def create_purchase_receipt_for_subcontractor(docname):
 			pr_items.append({
 				"item_code": dt.get("item_code"),
 				"qty": dt.get("qty"),
+				"rate": dt.get("rate"),
 				"discount_percentage": 0.0,
 				"manufacturing_date": datetime.today().strftime('%Y-%m-%d'),
 				"expiry_date" : (datetime.today().replace(year=datetime.today().year + 1)).strftime('%Y-%m-%d'),
@@ -898,6 +899,7 @@ def create_purchase_receipt_for_subcontractor(docname):
 
 		purchase_receipt = frappe.get_doc(pr_dict)
 		purchase_receipt.save(ignore_permissions=True)
+		frappe.db.commit()
 		purchase_receipt.submit()
 		frappe.db.commit()
 	except Exception as e:

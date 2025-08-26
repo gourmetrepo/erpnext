@@ -1384,6 +1384,7 @@ def create_delivery_note_for_subcontractor(docname):
 			dn_items.append({
 				"item_code": dt.get("item_code"),
 				"qty": dt.get("qty"),
+				"rate": dt.get("rate"),
 				"discount_percentage": 0.0,
 				"against_sales_order": doc.name,
 				"doctype": "Delivery Note Item"

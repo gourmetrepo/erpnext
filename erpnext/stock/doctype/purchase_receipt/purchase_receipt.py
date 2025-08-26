@@ -834,6 +834,7 @@ def create_documents_flow(docname):
 			items["so_items"].append({
 				"item_code": dt.get("item_code"),
 				"qty": dt.get("qty"),
+				"rate": dt.get("rate"),
 				"discount_percentage": 0.0,
 				"doctype": "Sales Order Item"
 			})
@@ -901,6 +902,7 @@ def create_purchase_invoice(docname):
 			pi_items.append({
 				"item_code": dt.get("item_code"),
 				"qty": dt.get("qty"),
+				"rate": dt.get("rate"),
 				"discount_percentage": 0.0,
 				"purchase_order": dt.purchase_order,
 				"purchase_receipt": doc.name,
