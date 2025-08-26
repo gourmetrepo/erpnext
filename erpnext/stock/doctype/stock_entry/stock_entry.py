@@ -1893,7 +1893,8 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
 				
-				asset_maintenance_doc.save()
+				asset_maintenance_doc.flags.ignore_validate_update_after_submit = 1
+				asset_maintenance_doc.save(ignore_workflow=True, ignore_permissions=True)
 				# Update status only if all items (complete stock) are returned
 				if submit_doc:
 					if asset_maintenance_doc.status == "Completed":
@@ -1901,7 +1902,7 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 					elif asset_maintenance_doc.status == "Stopped":
 						asset_maintenance_doc.status = "Closed"
 
-					asset_maintenance_doc.submit()
+					asset_maintenance_doc.submit(ignore_workflow=True, ignore_permissions=True)
 						
 			# This means user is adding stock entry Material Transfer to transfer stock to wip warehouse
 			else:
@@ -1924,8 +1925,9 @@ def update_plant_asset_maintenance_document_on_transfer(doc):
 						child_doc.issued_qty = item.get('qty')
 						child_doc.uom = item.get('uom')
 						asset_maintenance_doc.append('consumed_items', child_doc)
-			
-				asset_maintenance_doc.save()
+				
+				asset_maintenance_doc.flags.ignore_validate_update_after_submit = 1
+				asset_maintenance_doc.save(ignore_workflow=True, ignore_permissions=True)
 			frappe.db.commit()
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
@@ -1959,8 +1961,8 @@ def update_plant_asset_maintenance_document_on_consumption(doc):
 					child_doc.consumed_qty = item.get('qty')
 					child_doc.uom = item.get('uom')
 					asset_maintenance_doc.append('consumed_items', child_doc)
-			
-			asset_maintenance_doc.save()
+			asset_maintenance_doc.flags.ignore_validate_update_after_submit = 1
+			asset_maintenance_doc.save(ignore_workflow=True, ignore_permissions=True)
 			frappe.db.commit()
 		else:
 			frappe.throw(f"Asset Maintenance {asset_maintenance_doc_ref} not found")
