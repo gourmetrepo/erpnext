@@ -180,7 +180,6 @@ class PurchaseReceipt(BuyingController):
 		from erpnext.stock.doctype.serial_no.serial_no import update_serial_nos_after_submit
 		update_serial_nos_after_submit(self, "items")
 
-		#self.make_gl_entries()
 		# Check for sub contractor
 		if self.supplier == "SUP-IU-00005" and self.company in ["Unit 5", "Unit 8", "Unit 11"]:
 			try:
@@ -809,6 +808,7 @@ def delete_items(data):
 # 		if valuation_rate.get('batch_no') not in valuation_batchwise_data[valuation_rate.get('item_code')]:
 # 			valuation_batchwise_data[valuation_rate.get('item_code')][valuation_rate.get('batch_no')] = valuation_rate.get('valuation_rate')
 
+
 # 	for supplied_item in doc.supplied_items:
 # 		if supplied_item.rm_item_code in valuation_batchwise_data and supplied_item.batch_no in valuation_batchwise_data[supplied_item.rm_item_code]:
 # 			supplied_item.rate = valuation_batchwise_data[supplied_item.rm_item_code][supplied_item.batch_no]
@@ -844,6 +844,25 @@ def create_documents_flow(docname):
 				"doctype": "Purchase Order Item"
 			})
 
+		# Create Purchase Order
+		po_dict = {
+			"doctype": "Purchase Order",
+			"company": company,
+			"supplier": doc.sub_contractor,
+			"request_from": "SubContractor",
+			"purchase_order_type": "Local",
+			"subcontracted": 1,
+			"is_subcontracted": "Yes",
+			"schedule_date": datetime.today().strftime('%Y-%m-%d'),
+			"items": items.get("po_items", []),
+			"against_document": doc.name
+		}
+		
+		purchase_order = frappe.get_doc(po_dict)
+		purchase_order.save(ignore_permissions=True)
+		purchase_order.submit()
+		frappe.db.commit()
+
 		# Create Sales Order
 		so_dict = {
 			"doctype": "Sales Order",
@@ -863,24 +882,6 @@ def create_documents_flow(docname):
 		sales_order.submit()
 		frappe.db.commit()
 
-		# Create Purchase Order
-		po_dict = {
-			"doctype": "Purchase Order",
-			"company": company,
-			"supplier": doc.sub_contractor,
-			"request_from": "SubContractor",
-			"purchase_order_type": "Local",
-			"subcontracted": 1,
-			"is_subcontracted": "Yes",
-			"schedule_date": datetime.today().strftime('%Y-%m-%d'),
-			"items": items.get("po_items", []),
-			"against_document": doc.name
-		}
-		
-		purchase_order = frappe.get_doc(po_dict)
-		purchase_order.save(ignore_permissions=True)
-		purchase_order.submit()
-		frappe.db.commit()
 	except Exception as error:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()

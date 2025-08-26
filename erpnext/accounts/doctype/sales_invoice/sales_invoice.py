@@ -308,6 +308,21 @@ class SalesInvoice(SellingController):
 			)
 	
 
+		if self.company in ["Unit 5", "Unit 8", "Unit 11"] and self.customer_name in ["Unit 5", "Unit 8", "Unit 11"] and self.docstatus == 1:
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_overhead_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+			frappe.enqueue(
+				"erpnext.accounts.utils.make_inter_unit_sales_journal_entry",
+				queue="gl",
+				sales_invoice=self.name,
+				enqueue_after_commit=True
+			)
+			
+
 	def validate_pos_return(self):
 
 		if self.is_pos and self.is_return:
@@ -1711,3 +1726,14 @@ def create_invoice_discounting(source_name, target_doc=None):
 
 	return invoice_discounting
 
+@frappe.whitelist()
+def submit_doc_for_subcontractor(docname):
+	try:
+		doc = frappe.get_doc("Sales Invoice", docname)
+		doc.submit()
+		frappe.db.commit()
+	except Exception as e:
+		frappe.db.rollback()
+		traceback = frappe.get_traceback()
+		frappe.log_error(message=traceback, title=f"Error while submitting PI: {doc.name}.")
+		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
