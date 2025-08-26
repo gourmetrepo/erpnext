@@ -371,6 +371,7 @@ class StockController(AccountsController):
 		}, update_modified)
 
 	def validate_inspection(self):
+		from nrp_manufacturing.utils import  get_config_by_name
 		'''Checks if quality inspection is set for Items that require inspection.
 		On submit, throw an exception'''
 		inspection_required_fieldname = None
@@ -395,6 +396,12 @@ class StockController(AccountsController):
 					qa_required = True
 			elif self.doctype == "Stock Entry" and not d.quality_inspection and d.t_warehouse:
 				qa_required = True
+			
+			skip_quality_company = get_config_by_name("AUTO_TOOLING_COMPANY_TO_SKIP_QUALITY", [])
+			if self.doctype == "Purchase Receipt":
+				if self.company in skip_quality_company and self.subcontracted:
+					qa_required = False
+
 			if self.docstatus == 1 and d.quality_inspection:
 				qa_doc = frappe.get_doc("Quality Inspection", d.quality_inspection)
 				if qa_doc.docstatus == 0:
