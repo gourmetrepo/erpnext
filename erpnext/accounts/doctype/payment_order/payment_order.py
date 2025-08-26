@@ -16,10 +16,6 @@ class PaymentOrder(Document):
 		validate_company_cost_center_and_accounts(self)
 		
 	def before_save(self):
-		if self.wire_transfer == 1:
-			if check_bank_account_allowed_integration(self.company_bank_account, self.company) == False:
-				frappe.throw(_("Bank Account {0} is not allowed for Wire Transfer integration in company {1}").format(self.company_bank_account, self.company))
-		
 		suppliers = frappe.db.sql("""
 		SELECT
 			  GROUP_CONCAT(supplier_name,"(",supplier, " )")
@@ -56,17 +52,6 @@ class PaymentOrder(Document):
 		for d in self.references:
 			frappe.db.set_value(self.payment_order_type, d.get(frappe.scrub(self.payment_order_type)), ref_field, status)
 
-@frappe.whitelist()
-def check_bank_account_allowed_integration(bank_account, company):
-	bank_account_number = frappe.db.get_value("Bank Account",bank_account, "bank_account_no")
-	account_number = frappe.db.sql(f"""select iba.name 
-						FROM `tabIntegration Bank Account` AS iba
-						JOIN `tabSelect Multiple Companies` AS smc ON smc.parent = iba.name and smc.parenttype = 'Integration Bank Account'
-						WHERE smc.company = '{company}' and iba.account_number = '{bank_account_number}'""",as_dict=True)
-	response = False
-	if account_number:
-		response = True
-	return response
 @frappe.whitelist()
 @frappe.validate_and_sanitize_search_inputs
 def get_mop_query(doctype, txt, searchfield, start, page_len, filters):

@@ -259,13 +259,6 @@ def get_data():
 					"doctype": "Purchase Receipt",
 					"onboard": 1,
 				},
-				{
-					"type": "report",
-					"is_query_report": True,
-					"name": "Finish Good Stock Aging",
-					"doctype": "Stock Ledger Entry",
-					"onboard": 1,
-				},
          		  {
 					"type": "report",
 					"is_query_report": True,

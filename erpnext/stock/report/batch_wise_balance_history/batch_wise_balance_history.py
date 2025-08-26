@@ -70,19 +70,13 @@ def get_stock_ledger_entries(filters):
 	conditions = get_conditions(filters)
 	return frappe.db.sql("""
 		select s.supplier_name,s.supplier_group,sle.item_code, sle.valuation_rate,sle.batch_no, 
-		CASE
-        WHEN pri.expiry_date IS NOT NULL THEN 
-            CONCAT(
-                TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ',
-                DATEDIFF(CURDATE(), DATE_ADD(pri.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()) MONTH)), ' D'
-            )
-        WHEN b.expiry_date IS NOT NULL THEN
-            CONCAT(
-                TIMESTAMPDIFF(MONTH, b.expiry_date, CURDATE()), ' M, ',
-                DATEDIFF(CURDATE(), DATE_ADD(b.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, b.expiry_date, CURDATE()) MONTH)), ' D'
-            )
-        ELSE 'No Expiry Date'
-    END AS expiry_date,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
+					  IF(pri.expiry_date IS NOT NULL, 
+        CONCAT(
+            TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()), ' M, ', 
+            DATEDIFF(CURDATE(), DATE_ADD(pri.expiry_date, INTERVAL TIMESTAMPDIFF(MONTH, pri.expiry_date, CURDATE()) MONTH)), ' D'
+        ), 
+        'No Expiry Date'
+    ) AS expiry_date,sle.outgoing_rate,sle.incoming_rate, sle.warehouse, sle.posting_date, sum(sle.actual_qty) as actual_qty
 		from `tabStock Ledger Entry` as sle
 		INNER JOIN `tabBatch` as b ON b.name = sle.batch_no 
 		LEFT JOIN `tabSupplier` as s on s.name = b.supplier

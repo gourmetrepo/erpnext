@@ -25,11 +25,10 @@ frappe.ui.form.on("Purchase Order", {
 				)
 			})
 		}
-
 		if (frm.is_new()) {
             let restricted_companies = ["Unit 5", "Unit 8", "Unit 11"];            
             if (restricted_companies.includes(frm.doc.company) && restricted_companies.includes(frm.doc.supplier_name)) {
-                frappe.throw("You are not allowed to create a document for interunit.");
+                frappe.throw("You are not allowed to create a document for inter.");
             }
         }
 	},

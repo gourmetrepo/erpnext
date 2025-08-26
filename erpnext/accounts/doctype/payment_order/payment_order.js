@@ -169,12 +169,6 @@ frappe.ui.form.on('Payment Order', {
         frm.set_value("company_bank_account", null);
         frm.set_value("references", null);
     },
-	wire_transfer: function(frm){
-		check_bank_account_allowed_integration(frm)
-	},
-	company_bank_account: function(frm) {
-		check_bank_account_allowed_integration(frm);
-	},
 	make_payment_records: function(frm){
 		var dialog = new frappe.ui.Dialog({
 			title: __("For Supplier"),
@@ -391,23 +385,3 @@ frappe.ui.form.on('Payment Order', {
 		}
 	}
 });
-
-function check_bank_account_allowed_integration(frm){
-	if (frm.doc.wire_transfer == 1 && frm.doc.company_bank_account) {
-		frappe.call({
-			freeze: true,
-			method: "erpnext.accounts.doctype.payment_order.payment_order.check_bank_account_allowed_integration",
-			args: {
-				"bank_account": frm.doc.company_bank_account,
-				"company": frm.doc.company
-			},
-			callback: function(r) {
-				if (r.message == false) {
-					var company_bank_account = frm.doc.company_bank_account
-					frm.set_value("company_bank_account",null)
-					frappe.throw("Bank Account "+company_bank_account+" is not allowed for Wire Transfer integration in company "+frm.doc.company)
-				}
-			}
-		});
-	}
-}
