@@ -344,6 +344,12 @@ frappe.ui.form.on('Employee',{
 			frm.set_df_property("valid_upto", "reqd", 1);
 		}
 	},
+	actual_date_of_joining: function(frm) {
+        validate_date_change(frm);
+    },
+    date_of_joining: function(frm) {
+        validate_date_change(frm);
+    },
 	make_dashboard: function(frm) {
 		let employee_details_columns;
 		let employee_details_data;
@@ -622,3 +628,54 @@ frappe.ui.form.on('Employee Address',{
     }
 });
 cur_frm.cscript = new erpnext.hr.EmployeeController({frm: cur_frm});
+
+// This function will check if there are any attendance or checkin records against the employee..
+// if yes, then user will not be allowed to change the date_of_joining, actual_date_of_joining..
+function validate_date_change(frm) {
+    if (!frm.doc.name) return;
+
+    frappe.call({
+        method: "frappe.client.get_value",
+        args: {
+            doctype: "Attendance",
+            filters: { employee: frm.doc.name },
+            fieldname: "name"
+        },
+        callback: function(att_res) {
+            if (att_res.message && att_res.message.name) {
+                reset_to_db_date(frm);
+            } else {
+                frappe.call({
+                    method: "frappe.client.get_value",
+                    args: {
+                        doctype: "Employee Checkin",
+                        filters: { employee: frm.doc.name },
+                        fieldname: "name"
+                    },
+                    callback: function(chk_res) {
+                        if (chk_res.message && chk_res.message.name) {
+                            reset_to_db_date(frm);
+                        }
+                    }
+                });
+            }
+        }
+    });
+}
+function reset_to_db_date(frm) {
+    frappe.call({
+        method: "frappe.client.get_value",
+        args: {
+            doctype: "Employee",
+            filters: { name: frm.doc.name },
+            fieldname: ["date_of_joining", "actual_date_of_joining"]
+        },
+        callback: function(r) {
+            if (r.message) {
+                frm.set_value("date_of_joining", r.message.date_of_joining);
+                frm.set_value("actual_date_of_joining", r.message.actual_date_of_joining);
+                frappe.msgprint(__("Date of Joining cannot be changed because Attendance/Checkin records of this employee exist."));
+            }
+        }
+    });
+}
