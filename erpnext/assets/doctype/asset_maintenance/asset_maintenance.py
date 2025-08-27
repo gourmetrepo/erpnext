@@ -61,7 +61,7 @@ class AssetMaintenance(Document):
 		if self.project_based == "No" and not self.clearing_account:
 			frappe.throw("Please set clearing account to proceed for non project based asset maintenance. Contact support team for more information.")
 
-		if self.status != "Closed" or self.status != "Finished":
+		if not (self.status == "Closed" or self.status == "Finished"):
 			frappe.throw("Asset Maintenance cannot be submitted if its status is not Closed or Finished.")
 		
 		# Create Damage and Scrap stock entries
