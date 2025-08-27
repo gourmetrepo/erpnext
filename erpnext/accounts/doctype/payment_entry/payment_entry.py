@@ -103,34 +103,9 @@ class PaymentEntry(AccountsController):
 		self.set_status()
 		self.update_payment_order_amount()
 		if self.mode_of_payment == "Wire Transfer" and self.party:
-			supplier = frappe.get_doc('Supplier',self.party)
-			supplier_bank_account = frappe.get_doc('Bank Account', supplier.bank_account)
-			bank = frappe.get_doc('Bank',supplier_bank_account.bank)
-			# park entry to the HBL integration
-			from nrp_manufacturing.hbl import send_request
-			import re
-			from datetime import datetime
-			if bank.bank_code == "054":
-				lft_or_ibft = "IFT"
-			else:
-				lft_or_ibft = "IBFT"
-
-			posting_date = datetime.strptime(self.posting_date,"%Y-%m-%d")
-			payment_order_reference = posting_date.strftime("%m")
-			payment_order_reference += posting_date.strftime("%y")
-			payment_order_reference += lft_or_ibft
-			payment_order_reference += re.sub(r"\D", "", self.payment_order)
-			hbl_data = {
-				"payment_entry_name": self.name.replace("-",""),
-				"payment_order_reference": payment_order_reference,
-				"supplier_name": self.party_name,
-				"supplier_address": "",
-				"supplier_bank_code":bank.bank_code,
-				"supplier_bank_account":supplier_bank_account.iban if supplier_bank_account.iban else supplier_bank_account.account_no,
-				"payment_purpose":"",
-				"transaction_month":posting_date.strftime("%m")
-			}
-			send_request(hbl_data)
+			self.db_set('bank_queue_status', 'Queued')
+			# hbl_integration(self.name)
+			frappe.enqueue("erpnext.accounts.doctype.payment_entry.payment_entry.hbl_integration",doc=self.name,queue="hbl_integration",enqueue_after_commit=True)
 
 	def on_cancel(self):
 		self.setup_party_account_field()
@@ -1308,3 +1283,50 @@ def validate_payment_order_on_new_document(payment_entry):
 	if payment_entry.is_new():
 		if payment_entry.payment_type == "Pay" and not payment_entry.payment_order:
 			frappe.throw("<strong>Payment Order<strong> is required to create a Payment Entry.")
+
+
+@frappe.whitelist()
+def hbl_integration(doc):
+	try:
+		doc = frappe.get_doc('Payment Entry', doc)
+		supplier = frappe.get_doc('Supplier',doc.party)
+		supplier_bank_account = frappe.get_doc('Bank Account', supplier.bank_account)
+		bank = frappe.get_doc('Bank',supplier_bank_account.bank)
+		# park entry to the HBL integration
+		from nrp_manufacturing.hbl import send_request
+		import re
+		from datetime import datetime
+		if bank.bank_code == "054":
+			lft_or_ibft = "IFT01"
+		else:
+			lft_or_ibft = "IBFT2"
+
+		posting_date = doc.posting_date
+		payment_order_reference = posting_date.strftime("%m")
+		payment_order_reference += posting_date.strftime("%y")
+		payment_order_reference += lft_or_ibft
+		payment_order_reference += re.sub(r"\D", "", doc.payment_order)[-5:]
+		hbl_data = {
+			"payment_entry_name": doc.name.replace("-","")[-16:],
+			"payment_order_reference": payment_order_reference,
+			"supplier_name": doc.party_name,
+			"supplier_address": "",
+			"supplier_bank_code":bank.bank_code,
+			"supplier_bank_account":supplier_bank_account.iban if supplier_bank_account.iban else supplier_bank_account.account_no,
+			"payment_purpose":"Fund Transfer",
+			"transaction_month":posting_date.strftime("%m"),
+			"amount":doc.paid_amount,
+			"document_name":doc.name
+		}
+		response = send_request(hbl_data)
+		doc.add_comment('Comment', _('HBL Integration Response: {0}').format(response))
+		data = json.loads(response)
+		if data.get('message') == 'Success':
+			status = 'Sucess'
+		else:
+			status = 'Error'
+		frappe.db.sql(f"""UPDATE `tabPayment Entry` set bank_queue_status = '{status}' WHERE name = '{doc.name}'""")
+	except Exception as e:
+		doc.add_comment('Comment', _('HBL Integration Response: {0}').format(frappe.get_traceback()))
+		frappe.log_error(message=frappe.get_traceback(), title='HBL Integration Error Payment Entry: ' + doc.name)
+		frappe.throw(_("Error while sending data to HBL integration. Please check the comments or logs for more details."))

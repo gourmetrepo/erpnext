@@ -57,9 +57,8 @@ class SalesOrder(SellingController):
 		self.validate_for_items()
 		self.validate_warehouse()
 		self.validate_drop_ship()
-		# Validation for interunit CSD suggested by Zain Riaz (unit 5, 8, 11)
-		validate_inter_unit(self)
 		self.validate_serial_no_based_delivery()
+		validate_inter_unit(self)
 		validate_inter_company_party(self.doctype, self.customer, self.company, self.inter_company_order_reference)
 
 		if self.coupon_code:
@@ -77,8 +76,6 @@ class SalesOrder(SellingController):
 
 		# Code by Moeiz to validate company cost center and accounts
 		validate_company_cost_center_and_accounts(self)
-
-
 
 	def validate_po(self):
 		# validate p.o date v/s delivery date
@@ -217,7 +214,38 @@ class SalesOrder(SellingController):
 		
 				
 		from nrp_manufacturing.utils import returnable_items
-		# Add check for Inter Unit Sales to avoid multi-category items SO
+		returnables = returnable_items(self.items,self.company)
+		self.returnable_items = {} # reset		
+		for returnable in returnables:
+			ordered_qty = 0
+			for item in self.items:
+				if item.item_code == returnable.item:
+					ordered_qty = item.qty
+					break
+			if ordered_qty == 0:
+				frappe.throw(f"Item {returnable.item_name} qty must be greater then zero")
+			if returnable.returnable_qty == 1:
+				qty = ordered_qty / returnable.item_qty
+			else:
+				res = returnable.item_qty / returnable.returnable_qty
+				qty = ordered_qty * res
+			qty = math.ceil(qty)
+			# check if item is ordered then please adjust the RI quantity
+			minus_qty = 0
+			for i in self.items:
+				if i.item_code == returnable.returnable_item:
+					minus_qty = i.qty
+					break
+			qty -= minus_qty
+			temp_item = self.append('returnable_items',{})
+			temp_item.item_code = returnable.returnable_item
+			temp_item.item_name = returnable.returnable_item_name
+			temp_item.rate = returnable.sale_price
+			temp_item.item_reference = returnable.item
+			temp_item.qty = qty
+			temp_item.is_allways_return = returnable.is_allways_return
+
+		# Add check for Inter Unit Sales to avoid multi category items SO
 		if self.order_type == "Inter Unit Sales":
 			inter_units_overhead = get_config_by_name("INTER_UNIT_SALE_PURCHASE", {})
 			inter_units_overhead_companies = list(inter_units_overhead.keys()) if inter_units_overhead else []
@@ -244,92 +272,6 @@ class SalesOrder(SellingController):
 
 				if has_fg_not_preform and has_non_fg:
 					frappe.throw(_("You cannot mix 'Finished Good + non-Preform' items with 'Non-Finished Good' items in the same Sales Order."))
-
-		if self.company in ["Unit 5", "Unit 8", "Unit 11"]:
-			if self.palletized:
-				returnables = returnable_items(self.items,self.company, "CSD")
-				self.returnable_items = {} # reset
-				clubbed_returnable_items = {}
-				for returnable in returnables:
-					ordered_qty = 0
-					for item in self.items:
-						if item.item_group == returnable.item_group:
-							ordered_qty = item.qty
-							break
-					if ordered_qty == 0:
-						frappe.throw(f"Item Group {returnable.item_group} qty must be greater then zero")
-					qty = (ordered_qty / returnable.item_qty) * returnable.returnable_qty
-					qty = math.ceil(qty)
-					# check if item is ordered then please adjust the RI quantity
-					# minus_qty = 0
-					# for i in self.items:
-					# 	if i.item_group == returnable.item_group:
-					# 		minus_qty = i.qty
-					# 		break
-					# qty -= minus_qty
-
-					if returnable.returnable_item not in clubbed_returnable_items.keys():
-						clubbed_returnable_items[returnable.returnable_item] = {'item_name': returnable.returnable_item_name, 'rate': returnable.sale_price, 'qty': qty, 'is_allways_return': returnable.is_allways_return}
-					else:
-						clubbed_returnable_items[returnable.returnable_item]['qty'] += qty
-					
-				for item, returnable in clubbed_returnable_items.items():
-					returnable_doc = frappe.new_doc("Sale Order Returnable Item")
-					returnable_doc.item_code = item
-					returnable_doc.item_name = returnable['item_name']
-					returnable_doc.rate = returnable['rate']
-					returnable_doc.qty = returnable['qty']
-					returnable_doc.is_allways_return = returnable['is_allways_return']
-					self.append('returnable_items', returnable_doc)
-					
-					# temp_item = self.append('returnable_items',{})
-					# temp_item.item_code = returnable.returnable_item
-					# temp_item.item_name = returnable.returnable_item_name
-					# temp_item.rate = returnable.sale_price
-					# temp_item.item_group = returnable.item_group
-					# temp_item.qty = qty
-					# temp_item.is_allways_return = returnable.is_allways_return
-		else:
-			returnables = returnable_items(self.items,self.company)
-			self.returnable_items = {} # reset		
-			for returnable in returnables:
-				ordered_qty = 0
-				for item in self.items:
-					if item.item_code == returnable.item:
-						ordered_qty = item.qty
-						break
-				if ordered_qty == 0:
-					frappe.throw(f"Item {returnable.item_name} qty must be greater then zero")
-				if returnable.returnable_qty == 1:
-					qty = ordered_qty / returnable.item_qty
-				else:
-					res = returnable.item_qty / returnable.returnable_qty
-					qty = ordered_qty * res
-				qty = math.ceil(qty)
-				# check if item is ordered then please adjust the RI quantity
-				minus_qty = 0
-				for i in self.items:
-					if i.item_code == returnable.returnable_item:
-						minus_qty = i.qty
-						break
-				qty -= minus_qty
-				temp_item = self.append('returnable_items',{})
-				temp_item.item_code = returnable.returnable_item
-				temp_item.item_name = returnable.returnable_item_name
-				temp_item.rate = returnable.sale_price
-				temp_item.item_reference = returnable.item
-				temp_item.qty = qty
-				temp_item.is_allways_return = returnable.is_allways_return
-		if self.request_from == "GSSM":
-			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
-
-
-	# def save(self, *args, **kwargs):
-	# 	# Log Sales Order at GSSM
-	# 	if self.request_from == "GSSM":
-	# 		from nrp_manufacturing.utils import send_notification_to_gssm
-	# 		send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 
 	def submit(self, *args, **kwargs):
@@ -365,11 +307,6 @@ class SalesOrder(SellingController):
 		if self.coupon_code:
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
-		
-		# Log Sales Order at GSSM
-		if self.request_from == "GSSM":
-			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 		# For Sub Contractor
 		if self.request_from == "SubContractor":
@@ -1434,11 +1371,6 @@ def validate_company_cost_center_and_accounts(sales_order):
 		if tax.cost_center and tax.cost_center not in cost_centers:
 			frappe.throw(_("Row {0}: Cost Center {1} does not belong to company {2}").format(tax.idx, tax.cost_center, company))
 
-def validate_inter_unit(sales_order):
-	"""Validate inter-unit sales order for CSD Unit 5, Unit 8, Unit 11."""
-	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
-		if sales_order.order_type != 'Inter Unit Sales':
-			sales_order.order_type = 'Inter Unit Sales'
 
 @frappe.whitelist()
 def create_delivery_note_for_subcontractor(docname):
@@ -1473,16 +1405,20 @@ def create_delivery_note_for_subcontractor(docname):
 			"customer_type": "Supplier",
 			"transporter": doc.sub_contractor,
 			"vehicle_no": "1122",
-			"selling_price_list": doc.selling_price_list,
-			"against_document": doc.against_document
+			"selling_price_list": doc.selling_price_list
 		}
 
 		delivery_note = frappe.get_doc(dn_dict)
 		delivery_note.save(ignore_permissions=True)
-		frappe.db.commit()
-		# delivery_note.submit()
+		delivery_note.submit()
 	except Exception as e:
 		frappe.db.rollback()
 		traceback = frappe.get_traceback()
 		frappe.log_error(message=traceback, title=f"Error while creating DN from sales order: {doc.name}.")
 		doc.add_comment('Comment', _('Action Failed') + '<br><br>' + str(e))
+
+def validate_inter_unit(sales_order):
+	"""Validate inter-unit sales order for CSD Unit 5, Unit 8, Unit 11."""
+	if sales_order.company in ['Unit 5', 'Unit 8', 'Unit 11'] and sales_order.customer_name in ['Unit 5', 'Unit 8', 'Unit 11']:
+		if sales_order.order_type != 'Inter Unit Sales':
+			sales_order.order_type = 'Inter Unit Sales'

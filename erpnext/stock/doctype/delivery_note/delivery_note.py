@@ -122,7 +122,6 @@ class DeliveryNote(SellingController):
 		self.validate_uom_is_integer("stock_uom", "stock_qty")
 		self.validate_uom_is_integer("uom", "qty")
 		self.validate_with_previous_doc()
-		self.validate_sale_order()
 		if self._action != 'submit' and not self.is_return:
 			set_batch_nos(self, 'warehouse', True)
 
@@ -347,13 +346,6 @@ class DeliveryNote(SellingController):
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
 		time.sleep(1)
-
-		if self.request_from == "GSSM":
-			from nrp_manufacturing.utils import send_notification_to_gssm
-			send_notification_to_gssm(status=None, document_number=self.sale_order_refrence, document_type="Sales Order", vehicle=self.vehicle if self.vehicle else None, driver= self.driver if self.driver else None)
-
-			
-
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
 		except Exception as e:

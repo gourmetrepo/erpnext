@@ -20,6 +20,7 @@
   "posting_time",
   "set_posting_time",
   "is_return",
+  "against_document",
   "issue_credit_note",
   "return_against",
   "customer_po_details",
@@ -51,6 +52,7 @@
   "ignore_pricing_rule",
   "sec_warehouse",
   "set_warehouse",
+  "set_warehouse_once",
   "col_break_warehouse",
   "to_warehouse",
   "items_section",
@@ -1270,15 +1272,38 @@
    "fieldname": "stock_reservation",
    "fieldtype": "Link",
    "label": "Stock Reservation",
-   "options": "Stock Reservation"
+   "options": "Stock Reservation",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "set_warehouse_once",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Set Warehouse Once",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "set_warehouse_once",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Set Warehouse Once",
+   "read_only": 1
+  },
+  {
+   "fieldname": "against_document",
+   "fieldtype": "Data",
+   "label": "Against Document",
+   "read_only": 1
   }
  ],
  "icon": "fa fa-truck",
  "idx": 146,
  "in_create": 1,
  "is_submittable": 1,
- "modified": "2025-05-15 16:36:48.309700",
- "modified_by": "Administrator",
+ "modified": "2025-08-19 11:30:53.628005",
+ "modified_by": "attiqur.rehman@gourmetpakistan.com",
  "module": "Stock",
  "name": "Delivery Note",
  "owner": "Administrator",
