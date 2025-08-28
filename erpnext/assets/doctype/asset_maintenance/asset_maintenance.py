@@ -11,8 +11,9 @@ from frappe.utils import add_days, add_months, add_years, getdate, nowdate
 
 class AssetMaintenance(Document):
 	def validate(self):
-		if self.bill_of_material_and_services or self.plant_maintenance_assets or self.items_replacement_and_repair:
-			frappe.throw("Please save document before adding data to the following tables: Bill of Material and Services, Plant Maintenance Assets and Items Replacement and Repair")		
+		if self.is_new():
+			if self.bill_of_material_and_services or self.plant_maintenance_assets or self.items_replacement_and_repair:
+				frappe.throw("Please save document before adding data to the following tables: Bill of Material and Services, Plant Maintenance Assets and Items Replacement and Repair")		
 
 		self.validate_item_replacement_and_scrap()
 		self.validate_assets()
