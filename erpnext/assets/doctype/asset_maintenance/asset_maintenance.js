@@ -38,10 +38,12 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	refresh: (frm) => {
-		frm.page.set_primary_action(__('Save'), () => {
-            frm.save();
-        });
-      	
+		if (!(frm.doc.status === "Completed" || frm.doc.status === "Closed" || frm.doc.status === "Finished")) {
+			frm.page.set_primary_action(__('Save'), () => {
+				frm.save();
+			})
+		}
+			
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
