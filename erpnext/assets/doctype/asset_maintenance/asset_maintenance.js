@@ -35,6 +35,15 @@ frappe.ui.form.on('Asset Maintenance', {
 				}
 			})
 		
+		frm.fields_dict["items_replacement_and_repair"].grid.get_field("item").get_query =
+			function (doc, cdt, cdn) {
+				return {
+					filters: {
+						'is_stock_item': 1
+					}
+				};
+
+			};
 	},
 
 	refresh: (frm) => {
@@ -43,7 +52,7 @@ frappe.ui.form.on('Asset Maintenance', {
 				frm.save();
 			})
 		}
-			
+
 		if(!frm.is_new()) {
 			frm.trigger('make_dashboard');
 		}
