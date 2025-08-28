@@ -587,26 +587,26 @@ def add_default_credit_limit(doc):
 			new_row = doc.append("credit_limits", {})
 			new_row.company = company
 			new_row.credit_limit = 1
-    ''' As Per disscussion with BA Team. The default credit limit 1 will be 
-    added for Unit 5, Unit 8, Unit 11 and the 
-    customer group is Key-Account & CSD-Distributor only. '''
+	''' As Per disscussion with BA Team. The default credit limit 1 will be 
+	added for Unit 5, Unit 8, Unit 11 and the 
+	customer group is Key-Account & CSD-Distributor only. '''
 
-    if not doc.credit_limits and doc.customer_group in ['Key-Account Customer', 'CSD Distributors']:
-        for company in ['Unit 5', 'Unit 8', 'Unit 11']:
-            new_row = doc.append("credit_limits", {})
-            new_row.company = company
-            new_row.credit_limit = 1
+	if not doc.credit_limits and doc.customer_group in ['Key-Account Customer', 'CSD Distributors']:
+		for company in ['Unit 5', 'Unit 8', 'Unit 11']:
+			new_row = doc.append("credit_limits", {})
+			new_row.company = company
+			new_row.credit_limit = 1
 
 
 @frappe.whitelist()
 def get_distribution_geo(distribution_code):
-    data = frappe.db.sql(f"""
-        SELECT 
-            `region`, `zone`, `area`, `territory`, `warehouseLatitude`, `warehouseLongitude`, `distributionLatitude`, `distributionLongitude`
-        FROM 
+	data = frappe.db.sql(f"""
+		SELECT 
+			`region`, `zone`, `area`, `territory`, `warehouseLatitude`, `warehouseLongitude`, `distributionLatitude`, `distributionLongitude`
+		FROM 
 			`mssql_distribution_geo`
-        WHERE 
+		WHERE 
 		DistributionCode = {frappe.db.escape(distribution_code)};
-    """, as_dict=True)
+	""", as_dict=True)
 
-    return data
+	return data
