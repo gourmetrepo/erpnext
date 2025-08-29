@@ -84,6 +84,8 @@ class AssetMaintenance(Document):
 		
 		# Update repair count at assets
 		self.update_repair_count()
+		
+		frappe.db.commit()
 
 		
 	def sync_maintenance_tasks(self):
@@ -276,12 +278,10 @@ class AssetMaintenance(Document):
 		# Create a stock entry for damaged items if any exist
 		if create_damage_stock_entry:
 			make_damage_stock_entry(self)
-			frappe.db.commit()
 		
 		# Create a stock entry for scrap items if any exist
 		if create_scrap_stock_entry:
 			make_scrap_stock_entry(self)
-			frappe.db.commit()
 	
 	def create_project_based_journal_entry(self):
 		"""
@@ -291,57 +291,62 @@ class AssetMaintenance(Document):
 		It calculates the total cost from GL entries related to stock entries marked for material issue and associates 
 		them with the asset maintenance document. The calculated total cost is then used to create debit and credit entries.
 		"""
-		if self.clearing_account:
-			# Initialize a new Journal Entry document
-			jv_doc = frappe.new_doc('Journal Entry')
-			jv_doc.voucher_type = "Journal Entry"
-			jv_doc.company = self.company
-			jv_doc.generated = "System Generated"
-			jv_doc.plant_maintenance_reference = self.name
-			jv_doc.user_remark = "Journal Entry for Plant Maintenance"
+		try:
+			if self.clearing_account:
+				# Initialize a new Journal Entry document
+				jv_doc = frappe.new_doc('Journal Entry')
+				jv_doc.voucher_type = "Journal Entry"
+				jv_doc.company = self.company
+				jv_doc.generated = "System Generated"
+				jv_doc.plant_maintenance_reference = self.name
+				jv_doc.user_remark = "Journal Entry for Plant Maintenance"
 
-			# Query total cost from GL Entry based on stock entries associated with this maintenance
-			total_cost_from_db = frappe.db.sql(
-				f""" 
-				SELECT SUM(gl.`debit`) as total_amount
-				FROM `tabGL Entry` gl
-				WHERE gl.`voucher_no` IN (
-					SELECT DISTINCT se.`name`
-					FROM `tabStock Entry` se
-					JOIN `tabStock Entry Detail` sed ON se.`name` = sed.`parent`
-					WHERE sed.`asset_maintenance` = "{self.name}"
-					AND se.`stock_entry_type` = "Material Issue"
-					AND se.`docstatus` = 1
-				);
-				""", as_dict=True
-			)
+				# Query total cost from GL Entry based on stock entries associated with this maintenance
+				# If Material Receipt is added in this query, then frappe.db.commit will be need to be added when creating
+				# scrap and damage stock entries. Another button to create journal entry will need to be added
+				total_cost_from_db = frappe.db.sql(
+					f""" 
+					SELECT SUM(gl.`debit`) as total_amount
+					FROM `tabGL Entry` gl
+					WHERE gl.`voucher_no` IN (
+						SELECT DISTINCT se.`name`
+						FROM `tabStock Entry` se
+						JOIN `tabStock Entry Detail` sed ON se.`name` = sed.`parent`
+						WHERE sed.`asset_maintenance` = "{self.name}"
+						AND se.`stock_entry_type` = "Material Issue"
+						AND se.`docstatus` = 1
+					);
+					""", as_dict=True
+				)
 
-			# Check if any cost was retrieved and proceed with journal entry creation
-			if len(total_cost_from_db) > 0 and total_cost_from_db[0].get('total_amount'):
-				total_cost = total_cost_from_db[0].get('total_amount')
+				# Check if any cost was retrieved and proceed with journal entry creation
+				if len(total_cost_from_db) > 0 and total_cost_from_db[0].get('total_amount'):
+					total_cost = total_cost_from_db[0].get('total_amount')
 
-				# Create a debit entry in the journal
-				debit_account_entry = frappe.new_doc('Journal Entry Account')
-				debit_account_entry.update({
-					'account': self.clearing_account,
-					'debit_in_account_currency': total_cost,
-				})
-				jv_doc.append('accounts', debit_account_entry)
+					# Create a debit entry in the journal
+					debit_account_entry = frappe.new_doc('Journal Entry Account')
+					debit_account_entry.update({
+						'account': self.clearing_account,
+						'debit_in_account_currency': total_cost,
+					})
+					jv_doc.append('accounts', debit_account_entry)
 
-				# Create a credit entry in the journal
-				credit_account_entry = frappe.new_doc('Journal Entry Account')
-				credit_account_entry.update({
-					'account': self.clearing_account,
-					'credit_in_account_currency': total_cost,
-				})
-				jv_doc.append('accounts', credit_account_entry)
+					# Create a credit entry in the journal
+					credit_account_entry = frappe.new_doc('Journal Entry Account')
+					credit_account_entry.update({
+						'account': self.clearing_account,
+						'credit_in_account_currency': total_cost,
+					})
+					jv_doc.append('accounts', credit_account_entry)
 
-				# Save the journal entry document
-				jv_doc.save()
-				frappe.db.commit()
-			else:
-				# Delete the journal entry document if no cost was retrieved
-				del jv_doc
+					# Save the journal entry document
+					jv_doc.save()
+				else:
+					# Delete the journal entry document if no cost was retrieved
+					del jv_doc
+		except Exception as e:
+			frappe.log_error(frappe.get_traceback(), "Plant Maintenance Journal Entry Error")
+			frappe.throw(_("An error occurred while creating the journal entry: {0}").format(str(e)))
 	
 	def update_repair_count(self):
 		"""
@@ -694,6 +699,7 @@ def make_return_stock_entry(asset_maintenance_doc_ref):
 
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Material Return Stock Entry Error")
+		frappe.db.rollback()
 		frappe.throw(_("An error occurred while creating the stock entry: {0}").format(str(e)))
 
 
@@ -826,6 +832,8 @@ def get_tasks(doctype, txt, searchfield, start, page_len, filters):
 
 	
 	return tasks
+
+
 @frappe.whitelist()
 def create_jv_for_asset_maintenance(asset_maintenance_name):
 	asset_maintenance_doc = frappe.get_doc("Asset Maintenance", asset_maintenance_name)
