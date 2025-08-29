@@ -438,7 +438,7 @@ def get_team_members(doctype, txt, searchfield, start, page_len, filters):
 
 # Code by Moeiz
 @frappe.whitelist()
-def get_available_stock_for_bill_and_services(item_code, company):
+def get_available_stock_for_bill_and_services(item_code, company, scrap_warehouse, damage_warehouse):
 	"""
 	Fetch the total available stock quantity for a given item code and company.
 
@@ -460,8 +460,8 @@ def get_available_stock_for_bill_and_services(item_code, company):
 		FROM 
 			`tabStock Ledger Entry`
 		WHERE 
-			item_code = %s AND company = %s
-	""", (item_code, company), as_dict=True)
+			item_code = %s AND company = %s AND warehouse NOT IN (%s, %s)
+	""", (item_code, company, scrap_warehouse, damage_warehouse), as_dict=True)
 	
 	# Return the total stock quantity, defaulting to 0 if no record is found
 	total_qty = stock_data[0].get("total_qty", 0) if stock_data else 0
@@ -764,7 +764,6 @@ def make_damage_stock_entry(doc):
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
-		stock_entry.submit()
 
 
 
@@ -792,7 +791,6 @@ def make_scrap_stock_entry(doc):
 			stock_entry.append('items',i)
 			
 		stock_entry.save()
-		stock_entry.submit()
 
 
 @frappe.whitelist()

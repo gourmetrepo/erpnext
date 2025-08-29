@@ -431,7 +431,9 @@ frappe.ui.form.on('Bill of Material and Services', {
                 method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_available_stock_for_bill_and_services',
                 args: {
                     'item_code': row.item,  // Verify the field name here
-                    'company': frm.doc.company
+                    'company': frm.doc.company,
+					'scrap_warehouse': frm.doc.scrap_warehouse,
+					'damage_warehouse': frm.doc.damage_warehouse
                 },
 				freeze: true, // Freeze the UI during the request
                 freeze_message: __("Calculating Stock for this Item"), // Display message
