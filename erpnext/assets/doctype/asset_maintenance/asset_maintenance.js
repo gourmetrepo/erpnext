@@ -427,6 +427,9 @@ frappe.ui.form.on('Bill of Material and Services', {
 
         if (frm.doc.company && row.item) {
             // Run server-side code to get stock available for the selected item
+			if (!(frm.doc.damage_warehouse && frm.doc.scrap_warehouse)){
+				frappe.throw("Please save document before adding data to the following tables: Bill of Material and Services, Plant Maintenance Assets and Items Replacement and Repair");
+			}
             frappe.call({
                 method: 'erpnext.assets.doctype.asset_maintenance.asset_maintenance.get_available_stock_for_bill_and_services',
                 args: {
