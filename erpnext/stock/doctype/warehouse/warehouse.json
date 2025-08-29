@@ -35,7 +35,28 @@
   "tree_details",
   "lft",
   "rgt",
-  "old_parent"
+  "old_parent",
+  "planning_setup",
+  "length",
+  "width",
+  "height",
+  "area",
+  "operating_hours_start",
+  "operating_hours_end",
+  "security_level",
+  "contact_person_designation",
+  "status",
+  "notes",
+  "column_break_41",
+  "latitude",
+  "longitude",
+  "capacity_pallets",
+  "capacity_pets",
+  "temp_control",
+  "min_temp",
+  "max_temp",
+  "vehicle_access",
+  "bay_selection"
  ],
  "fields": [
   {
@@ -236,13 +257,124 @@
    "fieldtype": "Select",
    "label": "Reporting Warehouse",
    "options": "\nCSD Distributors\nRetail Shops\nKey-Account"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "planning_setup",
+   "fieldtype": "Section Break",
+   "label": "Location and Planning Setup"
+  },
+  {
+   "fieldname": "length",
+   "fieldtype": "Float",
+   "label": "Warehouse Length (ft.)"
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Float",
+   "label": "Warehouse Width (ft.)"
+  },
+  {
+   "fieldname": "height",
+   "fieldtype": "Float",
+   "label": "Warehouse Height (ft.)"
+  },
+  {
+   "fieldname": "area",
+   "fieldtype": "Float",
+   "label": "Calculated Area (Cb.ft.)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "operating_hours_start",
+   "fieldtype": "Time",
+   "label": "Operating Hours Start"
+  },
+  {
+   "fieldname": "operating_hours_end",
+   "fieldtype": "Time",
+   "label": "Operating Hours End"
+  },
+  {
+   "fieldname": "security_level",
+   "fieldtype": "Select",
+   "label": "Security Level",
+   "options": "\nLow\nMedium\nHigh\nGuarded 24/7\nCCTV + Guarded 24/7"
+  },
+  {
+   "fieldname": "contact_person_designation",
+   "fieldtype": "Data",
+   "label": "Contact Person Designation"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "\nActive\nInactive\nUnder Maintenance"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "column_break_41",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "latitude",
+   "fieldtype": "Float",
+   "label": "Location Latitude"
+  },
+  {
+   "fieldname": "longitude",
+   "fieldtype": "Float",
+   "label": "Location Longitude"
+  },
+  {
+   "fieldname": "capacity_pallets",
+   "fieldtype": "Int",
+   "label": "Capacity (Pallets)"
+  },
+  {
+   "fieldname": "capacity_pets",
+   "fieldtype": "Int",
+   "label": "Capacity (Pets)"
+  },
+  {
+   "fieldname": "temp_control",
+   "fieldtype": "Select",
+   "label": "Temp. Control",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "min_temp",
+   "fieldtype": "Float",
+   "label": "Min Temp (\u00b0C)"
+  },
+  {
+   "fieldname": "max_temp",
+   "fieldtype": "Float",
+   "label": "Max Temp (\u00b0C)"
+  },
+  {
+   "fieldname": "vehicle_access",
+   "fieldtype": "Table MultiSelect",
+   "label": "Vehicle Access",
+   "options": "Multiple Transport Vehicle Setup"
+  },
+  {
+   "fieldname": "bay_selection",
+   "fieldtype": "Table MultiSelect",
+   "label": "Bay Selection",
+   "options": "Multiple Bays Setup"
   }
  ],
  "icon": "fa fa-building",
  "idx": 1,
  "is_tree": 1,
- "modified": "2025-06-20 19:56:48.800449",
- "modified_by": "attiqur.rehman@gourmetpakistan.com",
+ "modified": "2025-08-29 13:20:30.731096",
+ "modified_by": "Administrator",
  "module": "Stock",
  "name": "Warehouse",
  "nsm_parent_field": "parent_warehouse",
