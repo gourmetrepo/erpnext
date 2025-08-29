@@ -244,6 +244,10 @@ class SalesOrder(SellingController):
 			temp_item.item_reference = returnable.item
 			temp_item.qty = qty
 			temp_item.is_allways_return = returnable.is_allways_return
+		
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 		# Add check for Inter Unit Sales to avoid multi category items SO
 		if self.order_type == "Inter Unit Sales":
@@ -307,6 +311,10 @@ class SalesOrder(SellingController):
 		if self.coupon_code:
 			from erpnext.accounts.doctype.pricing_rule.utils import update_coupon_code_count
 			update_coupon_code_count(self.coupon_code,'used')
+		
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=self.workflow_state if self.workflow_state else None, document_number=self.name, document_type="Sales Order")
 
 		# For Sub Contractor
 		if self.request_from == "SubContractor":

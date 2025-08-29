@@ -345,6 +345,10 @@ class DeliveryNote(SellingController):
 		# stock_gl = frappe.new_doc('Stock GL Queue')
 		# stock_gl.stock_entry = self.name
 		# stock_gl.save(ignore_permissions=True)
+		if self.request_from == "GSSM":
+			from nrp_manufacturing.utils import send_notification_to_gssm
+			send_notification_to_gssm(status=None, document_number=self.sale_order_refrence, document_type="Sales Order", vehicle=self.vehicle if self.vehicle else None, driver= self.driver if self.driver else None)
+		
 		time.sleep(1)
 		try:
 			frappe.enqueue("nrp_manufacturing.nrp_manufacturing.doctype.stock_gl_queue.stock_gl_queue.process_single_stock_gl_queue",doc_name=self.name,doc_type=self.doctype,queue="gl",enqueue_after_commit=True)
