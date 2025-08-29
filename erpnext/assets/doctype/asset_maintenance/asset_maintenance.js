@@ -220,7 +220,7 @@ frappe.ui.form.on('Asset Maintenance', {
 	},
 
 	get_project_tasks: (frm) => {
-		// frm.clear_table("asset_maintenance_tasks");
+
 
 		if (frm.is_dirty()) {
 			frappe.throw(__(`Save document before fetching project tasks`));
@@ -583,14 +583,7 @@ erpnext.asset_maintenance = {
 
 		} else if (status === "Completed") {
 			frm.add_custom_button(__('Close'), function () {
-				try {
-					erpnext.asset_maintenance.make_return_stock_entry(frm);
-					this.frm.remove_custom_button('Close', __('Create'));
-				} catch (error) {
-					frm.add_custom_button(__('Close'), function () {
-						erpnext.asset_maintenance.make_return_stock_entry(frm);
-					}).addClass('btn-danger');
-				}
+				erpnext.asset_maintenance.make_return_stock_entry(frm);
 			}).addClass('btn-danger');
 
 		} else if (status === "Closed"){
@@ -604,14 +597,7 @@ erpnext.asset_maintenance = {
 				frm.save();
 			}).addClass('btn-danger');
 			frm.add_custom_button(__('Close'), function () {
-				try {
-					erpnext.asset_maintenance.make_return_stock_entry(frm);
-					this.frm.remove_custom_button('Close', __('Create'));
-				} catch (error) {
-					frm.add_custom_button(__('Close'), function () {
-						erpnext.asset_maintenance.make_return_stock_entry(frm);
-					}).addClass('btn-danger');
-				}
+				erpnext.asset_maintenance.make_return_stock_entry(frm);
 			}).addClass('btn-danger');
 
 		}
